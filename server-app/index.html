@@ -658,7 +658,25 @@
       </div>
     </section>
 
-  </div>
+  <!-- Réglages -->
+  <section class="tab-panel" id="panel-settings" style="padding:1.2rem 1rem">
+    <div style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Restaurant actif</div>
+
+    <div style="background:rgba(200,164,78,0.07);border:1px solid rgba(200,164,78,0.2);border-radius:14px;padding:16px 18px;margin-bottom:24px">
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">Identifiant (rid)</div>
+      <div id="settings-rid" style="font-size:1.1rem;font-weight:700;color:var(--gold);font-family:monospace;letter-spacing:0.05em"></div>
+      <div id="settings-name" style="font-size:0.8rem;color:var(--cream);margin-top:4px"></div>
+    </div>
+
+    <button onclick="changeRestaurant()" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.35);background:transparent;color:var(--gold);font-family:inherit;font-size:0.9rem;font-weight:600;cursor:pointer;margin-bottom:12px">
+      🔄 Changer de restaurant
+    </button>
+
+    <div style="font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.6">
+      Supprime la connexion actuelle et<br>demande un nouvel identifiant de restaurant.
+    </div>
+  </section>
+
 </div>
 
 <!-- Bottom navigation -->
@@ -677,6 +695,14 @@
     <div class="nav-icon"><svg><use href="#i-msg"/></svg></div>
     <span class="nav-label" id="nav-lbl-messages">Messages</span>
     <span class="nav-badge" id="messages-badge" style="display:none">0</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')">
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Réglages</span>
   </button>
 </nav>
 
@@ -1247,7 +1273,7 @@ document.getElementById('alert-close').addEventListener('click', function() {
 setInterval(function() { if (calls.length) renderCalls(); if (messages.length) renderMessages(); }, 30000);
 
 /* ── TABS ── */
-var TABS = ['calls', 'orders', 'messages'];
+var TABS = ['calls', 'orders', 'messages', 'settings'];
 var currentTab = 'calls';
 
 function switchTab(tab) {
@@ -1384,6 +1410,13 @@ function renderOrders() {
   });
 }
 
+/* ── CHANGEMENT DE RESTAURANT ── */
+function changeRestaurant() {
+  if (!confirm('Changer de restaurant ?\nLa connexion actuelle sera supprimée.')) return;
+  localStorage.removeItem('saas_rid');
+  location.reload();
+}
+
 /* ── SETUP RID (premier lancement) ── */
 function confirmSetupRid() {
   var val = (document.getElementById('setup-rid-input').value || '').trim().toLowerCase();
@@ -1488,6 +1521,11 @@ function init() {
     if (logo && logo.textContent === 'Menu Pro') logo.textContent = name;
     if (footer) footer.textContent = '© ' + new Date().getFullYear() + ' ' + name;
     document.title = name + ' — Serveur';
+    // Remplir l'onglet Réglages
+    var elRid  = document.getElementById('settings-rid');
+    var elName = document.getElementById('settings-name');
+    if (elRid)  elRid.textContent  = _RID;
+    if (elName) elName.textContent = name !== _RID ? name : '';
     if (info.showOrderUI) { switchTab('orders'); }
   }).catch(function() {});
 }
