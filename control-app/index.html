@@ -783,6 +783,109 @@
     }
     .quick-nav-fab:active { transform: scale(0.91); box-shadow: 0 2px 10px rgba(200,164,78,0.3); }
 
+    /* ═══════════════════════════════
+       NOUVEAU CLIENT
+    ═══════════════════════════════ */
+    .btn-nouveau-client {
+      padding:7px 14px; border-radius:10px; border:1px solid var(--gold);
+      background:var(--gold-dim); color:var(--gold);
+      font-size:0.78rem; font-weight:600; font-family:inherit;
+      display:flex; align-items:center; gap:5px;
+    }
+    #nc-modal {
+      display:none; position:fixed; inset:0; z-index:500;
+      background:rgba(0,0,0,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      align-items:center; justify-content:center; padding:1rem;
+    }
+    #nc-modal.show { display:flex; }
+    .nc-box {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:20px; padding:24px 20px; width:100%; max-width:400px;
+      max-height:90vh; overflow-y:auto;
+    }
+    html.light .nc-box { background:#fff; }
+    .nc-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--gold); margin-bottom:3px; }
+    .nc-sub { font-size:0.7rem; color:var(--muted); margin-bottom:20px; letter-spacing:0.12em; text-transform:uppercase; }
+    .nc-label { font-size:0.73rem; color:var(--muted); margin-bottom:5px; margin-top:14px; display:block; letter-spacing:0.05em; }
+    .nc-input {
+      width:100%; padding:10px 14px; border-radius:10px;
+      border:1.5px solid var(--border); background:var(--bg);
+      color:var(--text); font-family:inherit; font-size:0.92rem; outline:none;
+      transition:border-color 0.2s;
+    }
+    html.light .nc-input { background:var(--card-bg); }
+    .nc-input:focus { border-color:var(--gold); }
+    .nc-rid-hint { font-size:0.67rem; color:var(--muted); margin-top:4px; }
+    .nc-err { color:var(--red); font-size:0.78rem; margin-top:10px; min-height:16px; }
+    .nc-actions { display:flex; gap:10px; margin-top:20px; }
+    .nc-btn-create {
+      flex:2; padding:12px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08;
+      font-weight:700; font-size:0.9rem; font-family:inherit; cursor:pointer;
+    }
+    .nc-btn-create:disabled { opacity:0.5; cursor:not-allowed; }
+    .nc-btn-cancel {
+      flex:1; padding:12px; border-radius:12px; border:1px solid var(--border);
+      background:transparent; color:var(--muted); font-family:inherit; cursor:pointer;
+    }
+    .nc-result { display:none; }
+    .nc-result.show { display:block; }
+    .nc-result-title { color:#4caf50; font-weight:700; font-size:1.05rem; margin-bottom:16px; }
+    .nc-link-row {
+      background:var(--bg); border:1px solid var(--border); border-radius:10px;
+      padding:10px 12px; margin-bottom:8px;
+    }
+    html.light .nc-link-row { background:rgba(0,0,0,0.03); }
+    .nc-link-label { font-size:0.67rem; color:var(--muted); margin-bottom:4px; letter-spacing:0.08em; text-transform:uppercase; }
+    .nc-link-val { font-size:0.73rem; color:var(--gold); word-break:break-all; font-family:monospace; }
+    .nc-copy-btn {
+      margin-top:6px; padding:5px 12px; border-radius:8px;
+      border:1px solid var(--border); background:transparent; color:var(--muted);
+      font-size:0.7rem; font-family:inherit; cursor:pointer;
+    }
+    .nc-copy-btn.copied { color:var(--gold); border-color:var(--gold); }
+    .nc-instructions { font-size:0.73rem; color:var(--muted); line-height:1.7; }
+
+    /* ═══════════════════════════════
+       STATUT CLIENT (actif / pause)
+    ═══════════════════════════════ */
+    .client-status-badge {
+      font-size:0.62rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+      padding:3px 9px; border-radius:20px; margin-right:6px; flex-shrink:0;
+    }
+    .client-status-badge.active   { background:rgba(76,175,80,0.15); color:#4caf50; border:1px solid rgba(76,175,80,0.3); }
+    .client-status-badge.paused   { background:rgba(255,152,0,0.15); color:#ff9800; border:1px solid rgba(255,152,0,0.3); }
+    .btn-client-pause  {
+      padding:7px 13px; border-radius:9px; font-size:0.75rem; font-weight:600;
+      border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit;
+    }
+    .btn-client-pause.is-active   { color:#ff9800; border-color:rgba(255,152,0,0.4); }
+    .btn-client-delete {
+      padding:7px 13px; border-radius:9px; font-size:0.75rem; font-weight:600;
+      border:1px solid rgba(239,83,80,0.3); background:rgba(239,83,80,0.08); color:var(--red); font-family:inherit;
+    }
+    .client-danger-zone { display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+
+    /* Modal confirmation suppression */
+    #del-modal {
+      display:none; position:fixed; inset:0; z-index:600;
+      background:rgba(0,0,0,0.75); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+      align-items:center; justify-content:center; padding:1.5rem;
+    }
+    #del-modal.show { display:flex; }
+    .del-box {
+      background:var(--card-bg); border:1px solid rgba(239,83,80,0.3);
+      border-radius:18px; padding:24px 20px; width:100%; max-width:340px; text-align:center;
+    }
+    html.light .del-box { background:#fff; }
+    .del-icon { font-size:2.2rem; margin-bottom:10px; }
+    .del-title { font-weight:700; font-size:1.05rem; margin-bottom:6px; }
+    .del-name { color:var(--gold); font-weight:700; }
+    .del-warn { font-size:0.78rem; color:var(--muted); margin:10px 0 20px; line-height:1.6; }
+    .del-actions { display:flex; gap:10px; }
+    .del-btn-cancel { flex:1; padding:11px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.88rem; }
+    .del-btn-confirm { flex:1; padding:11px; border-radius:10px; border:none; background:var(--red); color:#fff; font-family:inherit; font-size:0.88rem; font-weight:700; }
+
     .quick-nav-overlay {
       display: none; position: fixed; inset: 0; z-index: 200;
       background: rgba(0,0,0,0.5);
@@ -876,8 +979,78 @@
 
     <!-- TAB CLIENTS -->
     <div class="tab-pane" id="pane-clients">
-      <div class="section-title">Clients</div>
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Clients</span>
+        <button class="btn-nouveau-client" onclick="showNewClientModal()">＋ Nouveau client</button>
+      </div>
       <div class="clients-list" id="clients-list"></div>
+    </div>
+
+    <!-- MODAL CONFIRMATION SUPPRESSION -->
+    <div id="del-modal" onclick="if(event.target===this)closeDelModal()">
+      <div class="del-box">
+        <div class="del-icon">🗑️</div>
+        <div class="del-title">Supprimer le client</div>
+        <div class="del-warn"><span class="del-name" id="del-client-name"></span><br>Toutes les données (menu, commandes, config) seront supprimées définitivement.</div>
+        <div class="del-actions">
+          <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
+          <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL NOUVEAU CLIENT -->
+    <div id="nc-modal" onclick="if(event.target===this)closeNewClientModal()">
+      <div class="nc-box">
+        <div class="nc-title">Nouveau client</div>
+        <div class="nc-sub">Création automatique Firebase</div>
+
+        <div id="nc-form">
+          <label class="nc-label">Nom du restaurant *</label>
+          <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran" oninput="ncAutoRid(this.value)">
+
+          <label class="nc-label">Identifiant unique (rid)</label>
+          <input type="text" id="nc-rid" class="nc-input" placeholder="ex: cafe-oran">
+          <div class="nc-rid-hint">Généré automatiquement — tu peux le modifier</div>
+
+          <label class="nc-label">Mot de passe admin *</label>
+          <input type="password" id="nc-pwd" class="nc-input" placeholder="Minimum 6 caractères">
+
+          <div class="nc-err" id="nc-err"></div>
+
+          <div class="nc-actions">
+            <button class="nc-btn-cancel" onclick="closeNewClientModal()">Annuler</button>
+            <button class="nc-btn-create" id="nc-create-btn" onclick="createNewClient()">Créer le client</button>
+          </div>
+        </div>
+
+        <div class="nc-result" id="nc-result">
+          <div class="nc-result-title">✓ Client créé avec succès !</div>
+
+          <div class="nc-link-row">
+            <div class="nc-link-label">Lien Admin — à donner au client</div>
+            <div class="nc-link-val" id="nc-admin-url"></div>
+            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-admin-url','Copier')">Copier</button>
+          </div>
+
+          <div class="nc-link-row">
+            <div class="nc-link-label">App Serveur — identifiant à entrer</div>
+            <div class="nc-link-val" id="nc-rid-val"></div>
+            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier le rid')">Copier le rid</button>
+          </div>
+
+          <div class="nc-link-row">
+            <div class="nc-link-label">Instructions pour le staff</div>
+            <div class="nc-instructions">
+              1. Installer <strong>MenuProServeur-v1.0.apk</strong> (Drive)<br>
+              2. Au premier lancement : entrer l'identifiant <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
+              3. Le menu admin : ouvrir le lien ci-dessus
+            </div>
+          </div>
+
+          <button class="nc-btn-create" style="width:100%;margin-top:16px" onclick="closeNewClientModal()">Fermer</button>
+        </div>
+      </div>
     </div>
 
     <!-- TAB RÉGLAGES -->
@@ -1371,6 +1544,102 @@ function loadClientsFromFirebase() {
   });
 }
 
+// ════════════════════════════════════════════════════
+// NOUVEAU CLIENT
+// ════════════════════════════════════════════════════
+function showNewClientModal() {
+  document.getElementById('nc-form').style.display = '';
+  document.getElementById('nc-result').classList.remove('show');
+  document.getElementById('nc-name').value = '';
+  document.getElementById('nc-rid').value = '';
+  document.getElementById('nc-pwd').value = '';
+  document.getElementById('nc-err').textContent = '';
+  const btn = document.getElementById('nc-create-btn');
+  btn.textContent = 'Créer le client'; btn.disabled = false;
+  document.getElementById('nc-modal').classList.add('show');
+  setTimeout(() => document.getElementById('nc-name').focus(), 200);
+}
+
+function closeNewClientModal() {
+  document.getElementById('nc-modal').classList.remove('show');
+}
+
+function ncAutoRid(name) {
+  const rid = name.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30);
+  document.getElementById('nc-rid').value = rid;
+}
+
+async function ncHashPwd(pwd) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function createNewClient() {
+  const name = document.getElementById('nc-name').value.trim();
+  const rid  = document.getElementById('nc-rid').value.trim().toLowerCase();
+  const pwd  = document.getElementById('nc-pwd').value;
+  const err  = document.getElementById('nc-err');
+  err.textContent = '';
+
+  if (!name) { err.textContent = 'Le nom du restaurant est requis.'; return; }
+  if (!rid || !/^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/.test(rid)) {
+    err.textContent = 'Identifiant invalide (lettres minuscules, chiffres, tirets, min 3 caractères).'; return;
+  }
+  if (!pwd || pwd.length < 6) { err.textContent = 'Mot de passe trop court (6 caractères minimum).'; return; }
+
+  const btn = document.getElementById('nc-create-btn');
+  btn.textContent = 'Création en cours…'; btn.disabled = true;
+
+  try {
+    // Vérifier que le rid n'existe pas déjà
+    const existing = await _saasDb.ref('restaurants/' + rid).once('value');
+    if (existing.exists()) { err.textContent = 'Cet identifiant existe déjà. Choisis-en un autre.'; btn.textContent = 'Créer le client'; btn.disabled = false; return; }
+
+    const hash = await ncHashPwd(pwd);
+    const ts   = Date.now();
+
+    await _saasDb.ref('restaurants/' + rid).set({
+      profile: { name, createdAt: ts },
+      config: {
+        adminHash: hash,
+        tableCount: 0,
+        active: true,
+        features: {
+          callBtn: true, orderUI: true, photos: true,
+          tableSystem: true, qrOrdering: true
+        }
+      }
+    });
+
+    // Afficher le résultat
+    const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html?rid=' + rid;
+    document.getElementById('nc-admin-url').textContent = adminUrl;
+    document.getElementById('nc-rid-val').textContent = rid;
+    document.getElementById('nc-rid-inline').textContent = rid;
+    document.getElementById('nc-form').style.display = 'none';
+    document.getElementById('nc-result').classList.add('show');
+
+    // Recharger la liste des clients
+    loadClientsFromFirebase();
+
+  } catch(e) {
+    err.textContent = 'Erreur : ' + (e.message || e);
+    btn.textContent = 'Créer le client'; btn.disabled = false;
+  }
+}
+
+function ncCopy(btn, elId, label) {
+  const text = document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié !'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
 function getClientDb(slug) {
   // SaaS : un seul Firebase platform, chemins préfixés par restaurants/{slug}/
   if (!_saasDb) { console.warn('SaaS Firebase non initialisé'); return null; }
@@ -1584,6 +1853,7 @@ function buildClientCard(client) {
     '<div class="card-top" onclick="toggleCard(\''+id+'\')">' +
       '<span class="card-name">'+client.name+'</span>' +
       '<div class="card-top-right">' +
+        '<span class="client-status-badge active" id="active-badge-'+id+'">Actif</span>' +
         '<div class="status-dot" id="status-'+id+'"></div>' +
         '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
@@ -1640,6 +1910,11 @@ function buildClientCard(client) {
       '<div class="retention-row"><span class="retention-label">🛒 Commandes</span>' +
       '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\''+s+'\',\'orders\',this)">'+retOpts+'</select></div>' +
 
+      '<div class="client-danger-zone">' +
+        '<button class="btn-client-pause is-active" id="pause-btn-'+id+'" onclick="toggleClientActive(\''+s+'\')">⏸ Mettre en pause</button>' +
+        '<button class="btn-client-delete" onclick="askDeleteClient(\''+s+'\',\''+client.name+'\')">🗑️ Supprimer</button>' +
+      '</div>' +
+
     '</div></div>';
 
   return div;
@@ -1655,6 +1930,40 @@ async function openAdmin(e, slug) {
   const client = CLIENTS.find(c => c.slug === slug);
   await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
   window.open(client.url + '/admin.html?ctrl=1', '_blank');
+}
+
+async function toggleClientActive(slug) {
+  const db = getClientDb(slug);
+  const snap = await db.ref('/config/active').once('value');
+  const current = snap.val() !== false; // null ou true = actif
+  await db.ref('/config/active').set(!current);
+}
+
+let _deleteSlug = null;
+function askDeleteClient(slug, name) {
+  _deleteSlug = slug;
+  document.getElementById('del-client-name').textContent = name;
+  document.getElementById('del-modal').classList.add('show');
+}
+function closeDelModal() {
+  _deleteSlug = null;
+  document.getElementById('del-modal').classList.remove('show');
+}
+async function confirmDeleteClient() {
+  if (!_deleteSlug) return;
+  const btn = document.getElementById('del-confirm-btn');
+  btn.textContent = 'Suppression…'; btn.disabled = true;
+  try {
+    await _saasDb.ref('restaurants/' + _deleteSlug).remove();
+    closeDelModal();
+    // Retirer de CLIENTS et reconstruire
+    const idx = CLIENTS.findIndex(c => c.slug === _deleteSlug);
+    if (idx !== -1) CLIENTS.splice(idx, 1);
+    buildClientsTab();
+  } catch(e) {
+    btn.textContent = 'Supprimer'; btn.disabled = false;
+    alert('Erreur : ' + e.message);
+  }
 }
 
 // ════════════════════════════════════════════════════
@@ -1677,6 +1986,19 @@ function loadClientData(client) {
     const cfg  = snap.val() || {};
     const feat = cfg.features || {};
     const state = getClientState(s);
+
+    // Statut actif / en pause
+    const isActive = cfg.active !== false;
+    const badge   = document.getElementById('active-badge-' + id);
+    const pauseBtn = document.getElementById('pause-btn-' + id);
+    if (badge) {
+      badge.textContent = isActive ? 'Actif' : 'En pause';
+      badge.className = 'client-status-badge ' + (isActive ? 'active' : 'paused');
+    }
+    if (pauseBtn) {
+      pauseBtn.textContent = isActive ? '⏸ Mettre en pause' : '▶ Réactiver';
+      pauseBtn.className = 'btn-client-pause' + (isActive ? ' is-active' : '');
+    }
 
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
     set('feat-btn-callBtn',      feat.callBtn);

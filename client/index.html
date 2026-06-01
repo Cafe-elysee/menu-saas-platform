@@ -4952,6 +4952,19 @@
   </div>
 </div>
 
+<div id="pause-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <div style="max-width:340px;width:100%">
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 20px">⏸</div>
+    <div id="pause-title" style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:var(--gold);letter-spacing:0.04em;margin-bottom:12px">Menu en pause</div>
+    <div id="pause-msg" style="font-size:0.88rem;color:var(--muted);line-height:1.8">Votre menu est momentanément en pause.<br>Merci de contacter l'administrateur pour le réactiver.</div>
+    <div style="margin-top:32px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.3">
+      <div style="height:1px;width:30px;background:var(--gold)"></div>
+      <div style="font-size:0.6rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase">Menu Pro</div>
+      <div style="height:1px;width:30px;background:var(--gold)"></div>
+    </div>
+  </div>
+</div>
+
 <div id="preloader">
   <img id="pre-logo-img" class="pre-logo" style="display:none" alt="">
   <div class="pre-ornament">
@@ -5602,6 +5615,29 @@ function loadAdminData() {
   applyStyle(menuStyle);
   _applyDemoParams(); // URL params override Firebase/cache
   init_after_data();
+
+  // Vérifier si le restaurant est actif (config/active)
+  _rref('/config/active').on('value', snap => {
+    const isActive = snap.val() !== false;
+    const screen = document.getElementById('pause-screen');
+    if (!screen) return;
+    if (!isActive) {
+      const _PAUSE = {
+        fr: { title:'Menu en pause',    msg:'Votre menu est momentanément en pause.<br>Merci de contacter l\'administrateur pour le réactiver.' },
+        en: { title:'Menu paused',      msg:'Your menu is currently paused.<br>Please contact the administrator to reactivate it.' },
+        el: { title:'Μενού σε παύση',   msg:'Το μενού σας είναι προσωρινά σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
+        de: { title:'Menü pausiert',    msg:'Ihr Menü ist vorübergehend pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
+        ar: { title:'القائمة متوقفة',   msg:'قائمتك متوقفة مؤقتاً.<br>يرجى التواصل مع المسؤول لإعادة تفعيلها.' }
+      };
+      const p = _PAUSE[lang] || _PAUSE.fr;
+      document.getElementById('pause-title').textContent = p.title;
+      document.getElementById('pause-msg').innerHTML = p.msg;
+      screen.style.display = 'flex';
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    } else {
+      screen.style.display = 'none';
+    }
+  });
 
   // Langue par défaut depuis Control (appliquée seulement si aucun choix localStorage)
   _rref('/config/defaultLang').on('value', snap => {
