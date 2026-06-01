@@ -14,16 +14,16 @@
 - [ ] **NOTE** : `app.html` (PWA serveur) absent du source — supprimé en production (remplacé par APK natif). À recréer from scratch en Phase 5 si nécessaire pour le SaaS.
 - [ ] Vérifier intégrité fichiers copiés (tailles OK)
 
-## PHASE 2 — Audit système existant ⏳
+## PHASE 2 — Audit système existant ✅
 
-- [ ] Analyser structure Firebase actuelle dans `client/index.html`
-- [ ] Analyser structure Firebase dans `client/admin.html`
-- [ ] Analyser `client/api/notify.js` — flow notifications
-- [ ] Identifier tous les hardcoded restaurant data
-- [ ] Identifier les localStorage keys à migrer
-- [ ] Identifier les points de duplication entre clients
-- [ ] Cartographier le flow commande complet
-- [ ] Produire rapport d'architecture SaaS détaillé
+- [x] Analyser structure Firebase actuelle dans `client/index.html`
+- [x] Analyser structure Firebase dans `client/admin.html`
+- [x] Analyser `client/api/notify.js` — flow notifications
+- [x] Identifier tous les hardcoded restaurant data
+- [x] Identifier les localStorage keys à migrer
+- [x] Identifier les points de duplication entre clients
+- [x] Cartographier le flow commande complet
+- [x] Produire rapport d'architecture SaaS détaillé (voir STATE.md)
 
 ## PHASE 3 — Firebase SaaS Architecture ✅
 
@@ -34,31 +34,41 @@
 - [x] Refactor `client/api/notify.js` — recevoir + valider restaurantId
 - [x] Refactor `server-app/index.html` — config SaaS + localStorage _PFX + fcm_tokens→devices
 - [x] Refactor `control-app/index.html` — SAAS_FB_CONFIG + loadClientsFromFirebase() + getClientDb() proxy SaaS
-- [ ] Créer projet Firebase SaaS (à faire par Malek dans navigateur) — remplacer %%SAAS_*%% dans tous les fichiers
-- [ ] Tester isolation données entre restaurants
+- [x] Créer projet Firebase SaaS (`menu-saas-platform`) — credentials injectés dans tous les fichiers via `_fill_saas_config.js`
+- [ ] Tester isolation données entre restaurants (ouvrir 2 onglets ?rid=demo et ?rid=test)
 
-## PHASE 4 — Flow commande complet ⏳
+## PHASE 4 — Flow commande complet ✅
 
-- [ ] Client : sélection menu → panier → submit
-- [ ] Firebase write : `/restaurants/{restaurantId}/orders/{orderId}`
-- [ ] Listener commandes côté serveur app
-- [ ] Trigger Vercel API avec `restaurantId` + `orderId`
-- [ ] Fetch tokens `/restaurants/{restaurantId}/devices/`
-- [ ] Envoi FCM notifications
+- [x] Client : sélection menu → panier → submit
+- [x] Firebase write : `_rref('orders/' + orderId).set(order)` → `/restaurants/{rid}/orders/{orderId}`
+- [x] Listener commandes côté serveur app : `_rref('orders').on('value', ...)`
+- [x] Trigger Vercel `/api/notify` avec `restaurantId` + `table` (keepalive fetch)
+- [x] Fetch tokens `/restaurants/{restaurantId}/devices/` dans `notify.js`
+- [x] Envoi FCM notifications
+- [x] Corriger clés localStorage hardcodées (CART_KEY, ORDERS_HIST_KEY, STORE_KEY_SEC, CALLS_KEY, MSGS_KEY → _PFX)
 
-## PHASE 5 — Capacitor apps ⏳
+## PHASE 5 — Capacitor apps ✅ (partiel — build manuel requis)
 
-- [ ] Refactor `control-app/index.html` — dashboard SaaS global
-- [ ] Créer `server-app/index.html` — app serveur SaaS
-- [ ] Build APK Control SaaS
-- [ ] Build APK Server SaaS
+- [x] Refactor `control-app/index.html` — dashboard SaaS global (fait en Phase 3)
+- [x] Refactor `server-app/index.html` — app serveur SaaS (fait en Phase 3)
+- [x] Créer `control-app/capacitor.config.json` + `package.json`
+- [x] Créer `server-app/capacitor.config.json` + `package.json`
+- [x] Copier projet Android depuis H: Controle Native → `control-app/android/`
+- [x] Créer templates `google-services.json.TEMPLATE` pour les deux apps
+- [x] Créer `BUILD.md` avec instructions complètes
+- [ ] **MALEK** : Télécharger `google-services.json` SaaS depuis Firebase Console (package: `com.menupro.control` et `com.menupro.serveur`)
+- [ ] **MALEK** : `npx cap add android` pour server-app (avec Node.js 18/20)
+- [ ] Build APK Control SaaS (Android Studio)
+- [ ] Build APK Server SaaS (Android Studio)
 
-## PHASE 6 — Table system + QR ⏳
+## PHASE 6 — Table system + QR ✅
 
-- [ ] Admin : générateur tables (1 → N)
-- [ ] Assigner `tableId` à chaque QR
-- [ ] Format URL : `/menu.html?rid={restaurantId}&table={tableId}`
-- [ ] Affichage "📍 Table X" côté client
+- [x] Admin : section "Tables & QR codes" — input nombre de tables → `_rref('config/tableCount').set(n)`
+- [x] URLs générées : `index.html?rid={rid}&table={n}` avec bouton "Copier" par table
+- [x] Section visible seulement si `showOrderUI` est actif (mode commande)
+- [x] `client/index.html` : `_TID = URLSearchParams.get('table')` — saute le prompt si QR
+- [x] Affichage "📍 Table X" chip dans nav quand `_TID` est défini
+- [ ] Phase 7 (QR generation pro) : export PDF QR codes avec jsPDF
 
 ## PHASE 7 — QR generation pro ⏳
 
@@ -68,19 +78,24 @@
 - [ ] Grid view + preview
 - [ ] Download PDF via `jsPDF` avec branding
 
-## PHASE 8 — Vercel API notifications ⏳
+## PHASE 8 — Vercel API notifications ✅
 
-- [ ] `api/notify.js` : recevoir `restaurantId` + `orderId`
-- [ ] Valider `restaurantId`
-- [ ] Fetch RTDB tokens `/restaurants/{restaurantId}/devices`
-- [ ] Envoi FCM
-- [ ] Log résultat dans RTDB logs
+- [x] `api/notify.js` : reçoit `restaurantId` + `table` + `type`
+- [x] Valide `restaurantId` (regex `[a-z0-9_-]+`)
+- [x] Fetch RTDB tokens `/restaurants/{restaurantId}/devices/`
+- [x] Envoi FCM multi-token avec retry
+- [x] Log résultat dans `restaurants/{rid}/logs/notifications/`
+- [x] Nettoyage tokens invalides (`deleteToken`)
 
-## PHASE 9 — Auth + Session ⏳
+## PHASE 9 — Auth + Session ✅
 
-- [ ] Conserver SHA-256 login
-- [ ] Ajouter session tokens Firebase : `sessions/{restaurantId}/`
-- [ ] Validation admin access obligatoire
+- [x] SHA-256 login conservé (`crypto.subtle.digest`)
+- [x] Hash stocké dans Firebase `config/adminHash` (priorité sur fallback local)
+- [x] Session tokens Firebase : `sessions/{rid}/{sessionId}` — écriture login, suppression logout
+- [x] Vérification session au rechargement (révocation à distance depuis control-app)
+- [x] Bypass `?ctrl=1` pour control-app avec `ctrlBypass` timestamp Firebase
+- [x] Login screen : nom du restaurant chargé depuis Firebase `menu/info/name`
+- [x] ADMIN_HASH fallback nettoyé (plus de password Café Élysée hardcodé)
 
 ## PHASE 10 — Feature flags ⏳
 
@@ -97,7 +112,7 @@
 
 - [ ] Créer repo GitHub SaaS
 - [ ] Créer projet Vercel SaaS
-- [ ] Créer projet Firebase SaaS
+- [x] Créer projet Firebase SaaS (`menu-saas-platform`)
 - [ ] Configurer FCM
 - [ ] Configurer Cloudinary si nécessaire
 

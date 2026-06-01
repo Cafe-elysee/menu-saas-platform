@@ -787,7 +787,7 @@ function deletionCutoffTs(ret) {
 }
 
 /* ── CALLS PERSISTENCE ── */
-var CALLS_KEY = 'mc_calls_v1';
+var CALLS_KEY = _PFX + 'calls_v1';
 function saveCalls() {
   try {
     localStorage.setItem(CALLS_KEY, JSON.stringify(
@@ -826,7 +826,7 @@ function cleanupCallsFromStorage() {
 }
 
 /* ── MESSAGES PERSISTENCE ── */
-var MSGS_KEY = 'mc_messages_v1';
+var MSGS_KEY = _PFX + 'messages_v1';
 function saveMessages() {
   try {
     localStorage.setItem(MSGS_KEY, JSON.stringify(

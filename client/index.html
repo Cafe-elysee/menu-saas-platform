@@ -4591,6 +4591,11 @@
     }
     #cart-fab-badge.visible { display:flex; }
 
+    /* ── TABLE CHIP (QR code) ── */
+    #table-chip { display:none; align-items:center; gap:4px; background:rgba(200,164,78,0.13); border:1px solid rgba(200,164,78,0.32); border-radius:20px; padding:3px 10px 3px 8px; font-size:0.73rem; font-weight:600; color:var(--gold); white-space:nowrap; flex-shrink:0; }
+    #table-chip.show { display:flex; }
+    html.light #table-chip { background:rgba(168,104,64,0.1); border-color:rgba(168,104,64,0.3); color:#a86840; }
+
     #cart-modal {
       position:fixed; inset:0; z-index:400;
       background:rgba(0,0,0,0.72); backdrop-filter:blur(8px);
@@ -4760,6 +4765,7 @@
     // ── SaaS : restaurantId depuis URL param ?rid=xxx
     const _RID  = new URLSearchParams(location.search).get('rid') || 'demo';
     const _PFX  = _RID + '_'; // préfixe localStorage isolé par restaurant
+    const _TID  = new URLSearchParams(location.search).get('table') || null; // table fixée par QR code
     // _rref : préfixe tous les chemins Firebase avec restaurants/{rid}/
     const _rref = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
   </script>
@@ -5001,6 +5007,7 @@
       <input type="search" class="s-input" id="search" placeholder="Rechercher dans le menu…">
     </div>
     <div class="nav-controls">
+      <div id="table-chip" aria-label="Numéro de table">📍 <span id="table-chip-label"></span></div>
       <div class="lang-wrap" id="lang-wrap"></div>
       <button class="theme-btn" id="theme-btn" aria-label="Toggle theme"><svg id="theme-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ico-moon"/></svg></button>
     </div>
@@ -6580,7 +6587,7 @@ if (window.visualViewport) {
    MODE COMMANDE — PANIER
 ================================================ */
 let cartItems = []; // [{ id, name, price, priceNum, qty }]
-const CART_KEY = 'ce_cart_v1';
+const CART_KEY = _PFX + 'cart_v1';
 
 function saveCart() {
   try { localStorage.setItem(CART_KEY, JSON.stringify(cartItems)); } catch(e) {}
@@ -6838,8 +6845,9 @@ async function confirmOrder() {
   let tableNum;
   if (isTakeaway) {
     tableNum = t.histTakeaway || 'À emporter';
+  } else if (_TID) {
+    tableNum = _TID; // fixé par URL QR code
   } else {
-    // Demander le numéro de table via une petite popup inline
     const numStr = await promptTableNumber(t);
     if (numStr === null) return; // annulé
     tableNum = numStr;
@@ -6893,7 +6901,7 @@ async function confirmOrder() {
 }
 
 /* ── Historique commandes par appareil ── */
-const ORDERS_HIST_KEY = 'ce_orders_hist_v1';
+const ORDERS_HIST_KEY = _PFX + 'orders_hist_v1';
 
 function saveOrderToHistory(id, tableNum, items, total) {
   const hist = getOrderHistory();
@@ -7239,6 +7247,12 @@ window.addEventListener('popstate', () => {
 ================================================ */
 function init() {
   if (isDemo) document.body.classList.add('demo-mode');
+  // Chip table QR code
+  if (_TID) {
+    const chip = document.getElementById('table-chip');
+    const lbl  = document.getElementById('table-chip-label');
+    if (chip && lbl) { lbl.textContent = 'Table ' + _TID; chip.classList.add('show'); }
+  }
   // Initialiser l'UI de base immédiatement
   buildLangBtns();
   setupPreloader();

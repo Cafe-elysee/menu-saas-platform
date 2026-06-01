@@ -1,0 +1,15 @@
+{
+  "appId": "com.menupro.serveur",
+  "appName": "Menu Pro Serveur",
+  "webDir": ".",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  },
+  "android": {
+    "captureInput": true,
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

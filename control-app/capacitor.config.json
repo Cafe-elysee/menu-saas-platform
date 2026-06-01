@@ -1,0 +1,15 @@
+{
+  "appId": "com.menupro.control",
+  "appName": "Menu Pro Control",
+  "webDir": ".",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  },
+  "android": {
+    "captureInput": true,
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

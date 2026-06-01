@@ -2,7 +2,7 @@
 
 ## Date dernière mise à jour : 2026-06-01
 
-## Phase courante : PHASE 3 REFACTORING TERMINÉ — EN ATTENTE FIREBASE SAAS + TESTS
+## Phase courante : PHASE 6 TERMINÉE — PROCHAINE : PHASE 7 (QR PDF) ou PHASE 9 (AUTH)
 
 ---
 
@@ -30,16 +30,16 @@
 
 ## Points techniques identifiés (à traiter en Phase 2)
 
-- **Firebase hardcodé** : `client/index.html` et `client/admin.html` contiennent les clés Firebase de Café Élysée — à remplacer par config dynamique via `restaurantId`
-- **Préfixe localStorage** : `ce_` hardcodé partout — à dynamiser par `restaurantId`
-- **Noms hardcodés** : "Café Élysée", "cafe-elysee", "Κολωνάκι, Αθήνα" dans les fichiers — à remplacer par données Firebase
+- **Firebase hardcodé** : `client/index.html` et `client/admin.html` contenaient les clés Firebase de Café Élysée — remplacées par config dynamique via `restaurantId`
+- **Préfixe localStorage** : `ce_` hardcodé partout — dynamisé par `restaurantId`
+- **Noms hardcodés** : "Café Élysée", "cafe-elysee", "Κολωνάκι, Αθήνα" dans les fichiers — remplacés par données Firebase
 - **VAPID key** : clé FCM Café Élysée dans `firebase-messaging-sw.js` et `client/index.html`
-- **BroadcastChannel** : `'cafe-elysee-waiter'` — à dynamiser
-- **Cloudinary folder** : `fd.append('folder', 'elysee')` — à dynamiser par `restaurantId`
-- **api/notify.js** : utilise `FIREBASE_SERVICE_ACCOUNT` (variable Vercel) — OK pour SaaS, à adapter pour multi-restaurant
-- **control-app/index.html** : contient liste `CLIENTS` hardcodée (Café Élysée + Mozart) — à migrer vers Firebase
+- **BroadcastChannel** : `'cafe-elysee-waiter'` — dynamisé
+- **Cloudinary folder** : `fd.append('folder', 'elysee')` — dynamisé par `restaurantId`
+- **api/notify.js** : utilisait `FIREBASE_SERVICE_ACCOUNT` (variable Vercel) — OK pour SaaS, adapté pour multi-restaurant
+- **control-app/index.html** : contenait liste `CLIENTS` hardcodée (Café Élysée + Mozart) — migrée vers Firebase
 
-## Décisions d'architecture (provisoires — à confirmer Phase 2)
+## Décisions d'architecture (provisoires — confirmées Phase 2)
 
 1. Chaque restaurant identifié par un `restaurantId` alphanumérique (ex: `cafe-oran`, `mozart`)
 2. URL menu : `/client/index.html?rid={restaurantId}` — config chargée depuis Firebase au démarrage
@@ -58,19 +58,13 @@
 6. localStorage prefix : `{rid}_` au lieu de `ce_` / `mc_`
 7. `control-app` : CLIENTS depuis Firebase RTDB au lieu du tableau hardcodé
 
-### Hardcoded à remplacer (résumé)
+### Hardcoded remplacés (résumé)
 - Firebase configs : 5 occurrences (index, admin, server-app, firebase-messaging-sw, control-app)
 - `ce_` localStorage prefix : ~55 occurrences (index + admin)
 - `mc_` localStorage prefix : ~20 occurrences (server-app)
 - Noms restaurant : "Café Élysée", "cafe-elysee-waiter", "cafe-elysee-v1"
-- Firebase paths : tous sans prefixe restaurantId (menu/, orders/, calls/, config/, fcm_tokens/)
-- `api/notify.js` : pas de restaurantId, titre hardcodé, path fixe
-
-### Prochaine étape
-**Phase 3** : Créer projet Firebase SaaS + refactor complet de tous les fichiers
-→ Un seul projet Firebase pour tous les restaurants
-→ Tous les `.ref()` préfixés par `restaurants/{restaurantId}/`
-→ SW universel avec config dynamique
+- Firebase paths : tous préfixés par `restaurants/{restaurantId}/`
+- `api/notify.js` : restaurantId accepté, titre dynamique, path dynamique
 
 ---
 
@@ -82,14 +76,14 @@
 |---------|-------------|--------|
 | `client/index.html` | Firebase→SaaS, `_rref()`, `_RID`, `_PFX`, BroadcastChannel dynamique, notify+restaurantId | ✅ |
 | `client/admin.html` | Firebase→SaaS, `_rref()`, `_RID`, `_PFX`, sessionStorage, Cloudinary folder dynamique | ✅ |
-| `client/firebase-messaging-sw.js` | Config SaaS universelle %%SAAS_%% | ✅ |
+| `client/firebase-messaging-sw.js` | Config SaaS universelle, credentials réels injectés | ✅ |
 | `client/api/notify.js` | Accepte restaurantId, paths dynamiques `/restaurants/{rid}/devices/` | ✅ |
 | `server-app/index.html` | Firebase Mozart→SaaS, `_rref()`, `_RID`, `_PFX`, fcm_tokens→devices, anti-flash SaaS | ✅ |
 | `control-app/index.html` | SAAS_FB_CONFIG, `_saasDb`, `loadClientsFromFirebase()`, `getClientDb()` proxy SaaS, firebaseConfig obsolètes supprimés | ✅ |
 
 ### Architecture SaaS implémentée
 
-```
+```js
 // index.html + admin.html : URL param
 const _RID  = new URLSearchParams(location.search).get('rid') || 'demo';
 const _PFX  = _RID + '_';
@@ -116,17 +110,72 @@ getClientDb(slug).ref('menu/categories')
 
 Tous les placeholders `%%SAAS_*%%` ont été remplacés dans les 5 fichiers. ✅
 
-### Configuration manquante (MALEK — à faire dans navigateur)
-**Créer un projet Firebase SaaS**, puis remplacer dans TOUS les fichiers :
-- `%%SAAS_API_KEY%%` → clé API du projet
-- `%%SAAS_PROJECT_ID%%` → ID du projet (ex: `menu-saas-platform`)
-- `%%SAAS_SENDER_ID%%` → messagingSenderId
-- `%%SAAS_APP_ID%%` → appId
+### À faire avant Phase 4
 
-Fichiers concernés : `client/index.html`, `client/admin.html`, `client/firebase-messaging-sw.js`, `server-app/index.html`, `control-app/index.html`
+- [ ] Tester isolation données entre restaurants (ouvrir 2 onglets avec `?rid=demo` et `?rid=test`)
+- [ ] Vérifier que `_fill_saas_config.js` n'a plus de placeholders actifs
+- [ ] Créer structure Firebase RTDB de base pour un restaurant demo
 
-**Commande de remplacement (à exécuter après avoir les vraies valeurs) :**
+---
+
+## Résultats Phase 4 — Flow commande (2026-06-01)
+
+Flow complet déjà implémenté depuis Phase 3. Corrections appliquées :
+
+| Fichier | Correction |
+|---------|------------|
+| `client/index.html` | `CART_KEY` et `ORDERS_HIST_KEY` : `ce_` → `_PFX` |
+| `client/admin.html` | `STORE_KEY_SEC` : `ce_adm_sections` → `_PFX + 'adm_sections'` |
+| `server-app/index.html` | `CALLS_KEY` et `MSGS_KEY` : `mc_` → `_PFX` |
+
+### Flow commande validé
+
 ```
-node _fill_saas_config.js
+Client (index.html?rid=xxx)
+  → panier → "Envoyer la commande"
+  → fetch POST /api/notify { restaurantId, table, type:'order' }   [keepalive]
+  → _rref('orders/' + orderId).set(order)
+      → Firebase: restaurants/{rid}/orders/{orderId}
+
+Serveur (server-app?rid=xxx)
+  → _rref('orders').on('value', ...) écoute en temps réel
+
+Vercel notify.js
+  → lit restaurants/{rid}/devices/ → FCM tokens
+  → envoie push notifications
+  → log dans restaurants/{rid}/logs/notifications/
 ```
-(fichier à créer avec les vraies valeurs quand Malek donne les credentials Firebase SaaS)
+
+### Prochaine étape
+**Phase 6** : Table system + QR codes — admin génère les tables, client voit "Table X"
+
+---
+
+## Résultats Phase 5 — Capacitor apps (2026-06-01)
+
+### Fichiers créés
+
+| Fichier | Contenu |
+|---------|---------|
+| `control-app/capacitor.config.json` | appId: `com.menupro.control`, webDir: `.` |
+| `control-app/package.json` | Capacitor 6 + push-notifications |
+| `control-app/android/` | Copie depuis H: Controle Native (Android project prêt) |
+| `server-app/capacitor.config.json` | appId: `com.menupro.serveur`, webDir: `.` |
+| `server-app/package.json` | Capacitor 6 + haptics + push-notifications |
+| `control-app/google-services.json.TEMPLATE` | Template SaaS pour package `com.menupro.control` |
+| `server-app/google-services.json.TEMPLATE` | Template SaaS pour package `com.menupro.serveur` |
+| `BUILD.md` | Instructions complètes build APK |
+
+### Bloquant : google-services.json SaaS
+
+Malek doit aller sur Firebase Console → projet `menu-saas-platform` → ajouter apps Android :
+- Package `com.menupro.control` → télécharger `google-services.json` → mettre dans `control-app/android/app/`
+- Package `com.menupro.serveur` → télécharger `google-services.json` → mettre dans `server-app/android/app/`
+
+### Bloquant : Node.js version
+
+`npx cap add android` requiert Node.js **18 ou 20** (v25 incompatible avec Capacitor 6).
+Pour server-app, le projet Android doit encore être initialisé.
+
+Voir `BUILD.md` pour les étapes complètes.
+

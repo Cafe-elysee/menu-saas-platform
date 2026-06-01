@@ -594,6 +594,22 @@
     .adm-section.collapsed .sec-body { max-height:0 !important; transition:max-height 0.35s cubic-bezier(0.65,0,0.35,1); }
     .sec-body-inner { padding:16px 16px 18px; transition:padding 0.25s ease; }
     .adm-section.collapsed .sec-body-inner { padding-top:0; padding-bottom:0; }
+
+    /* ── TABLES ── */
+    #tables-admin-section { display:none; }
+    .tables-count-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .tables-count-input { width:72px; padding:8px 12px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); color:var(--cream); font-family:'Outfit',inherit; font-size:1rem; font-weight:600; text-align:center; }
+    .tables-count-btn { padding:8px 18px; border-radius:10px; border:none; background:var(--gold); color:#0c0a08; font-family:'Outfit',inherit; font-size:0.85rem; font-weight:700; cursor:pointer; }
+    .tables-count-btn:active { opacity:0.8; }
+    .tables-url-list { display:flex; flex-direction:column; gap:8px; }
+    .table-url-row { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 12px; }
+    .table-url-num { font-weight:700; color:var(--gold); font-size:0.82rem; min-width:60px; }
+    .table-url-link { flex:1; font-size:0.72rem; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:monospace; }
+    .table-url-copy { padding:4px 10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Outfit',inherit; font-size:0.72rem; cursor:pointer; flex-shrink:0; }
+    .table-url-copy:active, .table-url-copy.copied { background:rgba(200,164,78,0.15); color:var(--gold); border-color:var(--gold); }
+    html.light .tables-count-input { background:var(--bg2); }
+    html.light .table-url-row { background:var(--bg2); }
+
     .sec-badge {
       font-family:'Outfit','Noto Sans',sans-serif; font-size:0.62rem; font-weight:600;
       padding:4px 12px; border-radius:20px; letter-spacing:0.09em; text-transform:uppercase;
@@ -1338,7 +1354,7 @@
 ══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">Café Élysée</div>
+    <div class="login-logo" id="login-logo">Menu Pro</div>
     <div class="login-sub">Administration</div>
     <input type="password" class="login-input" id="pwd-input"
            placeholder="Mot de passe" autocomplete="current-password">
@@ -1545,6 +1561,19 @@
     <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
   </div>
 
+  <!-- ── TABLES QR (visible seulement en mode Commande) ── -->
+  <div class="adm-section" id="tables-admin-section">
+    <div class="sec-hd" id="sec-hd-tables">Tables &amp; QR codes <span class="sec-badge" id="tables-count-badge">0</span></div>
+    <div class="sec-body-inner" id="tables-body">
+      <div class="tables-count-row">
+        <input type="number" id="tables-count-input" class="tables-count-input" min="1" max="99" value="1" inputmode="numeric">
+        <button class="tables-count-btn" id="tables-count-save">Générer</button>
+        <span style="font-size:0.78rem;color:var(--muted)">tables</span>
+      </div>
+      <div class="tables-url-list" id="tables-url-list"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Save bar (caché, gardé pour compatibilité) -->
@@ -1597,8 +1626,9 @@
    1. Calculer SHA-256 du nouveau mot de passe sur : sha256.online
    2. Remplacer la valeur de ADMIN_HASH ci-dessous
 ═══════════════════════════════════════════ */
-// SHA-256 hash local — utilisé uniquement si Firebase /config/adminHash est absent
-const ADMIN_HASH = '72281bdc8c4c19dbb99e0891963b878231fe0d2a06e555c84483926c2cbc580c'; // elysee2026
+// SHA-256 hash local — fallback si Firebase /config/adminHash est absent
+// Le hash Firebase a toujours la priorité. Changer via control-app.
+const ADMIN_HASH = 'b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576b3fdefa5b9e65dbe'; // demo (ne pas utiliser en prod)
 const STORE_KEY = _PFX + 'admin_data_v1';
 
 async function _hashPwd(pwd) {
@@ -2211,11 +2241,35 @@ let _dragCatIdx  = null;  // index catégorie en cours de drag
 let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase Storage download URL (en attente de sauvegarde)
 
 /* ═══════════════════════════════════════════
-   LOGIN
+   LOGIN + SESSION FIREBASE
 ═══════════════════════════════════════════ */
 async function checkLogin() {
-  const saved = sessionStorage.getItem(_PFX+'admin_auth');
-  if (saved === 'ok') { showAdmin(); return; }
+  // Charger le nom du restaurant pour la page de login
+  try {
+    const nameSnap = await _rref('menu/info/name').once('value');
+    const rName = nameSnap.val();
+    if (rName) {
+      const logo = document.getElementById('login-logo');
+      if (logo) logo.textContent = rName;
+    }
+  } catch(e) {}
+
+  const saved    = sessionStorage.getItem(_PFX+'admin_auth');
+  const sessionId = sessionStorage.getItem(_PFX+'session_id');
+
+  if (saved === 'ok' && sessionId) {
+    // Vérifier que la session Firebase n'a pas été révoquée
+    try {
+      const snap = await _rref('sessions/' + sessionId).once('value');
+      if (snap.exists()) { showAdmin(); return; }
+      // Session révoquée → déconnexion forcée
+      sessionStorage.removeItem(_PFX+'admin_auth');
+      sessionStorage.removeItem(_PFX+'session_id');
+    } catch(e) {
+      // Erreur réseau → laisser passer (mode offline)
+      showAdmin(); return;
+    }
+  }
 
   if (new URLSearchParams(location.search).get('demo') === '1') {
     document.body.classList.add('demo-mode');
@@ -2228,12 +2282,34 @@ async function checkLogin() {
       const ts = snap.val();
       if (ts && Date.now() - ts < 15000) {
         await _rref('/config/ctrlBypass').remove();
-        sessionStorage.setItem(_PFX+'admin_auth', 'ok');
+        await _openSession();
         showAdmin();
         return;
       }
     } catch(e) {}
   }
+}
+
+async function _openSession() {
+  const sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  sessionStorage.setItem(_PFX+'admin_auth', 'ok');
+  sessionStorage.setItem(_PFX+'session_id', sid);
+  try {
+    await _rref('sessions/' + sid).set({
+      ts: Date.now(),
+      rid: _RID,
+      ua: navigator.userAgent.slice(0, 120)
+    });
+  } catch(e) {}
+}
+
+async function _closeSession() {
+  const sid = sessionStorage.getItem(_PFX+'session_id');
+  if (sid) {
+    try { await _rref('sessions/' + sid).remove(); } catch(e) {}
+  }
+  sessionStorage.removeItem(_PFX+'admin_auth');
+  sessionStorage.removeItem(_PFX+'session_id');
 }
 
 /* ── THÈME ── */
@@ -2266,8 +2342,8 @@ document.getElementById('adm-theme-btn').addEventListener('click', () => {
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('logout-btn')?.addEventListener('click', () => {
-  sessionStorage.removeItem(_PFX+'admin_auth');
+document.getElementById('logout-btn')?.addEventListener('click', async () => {
+  await _closeSession();
   location.reload();
 });
 
@@ -2282,7 +2358,7 @@ async function doLogin() {
   } catch {}
 
   if (hash === expectedHash) {
-    sessionStorage.setItem(_PFX+'admin_auth', 'ok');
+    await _openSession();
     showAdmin();
   } else {
     document.getElementById('login-err').textContent = 'Mot de passe incorrect.';
@@ -2306,6 +2382,7 @@ function showAdmin() {
   loadFeatures();
   loadPrimaryLang();
   loadEnabledLangs();
+  loadTableSystem();
   setupNotifFab();
 }
 
@@ -2806,7 +2883,7 @@ function renderHeroImageSection() {
 
 /* ─── SECTIONS REPLIABLES ─── */
 (function setupCollapsible() {
-  const STORE_KEY_SEC = 'ce_adm_sections';
+  const STORE_KEY_SEC = _PFX + 'adm_sections';
   const saved = JSON.parse(localStorage.getItem(STORE_KEY_SEC) || '{}');
 
   document.querySelectorAll('.adm-section').forEach(section => {
@@ -5259,6 +5336,8 @@ function syncStyleAdminUI(mode) {
   // Section commandes : visible si l'interface commande est activée (peu importe le style)
   const ordersSection = document.getElementById('orders-admin-section');
   if (ordersSection) ordersSection.style.display = showOrder ? 'block' : 'none';
+  const tablesSection = document.getElementById('tables-admin-section');
+  if (tablesSection) tablesSection.style.display = showOrder ? 'block' : 'none';
   const scOrdersBtn = document.getElementById('sc-orders-btn');
   if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
 
@@ -5400,6 +5479,60 @@ function toggleOrderCard(cardId) {
 
 function setOrderStatus(orderId, status) {
   _rref('orders/' + orderId + '/status').set(status);
+}
+
+/* ═══════════════════════════════════════════
+   TABLE SYSTEM
+═══════════════════════════════════════════ */
+let _tableCount = 0;
+
+function loadTableSystem() {
+  _rref('config/tableCount').on('value', snap => {
+    const n = parseInt(snap.val()) || 0;
+    _tableCount = n;
+    const input = document.getElementById('tables-count-input');
+    if (input && n > 0) input.value = n;
+    const badge = document.getElementById('tables-count-badge');
+    if (badge) badge.textContent = n;
+    renderTableURLs(n);
+  });
+
+  const saveBtn = document.getElementById('tables-count-save');
+  if (saveBtn) saveBtn.addEventListener('click', () => {
+    const input = document.getElementById('tables-count-input');
+    const n = parseInt(input?.value) || 0;
+    if (n < 1 || n > 99) return;
+    _rref('config/tableCount').set(n);
+  });
+}
+
+function renderTableURLs(n) {
+  const list = document.getElementById('tables-url-list');
+  if (!list) return;
+  if (n === 0) { list.innerHTML = ''; return; }
+
+  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  const rows = [];
+  for (let i = 1; i <= n; i++) {
+    const url = base + '?rid=' + _RID + '&table=' + i;
+    rows.push(`
+      <div class="table-url-row">
+        <div class="table-url-num">Table ${i}</div>
+        <div class="table-url-link" title="${url}">${url}</div>
+        <button class="table-url-copy" onclick="copyTableURL(this,'${url}')">Copier</button>
+      </div>`);
+  }
+  list.innerHTML = rows.join('');
+}
+
+function copyTableURL(btn, url) {
+  navigator.clipboard.writeText(url).then(() => {
+    btn.textContent = 'Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    btn.textContent = url; // fallback visible
+  });
 }
 
 /* ═══════════════════════════════════════════
