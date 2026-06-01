@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "460781372428",
+    "firebase_url": "https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "menu-saas-platform",
+    "storage_bucket": "menu-saas-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460781372428:android:512628c5e34628d182da29",
+        "android_client_info": {
+          "package_name": "com.menupro.control"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWGB_W947x1FfzEpIozSDlEbQb6FwaP-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460781372428:android:3f98b007731acf6f82da29",
+        "android_client_info": {
+          "package_name": "com.menupro.serveur"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWGB_W947x1FfzEpIozSDlEbQb6FwaP-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
