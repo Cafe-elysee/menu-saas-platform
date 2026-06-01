@@ -2626,14 +2626,14 @@ function forceTokenRenewal() {
 }
 
 function saveControlToken(tokenValue) {
-  if (!_controlDb) { _pendingFcmToken = tokenValue; return; }
+  if (!_saasDb) { _pendingFcmToken = tokenValue; return; }
   const deviceId = tokenValue.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
   const lastTs  = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
   const lastTok = localStorage.getItem('ctrl_fcm_token_v') || '';
   if (tokenValue === lastTok && Date.now() - lastTs < 12 * 3600 * 1000) return;
   localStorage.setItem('ctrl_fcm_token_v', tokenValue);
   localStorage.setItem('ctrl_fcm_last_reg', String(Date.now()));
-  _controlDb.ref('/fcm_tokens/' + deviceId).set({ token: tokenValue, ts: Date.now() })
+  _saasDb.ref('control/fcm_tokens/' + deviceId).set({ token: tokenValue, ts: Date.now() })
     .then(() => { showToast('🔔 Notifications activées'); refreshNotifStatus(); })
     .catch(() => setTimeout(() => saveControlToken(tokenValue), 5000));
 }

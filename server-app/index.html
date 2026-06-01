@@ -1413,8 +1413,11 @@ function renderOrders() {
 /* ── CHANGEMENT DE RESTAURANT ── */
 function changeRestaurant() {
   if (!confirm('Changer de restaurant ?\nLa connexion actuelle sera supprimée.')) return;
-  localStorage.removeItem('saas_rid');
-  location.reload();
+  var deviceId = getDeviceId();
+  _rref('devices/' + deviceId).remove().catch(function() {}).finally(function() {
+    localStorage.removeItem('saas_rid');
+    location.reload();
+  });
 }
 
 /* ── SETUP RID (premier lancement) ── */
