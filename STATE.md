@@ -2,7 +2,7 @@
 
 ## Date dernière mise à jour : 2026-06-01
 
-## Phase courante : PRODUCTION READY — EN ATTENTE TESTS APK SUR TÉLÉPHONE
+## Phase courante : APKs REBUILT — EN ATTENTE CONFIRMATION OUVERTURE SUR TÉLÉPHONE (Redmi Note 13 5G)
 
 ---
 
@@ -166,16 +166,35 @@ Tests APK sur Redmi Note 13 5G (control-app + server-app)
 | `server-app/google-services.json.TEMPLATE` | Template SaaS pour package `com.menupro.serveur` |
 | `BUILD.md` | Instructions complètes build APK |
 
-### Bloquant : google-services.json SaaS
+### État actuel des APKs (2026-06-01)
 
-Malek doit aller sur Firebase Console → projet `menu-saas-platform` → ajouter apps Android :
-- Package `com.menupro.control` → télécharger `google-services.json` → mettre dans `control-app/android/app/`
-- Package `com.menupro.serveur` → télécharger `google-services.json` → mettre dans `server-app/android/app/`
+**APKs dans `G:\Mon Drive\menu-saas-platform\` :**
+- `MenuProControl-SaaS-v1.0.apk` — app Malek (dashboard multi-restaurants)
+- `MenuProServeur-SaaS-v1.0.apk` — app staff/clients (réception commandes)
 
-### Bloquant : Node.js version
+**⚠️ EN ATTENTE : test d'ouverture sur Redmi Note 13 5G**
 
-`npx cap add android` requiert Node.js **18 ou 20** (v25 incompatible avec Capacitor 6).
-Pour server-app, le projet Android doit encore être initialisé.
+### Packages Android définitifs
 
-Voir `BUILD.md` pour les étapes complètes.
+| App | applicationId | namespace | MainActivity.java package |
+|-----|---------------|-----------|--------------------------|
+| control-app | `com.menupro.control.saas` | `com.menupro.control` | `com.menupro.control` |
+| server-app | `com.menupro.serveur` | `com.monresto.serveur` | `com.monresto.serveur` |
+
+**RÈGLE CRITIQUE** : Ne jamais changer le `namespace` — il doit toujours correspondre au package déclaré dans `MainActivity.java`. Seul `applicationId` peut changer.
+
+### google-services.json en place
+
+Les deux fichiers `android/app/google-services.json` contiennent :
+- `com.menupro.control.saas` (mobilesdk_app_id: `1:460781372428:android:739bbbacdecea46582da29`)
+- `com.menupro.serveur` (mobilesdk_app_id: `1:460781372428:android:3f98b007731acf6f82da29`)
+
+### Fonctionnalités ajoutées (au-delà des 13 phases initiales)
+
+- **Nouveau client** : bouton dans control-app → crée Firebase + hash password automatiquement
+- **Toggle actif/pause** : met le restaurant en pause → page élégante multilingue côté client et staff
+- **Suppression client** : avec confirmation dans control-app
+- **Page pause** : affichée dans index.html ET server-app quand `config/active = false`
+
+### Voir BUILD.md pour les commandes rebuild complètes.
 

@@ -1,122 +1,89 @@
 # BUILD — Menu SaaS Platform
 
-## Commande rapide rebuild (tout depuis G:)
+## Commande rebuild complète (depuis G: — tout automatique)
 
 ```powershell
-# Mettre à jour les assets ET rebuilder les deux APKs en une commande :
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 $env:ANDROID_HOME = "C:\Users\malek\AppData\Local\Android\Sdk"
-Copy-Item "G:\Mon Drive\menu-saas-platform\client\index.html" "G:\Mon Drive\menu-saas-platform\control-app\android\app\src\main\assets\public\index.html" -Force
+
+# Sync assets web → android
+Copy-Item "G:\Mon Drive\menu-saas-platform\control-app\index.html" "G:\Mon Drive\menu-saas-platform\control-app\android\app\src\main\assets\public\index.html" -Force
 Copy-Item "G:\Mon Drive\menu-saas-platform\server-app\index.html" "G:\Mon Drive\menu-saas-platform\server-app\android\app\src\main\assets\public\index.html" -Force
+
+# Build
 Set-Location "G:\Mon Drive\menu-saas-platform\control-app\android"; .\gradlew.bat assembleDebug
 Set-Location "G:\Mon Drive\menu-saas-platform\server-app\android"; .\gradlew.bat assembleDebug
+
+# Copier APKs à la racine
+Copy-Item "G:\Mon Drive\menu-saas-platform\builds\control-app\debug\MenuProControl-SaaS-v1.0.apk" "G:\Mon Drive\menu-saas-platform\MenuProControl-SaaS-v1.0.apk" -Force
+Copy-Item "G:\Mon Drive\menu-saas-platform\builds\server-app\debug\MenuProServeur-SaaS-v1.0.apk" "G:\Mon Drive\menu-saas-platform\MenuProServeur-SaaS-v1.0.apk" -Force
 ```
 
-APKs générés dans :
-- `G:\Mon Drive\menu-saas-platform\builds\control-app\debug\MenuProControl-v1.0.apk`
-- `G:\Mon Drive\menu-saas-platform\builds\server-app\debug\MenuProServeur-v1.0.apk`
+APKs à la racine :
+- `G:\Mon Drive\menu-saas-platform\MenuProControl-SaaS-v1.0.apk`
+- `G:\Mon Drive\menu-saas-platform\MenuProServeur-SaaS-v1.0.apk`
 
 ---
 
+## Configuration Android — NE PAS MODIFIER
 
-## Prérequis
+### Packages définitifs (CRITIQUE — ne pas changer le namespace)
 
-- Node.js **18 ou 20** LTS (pas v21+) — Capacitor 6 incompatible avec Node.js v25
-- Android Studio installé
-- Android SDK configuré (`ANDROID_HOME`)
-- Java 17+
+| App | applicationId | namespace | MainActivity.java |
+|-----|---------------|-----------|-------------------|
+| control-app | `com.menupro.control.saas` | `com.menupro.control` | `package com.menupro.control` |
+| server-app | `com.menupro.serveur` | `com.monresto.serveur` | `package com.monresto.serveur` |
 
----
+**RÈGLE** : `namespace` = package de `MainActivity.java`. Ne jamais les désynchroniser.
+**RÈGLE** : `applicationId` = identifiant unique sur le téléphone (peut différer du namespace).
 
-## Étape 1 — google-services.json (OBLIGATOIRE avant build)
+### capacitor.config.json (appId doit correspondre à applicationId)
 
-Aller sur Firebase Console → projet `menu-saas-platform` → Paramètres du projet → Tes applications
+| App | appId dans capacitor.config.json |
+|-----|----------------------------------|
+| control-app | `com.menupro.control.saas` |
+| server-app | `com.menupro.serveur` |
 
-### Pour control-app (`com.menupro.control`)
-1. Ajouter une app Android avec le package `com.menupro.control` si pas encore fait
-2. Télécharger `google-services.json`
-3. Copier dans **deux endroits** :
-   - `control-app/google-services.json`
-   - `control-app/android/app/google-services.json`
+### google-services.json (même fichier pour les deux apps)
 
-### Pour server-app (`com.menupro.serveur`)
-1. Ajouter une app Android avec le package `com.menupro.serveur` si pas encore fait
-2. Télécharger `google-services.json`
-3. Copier dans **deux endroits** :
-   - `server-app/google-services.json`
-   - `server-app/android/app/google-services.json` (créé après `cap add android`)
+Contient les deux packages enregistrés dans Firebase `menu-saas-platform` :
+- `com.menupro.control.saas` → mobilesdk_app_id: `1:460781372428:android:739bbbacdecea46582da29`
+- `com.menupro.serveur` → mobilesdk_app_id: `1:460781372428:android:3f98b007731acf6f82da29`
 
-Les templates sont dans `*.TEMPLATE` dans chaque dossier.
-
----
-
-## Build control-app (projet Android déjà copié depuis H:)
-
-Le projet Android existe déjà dans `control-app/android/`.
-Il faut juste mettre à jour les assets web et le `google-services.json`.
-
-```bash
-cd "G:\Mon Drive\menu-saas-platform\control-app"
-
-# 1. Copier index.html dans les assets Android
-copy index.html android\app\src\main\assets\public\index.html
-
-# 2. Copier le google-services.json téléchargé depuis Firebase
-copy google-services.json android\app\google-services.json
-
-# 3. Ouvrir dans Android Studio pour builder l'APK
-npx cap open android
-# → Android Studio : Build > Build APK(s) ou Generate Signed APK
-```
+Fichiers en place :
+- `control-app/android/app/google-services.json`
+- `server-app/android/app/google-services.json`
 
 ---
 
-## Build server-app (projet Android à initialiser)
+## Prérequis système
 
-Le projet Android doit être créé depuis zéro avec Node.js 18/20.
-
-```bash
-cd "G:\Mon Drive\menu-saas-platform\server-app"
-
-# 1. Installer les dépendances (avec Node.js 18 ou 20)
-npm install
-
-# 2. Initialiser le projet Android
-npx cap add android
-
-# 3. Copier le google-services.json téléchargé depuis Firebase
-copy google-services.json android\app\google-services.json
-
-# 4. Synchroniser les assets web
-npx cap sync android
-
-# 5. Ouvrir dans Android Studio
-npx cap open android
-# → Android Studio : Build > Build APK(s) ou Generate Signed APK
-```
+- JAVA_HOME : `C:\Program Files\Android\Android Studio\jbr` (JBR 21)
+- ANDROID_HOME : `C:\Users\malek\AppData\Local\Android\Sdk`
+- Node.js v25 installé (non utilisé pour Capacitor, juste pour scripts)
+- Pas besoin d'Android Studio ouvert — build en ligne de commande
 
 ---
 
-## Sync rapide (mise à jour web assets uniquement)
+## Nouveau client — procédure complète
 
-Quand tu modifies `index.html`, pas besoin de rebuild l'APK complet.
-Sync + rebuild depuis Android Studio suffit :
-
-```bash
-# control-app
-copy "G:\Mon Drive\menu-saas-platform\control-app\index.html" "G:\Mon Drive\menu-saas-platform\control-app\android\app\src\main\assets\public\index.html"
-
-# server-app (après cap add android)
-cd "G:\Mon Drive\menu-saas-platform\server-app"
-npx cap sync android
-```
+1. Ouvrir l'app Control SaaS sur le téléphone
+2. Onglet Clients → bouton **"＋ Nouveau client"**
+3. Remplir : nom du restaurant, identifiant (rid), mot de passe admin
+4. Cliquer **Créer** → Firebase créé automatiquement
+5. Donner au client :
+   - **Lien admin** : `https://menu-saas-platform.vercel.app/admin.html?rid={rid}`
+   - **App serveur** : `MenuProServeur-SaaS-v1.0.apk` + entrer le `rid` au premier lancement
 
 ---
 
-## Checklist avant release APK
+## Checklist avant distribution APK
 
-- [ ] `google-services.json` SaaS dans `android/app/` des deux apps
-- [ ] Firebase RTDB rules configurées pour `menu-saas-platform`
-- [ ] Au moins un restaurant créé dans RTDB (`restaurants/demo/config/...`)
-- [ ] Vercel API déployée avec `FIREBASE_SERVICE_ACCOUNT` configuré
-- [ ] Test FCM : envoyer une commande de test, vérifier réception sur server-app
+- [x] `google-services.json` SaaS dans `android/app/` des deux apps
+- [x] Firebase `menu-saas-platform` actif
+- [x] Restaurant `demo` créé (mot de passe : `MenuPro2026`)
+- [x] Vercel déployé avec `FIREBASE_SERVICE_ACCOUNT`
+- [ ] Test ouverture APK control-app sur Redmi Note 13 5G
+- [ ] Test ouverture APK server-app sur Redmi Note 13 5G
+- [ ] Test commande end-to-end
+- [ ] Test notifications FCM
