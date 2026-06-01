@@ -47,7 +47,7 @@
 - [x] Envoi FCM notifications
 - [x] Corriger clés localStorage hardcodées (CART_KEY, ORDERS_HIST_KEY, STORE_KEY_SEC, CALLS_KEY, MSGS_KEY → _PFX)
 
-## PHASE 5 — Capacitor apps ✅ (partiel — build manuel requis)
+## PHASE 5 — Capacitor apps ✅
 
 - [x] Refactor `control-app/index.html` — dashboard SaaS global (fait en Phase 3)
 - [x] Refactor `server-app/index.html` — app serveur SaaS (fait en Phase 3)
@@ -56,10 +56,10 @@
 - [x] Copier projet Android depuis H: Controle Native → `control-app/android/`
 - [x] Créer templates `google-services.json.TEMPLATE` pour les deux apps
 - [x] Créer `BUILD.md` avec instructions complètes
-- [ ] **MALEK** : Télécharger `google-services.json` SaaS depuis Firebase Console (package: `com.menupro.control` et `com.menupro.serveur`)
-- [ ] **MALEK** : `npx cap add android` pour server-app (avec Node.js 18/20)
-- [ ] Build APK Control SaaS (Android Studio)
-- [ ] Build APK Server SaaS (Android Studio)
+- [x] `google-services.json` SaaS téléchargé pour `com.menupro.control` et `com.menupro.serveur`
+- [x] Build APK Control : `G:\Mon Drive\menu-saas-platform\builds\control-app\debug\MenuProControl-v1.0.apk`
+- [x] Build APK Server : `G:\Mon Drive\menu-saas-platform\builds\server-app\debug\MenuProServeur-v1.0.apk`
+- [x] G: entièrement autonome — builds sans dépendance H:
 
 ## PHASE 6 — Table system + QR ✅
 

@@ -67,16 +67,16 @@ Aucune donnée globale autorisée.
 | Phase | Titre | Statut |
 |-------|-------|--------|
 | 1  | Clonage complet | ✅ TERMINÉ |
-| 2  | Audit système existant | ⏳ EN ATTENTE |
-| 3  | Firebase SaaS Architecture | 🔶 REFACTORING OK — FIREBASE SaaS À CRÉER |
-| 4  | Flow commande complet | ⏳ EN ATTENTE |
-| 5  | Capacitor apps | ⏳ EN ATTENTE |
-| 6  | Table system + QR | ⏳ EN ATTENTE |
-| 7  | QR generation pro | ⏳ EN ATTENTE |
-| 8  | Vercel API notifications | ⏳ EN ATTENTE |
-| 9  | Auth + Session | ⏳ EN ATTENTE |
-| 10 | Feature flags | ⏳ EN ATTENTE |
-| 11 | Logging system | ⏳ EN ATTENTE |
-| 12 | Setup outils | ⏳ EN ATTENTE |
-| 13 | Tests + compatibilité | ⏳ EN ATTENTE |
+| 2  | Audit système existant | ✅ TERMINÉ |
+| 3  | Firebase SaaS Architecture | ✅ TERMINÉ — projet `menu-saas-platform` actif |
+| 4  | Flow commande complet | ✅ TERMINÉ |
+| 5  | Capacitor apps | ✅ TERMINÉ — APKs buildés depuis G: |
+| 6  | Table system + QR | ✅ TERMINÉ |
+| 7  | QR generation pro | ✅ TERMINÉ — `qr-generator.html` + export PDF |
+| 8  | Vercel API notifications | ✅ TERMINÉ — `api/notify.js` SaaS |
+| 9  | Auth + Session | ✅ TERMINÉ — session tokens Firebase |
+| 10 | Feature flags | ✅ TERMINÉ — tableSystem, qrOrdering |
+| 11 | Logging system | ✅ TERMINÉ — orders, errors, actions, notifications |
+| 12 | Setup outils | ✅ TERMINÉ — GitHub + Vercel + Firebase déployés |
+| 13 | Tests + compatibilité | 🔶 PROTOCOLE CRÉÉ — tests APK en cours |
 | 14 | Recovery system | ✅ TERMINÉ (fichiers créés) |

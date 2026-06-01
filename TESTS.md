@@ -7,10 +7,11 @@ Protocole de test avant mise en production.
 
 ## Prérequis
 
-- [ ] Vercel déployé avec `FIREBASE_SERVICE_ACCOUNT` configuré
-- [ ] Firebase RTDB `menu-saas-platform` accessible
-- [ ] Au moins un restaurant créé dans RTDB : `restaurants/demo/config/adminHash`
-- [ ] Un téléphone Android avec l'APK server-app installé
+- [x] Vercel déployé : `https://menu-saas-platform.vercel.app/` avec `FIREBASE_SERVICE_ACCOUNT` configuré
+- [x] Firebase RTDB `menu-saas-platform` accessible
+- [x] Restaurant `demo` créé dans RTDB avec mot de passe `MenuPro2026`
+- [x] APK Control : `builds/control-app/debug/MenuProControl-v1.0.apk`
+- [ ] APK Server installé sur un téléphone Android staff (Redmi Note 13 5G)
 
 ---
 
