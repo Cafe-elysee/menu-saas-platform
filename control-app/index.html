@@ -1534,10 +1534,11 @@ function loadClientsFromFirebase() {
   if (!_saasDb) return;
   _saasDb.ref('restaurants').once('value', snap => {
     const data = snap.val() || {};
+    const SAAS_URL = 'https://menu-saas-platform.vercel.app';
     const loaded = Object.entries(data).map(([slug, r]) => ({
       name:     (r.profile && r.profile.name)     || slug,
       slug,
-      url:      (r.profile && r.profile.url)      || '',
+      url:      SAAS_URL,   // URL SaaS unique pour tous les clients
       langs:    (r.profile && r.profile.langs)    || ['fr'],
       noEvents: !!(r.profile && r.profile.noEvents),
       demoPage: !!(r.profile && r.profile.demoPage)
@@ -1895,7 +1896,7 @@ function buildClientCard(client) {
     '</div>' +
     '<div class="card-body"><div class="card-body-inner">' +
       '<div class="card-links">' +
-        '<a class="card-link" href="'+client.url+'" target="_blank">Menu ↗</a>' +
+        '<a class="card-link" href="https://menu-saas-platform.vercel.app/?rid='+s+'" target="_blank">Menu ↗</a>' +
         '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
       '</div>' +
 
@@ -1962,9 +1963,8 @@ function toggleCard(id) {
 
 async function openAdmin(e, slug) {
   e.preventDefault();
-  const client = CLIENTS.find(c => c.slug === slug);
   await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
-  window.open(client.url + '/admin.html?ctrl=1', '_blank');
+  window.open('https://menu-saas-platform.vercel.app/admin.html?rid=' + slug + '&ctrl=1', '_blank');
 }
 
 async function toggleClientActive(slug) {
