@@ -17,6 +17,12 @@ server-app/android/
 # Templates (remplacés par les vrais fichiers)
 *.TEMPLATE
 
+# Documentation (Drive uniquement, pas dans Git)
+*.md
+
+# APKs
+*.apk
+
 # OS
 .DS_Store
 Thumbs.db
