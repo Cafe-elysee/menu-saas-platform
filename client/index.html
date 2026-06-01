@@ -5477,12 +5477,12 @@ let activeCat  = 'all';
 
 const _LIGHT_DEFAULT_THEMES = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white'];
 function _defaultThemeMode(vt) { return _LIGHT_DEFAULT_THEMES.includes(vt) ? 'light' : 'dark'; }
-function _loadThemeMode(themeId) { return localStorage.getItem(_rid + '_theme_mode_' + themeId) || _defaultThemeMode(themeId); }
+function _loadThemeMode(themeId) { return localStorage.getItem(_RID + '_theme_mode_' + themeId) || _defaultThemeMode(themeId); }
 function _saveThemeMode(themeId, mode) { localStorage.setItem(_PFX+'theme_mode_' + themeId, mode); }
 
 let _cachedVisualTheme = 'gold-noir';
 try {
-  const _cr = localStorage.getItem(_rid + '_admin_data_v1');
+  const _cr = localStorage.getItem(_RID + '_admin_data_v1');
   if (_cr) { const _cc = JSON.parse(_cr); if (_cc.menuTheme) _cachedVisualTheme = _cc.menuTheme; }
 } catch(_) {}
 let theme = _loadThemeMode(_cachedVisualTheme);
@@ -5565,7 +5565,7 @@ function loadAdminData() {
 
   // Afficher d'abord avec les données en cache (instantané)
   try {
-    const raw = localStorage.getItem(_rid + '_admin_data_v1');
+    const raw = localStorage.getItem(_RID + '_admin_data_v1');
     if (raw) {
       const cached = JSON.parse(raw);
       if (cached.menuTheme) {
