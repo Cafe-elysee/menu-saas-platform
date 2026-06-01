@@ -1663,11 +1663,11 @@ const DEFAULT_CATS = [
 
 const DEFAULT_INFO = {
   wifi_name:  { el:'WiFi', fr:'WiFi', en:'WiFi', de:'WLAN', ar:'واي فاي' },
-  wifi_val:   { el:'Elysee_Free · Elysee2026', fr:'Elysee_Free · Elysee2026', en:'Elysee_Free · Elysee2026', de:'Elysee_Free · Elysee2026', ar:'Elysee_Free · Elysee2026' },
+  wifi_val:   { el:'', fr:'', en:'', de:'', ar:'' },
   hours_name: { el:'Ωράριο', fr:'Horaires', en:'Hours', de:'Öffnungszeiten', ar:'أوقات العمل' },
   hours_val:  { el:'Δευ–Σαβ 7:00–22:00 · Κυρ 8:00–21:00', fr:'Lun–Sam 7h00–22h00 · Dim 8h00–21h00', en:'Mon–Sat 7:00–22:00 · Sun 8:00–21:00', de:'Mo–Sa 7:00–22:00 · So 8:00–21:00', ar:'الإثنين–السبت 7:00–22:00 · الأحد 8:00–21:00' },
   addr_name:   { el:'Διεύθυνση', fr:'Adresse', en:'Address', de:'Adresse', ar:'العنوان' },
-  addr_val:    { el:'12, Οδός Ερμού · Κολωνάκι, Αθήνα', fr:'12, Rue Hermès · Kolonaki, Athènes', en:'12, Hermès Street · Kolonaki, Athens', de:'12, Hermès-Straße · Kolonaki, Athen', ar:'12، شارع هيرميس · كولوناكي، أثينا' },
+  addr_val:    { el:'', fr:'', en:'', de:'', ar:'' },
   showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
@@ -2217,10 +2217,10 @@ const ADMIN_UI = {
    HERO MOCKUP TEXTS — miroir de index.html UI
 ═══════════════════════════════════════════ */
 const HERO_TEXTS = {
-  el: { tagline:'Μια εκλεπτυσμένη γαστρονομική εμπειρία', sub:['Εκλεκτοί καφέδες','Γαστρονομία','Κολωνάκι, Αθήνα'], explore:'Μενού' },
+  el: { tagline:'', sub:[], explore:'Μενού' },
   fr: { tagline:'Une expérience culinaire raffinée',       sub:["Cafés d'exception",'Plats gourmets','Ambiance élégante'],      explore:'Menu' },
   en: { tagline:'A refined culinary experience',           sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],    explore:'Menu' },
-  ar: { tagline:'تجربة طهي راقية',                         sub:['قهوة استثنائية','أطباق راقية','كولوناكي، أثينا'],               explore:'القائمة' },
+  ar: { tagline:'',                                           sub:[],                                                               explore:'القائمة' },
 };
 
 function updateMockupText() {
@@ -2787,7 +2787,7 @@ function renderLogoSection() {
           const fd = new FormData();
           fd.append('file', blob);
           fd.append('upload_preset', CLOUDINARY_PRESET);
-          fd.append('public_id', 'cafe-elysee/logo');
+          fd.append('public_id', _RID + '/logo');
           fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
             .then(r => r.json()).then(json => {
               if (!json.secure_url) throw new Error('Upload failed');
@@ -4272,7 +4272,7 @@ function getDefaultItems() {
     id:1, cat:0, price:'€3.50', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
     name:{ fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
-    desc:{ fr:'Café court et intense — pur, concentré, signature Mozart.', en:'Short and intense coffee — pure, concentrated, Mozart signature.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، توقيع موزارت.' },
+    desc:{ fr:'Café court et intense — pur, concentré, servi chaud.', en:'Short and intense coffee — pure, concentrated, served hot.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، تُقدَّم ساخنة.' },
     full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', ar:'يُستخلص إسبريسونا على ضغط مثالي 9 بار، ليكشف نكهات عميقة من البندق والشوكولاتة الداكنة. يُقدَّم في كوب مسخَّن مسبقاً للحفاظ على كل نكهاته.' },
     allergens:{ fr:[], en:[], ar:[] }
   },

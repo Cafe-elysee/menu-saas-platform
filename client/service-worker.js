@@ -1,9 +1,9 @@
 /* ================================================
-   Service Worker — Café Élysée Serveur
+   Service Worker — Menu Pro SaaS
    Gère le cache offline + notifications push
 ================================================ */
 
-const CACHE = 'cafe-elysee-v1';
+const CACHE = 'menu-saas-v1';
 const ASSETS = [
   'app.html',
   'manifest.json',
