@@ -1532,22 +1532,21 @@ function initFirebase() {
 // Charge dynamiquement la liste des restaurants depuis Firebase SaaS
 function loadClientsFromFirebase() {
   if (!_saasDb) return;
-  _saasDb.ref('restaurants').once('value', snap => {
+  // on() au lieu de once() → mise à jour automatique en temps réel
+  _saasDb.ref('restaurants').on('value', snap => {
     const data = snap.val() || {};
     const SAAS_URL = 'https://menu-saas-platform.vercel.app';
     const loaded = Object.entries(data).map(([slug, r]) => ({
       name:     (r.profile && r.profile.name)     || slug,
       slug,
-      url:      SAAS_URL,   // URL SaaS unique pour tous les clients
+      url:      SAAS_URL,
       langs:    (r.profile && r.profile.langs)    || ['fr'],
       noEvents: !!(r.profile && r.profile.noEvents),
       demoPage: !!(r.profile && r.profile.demoPage)
     }));
-    if (loaded.length > 0) {
-      CLIENTS.length = 0;
-      loaded.forEach(cl => CLIENTS.push(cl));
-      buildClientsTab();
-    }
+    CLIENTS.length = 0;
+    loaded.forEach(cl => CLIENTS.push(cl));
+    buildClientsTab();
   });
 }
 
