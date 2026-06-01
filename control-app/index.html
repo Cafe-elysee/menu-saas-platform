@@ -1602,6 +1602,8 @@ function buildClientCard(client) {
       '<div class="feat-list">' +
         togFeat('feat-btn-callBtn','🔔 Bouton sonnette',"writeFeatureBtn('"+s+"','callBtn',this.checked)") +
         togFeat('feat-btn-orderUI','🛒 Interface commande',"writeFeatureBtn('"+s+"','orderUI',this.checked)") +
+        togFeat('feat-btn-tableSystem','📍 Système de tables QR',"writeFeatureBtn('"+s+"','tableSystem',this.checked)") +
+        togFeat('feat-btn-qrOrdering','📷 Commande QR (sans prompt table)',"writeFeatureBtn('"+s+"','qrOrdering',this.checked)") +
         togFeat('feat-btn-photos','🖼️ Photos produits',"writeFeatureBtn('"+s+"','photos',this.checked)") +
         (client.noEvents ? '' : togFeat('feat-btn-eventOverlay','🎉 Overlay fêtes',"writeFeatureBtn('"+s+"','eventOverlay',this.checked)")) +
       '</div>' +
@@ -1677,8 +1679,10 @@ function loadClientData(client) {
     const state = getClientState(s);
 
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
-    set('feat-btn-callBtn',    feat.callBtn);
-    set('feat-btn-orderUI',    feat.orderUI);
+    set('feat-btn-callBtn',      feat.callBtn);
+    set('feat-btn-orderUI',      feat.orderUI);
+    set('feat-btn-tableSystem',  feat.tableSystem);
+    set('feat-btn-qrOrdering',   feat.qrOrdering);
     set('feat-btn-photos',     feat.photos);
     set('feat-btn-eventOverlay', feat.eventOverlay);
 

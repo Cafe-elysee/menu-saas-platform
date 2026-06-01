@@ -1638,6 +1638,11 @@ async function _hashPwd(pwd) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+// Error logging global → Firebase logs/errors/
+window.addEventListener('error', ev => {
+  try { _rref('logs/errors/' + Date.now()).set({ msg: String(ev.message).slice(0,200), src: String(ev.filename).slice(0,100), line: ev.lineno, ts: Date.now(), ctx: 'admin' }); } catch(e) {}
+});
+
 /* ═══════════════════════════════════════════
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
@@ -2345,6 +2350,7 @@ document.getElementById('adm-theme-btn').addEventListener('click', () => {
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
+  _logAction('logout');
   await _closeSession();
   location.reload();
 });
@@ -2361,6 +2367,7 @@ async function doLogin() {
 
   if (hash === expectedHash) {
     await _openSession();
+    _logAction('login');
     showAdmin();
   } else {
     document.getElementById('login-err').textContent = 'Mot de passe incorrect.';
@@ -5339,7 +5346,7 @@ function syncStyleAdminUI(mode) {
   const ordersSection = document.getElementById('orders-admin-section');
   if (ordersSection) ordersSection.style.display = showOrder ? 'block' : 'none';
   const tablesSection = document.getElementById('tables-admin-section');
-  if (tablesSection) tablesSection.style.display = showOrder ? 'block' : 'none';
+  if (tablesSection) tablesSection.style.display = (showOrder && _featOk('tableSystem')) ? 'block' : 'none';
   const scOrdersBtn = document.getElementById('sc-orders-btn');
   if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
 
@@ -5481,6 +5488,12 @@ function toggleOrderCard(cardId) {
 
 function setOrderStatus(orderId, status) {
   _rref('orders/' + orderId + '/status').set(status);
+  _logAction('order_status', { orderId, status });
+}
+
+function _logAction(type, extra) {
+  const ts = Date.now();
+  try { _rref('logs/actions/' + ts).set(Object.assign({ ts, type }, extra || {})); } catch(e) {}
 }
 
 /* ═══════════════════════════════════════════

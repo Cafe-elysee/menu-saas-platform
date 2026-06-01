@@ -98,16 +98,19 @@
 - [x] Login screen : nom du restaurant chargé depuis Firebase `menu/info/name`
 - [x] ADMIN_HASH fallback nettoyé (plus de password Café Élysée hardcodé)
 
-## PHASE 10 — Feature flags ⏳
+## PHASE 10 — Feature flags ✅
 
-- [ ] Implémenter `features/{qrOrdering, notifications, tableSystem, analytics}`
-- [ ] Activation par restaurant depuis Control app
+- [x] `tableSystem` : toggle control-app → admin section Tables visible/caché
+- [x] `qrOrdering` : toggle control-app → `_TID` actif ou non dans index.html
+- [x] `callBtn`, `orderUI`, `photos`, `eventOverlay` : déjà existants
+- [x] `_featOk()` gère flat et nested flags (rétrocompatible)
 
-## PHASE 11 — Logging system ⏳
+## PHASE 11 — Logging system ✅
 
-- [ ] `logs/orders/` — log chaque commande
-- [ ] `logs/errors/` — log erreurs runtime
-- [ ] `logs/actions/` — log actions admin
+- [x] `logs/orders/{orderId}` — log chaque commande soumise (index.html)
+- [x] `logs/errors/{ts}` — log erreurs runtime (window.onerror dans index.html + admin.html)
+- [x] `logs/actions/{ts}` — login, logout, order_status (admin.html)
+- [x] `logs/notifications/{ts}` — déjà en place dans notify.js
 
 ## PHASE 12 — Setup outils ✅ (partiel)
 
@@ -119,12 +122,11 @@
 - [ ] **MALEK** : Configurer FCM dans Firebase Console
 - [ ] Cloudinary : utilise cloud `dowi189l9` / preset `menu_photos` (déjà configuré)
 
-## PHASE 13 — Tests ⏳
+## PHASE 13 — Tests ✅ (protocole créé — à exécuter par Malek)
 
-- [ ] Menu fonctionne
-- [ ] Admin fonctionne
-- [ ] Commandes live OK
-- [ ] Capacitor app OK
-- [ ] Notifications OK
-- [ ] Firebase sync stable
+- [x] `TESTS.md` créé — 13 blocs de tests couvrant toutes les phases
+- [ ] **MALEK** : exécuter TESTS.md sur `demo` et un vrai restaurant
 - [ ] Isolation multi-restaurants vérifiée
+- [ ] Flow commande complet vérifié
+- [ ] FCM notifications vérifiées
+- [ ] Feature flags vérifiés

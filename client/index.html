@@ -4766,6 +4766,12 @@
     const _RID  = new URLSearchParams(location.search).get('rid') || 'demo';
     const _PFX  = _RID + '_'; // préfixe localStorage isolé par restaurant
     const _TID  = new URLSearchParams(location.search).get('table') || null; // table fixée par QR code
+    let   _qrOrderingEnabled = true; // chargé depuis config/features/qrOrdering
+
+    // Error logging global → Firebase logs/errors/
+    window.addEventListener('error', ev => {
+      try { _rref('logs/errors/' + Date.now()).set({ msg: String(ev.message).slice(0,200), src: String(ev.filename).slice(0,100), line: ev.lineno, ts: Date.now() }); } catch(e) {}
+    });
     // _rref : préfixe tous les chemins Firebase avec restaurants/{rid}/
     const _rref = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
   </script>
@@ -5613,6 +5619,14 @@ function loadAdminData() {
   _rref('/config/enabledLangs').on('value', snap => {
     enabledLangs = snap.val() || {};
     buildLangBtns();
+  });
+
+  // Feature flag : qrOrdering (commande sans prompt table quand _TID présent)
+  _rref('/config/features/qrOrdering').on('value', snap => {
+    _qrOrderingEnabled = snap.val() !== false;
+    // Si désactivé, cacher le chip table
+    const chip = document.getElementById('table-chip');
+    if (chip) chip.style.display = (_TID && _qrOrderingEnabled) ? '' : 'none';
   });
 
   // Licence overlay fêtes (depuis Control)
@@ -6845,7 +6859,7 @@ async function confirmOrder() {
   let tableNum;
   if (isTakeaway) {
     tableNum = t.histTakeaway || 'À emporter';
-  } else if (_TID) {
+  } else if (_TID && _qrOrderingEnabled) {
     tableNum = _TID; // fixé par URL QR code
   } else {
     const numStr = await promptTableNumber(t);
@@ -6877,6 +6891,9 @@ async function confirmOrder() {
 
   try {
     await _rref('orders/' + orderId).set(order);
+
+    // Log commande
+    _rref('logs/orders/' + orderId).set({ ts: orderId, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
 
     // Historique local
     saveOrderToHistory(orderId, tableNum, items, total);
