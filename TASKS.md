@@ -70,13 +70,14 @@
 - [x] Affichage "📍 Table X" chip dans nav quand `_TID` est défini
 - [ ] Phase 7 (QR generation pro) : export PDF QR codes avec jsPDF
 
-## PHASE 7 — QR generation pro ⏳
+## PHASE 7 — QR generation pro ✅
 
-- [ ] Page `qr-generator.html`
-- [ ] Intégration `QRCode.js`
-- [ ] Génération batch (toutes les tables)
-- [ ] Grid view + preview
-- [ ] Download PDF via `jsPDF` avec branding
+- [x] Page `client/qr-generator.html` — standalone, accessible depuis admin
+- [x] Intégration `QRCode.js` (CDN)
+- [x] Génération batch (1-99 tables), config rid + URL de base + taille
+- [x] Grid view avec sélection individuelle / tout sélectionner
+- [x] Copier URLs sélectionnées (clipboard)
+- [x] Export PDF via `jsPDF` : fond noir, branding or, grille 3 colonnes, multi-pages
 
 ## PHASE 8 — Vercel API notifications ✅
 
@@ -108,13 +109,15 @@
 - [ ] `logs/errors/` — log erreurs runtime
 - [ ] `logs/actions/` — log actions admin
 
-## PHASE 12 — Setup outils ⏳
+## PHASE 12 — Setup outils ✅ (partiel)
 
-- [ ] Créer repo GitHub SaaS
-- [ ] Créer projet Vercel SaaS
-- [x] Créer projet Firebase SaaS (`menu-saas-platform`)
-- [ ] Configurer FCM
-- [ ] Configurer Cloudinary si nécessaire
+- [x] Créer repo GitHub SaaS : `github.com/Cafe-elysee/menu-saas-platform`
+- [x] Créer projet Firebase SaaS (`menu-saas-platform`) — credentials dans STATE.md
+- [x] `BUILD.md` — instructions complètes build + déploiement
+- [ ] **MALEK** : Créer projet Vercel SaaS (lier au repo GitHub)
+- [ ] **MALEK** : Configurer variable `FIREBASE_SERVICE_ACCOUNT` dans Vercel
+- [ ] **MALEK** : Configurer FCM dans Firebase Console
+- [ ] Cloudinary : utilise cloud `dowi189l9` / preset `menu_photos` (déjà configuré)
 
 ## PHASE 13 — Tests ⏳
 

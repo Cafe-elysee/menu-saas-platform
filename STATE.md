@@ -2,7 +2,7 @@
 
 ## Date dernière mise à jour : 2026-06-01
 
-## Phase courante : PHASE 6 TERMINÉE — PROCHAINE : PHASE 7 (QR PDF) ou PHASE 9 (AUTH)
+## Phase courante : PHASES 7-9-12 TERMINÉES — PROCHAINE : PHASE 10 (FEATURE FLAGS) ou PHASE 13 (TESTS)
 
 ---
 

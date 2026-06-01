@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur QR Codes — Menu Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --gold:#c8a44e; --bg:#0f0d0a; --bg2:#1a1612; --bg3:#221e18;
+    --cream:#f0e6d0; --muted:#7a6a52; --border:rgba(200,164,78,0.18);
+    --red:#e05555;
+  }
+  html.light { --bg:#f5f0e8; --bg2:#ffffff; --bg3:#ede7dc; --cream:#1a1208; --muted:#8a7058; --border:rgba(168,104,64,0.22); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Outfit','Noto Sans',sans-serif; background:var(--bg); color:var(--cream); min-height:100vh; padding:24px 16px 60px; }
+  h1 { font-family:'Crimson Pro',serif; font-size:1.6rem; color:var(--gold); margin-bottom:4px; letter-spacing:0.04em; }
+  .sub { font-size:0.75rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:28px; }
+
+  .config-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:24px; }
+  .config-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .config-row:last-child { margin-bottom:0; }
+  label { font-size:0.8rem; color:var(--muted); min-width:120px; }
+  input[type=text], input[type=number] {
+    background:var(--bg3); border:1.5px solid var(--border); border-radius:10px;
+    padding:9px 14px; color:var(--cream); font-family:inherit; font-size:0.9rem;
+    outline:none; transition:border-color 0.2s;
+  }
+  input:focus { border-color:var(--gold); }
+  input[type=number] { width:80px; }
+  input[type=text] { flex:1; min-width:180px; }
+
+  .btn { padding:10px 22px; border-radius:12px; border:none; font-family:inherit; font-size:0.88rem; font-weight:700; cursor:pointer; transition:opacity 0.2s, transform 0.15s; }
+  .btn:active { transform:scale(0.95); }
+  .btn-primary { background:var(--gold); color:#0c0a08; }
+  .btn-secondary { background:var(--bg3); color:var(--cream); border:1px solid var(--border); }
+  .btn-danger { background:var(--red); color:#fff; }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+
+  /* QR Grid */
+  #qr-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap:16px;
+  }
+  .qr-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+    padding:16px 12px; display:flex; flex-direction:column; align-items:center; gap:10px;
+    cursor:pointer; transition:border-color 0.2s, transform 0.15s;
+    user-select:none;
+  }
+  .qr-card:hover { border-color:var(--gold); }
+  .qr-card.selected { border-color:var(--gold); background:rgba(200,164,78,0.07); }
+  .qr-card:active { transform:scale(0.97); }
+  .qr-canvas-wrap { background:#fff; border-radius:8px; padding:8px; }
+  .qr-label { font-size:0.78rem; font-weight:700; color:var(--gold); }
+  .qr-url { font-size:0.58rem; color:var(--muted); font-family:monospace; text-align:center; word-break:break-all; }
+
+  #status { font-size:0.78rem; color:var(--muted); margin-bottom:12px; min-height:20px; }
+  #status.ok { color:var(--gold); }
+  #status.err { color:var(--red); }
+
+  .sel-bar { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .sel-bar label { font-size:0.78rem; color:var(--muted); }
+
+  /* Dark/light toggle */
+  #theme-btn { position:fixed; top:16px; right:16px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--cream); cursor:pointer; font-size:0.8rem; }
+
+  html.light .qr-canvas-wrap { background:#f5f5f5; }
+</style>
+</head>
+<body>
+
+<button id="theme-btn" onclick="toggleTheme()">🌙</button>
+
+<h1>Générateur QR Codes</h1>
+<div class="sub">Menu Pro — Système de tables</div>
+
+<div class="config-card">
+  <div class="config-row">
+    <label>Restaurant ID</label>
+    <input type="text" id="inp-rid" placeholder="cafe-demo" value="">
+  </div>
+  <div class="config-row">
+    <label>URL de base</label>
+    <input type="text" id="inp-base" placeholder="https://votre-site.vercel.app/client/index.html">
+  </div>
+  <div class="config-row">
+    <label>Nombre de tables</label>
+    <input type="number" id="inp-count" min="1" max="99" value="5">
+    <button class="btn btn-primary" onclick="generate()">Générer</button>
+  </div>
+  <div class="config-row">
+    <label>Taille QR (px)</label>
+    <input type="number" id="inp-size" min="80" max="300" value="160">
+  </div>
+  <div class="config-row">
+    <label>Titre PDF</label>
+    <input type="text" id="inp-title" placeholder="Mon Restaurant" value="">
+  </div>
+</div>
+
+<div id="status"></div>
+
+<div class="sel-bar">
+  <label>Sélection :</label>
+  <button class="btn btn-secondary" onclick="selectAll()">Tout sélectionner</button>
+  <button class="btn btn-secondary" onclick="selectNone()">Tout désélectionner</button>
+  <span id="sel-count" style="font-size:0.78rem;color:var(--muted)"></span>
+</div>
+
+<div class="actions">
+  <button class="btn btn-primary" id="btn-pdf" onclick="exportPDF()" disabled>Exporter PDF</button>
+  <button class="btn btn-secondary" id="btn-copy-all" onclick="copySelected()">Copier URLs</button>
+</div>
+
+<div id="qr-grid"></div>
+
+<script>
+const params = new URLSearchParams(location.search);
+let selectedTables = new Set();
+
+// Pré-remplir depuis URL
+(function init() {
+  const rid = params.get('rid') || '';
+  if (rid) document.getElementById('inp-rid').value = rid;
+
+  const base = location.href.replace(/qr-generator\.html.*$/, 'index.html');
+  document.getElementById('inp-base').value = base;
+
+  // Thème sauvegardé
+  const theme = localStorage.getItem('qr_theme') || 'dark';
+  if (theme === 'light') document.documentElement.classList.add('light');
+
+  generate();
+})();
+
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('qr_theme', isLight ? 'light' : 'dark');
+}
+
+function getTableURL(n) {
+  const rid  = document.getElementById('inp-rid').value.trim() || 'demo';
+  const base = document.getElementById('inp-base').value.trim();
+  return base + '?rid=' + rid + '&table=' + n;
+}
+
+function generate() {
+  const count = parseInt(document.getElementById('inp-count').value) || 0;
+  const size  = parseInt(document.getElementById('inp-size').value) || 160;
+  const grid  = document.getElementById('qr-grid');
+  const status = document.getElementById('status');
+
+  if (count < 1 || count > 99) {
+    status.textContent = 'Nombre de tables invalide (1-99).';
+    status.className = 'err';
+    return;
+  }
+
+  grid.innerHTML = '';
+  selectedTables.clear();
+  updateSelCount();
+  document.getElementById('btn-pdf').disabled = true;
+
+  status.textContent = 'Génération en cours…';
+  status.className = '';
+
+  for (let i = 1; i <= count; i++) {
+    const url = getTableURL(i);
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.dataset.table = i;
+    card.innerHTML = `
+      <div class="qr-canvas-wrap" id="qr-wrap-${i}"></div>
+      <div class="qr-label">Table ${i}</div>
+      <div class="qr-url">${url}</div>`;
+    card.addEventListener('click', () => toggleSelect(i, card));
+    grid.appendChild(card);
+
+    new QRCode(document.getElementById('qr-wrap-' + i), {
+      text: url,
+      width: size,
+      height: size,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  status.textContent = count + ' QR codes générés.';
+  status.className = 'ok';
+}
+
+function toggleSelect(n, card) {
+  if (selectedTables.has(n)) {
+    selectedTables.delete(n);
+    card.classList.remove('selected');
+  } else {
+    selectedTables.add(n);
+    card.classList.add('selected');
+  }
+  updateSelCount();
+}
+
+function selectAll() {
+  document.querySelectorAll('.qr-card').forEach(card => {
+    const n = parseInt(card.dataset.table);
+    selectedTables.add(n);
+    card.classList.add('selected');
+  });
+  updateSelCount();
+}
+
+function selectNone() {
+  selectedTables.clear();
+  document.querySelectorAll('.qr-card').forEach(card => card.classList.remove('selected'));
+  updateSelCount();
+}
+
+function updateSelCount() {
+  const n = selectedTables.size;
+  document.getElementById('sel-count').textContent = n > 0 ? n + ' sélectionnée(s)' : '';
+  document.getElementById('btn-pdf').disabled = n === 0;
+}
+
+function copySelected() {
+  if (selectedTables.size === 0) {
+    const allCards = document.querySelectorAll('.qr-card');
+    const urls = Array.from(allCards).map(c => getTableURL(parseInt(c.dataset.table)));
+    navigator.clipboard.writeText(urls.join('\n'));
+  } else {
+    const urls = Array.from(selectedTables).sort((a,b)=>a-b).map(n => getTableURL(n));
+    navigator.clipboard.writeText(urls.join('\n'));
+  }
+  const btn = document.getElementById('btn-copy-all');
+  btn.textContent = 'Copié !';
+  setTimeout(() => { btn.textContent = 'Copier URLs'; }, 2000);
+}
+
+async function exportPDF() {
+  if (selectedTables.size === 0) return;
+
+  const { jsPDF } = window.jspdf;
+  const title  = document.getElementById('inp-title').value.trim() || document.getElementById('inp-rid').value.trim() || 'Menu Pro';
+  const size   = parseInt(document.getElementById('inp-size').value) || 160;
+  const tables = Array.from(selectedTables).sort((a,b) => a - b);
+
+  const status = document.getElementById('status');
+  status.textContent = 'Génération du PDF…';
+  status.className = '';
+
+  const QR_PX  = size;
+  const QR_MM  = 50;          // taille QR en mm dans le PDF
+  const MARGIN = 15;          // marges
+  const COL    = 3;           // colonnes par page
+  const CELL_W = (210 - MARGIN * 2) / COL;  // A4 = 210mm
+  const CELL_H = QR_MM + 20;
+  const ROW_H  = CELL_H + 8;
+  const TOP    = MARGIN + 14;
+
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const totalPages = Math.ceil(tables.length / (COL * Math.floor((297 - TOP - MARGIN) / ROW_H)));
+  let page = 1;
+  let colIdx = 0;
+  let rowIdx = 0;
+
+  const ROWS_PER_PAGE = Math.floor((297 - TOP - MARGIN) / ROW_H);
+
+  function addPageHeader() {
+    doc.setFillColor(15, 13, 10);
+    doc.rect(0, 0, 210, 297, 'F');
+    doc.setTextColor(200, 164, 78);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, 105, MARGIN, { align:'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(120, 105, 82);
+    doc.text('QR Codes — Scannez pour commander', 105, MARGIN + 6, { align:'center' });
+    if (totalPages > 1) {
+      doc.text('Page ' + page + ' / ' + totalPages, 195, 290, { align:'right' });
+    }
+  }
+
+  addPageHeader();
+
+  for (let i = 0; i < tables.length; i++) {
+    const n    = tables[i];
+    const wrap = document.getElementById('qr-wrap-' + n);
+    const img  = wrap?.querySelector('img') || wrap?.querySelector('canvas');
+    if (!img) continue;
+
+    const x = MARGIN + colIdx * CELL_W + (CELL_W - QR_MM) / 2;
+    const y = TOP + rowIdx * ROW_H;
+
+    // QR image
+    let imgData;
+    if (img.tagName === 'CANVAS') {
+      imgData = img.toDataURL('image/png');
+    } else {
+      // img tag — draw on canvas first
+      const cv = document.createElement('canvas');
+      cv.width = img.naturalWidth || QR_PX;
+      cv.height = img.naturalHeight || QR_PX;
+      cv.getContext('2d').drawImage(img, 0, 0);
+      imgData = cv.toDataURL('image/png');
+    }
+
+    // Fond blanc pour le QR
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(x - 2, y - 2, QR_MM + 4, QR_MM + 4, 3, 3, 'F');
+    doc.addImage(imgData, 'PNG', x, y, QR_MM, QR_MM);
+
+    // Label table
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(200, 164, 78);
+    doc.text('Table ' + n, x + QR_MM / 2, y + QR_MM + 7, { align:'center' });
+
+    // URL en petit
+    doc.setFontSize(5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 90, 70);
+    const url = getTableURL(n);
+    const urlShort = url.length > 50 ? url.slice(0, 47) + '…' : url;
+    doc.text(urlShort, x + QR_MM / 2, y + QR_MM + 12, { align:'center' });
+
+    colIdx++;
+    if (colIdx >= COL) {
+      colIdx = 0;
+      rowIdx++;
+      if (rowIdx >= ROWS_PER_PAGE && i < tables.length - 1) {
+        rowIdx = 0;
+        page++;
+        doc.addPage();
+        addPageHeader();
+      }
+    }
+  }
+
+  doc.save('qr-tables-' + (document.getElementById('inp-rid').value.trim() || 'menu') + '.pdf');
+  status.textContent = 'PDF téléchargé !';
+  status.className = 'ok';
+}
+</script>
+</body>
+</html>

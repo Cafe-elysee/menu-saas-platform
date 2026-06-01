@@ -1322,6 +1322,7 @@
       const fd = new FormData();
       fd.append('file', blob);
       fd.append('upload_preset', CLOUDINARY_PRESET);
+      fd.append('folder', _RID); // isolation par restaurant
       const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: 'POST', body: fd });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
@@ -1569,6 +1570,7 @@
         <input type="number" id="tables-count-input" class="tables-count-input" min="1" max="99" value="1" inputmode="numeric">
         <button class="tables-count-btn" id="tables-count-save">Générer</button>
         <span style="font-size:0.78rem;color:var(--muted)">tables</span>
+        <a id="qr-generator-link" href="qr-generator.html" target="_blank" style="margin-left:auto;font-size:0.75rem;color:var(--gold);text-decoration:none;padding:6px 12px;border:1px solid var(--border);border-radius:8px;">🖨 PDF QR</a>
       </div>
       <div class="tables-url-list" id="tables-url-list"></div>
     </div>
@@ -5487,6 +5489,10 @@ function setOrderStatus(orderId, status) {
 let _tableCount = 0;
 
 function loadTableSystem() {
+  // Mettre à jour le lien PDF QR avec le rid courant
+  const qrLink = document.getElementById('qr-generator-link');
+  if (qrLink) qrLink.href = 'qr-generator.html?rid=' + _RID;
+
   _rref('config/tableCount').on('value', snap => {
     const n = parseInt(snap.val()) || 0;
     _tableCount = n;
