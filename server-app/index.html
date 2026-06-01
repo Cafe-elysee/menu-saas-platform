@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0908">
-  <title>Mozart Coffee Lounge — Serveur</title>
+  <title>Menu Pro — Serveur</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
@@ -502,8 +502,9 @@
   </style>
   <script>
     (function() {
-      var _r = localStorage.getItem('saas_rid') || 'demo';
-      if (localStorage.getItem(_r + '_app_theme') !== 'dark')
+      var _r = localStorage.getItem('saas_rid');
+      window._NEEDS_SETUP = !_r; // pas de rid → écran de configuration
+      if (_r && localStorage.getItem(_r + '_app_theme') !== 'dark')
         document.documentElement.classList.add('light');
     })();
   </script>
@@ -521,7 +522,7 @@
     });
     const _db    = firebase.database();
     // ── SaaS : restaurantId stocké dans localStorage (configuré au 1er lancement)
-    const _RID   = localStorage.getItem('saas_rid') || 'demo';
+    const _RID   = localStorage.getItem('saas_rid') || '';
     const _PFX   = _RID + '_'; // préfixe localStorage isolé par restaurant
     const _rref  = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
     const isDemo = new URLSearchParams(location.search).get('demo') === '1';
@@ -539,6 +540,21 @@
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:#c8a44e;text-transform:uppercase">Menu Pro</div>
       <div style="height:1px;width:24px;background:#c8a44e"></div>
     </div>
+  </div>
+</div>
+
+<!-- ÉCRAN CONFIGURATION (premier lancement) -->
+<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:#0f0d0a;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <div style="max-width:340px;width:100%">
+    <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">Menu Pro Serveur</div>
+    <div style="font-size:0.78rem;color:#7a6a52;margin-bottom:28px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
+    <div style="font-size:0.82rem;color:#a09070;margin-bottom:10px;text-align:left">Identifiant du restaurant (rid)</div>
+    <input type="text" id="setup-rid-input" placeholder="ex: cafe-oran"
+      style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:rgba(255,255,255,0.04);color:#f2ead8;font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
+    <div style="font-size:0.68rem;color:#7a6a52;margin-bottom:20px">Demande l'identifiant à l'administrateur</div>
+    <div id="setup-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
+    <button onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer">Confirmer</button>
   </div>
 </div>
 
@@ -589,7 +605,7 @@
 <!-- Header -->
 <header class="app-header">
   <div class="header-brand">
-    <div class="header-logo">Mozart Coffee Lounge</div>
+    <div class="header-logo" id="header-logo">Menu Pro</div>
     <div class="header-sub" id="hdr-sub">Interface Serveur</div>
   </div>
   <div class="header-right">
@@ -617,7 +633,7 @@
           Aucun appel reçu pour le moment
         </div>
       </div>
-      <footer class="app-footer">© 2026 Mozart Coffee Lounge</footer>
+      <footer class="app-footer" id="app-footer">© 2026 Menu Pro</footer>
     </section>
 
     <!-- Panel 2 : Commandes -->
@@ -1032,7 +1048,7 @@ function applyLang() {
   var isRTL = LANG_DIRS[lang] === 'rtl';
   document.documentElement.lang = lang;
   document.documentElement.dir  = isRTL ? 'rtl' : 'ltr';
-  document.title = 'Mozart Coffee Lounge — ' + t.hdrSub;
+  document.title = (document.getElementById('header-logo')?.textContent || 'Menu Pro') + ' — ' + t.hdrSub;
   document.getElementById('hdr-sub').textContent         = t.hdrSub;
   document.getElementById('sec-history').textContent     = t.secHistory;
   document.getElementById('sec-orders').textContent      = t.secOrders;
@@ -1368,8 +1384,38 @@ function renderOrders() {
   });
 }
 
+/* ── SETUP RID (premier lancement) ── */
+function confirmSetupRid() {
+  var val = (document.getElementById('setup-rid-input').value || '').trim().toLowerCase();
+  var err = document.getElementById('setup-err');
+  if (!val || !/^[a-z0-9][a-z0-9-]{0,28}[a-z0-9]?$/.test(val)) {
+    err.textContent = 'Identifiant invalide (lettres minuscules, chiffres, tirets).'; return;
+  }
+  localStorage.setItem('saas_rid', val);
+  location.reload();
+}
+
 /* ── INIT ── */
 function init() {
+  // Premier lancement sans rid → écran de configuration
+  if (window._NEEDS_SETUP) {
+    document.getElementById('setup-screen').style.display = 'flex';
+    var inp = document.getElementById('setup-rid-input');
+    if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmSetupRid(); });
+    return;
+  }
+
+  // Charger le nom du restaurant depuis Firebase
+  _rref('menu/info').once('value').then(function(snap) {
+    var info = snap.val() || {};
+    var name = (info.name && (info.name.fr || info.name.el || info.name.en)) || _RID;
+    var logo = document.getElementById('header-logo');
+    var footer = document.getElementById('app-footer');
+    if (logo) logo.textContent = name;
+    if (footer) footer.textContent = '© ' + new Date().getFullYear() + ' ' + name;
+    document.title = name + ' — Serveur';
+  }).catch(function() {});
+
   // Vérifier statut actif du restaurant
   _rref('/config/active').on('value', function(snap) {
     var isActive = snap.val() !== false;
@@ -1436,6 +1482,12 @@ function init() {
 
   _rref('menu/info').once('value').then(function(snap) {
     var info = snap.val() || {};
+    var name = (info.name && (info.name.fr || info.name.el || info.name.en)) || _RID;
+    var logo = document.getElementById('header-logo');
+    var footer = document.getElementById('app-footer');
+    if (logo && logo.textContent === 'Menu Pro') logo.textContent = name;
+    if (footer) footer.textContent = '© ' + new Date().getFullYear() + ' ' + name;
+    document.title = name + ' — Serveur';
     if (info.showOrderUI) { switchTab('orders'); }
   }).catch(function() {});
 }

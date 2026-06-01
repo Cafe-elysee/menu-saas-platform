@@ -280,6 +280,24 @@
     .devis-card.nouveau  { border-left: 3px solid var(--orange); }
     .devis-card.en_cours { border-left: 3px solid var(--gold); }
     .devis-card.traite   { opacity: 0.58; }
+
+    /* Swipe-to-delete devis */
+    .devis-card { position:relative; overflow:hidden; touch-action:pan-y; }
+    .devis-delete-bg {
+      position:absolute; right:0; top:0; bottom:0; width:80px;
+      background:var(--red); display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:1.2rem; opacity:0; transition:opacity 0.2s;
+      pointer-events:none;
+    }
+    .devis-card-inner { transition:transform 0.2s; }
+    .devis-card.swiping .devis-delete-bg { opacity:1; pointer-events:auto; }
+    .devis-card.swiping .devis-card-inner { transform:translateX(-80px); }
+
+    /* Bouton vider devis */
+    .btn-vider-devis {
+      font-size:0.72rem; color:var(--muted); border:1px solid var(--border);
+      border-radius:8px; padding:4px 10px; font-family:inherit;
+    }
     .devis-card.status-flash { animation: statusPulse 0.7s ease forwards; }
     .devis-status-pill { transition: background 0.4s ease, color 0.4s ease; }
     .devis-status-pill.pill-pop { animation: pillPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
@@ -968,7 +986,10 @@
   <div class="tabs-track" id="tabs-track">
     <!-- TAB DEVIS -->
     <div class="tab-pane" id="pane-devis">
-      <div class="section-title">Devis reçus</div>
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Devis reçus</span>
+        <button class="btn-vider-devis" onclick="viderDevis()">🗑️ Vider tout</button>
+      </div>
       <div class="devis-list" id="devis-list">
         <div class="devis-empty" id="devis-empty">
           <div class="devis-empty-icon">📋</div>
@@ -1264,22 +1285,7 @@ const SAAS_FB_CONFIG = {
 // ════════════════════════════════════════════════════
 // CLIENTS — configs Firebase par client
 // ════════════════════════════════════════════════════
-const CLIENTS = [
-  {
-    name: 'Mozart Coffee Lounge',
-    slug: 'mozart',
-    url:  'https://mozart-cafe-menu.vercel.app',
-    langs: ['el','fr','en','ar','de'],
-    noEvents: true
-  },
-  {
-    name: 'Café Élysée',
-    slug: 'cafe-elysee',
-    url:  'https://cafe-elysee-dye1.vercel.app',
-    demoPage: true,
-    langs: ['el','fr','en','ar','de']
-  }
-];
+const CLIENTS = []; // Chargé dynamiquement depuis Firebase SaaS
 
 const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', ar:'العربية' };
 const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
@@ -1710,6 +1716,8 @@ function buildDevisCard(key, d) {
   const waUrl = 'https://wa.me/' + (d.phone||'').replace(/\D/g,'') + '?text=' + encodeURIComponent(waMsg);
 
   card.innerHTML =
+    '<div class="devis-delete-bg" onclick="deleteDevis(\'' + key + '\')">🗑️</div>' +
+    '<div class="devis-card-inner">' +
     '<div class="devis-summary" onclick="toggleDevisCard(\'' + key + '\')">' +
       '<div class="devis-summary-left">' +
         '<span class="devis-phone">' + (d.phone || '—') + '</span>' +
@@ -1746,7 +1754,20 @@ function buildDevisCard(key, d) {
           '</a>' +
         '</div>' +
       '</div>' +
-    '</div>';
+    '</div>' +
+    '</div>'; // fin devis-card-inner
+
+  // Swipe to delete
+  let startX = 0, swiped = false;
+  card.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; swiped = false; }, { passive:true });
+  card.addEventListener('touchend', function(e) {
+    const dx = startX - e.changedTouches[0].clientX;
+    if (dx > 60) { card.classList.add('swiping'); swiped = true; }
+    else if (dx < -20) { card.classList.remove('swiping'); }
+  }, { passive:true });
+  document.addEventListener('touchstart', function(e) {
+    if (!card.contains(e.target) && swiped) { card.classList.remove('swiping'); swiped = false; }
+  }, { passive:true });
 
   // Auto-ouvrir les devis nouveaux
   if (statut === 'nouveau') card.classList.add('open');
@@ -1757,6 +1778,20 @@ function buildDevisCard(key, d) {
 function toggleDevisCard(key) {
   const card = document.querySelector('.devis-card[data-key="' + key + '"]');
   if (card) card.classList.toggle('open');
+}
+
+function deleteDevis(key) {
+  if (!confirm('Supprimer ce devis définitivement ?')) {
+    const card = document.querySelector('.devis-card[data-key="' + key + '"]');
+    if (card) card.classList.remove('swiping');
+    return;
+  }
+  _controlDb.ref('/devis/' + key).remove();
+}
+
+function viderDevis() {
+  if (!confirm('Supprimer TOUS les devis ? Cette action est irréversible.')) return;
+  _controlDb.ref('/devis').remove();
 }
 
 function buildWaMsg(d) {
