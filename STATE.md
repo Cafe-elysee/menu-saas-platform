@@ -2,7 +2,7 @@
 
 ## Date dernière mise à jour : 2026-06-01
 
-## Phase courante : TOUTES LES PHASES TERMINÉES — EN ATTENTE DÉPLOIEMENT VERCEL + TESTS MALEK
+## Phase courante : PRODUCTION READY — EN ATTENTE TESTS APK SUR TÉLÉPHONE
 
 ---
 
@@ -147,7 +147,7 @@ Vercel notify.js
 ```
 
 ### Prochaine étape
-**Phase 6** : Table system + QR codes — admin génère les tables, client voit "Table X"
+Tests APK sur Redmi Note 13 5G (control-app + server-app)
 
 ---
 

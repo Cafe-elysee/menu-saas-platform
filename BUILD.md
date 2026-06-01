@@ -1,5 +1,24 @@
 # BUILD — Menu SaaS Platform
 
+## Commande rapide rebuild (tout depuis G:)
+
+```powershell
+# Mettre à jour les assets ET rebuilder les deux APKs en une commande :
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+$env:ANDROID_HOME = "C:\Users\malek\AppData\Local\Android\Sdk"
+Copy-Item "G:\Mon Drive\menu-saas-platform\client\index.html" "G:\Mon Drive\menu-saas-platform\control-app\android\app\src\main\assets\public\index.html" -Force
+Copy-Item "G:\Mon Drive\menu-saas-platform\server-app\index.html" "G:\Mon Drive\menu-saas-platform\server-app\android\app\src\main\assets\public\index.html" -Force
+Set-Location "G:\Mon Drive\menu-saas-platform\control-app\android"; .\gradlew.bat assembleDebug
+Set-Location "G:\Mon Drive\menu-saas-platform\server-app\android"; .\gradlew.bat assembleDebug
+```
+
+APKs générés dans :
+- `G:\Mon Drive\menu-saas-platform\builds\control-app\debug\MenuProControl-v1.0.apk`
+- `G:\Mon Drive\menu-saas-platform\builds\server-app\debug\MenuProServeur-v1.0.apk`
+
+---
+
+
 ## Prérequis
 
 - Node.js **18 ou 20** LTS (pas v21+) — Capacitor 6 incompatible avec Node.js v25

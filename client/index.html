@@ -4939,7 +4939,7 @@
 ================================================ -->
 <div id="cc-header">
   <img id="cc-logo-img" class="cc-logo" style="display:none" alt="">
-  <div class="cc-name-wrap" id="cc-name-wrap">Café Élysée</div>
+  <div class="cc-name-wrap" id="cc-name-wrap">Menu Pro</div>
   <p class="cc-sub" id="cc-sub"></p>
   <div class="cc-ornament">
     <div class="cc-orn-line"></div>
@@ -4959,7 +4959,7 @@
     <div class="pre-orn-diamond"></div>
     <div class="pre-orn-line" style="background:linear-gradient(270deg,transparent,rgba(200,164,78,0.6))"></div>
   </div>
-  <div class="pre-title" id="pre-title">Café Élysée</div>
+  <div class="pre-title" id="pre-title">Menu Pro</div>
   <div class="pre-tagline" id="pre-tag">Athènes, Grèce</div>
   <div class="pre-shimmer"></div>
 </div>
@@ -4977,7 +4977,7 @@
       <div class="hero-orn-line" style="background:linear-gradient(270deg,transparent,var(--gold))"></div>
     </div>
     <img id="hero-logo-img" class="hero-logo" style="display:none" alt="">
-    <h1 class="hero-title" id="hero-title-text">Café Élysée</h1>
+    <h1 class="hero-title" id="hero-title-text">Menu Pro</h1>
     <p class="hero-tagline" id="hero-tag">Μια εκλεπτυσμένη γαστρονομική εμπειρία</p>
     <p class="hero-sub" id="hero-sub">
       <span class="hero-sub-group"><span id="hero-sub-1">Καφέδες εκλεκτοί</span><span class="hero-sub-dot"></span></span>
@@ -5102,7 +5102,7 @@
     <svg class="ft-ico"><use href="#ico-pin"/></svg>
     <div class="ft-txt" id="ft-addr"></div>
   </div>
-  <div class="ft-cr">© 2026 Café Élysée · Κολωνάκι, Αθήνα</div>
+  <div class="ft-cr" id="ft-cr">© 2026 Menu Pro</div>
 </footer>
 
 <!-- CALL FAB — Appeler le serveur -->
@@ -5213,7 +5213,7 @@ const UI = {
   el: {
     tagline:'Μια εκλεπτυσμένη γαστρονομική εμπειρία',
     sub:['Εκλεκτοί καφέδες','Γαστρονομία','Κολωνάκι, Αθήνα'],
-    preTag:'Café Élysée',
+    preTag:'Menu Pro',
     explore:'Μενού',
     search:'Αναζήτηση στο μενού…',
     all:'Όλα',
@@ -5243,7 +5243,7 @@ const UI = {
   fr: {
     tagline:'Une expérience culinaire raffinée',
     sub:['Cafés d\'exception','Plats gourmets','Ambiance élégante'],
-    preTag:'Café Élysée',
+    preTag:'Menu Pro',
     explore:'Menu',
     search:'Rechercher dans le menu…',
     all:'Tout',
@@ -5273,7 +5273,7 @@ const UI = {
   en: {
     tagline:'A refined culinary experience',
     sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],
-    preTag:'Café Élysée',
+    preTag:'Menu Pro',
     explore:'Menu',
     search:'Search the menu…',
     all:'All',
@@ -5303,7 +5303,7 @@ const UI = {
   ar: {
     tagline:'تجربة طهي راقية',
     sub:['قهوة استثنائية','أطباق راقية','كولوناكي، أثينا'],
-    preTag:'كافيه إليزيه',
+    preTag:'Menu Pro',
     explore:'القائمة',
     search:'ابحث في القائمة…',
     all:'الكل',
@@ -5333,7 +5333,7 @@ const UI = {
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
     sub:['Ausgewählte Kaffeespezialitäten','Gastronomische Gerichte','Elegantes Ambiente'],
-    preTag:'Café Élysée',
+    preTag:'Menu Pro',
     explore:'Speisekarte',
     search:'Speisekarte durchsuchen…',
     all:'Alle',
@@ -6072,6 +6072,12 @@ function applyAdminData(data) {
 
     // Photo d'accueil hero (fallback → image Unsplash si rien dans Firebase)
     applyHeroImage(data.heroImage || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=85');
+
+    // Mettre à jour le copyright footer avec le nom du restaurant
+    if (data.info?.name) {
+      const ftCr = document.getElementById('ft-cr');
+      if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + (data.info.name.fr || data.info.name.el || data.info.name.en || 'Menu Pro');
+    }
 
     // Mettre à jour les infos du footer
     if (data.info) {
