@@ -47,7 +47,7 @@ self.addEventListener('fetch', e => {
 
 /* ── PUSH : notification système même app fermée ── */
 self.addEventListener('push', e => {
-  let title = '🔔 Café Élysée';
+  let title = '🔔 Menu Pro';
   let body  = 'Appel : Table ?';
   let table = '?';
 

@@ -28,7 +28,7 @@
       } catch(e) {}
     })();
   </script>
-  <title>Café Élysée — Menu Digital</title>
+  <title>Menu Pro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -5616,6 +5616,22 @@ function loadAdminData() {
   _applyDemoParams(); // URL params override Firebase/cache
   init_after_data();
 
+  // Charger le nom du restaurant depuis profile/name (créé par Control App)
+  _rref('profile/name').once('value').then(snap => {
+    const name = snap.val() || '';
+    if (name) {
+      _restaurantName = name;
+      const heroTitle = document.getElementById('hero-title-text');
+      if (heroTitle) heroTitle.textContent = name;
+      const ccName = document.getElementById('cc-name-wrap');
+      if (ccName) ccName.textContent = name;
+      const preTitle = document.getElementById('pre-title');
+      if (preTitle) preTitle.textContent = name;
+      const ftCr = document.getElementById('ft-cr');
+      if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + name;
+    }
+  }).catch(() => {});
+
   // Vérifier si le restaurant est actif (config/active)
   _rref('/config/active').on('value', snap => {
     const isActive = snap.val() !== false;
@@ -6115,7 +6131,7 @@ function applyAdminData(data) {
       if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + (data.info.name.fr || data.info.name.el || data.info.name.en || 'Menu Pro');
     }
 
-    // Mettre à jour les infos du footer
+    // Mettre à jour les infos du footer + tagline custom
     if (data.info) {
       Object.keys(UI).forEach(l => {
         if (data.info.wifi_name?.[l])  UI[l].wifiN   = data.info.wifi_name[l];
@@ -6124,6 +6140,7 @@ function applyAdminData(data) {
         if (data.info.hours_val?.[l])  UI[l].hoursV  = data.info.hours_val[l];
         if (data.info.addr_name?.[l])  UI[l].addrN   = data.info.addr_name[l];
         if (data.info.addr_val?.[l])   UI[l].addrV   = data.info.addr_val[l];
+        if (data.info.tagline?.[l])    UI[l].tagline  = data.info.tagline[l];
       });
 
       // Visibilité bouton serveur — pilotée uniquement par le toggle, indépendante du style
@@ -6253,7 +6270,7 @@ function buildFlipBook() {
     </div>
     <div class="fp-hero-content">
       <div class="fp-hero-title">${u.explore || 'Menu'}</div>
-      <div class="fp-hero-tag">Café Élysée</div>
+      <div class="fp-hero-tag">${_restaurantName}</div>
       <div class="fp-hero-sub">${u.tagline || ''}</div>
       <div class="fp-hero-sub2">${(u.sub || []).join(' · ')}</div>
       <div class="fp-wifi">
@@ -7389,6 +7406,7 @@ function init_after_data() {
    LOGO
 ================================================ */
 let _logoUrl = '';
+let _restaurantName = '';
 let _preloaderStarted = false;
 
 function _updateCCHeader() {

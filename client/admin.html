@@ -1369,7 +1369,7 @@
 ══════════════════════════════════════ -->
 <header class="adm-header" id="adm-header" style="display:none">
   <div>
-    <div class="adm-logo">Café Élysée</div>
+    <div class="adm-logo" id="adm-logo-name"></div>
     <div class="adm-sub">Administration du menu</div>
   </div>
   <div class="adm-center">
@@ -1471,7 +1471,7 @@
                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
                 <div class="phone-orn-line phone-orn-line-r"></div>
               </div>
-              <div class="phone-title" id="pm-title">Café Élysée</div>
+              <div class="phone-title" id="pm-title"></div>
               <div class="phone-tagline" id="pm-tagline"></div>
               <div class="phone-sub" id="pm-sub"></div>
               <div class="phone-socials">
@@ -1516,6 +1516,10 @@
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           <span data-uitxt="btnDelLogo">Supprimer le logo</span>
         </button>
+      </div>
+      <div style="margin-top:12px">
+        <div class="info-lbl" style="margin-bottom:6px" data-uitxt="taglineLabel">Slogan (sous le nom)</div>
+        <div id="tagline-inputs"></div>
       </div>
     </div>
   </div>
@@ -2228,7 +2232,12 @@ function updateMockupText() {
   const tagEl  = document.getElementById('pm-tagline');
   const subEl  = document.getElementById('pm-sub');
   const scrlEl = document.querySelector('.phone-scroll-lbl');
-  if (tagEl)  tagEl.textContent = h.tagline;
+  if (tagEl) {
+    const customTagline = adminData?.info?.tagline?.[currentLang]
+      || adminData?.info?.tagline?.[PRIMARY_LANG]
+      || '';
+    tagEl.textContent = customTagline || h.tagline;
+  }
   if (subEl)  subEl.innerHTML   = h.sub.map((s,i) =>
     `<span>${s}</span>${i < h.sub.length - 1 ? '<span class="phone-sub-dot">·</span>' : ''}`
   ).join('');
@@ -2251,9 +2260,9 @@ let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase
    LOGIN + SESSION FIREBASE
 ═══════════════════════════════════════════ */
 async function checkLogin() {
-  // Charger le nom du restaurant pour la page de login
+  // Charger le nom du restaurant pour la page de login (profile/name créé par Control App)
   try {
-    const nameSnap = await _rref('menu/info/name').once('value');
+    const nameSnap = await _rref('profile/name').once('value');
     const rName = nameSnap.val();
     if (rName) {
       const logo = document.getElementById('login-logo');
@@ -2382,6 +2391,16 @@ function showAdmin() {
   document.getElementById('sc-fab').classList.add('show');
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
+  // Charger le nom du restaurant depuis profile/name (créé par Control App)
+  _rref('profile/name').once('value').then(snap => {
+    const name = snap.val() || '';
+    if (name) {
+      const logoEl = document.getElementById('adm-logo-name');
+      const titleEl = document.getElementById('pm-title');
+      if (logoEl)  logoEl.textContent  = name;
+      if (titleEl) titleEl.textContent = name;
+    }
+  }).catch(() => {});
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
   loadData();
   loadMenuTheme();
@@ -2405,12 +2424,12 @@ function applyMenuSnapshot(data) {
   if (data && data.cats && data.cats.length > 0) {
     adminData = data;
     if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
-    if (!adminData.items) adminData.items = getDefaultItems();
+    if (!adminData.items) adminData.items = [];
   } else if (!adminData) {
     adminData = {
-      cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+      cats:  [],
       info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
-      items: getDefaultItems()
+      items: []
     };
   }
   try {
@@ -2454,9 +2473,9 @@ function loadData() {
       if (raw) adminData = JSON.parse(raw);
     } catch(_) {}
     if (!adminData || !adminData.cats) adminData = {
-      cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+      cats:  [],
       info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
-      items: getDefaultItems()
+      items: []
     };
     migrateToEl(adminData);
     renderAll();
@@ -2618,6 +2637,7 @@ function showToast(msg) {
 function renderAll() {
   renderHeroImageSection();
   renderLogoSection();
+  renderTaglineSection();
   renderInfoSection();
   renderNoteSection();
   renderCatsSection();
@@ -2814,6 +2834,33 @@ function renderLogoSection() {
     _rref('menu/logoUrl').set('');
     setLogo('');
     showToast('✅ Logo supprimé');
+  });
+}
+
+/* ─── SECTION TAGLINE ─── */
+function renderTaglineSection() {
+  const container = document.getElementById('tagline-inputs');
+  if (!container) return;
+  let html = '';
+  LANGS.forEach(l => {
+    html += `<input class="info-input tagline-input info-field-${l}${l===currentLang?'':' hide'}"
+      style="${l!==currentLang?'display:none':''}"
+      data-lang="${l}"
+      value="${esc(adminData.info?.tagline?.[l] || '')}"
+      placeholder="Slogan (${l.toUpperCase()})">`;
+  });
+  container.innerHTML = html;
+  container.querySelectorAll('.tagline-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      if (!adminData.info) adminData.info = {};
+      if (!adminData.info.tagline) adminData.info.tagline = {};
+      const l = e.target.dataset.lang;
+      adminData.info.tagline[l] = e.target.value;
+      if (l !== PRIMARY_LANG) setTxLock(`info-tagline-${l}`, e.target.value.trim() !== '');
+      const pmTag = document.getElementById('pm-tagline');
+      if (pmTag && l === currentLang) pmTag.textContent = e.target.value;
+      markUnsaved();
+    });
   });
 }
 
@@ -4086,7 +4133,7 @@ async function doSaveAll() {
   // 2. Auto-traduire depuis la langue principale vers les autres langues
   const srcLang    = PRIMARY_LANG; // Toujours traduire depuis la langue principale
   const targets    = LANGS.filter(l => l !== srcLang);
-  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText'];
+  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText','tagline'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   if (!adminData._txLock)   adminData._txLock   = {};

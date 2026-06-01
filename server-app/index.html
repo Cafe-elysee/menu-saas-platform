@@ -1438,10 +1438,9 @@ function init() {
     return;
   }
 
-  // Charger le nom du restaurant depuis Firebase
-  _rref('menu/info').once('value').then(function(snap) {
-    var info = snap.val() || {};
-    var name = (info.name && (info.name.fr || info.name.el || info.name.en)) || _RID;
+  // Charger le nom du restaurant depuis Firebase (profile/name = source de vérité SaaS)
+  _rref('profile/name').once('value').then(function(snap) {
+    var name = snap.val() || _RID;
     var logo = document.getElementById('header-logo');
     var footer = document.getElementById('app-footer');
     if (logo) logo.textContent = name;
@@ -1513,9 +1512,8 @@ function init() {
   document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });
   document.addEventListener('click',      unlockAudio, { once:true });
 
-  _rref('menu/info').once('value').then(function(snap) {
-    var info = snap.val() || {};
-    var name = (info.name && (info.name.fr || info.name.el || info.name.en)) || _RID;
+  _rref('profile/name').once('value').then(function(snap) {
+    var name = snap.val() || _RID;
     var logo = document.getElementById('header-logo');
     var footer = document.getElementById('app-footer');
     if (logo && logo.textContent === 'Menu Pro') logo.textContent = name;
@@ -1526,7 +1524,10 @@ function init() {
     var elName = document.getElementById('settings-name');
     if (elRid)  elRid.textContent  = _RID;
     if (elName) elName.textContent = name !== _RID ? name : '';
-    if (info.showOrderUI) { switchTab('orders'); }
+  }).catch(function() {});
+  // Optionnel : basculer sur l'onglet commandes si configuré
+  _rref('menu/info/showOrderUI').once('value').then(function(snap) {
+    if (snap.val()) switchTab('orders');
   }).catch(function() {});
 }
 
