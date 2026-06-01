@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0908">
+  <title>Mozart Coffee Lounge — Serveur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0a0908;
+      --bg2:     #111009;
+      --surface: #181512;
+      --card:    rgba(255,255,255,0.055);
+      --gold:    #c8a44e;
+      --gold-l:  #e2c47a;
+      --gold-d:  #9a7a35;
+      --cream:   #f4ead2;
+      --muted:   rgba(244,234,210,0.42);
+      --border:  rgba(200,164,78,0.12);
+      --bord2:   rgba(200,164,78,0.32);
+      --green:   #7ebd6a;
+      --blue:    #4db8ff;
+      --red:     #ff6b6b;
+      --tr:      0.28s cubic-bezier(0.4,0,0.2,1);
+      --r:       18px;
+      --nav-h:   68px;
+      --hdr-h:   64px;
+    }
+    html.light {
+      --bg:      #f5f0e8;
+      --bg2:     #ece7de;
+      --surface: #ffffff;
+      --card:    rgba(255,255,255,0.92);
+      --gold:    #a86840;
+      --gold-l:  #c4855a;
+      --gold-d:  #7d5130;
+      --cream:   #1c1710;
+      --muted:   rgba(28,23,16,0.48);
+      --border:  rgba(168,104,64,0.15);
+      --bord2:   rgba(168,104,64,0.38);
+      --green:   #3d8b30;
+      --blue:    #0066bb;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; overflow:hidden; }
+    body {
+      display:flex; flex-direction:column;
+      background:
+        radial-gradient(ellipse at 18% 0%, rgba(200,164,78,0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 82% 100%, rgba(200,164,78,0.04) 0%, transparent 45%),
+        var(--bg);
+      color:var(--cream);
+      font-family:'Outfit','Noto Sans',sans-serif; font-weight:300;
+      overscroll-behavior:none;
+    }
+    html.light body { background:var(--bg); }
+    html[dir="rtl"] body { font-family:'Noto Sans Arabic',sans-serif; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+
+    /* Grain texture */
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:0.02;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation:grain .8s steps(1) infinite;
+    }
+    @keyframes grain {
+      0%,100%{transform:translate(0,0)} 20%{transform:translate(3%,2%)}
+      40%{transform:translate(-2%,3%)} 60%{transform:translate(2%,-3%)}
+      80%{transform:translate(-1%,2%)}
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width:2px; }
+    ::-webkit-scrollbar-thumb { background:rgba(200,164,78,0.25); border-radius:2px; }
+
+    /* ── ALERT BANNER ── */
+    #call-alert {
+      position:fixed; top:0; left:0; right:0;
+      transform:translateY(-110%);
+      background:linear-gradient(160deg, rgba(28,22,14,0.98) 0%, rgba(18,14,9,0.98) 100%);
+      border-bottom:2px solid var(--gold);
+      padding:18px 20px 18px;
+      z-index:500;
+      backdrop-filter:blur(40px) saturate(220%); -webkit-backdrop-filter:blur(40px) saturate(220%);
+      box-shadow:0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,164,78,0.15), 0 8px 32px rgba(200,164,78,0.1);
+      transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+      display:flex; align-items:center; gap:16px;
+    }
+    #call-alert.show { transform:translateY(0); }
+    html[dir="rtl"] #call-alert { flex-direction:row-reverse; }
+    .alert-ring {
+      width:52px; height:52px; flex-shrink:0;
+      background:linear-gradient(135deg, rgba(200,164,78,0.22), rgba(200,164,78,0.06));
+      border:1.5px solid var(--gold); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; color:var(--gold);
+      box-shadow:0 0 28px rgba(200,164,78,0.22);
+      animation:ring-pulse 1.4s ease-in-out infinite;
+    }
+    .alert-ring svg { width:22px; height:22px; }
+    @keyframes ring-pulse {
+      0%,100%{box-shadow:0 0 0 0 rgba(200,164,78,0.5), 0 0 28px rgba(200,164,78,0.2)}
+      50%{box-shadow:0 0 0 14px rgba(200,164,78,0), 0 0 28px rgba(200,164,78,0.2)}
+    }
+    .alert-info { flex:1; }
+    .alert-title {
+      font-family:'Crimson Pro',serif; font-size:1.3rem; font-weight:600; line-height:1.2;
+      background:linear-gradient(135deg, var(--gold-l), var(--gold));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .alert-sub { font-size:0.78rem; color:rgba(200,164,78,0.65); margin-top:4px; }
+    html[dir="rtl"] .alert-title, html[dir="rtl"] .alert-sub { text-align:right; }
+    .alert-close {
+      width:34px; height:34px;
+      background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+      border-radius:50%; color:var(--muted);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      transition:var(--tr);
+    }
+    .alert-close:active { background:rgba(255,255,255,0.14); transform:scale(0.9); }
+    .alert-close svg { width:14px; height:14px; }
+
+    /* ── HEADER ── */
+    .app-header {
+      flex-shrink:0;
+      height:var(--hdr-h);
+      background:rgba(10,9,8,0.96);
+      backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
+      border-bottom:1px solid rgba(200,164,78,0.1);
+      box-shadow:0 1px 0 rgba(200,164,78,0.06), 0 8px 32px rgba(0,0,0,0.35);
+      padding:0 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      position:relative; z-index:50;
+    }
+    html.light .app-header {
+      background:rgba(245,240,232,0.97);
+      border-bottom-color:rgba(168,104,64,0.18);
+      box-shadow:0 1px 0 rgba(168,104,64,0.07), 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .header-brand { display:flex; flex-direction:column; gap:2px; }
+    .header-logo {
+      font-family:'Crimson Pro',serif; font-size:1.1rem; font-weight:600; letter-spacing:0.07em; line-height:1;
+      background:linear-gradient(135deg, var(--gold-l) 0%, var(--gold) 55%, var(--gold-d) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    html.light .header-logo {
+      background:linear-gradient(135deg, var(--gold-d), var(--gold));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .header-sub { display:none; }
+    .header-right { display:flex; align-items:center; gap:8px; }
+    .lang-wrap { display:flex; gap:3px; }
+    .lang-btn {
+      background:none; border:1px solid transparent;
+      color:var(--muted); font-size:0.65rem; font-weight:500;
+      padding:4px 7px; border-radius:8px; transition:var(--tr);
+    }
+    .lang-btn.on { border-color:var(--bord2); color:var(--gold); background:rgba(200,164,78,0.09); }
+    .conn-badge {
+      display:flex; align-items:center; gap:5px;
+      padding:5px 10px; border-radius:20px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid var(--border);
+      font-size:0.66rem; color:var(--muted);
+      transition:var(--tr); white-space:nowrap;
+    }
+    html.light .conn-badge { background:rgba(0,0,0,0.04); border-color:rgba(168,104,64,0.22); }
+    html.light .conn-badge.on { color:#3d7a33; border-color:rgba(61,122,51,0.35); background:rgba(61,122,51,0.05); }
+    .conn-dot { width:7px; height:7px; border-radius:50%; background:rgba(244,234,210,0.2); transition:background 0.4s; }
+    .conn-badge.on { border-color:rgba(126,189,106,0.35); color:var(--green); background:rgba(126,189,106,0.06); }
+    .conn-badge.on .conn-dot { background:var(--green); animation:dot-glow 2s ease-in-out infinite; }
+    @keyframes dot-glow { 0%,100%{box-shadow:0 0 0 0 rgba(126,189,106,0)} 50%{box-shadow:0 0 0 5px rgba(126,189,106,0.22)} }
+    .theme-btn {
+      width:34px; height:34px; border-radius:50%;
+      background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted); transition:var(--tr); flex-shrink:0;
+    }
+    html.light .theme-btn { background:rgba(0,0,0,0.04); }
+    .theme-btn svg { width:15px; height:15px; pointer-events:none; }
+    .theme-btn:active { background:rgba(255,255,255,0.1); transform:scale(0.92); }
+
+    /* ── TABS VIEWPORT ── */
+    .tabs-viewport { flex:1; overflow:hidden; position:relative; }
+    .tabs-track {
+      display:flex; height:100%;
+      direction:ltr;
+      transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
+      will-change:transform;
+    }
+    .tab-panel {
+      flex:0 0 100vw; overflow-y:auto; overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+      padding:0 16px 32px;
+    }
+    html[dir="rtl"] .tab-panel { direction:rtl; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family:'Crimson Pro',serif; font-size:1.05rem; font-weight:600;
+      color:var(--cream); letter-spacing:0.08em;
+      padding:20px 0 14px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .section-title::after {
+      content:''; flex:1; height:1px;
+      background:linear-gradient(90deg, rgba(200,164,78,0.35) 0%, rgba(200,164,78,0.07) 60%, transparent 100%);
+    }
+    html[dir="rtl"] .section-title { flex-direction:row-reverse; }
+    html[dir="rtl"] .section-title::after { background:linear-gradient(270deg,rgba(200,164,78,0.35),transparent); }
+
+    /* ── DAY SEPARATOR ── */
+    .day-sep {
+      font-size:0.6rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase;
+      color:rgba(200,164,78,0.5); text-align:center;
+      padding:14px 0 6px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .day-sep::before, .day-sep::after {
+      content:''; flex:1; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(200,164,78,0.2), transparent);
+    }
+
+    /* ── CALLS LIST ── */
+    #calls-list { display:flex; flex-direction:column; gap:10px; }
+    .empty-state {
+      text-align:center; padding:60px 24px;
+      font-family:'Crimson Pro',serif; font-size:1rem; font-style:italic;
+      color:var(--muted); line-height:1.8;
+    }
+    .empty-state-icon { font-size:2.8rem; display:block; margin-bottom:12px; opacity:0.22; filter:grayscale(0.5); }
+
+    .call-item {
+      background:linear-gradient(160deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.018) 100%);
+      border:1px solid rgba(200,164,78,0.12);
+      border-left:3px solid rgba(200,164,78,0.4);
+      border-radius:var(--r);
+      padding:15px 16px;
+      display:flex; align-items:center; gap:14px;
+      animation:slideIn 0.38s cubic-bezier(0.4,0,0.2,1);
+      cursor:pointer;
+      box-shadow:0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition:transform 0.2s ease, box-shadow 0.22s, border-left-color 0.22s;
+    }
+    .call-item:active { transform:scale(0.975); box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+    .call-item.fresh {
+      border-left-color:var(--gold);
+      box-shadow:0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(200,164,78,0.09), inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+    html[dir="rtl"] .call-item { flex-direction:row-reverse; border-left:1px solid rgba(200,164,78,0.12); border-right:3px solid rgba(200,164,78,0.4); }
+    html.light .call-item {
+      background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
+      border-color:rgba(168,104,64,0.14); border-left-color:rgba(168,104,64,0.42);
+      box-shadow:0 4px 18px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    html.light .call-item.fresh { border-left-color:var(--gold); }
+    @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .call-badge {
+      width:52px; height:52px; flex-shrink:0;
+      background:linear-gradient(135deg, rgba(200,164,78,0.2), rgba(200,164,78,0.05));
+      border:1px solid rgba(200,164,78,0.4);
+      border-radius:50%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      box-shadow:0 0 20px rgba(200,164,78,0.12), inset 0 1px 0 rgba(200,164,78,0.2);
+    }
+    .call-badge-lbl { font-size:0.46rem; color:rgba(200,164,78,0.6); letter-spacing:0.08em; text-transform:uppercase; }
+    .call-badge-num { font-family:'Crimson Pro',serif; font-size:1.45rem; font-weight:600; color:var(--gold); line-height:1; }
+    .call-meta { flex:1; min-width:0; }
+    .call-msg  { font-size:0.86rem; font-weight:400; color:var(--cream); }
+    .call-time { font-size:0.69rem; color:var(--muted); margin-top:3px; }
+    html[dir="rtl"] .call-msg, html[dir="rtl"] .call-time { text-align:right; font-family:'Noto Sans Arabic',sans-serif; }
+    .call-tag {
+      font-size:0.62rem; font-weight:600; padding:5px 12px;
+      border-radius:20px; flex-shrink:0; border:1px solid transparent;
+      letter-spacing:0.05em; text-transform:uppercase;
+      transition:var(--tr);
+    }
+    .call-tag.received {
+      background:linear-gradient(135deg, rgba(200,164,78,0.18), rgba(200,164,78,0.06));
+      color:var(--gold); border-color:rgba(200,164,78,0.32);
+    }
+    .call-tag.done {
+      background:linear-gradient(135deg, rgba(126,189,106,0.16), rgba(126,189,106,0.04));
+      color:var(--green); border-color:rgba(126,189,106,0.3);
+    }
+    html.light .call-tag.done { color:#3d7a33; }
+
+    /* ── ORDERS ── */
+    #orders-list { display:flex; flex-direction:column; gap:12px; }
+    .order-card {
+      background:linear-gradient(160deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.018) 100%);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:var(--r);
+      overflow:hidden;
+      animation:slideIn 0.38s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+      position:relative;
+    }
+    /* Status accent bar at top */
+    .order-card::before {
+      content:''; display:block; height:3px; width:100%;
+      position:absolute; top:0; left:0; z-index:1;
+      border-radius:var(--r) var(--r) 0 0;
+    }
+    .order-card.st-pending::before  { background:linear-gradient(90deg, var(--gold), rgba(200,164,78,0.25) 70%, transparent); }
+    .order-card.st-progress::before { background:linear-gradient(90deg, var(--blue), rgba(77,184,255,0.25) 70%, transparent); }
+    .order-card.st-done::before     { background:linear-gradient(90deg, var(--green), rgba(126,189,106,0.25) 70%, transparent); }
+    html.light .order-card {
+      background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
+      border-color:rgba(168,104,64,0.12);
+      box-shadow:0 4px 18px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .order-card.st-pending  { border-color:rgba(200,164,78,0.22); }
+    .order-card.st-progress { border-color:rgba(77,184,255,0.2); }
+    .order-card.st-done     { border-color:rgba(126,189,106,0.15); opacity:0.55; }
+    html.light .order-card.st-done { opacity:0.65; }
+    .order-card-hd {
+      display:flex; align-items:center; gap:10px;
+      padding:18px 16px 14px;
+      cursor:pointer; user-select:none; flex-wrap:wrap;
+      transition:background var(--tr);
+    }
+    .order-card-hd:active { background:rgba(255,255,255,0.03); }
+    html.light .order-card-hd:active { background:rgba(0,0,0,0.02); }
+    .order-table-lbl { font-family:'Crimson Pro',serif; font-size:1.2rem; font-weight:600; color:var(--cream); }
+    .order-time-lbl  { font-size:0.67rem; color:var(--muted); }
+    .order-total-hd  { font-size:0.75rem; color:var(--cream); font-weight:600; }
+    .order-status-badge {
+      font-size:0.62rem; font-weight:600; padding:5px 12px; border-radius:20px;
+      letter-spacing:0.05em; text-transform:uppercase;
+    }
+    .st-pending  .order-status-badge {
+      background:linear-gradient(135deg, rgba(200,164,78,0.2), rgba(200,164,78,0.07));
+      color:var(--gold); border:1px solid rgba(200,164,78,0.34);
+    }
+    .st-progress .order-status-badge {
+      background:linear-gradient(135deg, rgba(77,184,255,0.18), rgba(77,184,255,0.06));
+      color:var(--blue); border:1px solid rgba(77,184,255,0.34);
+    }
+    .st-done     .order-status-badge {
+      background:linear-gradient(135deg, rgba(126,189,106,0.16), rgba(126,189,106,0.05));
+      color:var(--green); border:1px solid rgba(126,189,106,0.3);
+    }
+    html.light .st-progress .order-status-badge { color:#0066bb; border-color:rgba(0,102,187,0.32); background:rgba(0,102,187,0.09); }
+    .order-chevron {
+      margin-left:auto; flex-shrink:0; color:var(--muted);
+      transition:transform 0.26s ease, color 0.2s; display:flex; align-items:center;
+    }
+    .order-card-hd:hover .order-chevron { color:var(--gold); }
+    .order-card.collapsed .order-chevron { transform:rotate(-90deg); }
+    .order-body {
+      display:grid; grid-template-rows:1fr;
+      overflow:hidden;
+      transition:grid-template-rows 0.3s ease;
+    }
+    .order-card.collapsed .order-body { grid-template-rows:0fr; }
+    .order-body-inner { min-height:0; overflow:hidden; }
+    .order-body-pad {
+      padding:0 16px 16px;
+      border-top:1px solid rgba(255,255,255,0.05);
+    }
+    html.light .order-body-pad { border-top-color:rgba(168,104,64,0.1); }
+    .order-items-lbl { font-size:0.74rem; color:var(--muted); margin-bottom:10px; line-height:1.7; padding-top:12px; }
+    .order-total-lbl { font-size:0.8rem; color:var(--cream); font-weight:600; margin-bottom:13px; }
+    .order-status-btns { display:flex; gap:7px; }
+    .order-st-btn {
+      flex:1; padding:9px 4px; border-radius:12px; font-size:0.69rem; font-weight:500;
+      border:1px solid rgba(255,255,255,0.08); color:var(--muted);
+      background:rgba(255,255,255,0.03);
+      cursor:pointer; transition:var(--tr); font-family:inherit; text-align:center;
+    }
+    html.light .order-st-btn {
+      border-color:rgba(168,104,64,0.2); color:rgba(28,23,16,0.5);
+      background:rgba(168,104,64,0.04);
+    }
+    .order-st-btn:active { transform:scale(0.96); }
+    .order-st-btn.active {
+      background:linear-gradient(135deg, rgba(200,164,78,0.18), rgba(200,164,78,0.06));
+      border-color:rgba(200,164,78,0.38); color:var(--gold); font-weight:600;
+    }
+    .order-st-btn.active.prog {
+      background:linear-gradient(135deg, rgba(77,184,255,0.16), rgba(77,184,255,0.05));
+      border-color:rgba(77,184,255,0.38); color:var(--blue);
+    }
+    .order-st-btn.active.done {
+      background:linear-gradient(135deg, rgba(126,189,106,0.16), rgba(126,189,106,0.05));
+      border-color:rgba(126,189,106,0.35); color:var(--green);
+    }
+    html.light .order-st-btn.active.prog { color:#0066bb; border-color:rgba(0,102,187,0.38); background:rgba(0,102,187,0.09); }
+
+    /* ── MESSAGES ── */
+    #messages-list { display:flex; flex-direction:column; gap:12px; }
+    .msg-item { animation:slideIn 0.38s cubic-bezier(0.4,0,0.2,1); }
+    .msg-bubble {
+      background:linear-gradient(160deg, rgba(200,164,78,0.09) 0%, rgba(200,164,78,0.03) 100%);
+      border:1px solid rgba(200,164,78,0.14);
+      border-radius:6px 20px 20px 20px;
+      padding:14px 18px 12px;
+      max-width:92%;
+      cursor:pointer;
+      box-shadow:0 4px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04);
+      transition:background var(--tr), border-color var(--tr), box-shadow var(--tr);
+    }
+    html[dir="rtl"] .msg-bubble { border-radius:20px 6px 20px 20px; margin-left:auto; }
+    html.light .msg-bubble {
+      background:linear-gradient(160deg, rgba(168,104,64,0.07) 0%, rgba(168,104,64,0.02) 100%);
+      border-color:rgba(168,104,64,0.18);
+      box-shadow:0 3px 12px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+    .msg-item.unread .msg-bubble {
+      border-color:rgba(200,164,78,0.38);
+      background:linear-gradient(160deg, rgba(200,164,78,0.14) 0%, rgba(200,164,78,0.05) 100%);
+      box-shadow:0 4px 22px rgba(0,0,0,0.38), 0 0 0 1px rgba(200,164,78,0.09);
+    }
+    .msg-item.unread .msg-bubble::before {
+      content:''; display:block; width:8px; height:8px;
+      background:var(--gold); border-radius:50%; margin-bottom:8px;
+      box-shadow:0 0 10px rgba(200,164,78,0.6);
+    }
+    .msg-sender {
+      font-size:0.62rem; color:var(--gold); font-weight:700;
+      text-transform:uppercase; letter-spacing:0.12em; margin-bottom:6px;
+    }
+    .msg-text  { font-size:0.87rem; color:var(--cream); line-height:1.6; }
+    .msg-time  { font-size:0.65rem; color:var(--muted); margin-top:7px; }
+    html[dir="rtl"] .msg-text, html[dir="rtl"] .msg-time { text-align:right; font-family:'Noto Sans Arabic',sans-serif; }
+
+    /* ── BOTTOM NAVIGATION ── */
+    .bottom-nav {
+      flex-shrink:0;
+      height:var(--nav-h);
+      background:rgba(10,9,8,0.97);
+      backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
+      border-top:1px solid rgba(200,164,78,0.1);
+      box-shadow:0 -8px 32px rgba(0,0,0,0.3);
+      display:flex; align-items:stretch;
+      position:relative; z-index:50;
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    html.light .bottom-nav {
+      background:rgba(245,240,232,0.97);
+      border-top-color:rgba(168,104,64,0.18);
+      box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-btn {
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:5px; padding:8px 4px 10px;
+      color:var(--muted); transition:color 0.22s;
+      position:relative; border-radius:0;
+      -webkit-tap-highlight-color:transparent;
+    }
+    /* Pill background for active tab */
+    .nav-btn::before {
+      content:'';
+      position:absolute; top:10px; left:50%;
+      transform:translateX(-50%) scaleX(0);
+      width:54px; height:36px;
+      background:rgba(200,164,78,0.1);
+      border-radius:12px;
+      transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s;
+      opacity:0;
+    }
+    .nav-btn.on::before { transform:translateX(-50%) scaleX(1); opacity:1; }
+    .nav-btn.on { color:var(--gold); }
+    .nav-btn:active { opacity:0.7; }
+    .nav-icon {
+      width:24px; height:24px;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      position:relative; z-index:1;
+    }
+    .nav-icon svg { width:22px; height:22px; }
+    .nav-btn.on .nav-icon { transform:translateY(-2px) scale(1.1); }
+    .nav-label {
+      font-size:0.59rem; font-weight:500; letter-spacing:0.04em; line-height:1;
+      position:relative; z-index:1; transition:font-weight 0.2s;
+    }
+    .nav-btn.on .nav-label { font-weight:700; }
+    .nav-badge {
+      position:absolute; top:7px; left:calc(50% + 6px);
+      min-width:17px; height:17px;
+      background:linear-gradient(135deg, #e2b84e, var(--gold));
+      color:#0a0908;
+      border-radius:9px; font-size:0.56rem; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      padding:0 5px; line-height:1; border:2px solid var(--bg);
+      box-shadow:0 2px 8px rgba(200,164,78,0.45);
+    }
+    /* Remove old line indicator */
+    .nav-btn::after { display:none; }
+
+    /* ── FOOTER ── */
+    .app-footer { text-align:center; padding:24px 20px 32px; font-size:0.62rem; color:rgba(244,234,210,0.1); letter-spacing:0.1em; }
+
+    /* Réduction taille Greek pour Table / À emporter */
+    html[lang="el"] .order-table-lbl { font-size: 1.05rem; }
+  </style>
+  <script>
+    (function() {
+      var _r = localStorage.getItem('saas_rid') || 'demo';
+      if (localStorage.getItem(_r + '_app_theme') !== 'dark')
+        document.documentElement.classList.add('light');
+    })();
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyCM6SiQoWQfsq_t-80EfiVplXV9p534_eI",
+      authDomain:        "menu-saas-platform.firebaseapp.com",
+      projectId:         "menu-saas-platform",
+      storageBucket:     "menu-saas-platform.firebasestorage.app",
+      messagingSenderId: "460781372428",
+      appId:             "1:460781372428:web:55c33bfb6f8f8d5582da29",
+      databaseURL:       "https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app"
+    });
+    const _db    = firebase.database();
+    // ── SaaS : restaurantId stocké dans localStorage (configuré au 1er lancement)
+    const _RID   = localStorage.getItem('saas_rid') || 'demo';
+    const _PFX   = _RID + '_'; // préfixe localStorage isolé par restaurant
+    const _rref  = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
+    const isDemo = new URLSearchParams(location.search).get('demo') === '1';
+  </script>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 01-3.46 0"/>
+  </symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+    <polyline points="10 9 9 9 8 9"/>
+  </symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  </symbol>
+  <symbol id="i-x" viewBox="0 0 24 24">
+    <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="6 9 12 15 18 9"/>
+  </symbol>
+</svg>
+
+<!-- Alert banner -->
+<div id="call-alert">
+  <div class="alert-ring"><svg><use href="#i-bell"/></svg></div>
+  <div class="alert-info">
+    <div class="alert-title" id="alert-title">Appel entrant</div>
+    <div class="alert-sub"  id="alert-sub">Table —</div>
+  </div>
+  <button class="alert-close" id="alert-close"><svg><use href="#i-x"/></svg></button>
+</div>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="header-brand">
+    <div class="header-logo">Mozart Coffee Lounge</div>
+    <div class="header-sub" id="hdr-sub">Interface Serveur</div>
+  </div>
+  <div class="header-right">
+    <div class="lang-wrap" id="lang-wrap"></div>
+    <button class="theme-btn" id="theme-btn" aria-label="Thème">
+      <svg id="theme-ico"><use id="theme-ico-use" href="#i-moon"/></svg>
+    </button>
+    <div class="conn-badge" id="conn-badge">
+      <div class="conn-dot"></div>
+      <span id="conn-txt">…</span>
+    </div>
+  </div>
+</header>
+
+<!-- Swipeable content -->
+<div class="tabs-viewport">
+  <div class="tabs-track" id="tabs-track">
+
+    <!-- Panel 1 : Appels -->
+    <section class="tab-panel" id="panel-calls">
+      <div class="section-title" id="sec-history">Appels récents</div>
+      <div id="calls-list">
+        <div class="empty-state" id="no-calls-msg">
+          <span class="empty-state-icon">🔔</span>
+          Aucun appel reçu pour le moment
+        </div>
+      </div>
+      <footer class="app-footer">© 2026 Mozart Coffee Lounge</footer>
+    </section>
+
+    <!-- Panel 2 : Commandes -->
+    <section class="tab-panel" id="panel-orders">
+      <div class="section-title" id="sec-orders">Commandes en cours</div>
+      <div id="orders-list">
+        <div class="empty-state" id="no-orders-msg">
+          <span class="empty-state-icon">🧾</span>
+          Aucune commande pour le moment
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 3 : Messages -->
+    <section class="tab-panel" id="panel-messages">
+      <div class="section-title" id="sec-messages">Messages admin</div>
+      <div id="messages-list">
+        <div class="empty-state" id="no-messages-msg">
+          <span class="empty-state-icon">💬</span>
+          Aucun message reçu pour le moment
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Bottom navigation -->
+<nav class="bottom-nav">
+  <button class="nav-btn on" id="nav-calls" onclick="switchTab('calls')">
+    <div class="nav-icon"><svg><use href="#i-bell"/></svg></div>
+    <span class="nav-label" id="nav-lbl-calls">Appels</span>
+    <span class="nav-badge" id="calls-badge" style="display:none">0</span>
+  </button>
+  <button class="nav-btn" id="nav-orders" onclick="switchTab('orders')">
+    <div class="nav-icon"><svg><use href="#i-receipt"/></svg></div>
+    <span class="nav-label" id="nav-lbl-orders">Commandes</span>
+    <span class="nav-badge" id="orders-badge" style="display:none">0</span>
+  </button>
+  <button class="nav-btn" id="nav-messages" onclick="switchTab('messages')">
+    <div class="nav-icon"><svg><use href="#i-msg"/></svg></div>
+    <span class="nav-label" id="nav-lbl-messages">Messages</span>
+    <span class="nav-badge" id="messages-badge" style="display:none">0</span>
+  </button>
+</nav>
+
+<script>
+/* ══════════════════════════════════════════════════════ */
+const LANGS     = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', ar:'🇸🇦' };
+const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', de:'ltr', ar:'rtl' };
+let enabledLangs = {};
+
+const T = {
+  el: {
+    hdrSub:'Διεπαφή σερβιτόρου', connWait:'Αναμονή…', connOn:'Συνδεδεμένο',
+    secHistory:'Πρόσφατες κλήσεις', secOrders:'Τρέχουσες παραγγελίες', secMessages:'Μηνύματα admin',
+    alertTitle:'Εισερχόμενη κλήση', alertSub:'Κλήση : Τραπέζι {n}',
+    callMsg:'Κλήση : Τραπέζι {n}', received:'Ελήφθη', done:'Ολοκληρώθηκε',
+    noCalls:'Δεν έχουν ληφθεί κλήσεις ακόμα', noOrders:'Καμία παραγγελία προς το παρόν', noMessages:'Δεν έχουν ληφθεί μηνύματα',
+    ago0:'Μόλις τώρα', agoMin:'Πριν {n} λεπτά', agoH:'Πριν {n}ω',
+    today:'Σήμερα', yesterday:'Χθες', history:'Ιστορικό',
+    ordTable:'Τραπέζι', ordTakeaway:'Σερβίρισμα', ordTotal:'Σύνολο',
+    ordPending:'Ελήφθη', ordProgress:'Σε εξέλιξη', ordDone:'Ολοκληρώθηκε',
+    msgAdmin:'Διαχειριστής', navCalls:'Κλήσεις', navOrders:'Παραγγελίες', navMessages:'Μηνύματα',
+  },
+  fr: {
+    hdrSub:'Interface Serveur', connWait:'En attente…', connOn:'Connecté',
+    secHistory:'Appels récents', secOrders:'Commandes en cours', secMessages:'Messages admin',
+    alertTitle:'Appel entrant', alertSub:'Appel : Table {n}',
+    callMsg:'Appel : Table {n}', received:'Reçu', done:'Terminé',
+    noCalls:'Aucun appel reçu pour le moment', noOrders:'Aucune commande pour le moment', noMessages:'Aucun message reçu pour le moment',
+    ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
+    today:'Aujourd\'hui', yesterday:'Hier', history:'Historique',
+    ordTable:'Table', ordTakeaway:'À emporter', ordTotal:'Total',
+    ordPending:'Reçue', ordProgress:'En cours', ordDone:'Terminée',
+    msgAdmin:'Administrateur', navCalls:'Appels', navOrders:'Commandes', navMessages:'Messages',
+  },
+  en: {
+    hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
+    secHistory:'Recent calls', secOrders:'Current orders', secMessages:'Admin messages',
+    alertTitle:'Incoming call', alertSub:'Call : Table {n}',
+    callMsg:'Call : Table {n}', received:'Received', done:'Done',
+    noCalls:'No calls received yet', noOrders:'No orders at the moment', noMessages:'No messages received yet',
+    ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
+    today:'Today', yesterday:'Yesterday', history:'History',
+    ordTable:'Table', ordTakeaway:'Takeaway', ordTotal:'Total',
+    ordPending:'Received', ordProgress:'In progress', ordDone:'Done',
+    msgAdmin:'Administrator', navCalls:'Calls', navOrders:'Orders', navMessages:'Messages',
+  },
+  de: {
+    hdrSub:'Kellner-Interface', connWait:'Warten…', connOn:'Verbunden',
+    secHistory:'Letzte Anrufe', secOrders:'Aktuelle Bestellungen', secMessages:'Admin-Nachrichten',
+    alertTitle:'Eingehender Anruf', alertSub:'Anruf : Tisch {n}',
+    callMsg:'Anruf : Tisch {n}', received:'Erhalten', done:'Erledigt',
+    noCalls:'Noch keine Anrufe', noOrders:'Derzeit keine Bestellungen', noMessages:'Noch keine Nachrichten',
+    ago0:'Gerade eben', agoMin:'Vor {n} Min', agoH:'Vor {n}h',
+    today:'Heute', yesterday:'Gestern', history:'Verlauf',
+    ordTable:'Tisch', ordTakeaway:'Zum Mitnehmen', ordTotal:'Gesamt',
+    ordPending:'Eingegangen', ordProgress:'In Bearbeitung', ordDone:'Erledigt',
+    msgAdmin:'Administrator', navCalls:'Anrufe', navOrders:'Bestellungen', navMessages:'Nachrichten',
+  },
+  ar: {
+    hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
+    secHistory:'النداءات الأخيرة', secOrders:'الطلبات الحالية', secMessages:'رسائل الإدارة',
+    alertTitle:'نداء وارد', alertSub:'نداء : طاولة {n}',
+    callMsg:'نداء : طاولة {n}', received:'استُلم', done:'منتهي',
+    noCalls:'لم تُستلم أي نداءات بعد', noOrders:'لا توجد طلبات حالياً', noMessages:'لم تُستلم أي رسائل بعد',
+    ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
+    today:'اليوم', yesterday:'أمس', history:'السجل',
+    ordTable:'طاولة', ordTakeaway:'للأخذ', ordTotal:'المجموع',
+    ordPending:'مستلمة', ordProgress:'قيد التنفيذ', ordDone:'منتهية',
+    msgAdmin:'المدير', navCalls:'النداءات', navOrders:'الطلبات', navMessages:'الرسائل',
+  }
+};
+
+const _cachedAppLang = localStorage.getItem(_PFX+'app_lang_cache');
+let lang = localStorage.getItem(_PFX+'app_lang') || _cachedAppLang || 'fr';
+let calls    = [];
+let messages = [];
+let alertTimer = null;
+let audioCtx   = null;
+let menuItemsMap = {};
+
+/* ── SECURITY ── */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── AUDIO ── */
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playNote(freq, dur, vol, delay) {
+  delay = delay || 0;
+  var ctx = getCtx();
+  var osc = ctx.createOscillator();
+  var g   = ctx.createGain();
+  osc.connect(g); g.connect(ctx.destination);
+  osc.type = 'sine'; osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, ctx.currentTime + delay);
+  g.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+  osc.start(ctx.currentTime + delay);
+  osc.stop(ctx.currentTime + delay + dur + 0.05);
+}
+function bell(f, d, v, delay) {
+  v = v || 0.7; delay = delay || 0;
+  [[1,1],[2.756,0.45],[5.404,0.22]].forEach(function(m) {
+    playNote(f*m[0], d/(m[0]*0.4+0.6), v*m[1], delay);
+  });
+}
+function playRing() {
+  try { [523,659,784].forEach(function(f,i) { bell(f, 0.6, 0.7, i*0.18); }); } catch(e) {}
+}
+function playMsgTone() {
+  try { [440,550].forEach(function(f,i) { bell(f, 0.4, 0.5, i*0.13); }); } catch(e) {}
+}
+function unlockAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+/* ── RETENTION SETTINGS ── */
+var _retCalls  = { ms: 604800000, changedAt: 0, previous: 604800000, isReduction: false };
+var _retOrders = { ms: 604800000, changedAt: 0, previous: 604800000, isReduction: false };
+
+function displayCutoffTs(ret) {
+  return Date.now() - ret.ms;
+}
+function deletionCutoffTs(ret) {
+  var GRACE = 7 * 24 * 3600 * 1000;
+  if (ret.isReduction && (Date.now() - ret.changedAt) < GRACE) {
+    return Date.now() - ret.previous;
+  }
+  return Date.now() - ret.ms;
+}
+
+/* ── CALLS PERSISTENCE ── */
+var CALLS_KEY = 'mc_calls_v1';
+function saveCalls() {
+  try {
+    localStorage.setItem(CALLS_KEY, JSON.stringify(
+      calls.map(function(c) { return Object.assign({}, c, { ts: c.ts instanceof Date ? c.ts.getTime() : c.ts }); })
+    ));
+  } catch(_) {}
+}
+function loadCalls() {
+  try {
+    calls = JSON.parse(localStorage.getItem(CALLS_KEY) || '[]')
+      .map(function(c) { return Object.assign({}, c, { ts: new Date(c.ts), status: c.status || 'received' }); });
+  } catch(_) { calls = []; }
+  // Supprime les entrées invalides (table non numérique = faux appel issu d'une commande)
+  calls = calls.filter(function(c) { return /^\d+$/.test(String(c.table)); });
+  // Supprime les doublons issus de l'ancien bug (même table, < 10 secondes d'écart)
+  var seen = [];
+  calls = calls.filter(function(c) {
+    var tsNum = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
+    var dup = seen.some(function(s) {
+      return String(s.table) === String(c.table) && Math.abs(s.ts - tsNum) < 10000;
+    });
+    if (!dup) seen.push({ table: c.table, ts: tsNum });
+    return !dup;
+  });
+  saveCalls();
+  cleanupCallsFromStorage();
+}
+function cleanupCallsFromStorage() {
+  var cutoff = deletionCutoffTs(_retCalls);
+  var before = calls.length;
+  calls = calls.filter(function(c) {
+    var ts = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
+    return ts >= cutoff;
+  });
+  if (calls.length !== before) saveCalls();
+}
+
+/* ── MESSAGES PERSISTENCE ── */
+var MSGS_KEY = 'mc_messages_v1';
+function saveMessages() {
+  try {
+    localStorage.setItem(MSGS_KEY, JSON.stringify(
+      messages.map(function(m) { return Object.assign({}, m, { ts: m.ts instanceof Date ? m.ts.getTime() : m.ts }); })
+    ));
+  } catch(_) {}
+}
+function loadMessages() {
+  try {
+    messages = JSON.parse(localStorage.getItem(MSGS_KEY) || '[]')
+      .map(function(m) { return Object.assign({}, m, { ts: new Date(m.ts) }); });
+  } catch(_) { messages = []; }
+}
+
+/* ── RECEIVE CALL ── */
+function receiveCall(table, ts) {
+  playRing();
+  showAlert(table);
+  addCallToHistory(table, ts);
+  nativeVibrate([200, 80, 200, 80, 350]);
+}
+
+function nativeVibrate(pattern) {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
+    window.Capacitor.Plugins.Haptics.vibrate({ duration: 1500 }).catch(function() {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    });
+  } else if (navigator.vibrate) {
+    navigator.vibrate(pattern);
+  }
+}
+
+function showAlert(table) {
+  var t = T[lang];
+  document.getElementById('alert-title').textContent = t.alertTitle;
+  document.getElementById('alert-sub').textContent   = t.alertSub.replace('{n}', table);
+  var el = document.getElementById('call-alert');
+  el.classList.add('show');
+  clearTimeout(alertTimer);
+  alertTimer = setTimeout(function() { el.classList.remove('show'); }, 9000);
+}
+
+function addCallToHistory(table, ts) {
+  var tsNum = ts ? (ts instanceof Date ? ts.getTime() : +ts) : Date.now();
+  var dup = calls.some(function(c) {
+    var cTs = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
+    return String(c.table) === String(table) && Math.abs(cTs - tsNum) < 10000;
+  });
+  if (dup) return;
+  calls.unshift({ table: table, ts: new Date(tsNum), id: Date.now(), status: 'received' });
+  saveCalls();
+  renderCalls();
+}
+
+function addMessage(text, ts) {
+  messages.unshift({ id: Date.now(), text: text, ts: new Date(ts || Date.now()), read: false });
+  if (messages.length > 100) messages.pop();
+  saveMessages();
+  renderMessages();
+  updateMessagesBadge();
+}
+
+/* ── TIME HELPERS ── */
+function timeAgo(d) {
+  var t = T[lang];
+  var s = Math.floor((Date.now() - (d instanceof Date ? d.getTime() : d)) / 1000);
+  if (s < 60)    return t.ago0;
+  if (s < 3600)  return t.agoMin.replace('{n}', Math.floor(s / 60));
+  if (s < 86400) return t.agoH.replace('{n}', Math.floor(s / 3600));
+  var date = d instanceof Date ? d : new Date(d);
+  var loc = { ar:'ar', el:'el-GR', de:'de-DE', en:'en-GB', fr:'fr-FR' }[lang] || 'fr-FR';
+  return formatDay(date, t) + ' · ' + date.toLocaleTimeString(loc, { hour:'2-digit', minute:'2-digit' });
+}
+function formatDay(date, t) {
+  var now  = new Date();
+  var yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (date.toDateString() === now.toDateString())  return t.today;
+  if (date.toDateString() === yest.toDateString()) return t.yesterday;
+  var loc = lang === 'ar' ? 'ar' : lang === 'el' ? 'el-GR' : lang === 'en' ? 'en-GB' : 'fr-FR';
+  return date.toLocaleDateString(loc, { day:'numeric', month:'long' });
+}
+
+/* ── RENDER CALLS ── */
+function toggleStatus(id) {
+  var c = calls.find(function(x) { return x.id === id; });
+  if (!c) return;
+  c.status = c.status === 'done' ? 'received' : 'done';
+  nativeVibrate([50, 30, 80]);
+  saveCalls();
+  renderCalls();
+}
+function renderCalls() {
+  var list = document.getElementById('calls-list');
+  var noEl = document.getElementById('no-calls-msg');
+  list.querySelectorAll('.call-item, .day-sep').forEach(function(e) { e.remove(); });
+  var dispCutoff = displayCutoffTs(_retCalls);
+  var visible = calls.filter(function(c) {
+    var ts = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
+    return ts >= dispCutoff;
+  });
+  if (visible.length === 0) { noEl.style.display = ''; return; }
+  noEl.style.display = 'none';
+  var t = T[lang];
+  var lastDay = null;
+  visible.forEach(function(c, i) {
+    var d      = c.ts instanceof Date ? c.ts : new Date(c.ts);
+    var dayKey = d.toDateString();
+    if (dayKey !== lastDay) {
+      lastDay = dayKey;
+      var sep = document.createElement('div');
+      sep.className = 'day-sep';
+      sep.textContent = formatDay(d, t);
+      list.appendChild(sep);
+    }
+    var isDone = c.status === 'done';
+    var el = document.createElement('div');
+    el.className = 'call-item';
+    el.dataset.id = String(c.id);
+    el.innerHTML =
+      '<div class="call-badge">' +
+        '<div class="call-badge-lbl">Table</div>' +
+        '<div class="call-badge-num">' + escapeHtml(c.table) + '</div>' +
+      '</div>' +
+      '<div class="call-meta">' +
+        '<div class="call-msg">' + t.callMsg.replace('{n}', escapeHtml(c.table)) + '</div>' +
+        '<div class="call-time">' + timeAgo(c.ts) + '</div>' +
+      '</div>' +
+      '<div class="call-tag ' + (isDone ? 'done' : 'received') + '">' + (isDone ? t.done : t.received) + '</div>';
+    el.addEventListener('click', function() { toggleStatus(c.id); });
+    list.appendChild(el);
+  });
+}
+
+/* ── RENDER MESSAGES ── */
+function renderMessages() {
+  var list = document.getElementById('messages-list');
+  var noEl = document.getElementById('no-messages-msg');
+  if (!list) return;
+  list.querySelectorAll('.msg-item, .day-sep').forEach(function(e) { e.remove(); });
+  if (messages.length === 0) { noEl.style.display = ''; return; }
+  noEl.style.display = 'none';
+  var t       = T[lang];
+  var lastDay = null;
+  messages.forEach(function(m) {
+    var d      = m.ts instanceof Date ? m.ts : new Date(m.ts);
+    var dayKey = d.toDateString();
+    if (dayKey !== lastDay) {
+      lastDay = dayKey;
+      var sep = document.createElement('div');
+      sep.className = 'day-sep';
+      sep.textContent = formatDay(d, t);
+      list.appendChild(sep);
+    }
+    var el = document.createElement('div');
+    el.className = 'msg-item' + (m.read ? '' : ' unread');
+    el.dataset.id = String(m.id);
+    el.innerHTML =
+      '<div class="msg-bubble">' +
+        '<div class="msg-sender">' + escapeHtml(t.msgAdmin) + '</div>' +
+        '<div class="msg-text">'   + escapeHtml(m.text)     + '</div>' +
+        '<div class="msg-time">'   + timeAgo(m.ts)          + '</div>' +
+      '</div>';
+    el.addEventListener('click', function() {
+      if (!m.read) {
+        m.read = true;
+        el.classList.remove('unread');
+        saveMessages();
+        updateMessagesBadge();
+      }
+    });
+    list.appendChild(el);
+  });
+}
+
+/* ── BADGE UPDATES ── */
+function updateOrdersTabBadge() {
+  var pending = Object.values(orders).filter(function(o) { return o.status !== 'done'; }).length;
+  var badge = document.getElementById('orders-badge');
+  if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? '' : 'none'; }
+}
+function updateMessagesBadge() {
+  var unread = messages.filter(function(m) { return !m.read; }).length;
+  var badge = document.getElementById('messages-badge');
+  if (badge) { badge.textContent = unread; badge.style.display = unread > 0 ? '' : 'none'; }
+}
+
+/* ── LANGUAGE ── */
+function applyLang() {
+  var t = T[lang];
+  var isRTL = LANG_DIRS[lang] === 'rtl';
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = isRTL ? 'rtl' : 'ltr';
+  document.title = 'Mozart Coffee Lounge — ' + t.hdrSub;
+  document.getElementById('hdr-sub').textContent         = t.hdrSub;
+  document.getElementById('sec-history').textContent     = t.secHistory;
+  document.getElementById('sec-orders').textContent      = t.secOrders;
+  document.getElementById('sec-messages').textContent    = t.secMessages;
+  document.getElementById('no-calls-msg').childNodes[1]
+    ? (document.getElementById('no-calls-msg').lastChild.textContent = t.noCalls)
+    : (document.getElementById('no-calls-msg').textContent = t.noCalls);
+  document.getElementById('no-orders-msg').childNodes[1]
+    ? (document.getElementById('no-orders-msg').lastChild.textContent = t.noOrders)
+    : (document.getElementById('no-orders-msg').textContent = t.noOrders);
+  document.getElementById('no-messages-msg').childNodes[1]
+    ? (document.getElementById('no-messages-msg').lastChild.textContent = t.noMessages)
+    : (document.getElementById('no-messages-msg').textContent = t.noMessages);
+  var connEl = document.getElementById('conn-badge');
+  document.getElementById('conn-txt').textContent = connEl.classList.contains('on') ? t.connOn : t.connWait;
+  document.getElementById('nav-lbl-calls').textContent    = t.navCalls;
+  document.getElementById('nav-lbl-orders').textContent   = t.navOrders;
+  document.getElementById('nav-lbl-messages').textContent = t.navMessages;
+  document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.toggle('on', b.dataset.l === lang); });
+  renderCalls();
+  renderOrders();
+  renderMessages();
+}
+
+function buildLangBtns() {
+  var wrap = document.getElementById('lang-wrap');
+  wrap.innerHTML = '';
+  Object.keys(LANGS).forEach(function(l) {
+    if (enabledLangs[l] === false) return;
+    var btn = document.createElement('button');
+    btn.className = 'lang-btn' + (l === lang ? ' on' : '');
+    btn.dataset.l = l;
+    btn.textContent = LANGS[l];
+    btn.addEventListener('click', function() {
+      lang = l;
+      localStorage.setItem(_PFX+'app_lang', l);
+      var deviceId = getDeviceId();
+      _rref('devices/' + deviceId + '/lang').set(l).catch(function() {});
+      applyLang();
+    });
+    wrap.appendChild(btn);
+  });
+  if (enabledLangs[lang] === false) {
+    var first = Object.keys(LANGS).find(function(l) { return enabledLangs[l] !== false; });
+    if (first) {
+      lang = first;
+      localStorage.setItem(_PFX+'app_lang', first);
+      _rref('devices/' + getDeviceId() + '/lang').set(first).catch(function() {});
+      applyLang();
+    }
+  }
+}
+
+/* ── CONNECTION ── */
+function setConnected(on) {
+  var b = document.getElementById('conn-badge');
+  b.classList.toggle('on', on);
+  document.getElementById('conn-txt').textContent = on ? T[lang].connOn : T[lang].connWait;
+}
+
+/* ── FIREBASE POLLING (appels) ── */
+var _lastCallTs = parseInt(localStorage.getItem(_PFX+'last_call_ts') || '0');
+function startPolling() {
+  setConnected(false);
+  _rref('calls/lastCall').on('value', function(snap) {
+    var call = snap.val();
+    if (call && call.ts && call.ts > _lastCallTs) {
+      _lastCallTs = call.ts;
+      localStorage.setItem(_PFX+'last_call_ts', String(_lastCallTs));
+      receiveCall(String(call.table), call.ts);
+    }
+    setConnected(true);
+  }, function() { setConnected(false); });
+}
+
+/* ══════════════════════════════════════════════════════
+   PUSH NOTIFICATIONS NATIVES — CAPACITOR
+   Sender ID Firebase : 89531105163
+══════════════════════════════════════════════════════ */
+function getDeviceId() {
+  var deviceId = localStorage.getItem(_PFX+'device_id');
+  if (!deviceId) {
+    var ua = navigator.userAgent + screen.width + screen.height;
+    var hash = 0;
+    for (var i = 0; i < ua.length; i++) hash = ((hash << 5) - hash) + ua.charCodeAt(i);
+    deviceId = 'dev_' + Math.abs(hash).toString(36);
+    localStorage.setItem(_PFX+'device_id', deviceId);
+  }
+  return deviceId;
+}
+
+function saveNativeToken(token) {
+  if (!token) return;
+  var deviceId   = getDeviceId();
+  var stored     = localStorage.getItem(_PFX+'fcm_token');
+  var lastReg    = parseInt(localStorage.getItem(_PFX+'fcm_last_reg') || '0');
+  if (stored === token && Date.now() - lastReg < 12 * 60 * 60 * 1000) return;
+  localStorage.setItem(_PFX+'fcm_token', token);
+  _rref('devices/' + deviceId).set({ token: token, ts: Date.now(), lang: lang })
+    .then(function() { localStorage.setItem(_PFX+'fcm_last_reg', String(Date.now())); })
+    .catch(function() { setTimeout(function() { saveNativeToken(token); }, 5000); });
+}
+
+function createNotificationChannel() {
+  if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.PushNotifications) return;
+  var Push = window.Capacitor.Plugins.PushNotifications;
+  if (Push.createChannel) {
+    Push.createChannel({
+      id: 'commandes_serveur', name: 'Commandes & Appels',
+      description: 'Nouvelles commandes et appels de table',
+      importance: 5, visibility: 1,
+      sound: 'sonnerie_commande',
+      vibration: true, lights: true, lightColor: '#c8a44e'
+    }).catch(function() {});
+  }
+}
+
+function setupNativePush() {
+  if (isDemo) return;
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  var Push = window.Capacitor.Plugins.PushNotifications;
+  if (!Push) return;
+
+  createNotificationChannel();
+
+  Push.requestPermissions().then(function(result) {
+    if (result.receive === 'granted') { Push.register(); }
+  }).catch(function() { setTimeout(function() { Push.register(); }, 5000); });
+
+  Push.addListener('registration', function(token) { saveNativeToken(token.value); });
+  Push.addListener('registrationError', function() { setTimeout(function() { Push.register(); }, 15000); });
+
+  Push.addListener('pushNotificationReceived', function(notification) {
+    var data  = notification.data || {};
+    var table = data.table || notification.title || '?';
+    if (data.type === 'bell' || (notification.title || '').toLowerCase().includes('appel')) {
+      nativeVibrate([300, 100, 300, 100, 600]);
+      receiveCall(table, parseInt(data.ts || '0') || Date.now());
+    } else if (data.type === 'message') {
+      nativeVibrate([100, 60, 100]);
+      var text = data.body || notification.body || notification.title || '?';
+      addMessage(text, parseInt(data.ts || '0') || Date.now());
+      playMsgTone();
+    } else if (data.type === 'order') {
+      /* commande — gérée par startOrdersListener via Firebase, rien à faire ici */
+    } else {
+      nativeVibrate([300, 100, 300, 100, 600]);
+      playRing();
+      showAlert(table);
+      addCallToHistory(table, parseInt(data.ts || '0') || Date.now());
+    }
+  });
+
+  Push.addListener('pushNotificationActionPerformed', function(action) {
+    var data = action.notification.data || {};
+    if (data.type === 'order') {
+      switchTab('orders');
+    } else if (data.type === 'message') {
+      var text = data.body || action.notification.body || action.notification.title || '?';
+      var ts   = parseInt(data.ts || '0') || Date.now();
+      var already = messages.find(function(m) {
+        var mts = m.ts instanceof Date ? m.ts.getTime() : m.ts;
+        return Math.abs(mts - ts) < 5000;
+      });
+      if (!already) { addMessage(text, ts); }
+      switchTab('messages');
+    } else {
+      switchTab('calls');
+    }
+  });
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      var lastReg = parseInt(localStorage.getItem(_PFX+'fcm_last_reg') || '0');
+      if (Date.now() - lastReg > 6 * 60 * 60 * 1000) { Push.register(); }
+    }
+  });
+}
+/* ══════════════════════════════════════════════════════ */
+
+/* ── THEME ── */
+function updateThemeIcon() {
+  var isLight = document.documentElement.classList.contains('light');
+  document.getElementById('theme-ico-use').setAttribute('href', isLight ? '#i-moon' : '#i-sun');
+}
+updateThemeIcon();
+document.getElementById('theme-btn').addEventListener('click', function() {
+  var isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem(_PFX+'app_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon();
+});
+document.getElementById('alert-close').addEventListener('click', function() {
+  document.getElementById('call-alert').classList.remove('show');
+  clearTimeout(alertTimer);
+});
+setInterval(function() { if (calls.length) renderCalls(); if (messages.length) renderMessages(); }, 30000);
+
+/* ── TABS ── */
+var TABS = ['calls', 'orders', 'messages'];
+var currentTab = 'calls';
+
+function switchTab(tab) {
+  nativeVibrate([30]);
+  currentTab = tab;
+  var idx = TABS.indexOf(tab);
+  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 100) + '%)';
+  TABS.forEach(function(t) {
+    document.getElementById('nav-' + t).classList.toggle('on', t === tab);
+  });
+  // Clear messages badge when opening messages
+  if (tab === 'messages') {
+    messages.forEach(function(m) { m.read = true; });
+    saveMessages();
+    updateMessagesBadge();
+    renderMessages();
+  }
+}
+
+/* ── SWIPE GESTURE ── */
+(function() {
+  var _sx = null, _sy = null;
+  document.addEventListener('touchstart', function(e) {
+    _sx = e.touches[0].clientX;
+    _sy = e.touches[0].clientY;
+  }, { passive:true });
+  document.addEventListener('touchend', function(e) {
+    if (_sx === null) return;
+    var dx = e.changedTouches[0].clientX - _sx;
+    var dy = e.changedTouches[0].clientY - _sy;
+    _sx = _sy = null;
+    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    var idx = TABS.indexOf(currentTab);
+    if (dx < 0 && idx < TABS.length - 1) switchTab(TABS[idx + 1]);
+    if (dx > 0 && idx > 0)               switchTab(TABS[idx - 1]);
+  }, { passive:true });
+})();
+
+/* ── ORDERS ── */
+var orders = {};
+
+function startOrdersListener() {
+  _rref('orders').on('value', function(snap) {
+    orders = snap.val() || {};
+    renderOrders();
+    updateOrdersTabBadge();
+  });
+}
+
+function setOrderStatus(orderId, status) {
+  nativeVibrate([50, 30, 80]);
+  _rref('orders/' + orderId + '/status').set(status);
+}
+
+function cleanupOrders() {
+  var cutoff = deletionCutoffTs(_retOrders);
+  var toDelete = {};
+  Object.entries(orders).forEach(function(entry) {
+    var id = entry[0]; var o = entry[1];
+    if (o.createdAt && o.createdAt < cutoff) toDelete[id] = null;
+  });
+  if (Object.keys(toDelete).length > 0) {
+    _rref('orders').update(toDelete).catch(function(e) { console.error(e); });
+  }
+}
+
+function renderOrders() {
+  var list = document.getElementById('orders-list');
+  var noEl = document.getElementById('no-orders-msg');
+  if (!list) return;
+
+  var arr = Object.entries(orders)
+    .map(function(e) { return Object.assign({ id: e[0] }, e[1]); })
+    .filter(function(o) { return o.status !== 'done' || (o.createdAt >= displayCutoffTs(_retOrders)); })
+    .sort(function(a, b) { return b.createdAt - a.createdAt; });
+
+  var expanded = new Set();
+  list.querySelectorAll('.order-card:not(.collapsed)').forEach(function(el) { expanded.add(el.dataset.id); });
+  list.querySelectorAll('.order-card, .day-sep').forEach(function(e) { e.remove(); });
+  if (arr.length === 0) { if (noEl) noEl.style.display = ''; return; }
+  if (noEl) noEl.style.display = 'none';
+
+  var localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', de:'de-DE', ar:'ar-SA' };
+  var locale    = localeMap[lang] || 'fr-FR';
+  var chevSvg   = '<svg width="14" height="14"><use href="#i-chevron"/></svg>';
+  var lastDay   = null;
+
+  arr.forEach(function(o) {
+    var t        = T[lang] || T.fr;
+    var _d       = o.createdAt ? new Date(o.createdAt) : null;
+    if (_d) {
+      var dayKey = _d.toDateString();
+      if (dayKey !== lastDay) {
+        lastDay = dayKey;
+        var sep = document.createElement('div');
+        sep.className = 'day-sep';
+        sep.textContent = formatDay(_d, t);
+        list.appendChild(sep);
+      }
+    }
+    var stClass  = o.status === 'done' ? 'st-done' : o.status === 'in_progress' ? 'st-progress' : 'st-pending';
+    var stLabel  = o.status === 'done' ? t.ordDone : o.status === 'in_progress' ? t.ordProgress : t.ordPending;
+    var itemsHtml = (o.items || []).map(function(it) {
+      var live = menuItemsMap[it.id];
+      var name = live ? (live.name && (live.name[lang] || live.name.fr) || it.name) : it.name;
+      return it.qty + '× ' + escapeHtml(name);
+    }).join(' · ');
+    var timeStr  = _d ? (formatDay(_d, t) + ' ' + _d.toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit' })) : '';
+    var isNum    = o.tableNum && /^\d+$/.test(String(o.tableNum));
+    var tableLabel = isNum ? (t.ordTable + ' ' + o.tableNum) : t.ordTakeaway;
+    var isCollapsed = !expanded.has(o.id);
+    var card = document.createElement('div');
+    card.className = 'order-card ' + stClass + (isCollapsed ? ' collapsed' : '');
+    card.dataset.id = o.id;
+    card.innerHTML =
+      '<div class="order-card-hd">' +
+        '<span class="order-table-lbl">' + escapeHtml(tableLabel) + '</span>' +
+        '<span class="order-time-lbl">'  + timeStr + '</span>' +
+        '<span class="order-total-hd">'  + escapeHtml(String(o.total || '—')) + '</span>' +
+        '<span class="order-status-badge">' + stLabel + '</span>' +
+        '<span class="order-chevron">' + chevSvg + '</span>' +
+      '</div>' +
+      '<div class="order-body"><div class="order-body-inner"><div class="order-body-pad">' +
+        '<div class="order-items-lbl">' + itemsHtml + '</div>' +
+        '<div class="order-total-lbl">' + t.ordTotal + ' : ' + escapeHtml(String(o.total || '—')) + '</div>' +
+        '<div class="order-status-btns">' +
+          '<button class="order-st-btn '      + (o.status==='pending'     ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'pending\')">'     + t.ordPending  + '</button>' +
+          '<button class="order-st-btn prog ' + (o.status==='in_progress' ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'in_progress\')">' + t.ordProgress + '</button>' +
+          '<button class="order-st-btn done ' + (o.status==='done'        ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'done\')">'        + t.ordDone     + '</button>' +
+        '</div>' +
+      '</div></div></div>';
+    card.querySelector('.order-card-hd').addEventListener('click', function() { card.classList.toggle('collapsed'); });
+    list.appendChild(card);
+  });
+}
+
+/* ── INIT ── */
+function init() {
+  _rref('/config/primaryLang').on('value', function(snap) {
+    var val = snap.val();
+    if (val) {
+      localStorage.setItem(_PFX+'app_lang_cache', val);
+      if (!localStorage.getItem(_PFX+'app_lang') && lang !== val) {
+        lang = val; applyLang(); buildLangBtns();
+      }
+    }
+  });
+  _rref('/config/enabledLangs').on('value', function(snap) {
+    enabledLangs = snap.val() || {};
+    buildLangBtns();
+  });
+
+  _rref('/config/retention').on('value', function(snap) {
+    var r = snap.val() || {};
+    _retCalls  = { ms: r.calls  || 604800000, changedAt: r.callsChangedAt  || 0, previous: r.callsPrevious  || r.calls  || 604800000, isReduction: r.callsIsReduction  || false };
+    _retOrders = { ms: r.orders || 604800000, changedAt: r.ordersChangedAt || 0, previous: r.ordersPrevious || r.orders || 604800000, isReduction: r.ordersIsReduction || false };
+    cleanupCallsFromStorage();
+    renderCalls();
+    renderOrders();
+    cleanupOrders();
+  });
+
+  loadCalls();
+  loadMessages();
+  buildLangBtns();
+  _rref('menu/items').once('value').then(function(snap) {
+    var raw = snap.val();
+    if (raw) {
+      menuItemsMap = {};
+      var arr = Array.isArray(raw) ? raw : Object.values(raw);
+      arr.forEach(function(it) { if (it && it.id) menuItemsMap[it.id] = it; });
+      renderOrders();
+    }
+  }).catch(function() {});
+
+  applyLang();
+  updateMessagesBadge();
+  startPolling();
+  startOrdersListener();
+  setupNativePush();
+
+  document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });
+  document.addEventListener('click',      unlockAudio, { once:true });
+
+  _rref('menu/info').once('value').then(function(snap) {
+    var info = snap.val() || {};
+    if (info.showOrderUI) { switchTab('orders'); }
+  }).catch(function() {});
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

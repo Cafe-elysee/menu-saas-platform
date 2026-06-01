@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "restaurants": {
+      "$restaurantId": {
+        "profile":  { ".read": true,  ".write": true  },
+        "menu":     { ".read": true,  ".write": true  },
+        "config":   { ".read": true,  ".write": true  },
+        "orders":   { ".read": true,  ".write": true  },
+        "calls":    { ".read": true,  ".write": true  },
+        "devices":  { ".read": true,  ".write": true  },
+        "sessions": { ".read": true,  ".write": true  },
+        "logs":     { ".read": false, ".write": true  }
+      }
+    }
+  }
+}

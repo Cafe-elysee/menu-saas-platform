@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0908">
+  <title>Menu Pro Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      display: flex; flex-direction: column;
+      background: radial-gradient(ellipse at 25% 0%, rgba(200,164,78,0.06) 0%, transparent 55%),
+                  radial-gradient(ellipse at 75% 100%, rgba(200,164,78,0.03) 0%, transparent 50%),
+                  #0a0908;
+      color: #e8e0d0;
+      font-family: 'Outfit', sans-serif;
+      overscroll-behavior: none;
+    }
+    html.light body {
+      background: #f0ebe0;
+      color: #1a140a;
+    }
+
+    :root {
+      --bg:       #0a0908;
+      --card-bg:  #1a1612;
+      --border:   #3c3022;
+      --gold:     #d4aa52;
+      --gold-dim: rgba(212,170,82,0.16);
+      --text:     #f2ead8;
+      --muted:    #a09070;
+      --green:    #4caf50;
+      --red:      #ef5350;
+      --orange:   #ff9800;
+      --nav-h:    68px;
+    }
+    html.light {
+      --bg:       #e8e2d6;
+      --card-bg:  #ffffff;
+      --border:   #c4ae90;
+      --gold:     #6e4410;
+      --gold-dim: rgba(110,68,16,0.10);
+      --text:     #0d0804;
+      --muted:    #7a6040;
+    }
+    html.light body {
+      background: linear-gradient(160deg, #ede8df 0%, #e4ddd0 100%);
+    }
+    html.light .app-header {
+      background: rgba(237,232,223,0.98);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.04);
+    }
+    html.light .bottom-nav {
+      background: rgba(237,232,223,0.98) !important;
+      box-shadow: 0 -1px 0 rgba(0,0,0,0.08), 0 -4px 16px rgba(0,0,0,0.04);
+    }
+    html.light .client-card,
+    html.light .devis-card,
+    html.light .settings-section {
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+    /* ═══════════════════════════════
+       LOGIN
+    ═══════════════════════════════ */
+    #login-screen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      background: var(--bg);
+      z-index: 1000;
+    }
+    #login-screen.hidden { display: none; }
+
+    .login-box {
+      background: var(--card-bg);
+      border: 1px solid rgba(200,164,78,0.2);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      width: 100%; max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 0 1px rgba(200,164,78,0.05), 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .login-logo {
+      width: 56px; height: 56px;
+      background: var(--gold-dim);
+      border: 1.5px solid rgba(200,164,78,0.3);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 1.25rem;
+    }
+    .login-box h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; color: var(--gold);
+      margin-bottom: 0.2rem; letter-spacing: 0.03em;
+    }
+    .login-box .login-sub {
+      color: var(--muted); font-size: 0.8rem;
+      margin-bottom: 2rem;
+    }
+    .login-input {
+      width: 100%; padding: 0.8rem 1rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 1rem;
+      margin-bottom: 0.75rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .login-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,164,78,0.12); }
+    .btn-gold {
+      width: 100%; padding: 0.85rem 1rem;
+      background: linear-gradient(135deg, #d4a94e, #b8922e);
+      color: #0c0a08; border: none; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.03em;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-gold:active { transform: translateY(0); }
+    .login-error {
+      color: var(--red); font-size: 0.82rem;
+      margin-top: 0.75rem; display: none;
+    }
+    .first-run-note {
+      background: rgba(200,164,78,0.08);
+      border: 1px solid rgba(200,164,78,0.2);
+      border-radius: 10px; padding: 0.75rem 1rem;
+      font-size: 0.78rem; color: var(--muted);
+      margin-bottom: 1.25rem; text-align: left; line-height: 1.6;
+    }
+    .first-run-note strong { color: var(--gold); }
+
+    /* ═══════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════ */
+    #app {
+      display: none; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+    #app.visible { display: flex; }
+
+    .app-header {
+      flex-shrink: 0;
+      background: rgba(13,11,8,0.97);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,164,78,0.15);
+      padding: 0 1.25rem;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    html.light .app-header { background: rgba(240,235,224,0.97); }
+    .app-header-left { display: flex; align-items: center; gap: 10px; }
+    .app-header-icon {
+      width: 34px; height: 34px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(200,164,78,0.25);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--gold); flex-shrink: 0;
+    }
+    .app-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; color: var(--gold); letter-spacing: 0.02em;
+    }
+    .btn-logout {
+      padding: 0.4rem 0.9rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted);
+      font-size: 0.8rem; transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Sliding tabs ── */
+    .tab-scroll {
+      flex: 1; overflow: hidden; position: relative;
+    }
+    .tabs-track {
+      display: flex; height: 100%;
+      width: 300%;
+      will-change: transform;
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tab-pane {
+      width: 33.333%; flex-shrink: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
+    }
+
+    .bottom-nav {
+      flex-shrink: 0;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+      background: rgba(13,11,8,0.97);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(212,170,82,0.18);
+      display: flex; align-items: flex-start;
+      padding-top: 10px;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; padding: 4px 8px;
+      cursor: pointer; background: none; border: none;
+      color: var(--muted); transition: color 0.25s;
+      position: relative;
+    }
+    /* Top indicator line */
+    .nav-btn::before {
+      content: '';
+      position: absolute; top: -10px; left: 50%;
+      width: 28px; height: 3px;
+      margin-left: -14px;
+      background: var(--gold);
+      border-radius: 0 0 4px 4px;
+      transform: scaleX(0);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .nav-btn.active { color: var(--gold); font-weight: 600; }
+    .nav-btn.active::before { transform: scaleX(1); }
+    .nav-btn svg { display: block; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+    .nav-btn.active svg { transform: translateY(-2px) scale(1.1); }
+    .nav-label { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.02em; }
+    .nav-badge {
+      position: absolute; top: 0; right: calc(50% - 22px);
+      background: var(--red); color: #fff;
+      font-size: 0.6rem; font-weight: 700;
+      min-width: 16px; height: 16px; border-radius: 8px;
+      display: none; align-items: center; justify-content: center;
+      padding: 0 4px;
+    }
+    .nav-badge.show { display: flex; }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; color: var(--gold);
+      padding: 1.25rem 1.25rem 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ═══════════════════════════════
+       TAB DEVIS
+    ═══════════════════════════════ */
+    .devis-list { padding: 0 1rem 1rem; }
+    .devis-empty {
+      text-align: center; padding: 4rem 2rem;
+      color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+    }
+    .devis-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+
+    @keyframes statusPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(212,170,82,0.5); }
+      50%  { box-shadow: 0 0 0 8px rgba(212,170,82,0); }
+      100% { box-shadow: 0 0 0 0 rgba(212,170,82,0); }
+    }
+    @keyframes pillPop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    /* Collapsible devis card */
+    .devis-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      transition: border-left-color 0.5s ease, opacity 0.4s ease, box-shadow 0.3s ease;
+    }
+    .devis-card.nouveau  { border-left: 3px solid var(--orange); }
+    .devis-card.en_cours { border-left: 3px solid var(--gold); }
+    .devis-card.traite   { opacity: 0.58; }
+    .devis-card.status-flash { animation: statusPulse 0.7s ease forwards; }
+    .devis-status-pill { transition: background 0.4s ease, color 0.4s ease; }
+    .devis-status-pill.pill-pop { animation: pillPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
+    /* Summary row — always visible */
+    .devis-summary {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.1rem;
+      cursor: pointer; gap: 10px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .devis-summary:active { background: rgba(200,164,78,0.06); }
+    .devis-summary-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .devis-phone {
+      font-size: 1rem; font-weight: 600;
+      color: var(--text); letter-spacing: 0.01em;
+    }
+    .devis-date { font-size: 0.74rem; color: var(--muted); font-weight: 400; }
+    .devis-summary-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .devis-new-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--orange); flex-shrink: 0;
+      box-shadow: 0 0 7px rgba(255,152,0,0.8);
+      display: none;
+    }
+    .devis-card.nouveau .devis-new-dot { display: block; }
+    .devis-status-pill {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .devis-card.nouveau  .devis-status-pill { background: rgba(255,152,0,0.15); color: var(--orange); }
+    .devis-card.en_cours .devis-status-pill { background: rgba(212,170,82,0.15); color: var(--gold); }
+    .devis-card.traite   .devis-status-pill { background: rgba(76,175,80,0.15);  color: var(--green); }
+    .devis-chevron {
+      color: var(--muted);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      flex-shrink: 0;
+    }
+    .devis-card.open .devis-chevron { transform: rotate(180deg); }
+
+    /* Collapsible body */
+    .devis-body {
+      max-height: 0 !important;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.38s ease, opacity 0.28s ease;
+    }
+    .devis-card.open .devis-body { max-height: 900px !important; opacity: 1; }
+    .devis-body-inner {
+      padding: 0.75rem 1.1rem 1.1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .devis-tags {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      margin-bottom: 0.8rem;
+    }
+    .devis-tag {
+      padding: 3px 9px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(212,170,82,0.25);
+      border-radius: 20px; color: var(--gold);
+      font-size: 0.72rem; font-weight: 500;
+    }
+    .devis-price {
+      display: flex; gap: 1.25rem; margin-bottom: 0.9rem;
+      padding: 0.6rem 0.75rem;
+      background: rgba(212,170,82,0.06);
+      border-radius: 10px; border: 1px solid rgba(212,170,82,0.1);
+    }
+    .devis-price-item { display: flex; flex-direction: column; gap: 3px; }
+    .devis-price-label { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 500; }
+    .devis-price-val { font-size: 1.05rem; font-weight: 700; color: var(--gold); }
+
+    .devis-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .devis-status-sel {
+      flex: 1; min-width: 120px;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; outline: none;
+      transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .devis-status-sel:focus { border-color: var(--gold); }
+    .devis-wa-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 0.5rem 1rem;
+      background: #25D366; color: #fff;
+      border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      text-decoration: none; flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .devis-wa-btn:active { opacity: 0.82; }
+
+    /* ═══════════════════════════════
+       TAB CLIENTS
+    ═══════════════════════════════ */
+    .clients-list { padding: 0 1rem 1rem; }
+
+    .client-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .card-top {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      cursor: pointer; user-select: none;
+      padding: 1rem 1.1rem;
+      transition: background 0.2s;
+    }
+    .card-top:hover { background: rgba(200,164,78,0.05); }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; color: var(--gold); letter-spacing: 0.02em;
+    }
+    .card-top-right { display: flex; align-items: center; gap: 8px; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); flex-shrink: 0;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .status-dot.online  { background: var(--green); box-shadow: 0 0 8px rgba(76,175,80,0.7); }
+    .status-dot.offline { background: var(--red); box-shadow: 0 0 6px rgba(239,83,80,0.5); }
+    .chevron {
+      color: var(--muted); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    .client-card.open .chevron { transform: rotate(180deg); }
+
+    .card-body {
+      max-height: 0 !important;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .client-card.open .card-body { max-height: 8000px !important; opacity: 1; }
+
+    .card-body-inner {
+      padding: 0 1.1rem 1.25rem;
+      border-top: 1px solid rgba(200,164,78,0.08);
+    }
+
+    .card-links {
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      margin: 0.85rem 0 0.75rem;
+    }
+    .card-link {
+      padding: 0.42rem 1.1rem;
+      background: linear-gradient(160deg, #e8c060 0%, #c8a44e 45%, #9e7428 100%);
+      border: none; border-radius: 10px;
+      color: #1a1208; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em;
+      text-decoration: none; cursor: pointer; text-align: center;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.30) inset,
+        0 -1px 0 rgba(0,0,0,0.20) inset,
+        0 3px 0 #7a5018,
+        0 4px 10px rgba(0,0,0,0.40);
+      text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative; overflow: hidden;
+    }
+    .card-link::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.20), transparent);
+      border-radius: 10px 10px 0 0;
+      pointer-events: none;
+    }
+    .card-link:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.30) inset,
+        0 -1px 0 rgba(0,0,0,0.20) inset,
+        0 1px 0 #7a5018,
+        0 2px 5px rgba(0,0,0,0.30);
+    }
+
+    .theme-type-sep {
+      font-size: 0.58rem; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--gold);
+      opacity: 0.65;
+      margin: 0.7rem 0 0.25rem;
+      padding: 0.18rem 0.5rem;
+      background: rgba(212,170,82,0.06);
+      border-radius: 4px;
+    }
+    .theme-type-sep:first-child { margin-top: 0.1rem; }
+    .section-label {
+      font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+      margin: 0.9rem 0 0.5rem;
+      padding-left: 0.6rem;
+      border-left: 2px solid var(--gold);
+      font-weight: 600;
+    }
+
+    .feat-list {
+      display: flex; flex-direction: column; gap: 0.25rem;
+      margin-bottom: 0.75rem;
+      background: rgba(212,170,82,0.04);
+      border-radius: 10px; padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+    }
+    .feat-row, .toggle-row, .lang-toggle-row {
+      display: flex; align-items: center;
+      justify-content: space-between; padding: 0.22rem 0;
+      border-bottom: 1px solid rgba(212,170,82,0.06);
+    }
+    .feat-row:last-child, .toggle-row:last-child, .lang-toggle-row:last-child { border-bottom: none; }
+    .feat-label, .toggle-label, .lang-toggle-label { font-size: 0.85rem; color: var(--text); }
+
+    .toggle { position: relative; width: 42px; height: 23px; flex-shrink: 0; }
+    .toggle input { display: none; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer;
+      transition: background 0.25s;
+    }
+    .toggle input:checked ~ .toggle-track {
+      background: linear-gradient(135deg, #d4a94e, #b8922e);
+      border-color: transparent;
+    }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 17px; height: 17px; background: #fff;
+      border-radius: 50%; pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(19px); }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.9rem 0; }
+
+    .pw-row { display: flex; gap: 0.5rem; }
+    .pw-row input {
+      flex: 1; padding: 0.5rem 0.7rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.84rem;
+      outline: none; min-width: 0;
+      transition: border-color 0.2s;
+    }
+    .pw-row input:focus { border-color: var(--gold); }
+    .btn-update {
+      padding: 0.5rem 0.85rem;
+      background: linear-gradient(135deg, #d4a94e, #b8922e);
+      color: #0c0a08; border-radius: 8px;
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-update:hover { opacity: 0.88; }
+    .btn-update:disabled { opacity: 0.4; cursor: default; }
+    .pw-feedback { font-size: 0.72rem; margin-top: 0.3rem; min-height: 1em; }
+    .pw-feedback.ok  { color: var(--green); }
+    .pw-feedback.err { color: var(--red); }
+
+    .lang-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .lang-row { display: flex; align-items: center; justify-content: space-between; }
+    .lang-label { font-size: 0.83rem; }
+    .lang-sel, .retention-sel {
+      padding: 0.3rem 0.55rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.78rem;
+      cursor: pointer; outline: none;
+      transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .lang-sel:focus, .retention-sel:focus { border-color: var(--gold); }
+
+    .retention-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 7px 0; border-bottom: 1px solid rgba(200,164,78,0.07);
+    }
+    .retention-row:last-child { border-bottom: none; }
+    .retention-label { font-size: 0.78rem; color: var(--muted); }
+
+    .variant-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      color: var(--muted); cursor: pointer; font-size: 0.73rem;
+      padding: 2px 8px; margin-left: 6px; flex-shrink: 0;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .variant-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .dp-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .dp-item { display: flex; flex-direction: column; gap: 0.4rem; }
+    .dp-num { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    .dp-preview {
+      width: 100%; height: 70px;
+      background: var(--bg); border: 1px dashed var(--border);
+      border-radius: 8px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dp-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .dp-cam { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); }
+    .dp-cam span { font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; }
+    .dp-btns { display: flex; gap: 0.35rem; }
+    .dp-upload-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 0.4rem 0.5rem;
+      background: var(--gold-dim); border: 1px solid rgba(200,164,78,0.28);
+      border-radius: 6px; color: var(--gold);
+      font-size: 0.73rem; font-weight: 500; cursor: pointer;
+      white-space: nowrap;
+    }
+    .dp-del-btn {
+      padding: 0.4rem 0.55rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 6px; color: var(--muted); font-size: 0.75rem;
+      cursor: pointer; flex-shrink: 0;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .dp-del-btn:hover { border-color: var(--red); color: var(--red); }
+    .dp-open-demo-btn {
+      display: block; width: 100%; margin-bottom: 1.2rem;
+      padding: 0.88rem 1.2rem;
+      background: linear-gradient(160deg, #e8c060 0%, #c8a44e 45%, #9e7428 100%);
+      border: none; border-radius: 14px;
+      color: #1a1208; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.04em;
+      cursor: pointer; text-align: center;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.32) inset,
+        0 -1px 0 rgba(0,0,0,0.22) inset,
+        0 4px 0 #7a5018,
+        0 6px 16px rgba(0,0,0,0.45);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative; overflow: hidden;
+    }
+    .dp-open-demo-btn::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 52%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.22), transparent);
+      border-radius: 14px 14px 0 0;
+      pointer-events: none;
+    }
+    .dp-open-demo-btn:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.32) inset,
+        0 -1px 0 rgba(0,0,0,0.22) inset,
+        0 1px 0 #7a5018,
+        0 2px 6px rgba(0,0,0,0.35);
+    }
+
+    /* ═══════════════════════════════
+       TAB RÉGLAGES
+    ═══════════════════════════════ */
+    .settings-section {
+      margin: 0 1rem 1rem;
+      background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(200,164,78,0.14);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+    }
+    .settings-title {
+      font-size: 0.63rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+      margin-bottom: 0.75rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid rgba(200,164,78,0.4);
+    }
+    .settings-row {
+      display: flex; align-items: center;
+      justify-content: space-between; padding: 0.5rem 0;
+    }
+    .settings-label { font-size: 0.85rem; }
+
+    .theme-options { display: flex; gap: 0.5rem; }
+    .theme-opt {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .theme-opt:hover { transform: scale(1.08); }
+    .theme-opt.active { border-color: var(--gold); background: var(--gold-dim); }
+
+    /* ═══════════════════════════════
+       MODALS
+    ═══════════════════════════════ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      z-index: 500; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid rgba(200,164,78,0.2);
+      border-radius: 18px; padding: 1.75rem;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .modal-box h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; color: var(--gold);
+      margin-bottom: 0.65rem;
+    }
+    .modal-box p { font-size: 0.83rem; color: var(--text); margin-bottom: 0.9rem; line-height: 1.5; }
+    .modal-sel {
+      width: 100%; padding: 0.5rem 0.7rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.84rem;
+      outline: none; margin-bottom: 1rem;
+      transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .modal-sel:focus { border-color: var(--gold); }
+    .modal-actions { display: flex; gap: 0.5rem; }
+    .modal-confirm {
+      flex: 1; padding: 0.62rem 1rem;
+      background: linear-gradient(135deg, #d4a94e, #b8922e);
+      color: #0c0a08; border: none; border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 0.84rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-confirm:hover { opacity: 0.88; }
+    .modal-cancel {
+      flex: 1; padding: 0.62rem 1rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--muted);
+      font-family: 'Outfit', sans-serif; font-size: 0.84rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .modal-cancel:hover { border-color: var(--gold); color: var(--gold); }
+
+    .ret-modal-icon { font-size: 1.8rem; text-align: center; margin-bottom: 0.5rem; }
+    .ret-modal-title { font-size: 0.95rem; font-weight: 600; text-align: center; margin-bottom: 0.4rem; }
+    .ret-modal-body { font-size: 0.8rem; color: var(--muted); line-height: 1.7; text-align: center; }
+    .ret-modal-body strong { color: var(--text); }
+    .ret-modal-body .warn { color: #e8a44a; }
+    .ret-modal-btns { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+    .variant-modal-box { max-height: 80vh; overflow-y: auto; }
+    .variant-list { display: flex; flex-direction: column; gap: 8px; margin: 0.5rem 0 0.9rem; }
+    .variant-item { display: flex; align-items: center; gap: 10px; }
+    .variant-cb { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; flex-shrink: 0; }
+    .variant-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
+    .variant-name { font-size: 0.83rem; }
+    .variant-star-btn { background:none; border:none; cursor:pointer; font-size:0.85rem; opacity:0.3; padding:0 0.1rem; flex-shrink:0; transition:opacity .15s; }
+    .variant-star-btn.is-std { opacity:1; }
+    .variant-star-btn:hover { opacity:0.75; }
+    .variant-eye-btn { background:none; border:none; cursor:pointer; font-size:0.85rem; opacity:0.5; padding:0 0.1rem; margin-left:auto; flex-shrink:0; transition:opacity .15s; }
+    .variant-eye-btn:hover { opacity:0.9; }
+    .variant-eye-btn.is-hidden { opacity:0.4; }
+    .variant-item.is-hidden-color { background: rgba(255,255,255,0.02); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: calc(var(--nav-h) + 1rem);
+      left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(13,11,8,0.95);
+      border: 1px solid rgba(200,164,78,0.25);
+      border-radius: 12px; padding: 0.6rem 1.25rem;
+      font-size: 0.82rem; color: var(--text);
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 900; white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    html.light #toast { background: rgba(40,35,25,0.93); color: #f5ead8; }
+
+    /* ═══════════════════════════════
+       QUICK NAV FAB
+    ═══════════════════════════════ */
+    .quick-nav-fab {
+      position: fixed;
+      bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 0.9rem);
+      right: 1rem;
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #d4a94e, #b8922e);
+      color: #0c0a08;
+      font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px;
+      display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(200,164,78,0.45);
+      z-index: 95;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      border: none; cursor: pointer;
+    }
+    .quick-nav-fab:active { transform: scale(0.91); box-shadow: 0 2px 10px rgba(200,164,78,0.3); }
+
+    .quick-nav-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    }
+    .quick-nav-overlay.open { display: block; }
+
+    .quick-nav-sheet {
+      position: fixed;
+      bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
+      right: 1rem; left: 1rem;
+      background: var(--card-bg);
+      border: 1px solid rgba(200,164,78,0.22);
+      border-radius: 18px;
+      padding: 1rem 1.1rem 1.1rem;
+      z-index: 201;
+      transform: translateY(16px) scale(0.97);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.18s;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.55);
+    }
+    .quick-nav-sheet.open {
+      transform: translateY(0) scale(1);
+      opacity: 1; pointer-events: auto;
+    }
+    .quick-nav-title {
+      font-size: 0.63rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+      margin-bottom: 0.6rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid rgba(200,164,78,0.4);
+    }
+    .quick-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid rgba(200,164,78,0.07);
+      cursor: pointer; border-radius: 8px;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .quick-nav-item:last-child { border-bottom: none; }
+    .quick-nav-item:active { background: var(--gold-dim); }
+    .quick-nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .quick-nav-name { font-size: 0.9rem; font-weight: 500; }
+    .variant-univ-sep { font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(200,164,78,.55); margin:0.6rem 0 0.3rem; padding-top:0.5rem; border-top:1px solid rgba(200,164,78,.15); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">⚙️</div>
+    <h1>Menu Pro</h1>
+    <p class="login-sub">Control — Accès privé</p>
+    <div id="first-run-note" class="first-run-note" style="display:none">
+      <strong>Premier lancement</strong> — Créez votre mot de passe d'accès à l'application.
+    </div>
+    <input type="password" class="login-input" id="login-pw"
+           placeholder="Mot de passe" autocomplete="current-password">
+    <input type="password" class="login-input" id="login-pw2"
+           placeholder="Confirmer le mot de passe" style="display:none" autocomplete="new-password">
+    <button class="btn-gold" id="login-btn" onclick="tryLogin()">Connexion</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+  <div class="app-header">
+    <div class="app-header-left">
+      <div class="app-header-icon">⚙️</div>
+      <h2>Menu Pro Control</h2>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <div class="tab-scroll">
+  <div class="tabs-track" id="tabs-track">
+    <!-- TAB DEVIS -->
+    <div class="tab-pane" id="pane-devis">
+      <div class="section-title">Devis reçus</div>
+      <div class="devis-list" id="devis-list">
+        <div class="devis-empty" id="devis-empty">
+          <div class="devis-empty-icon">📋</div>
+          Aucun devis pour l'instant.<br>Ils apparaîtront ici en temps réel.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB CLIENTS -->
+    <div class="tab-pane" id="pane-clients">
+      <div class="section-title">Clients</div>
+      <div class="clients-list" id="clients-list"></div>
+    </div>
+
+    <!-- TAB RÉGLAGES -->
+    <div class="tab-pane" id="pane-reglages">
+      <div class="section-title">Réglages</div>
+
+      <div class="settings-section">
+        <div class="settings-title">Apparence</div>
+        <div class="settings-row">
+          <span class="settings-label">Thème de l'application</span>
+          <div class="theme-options">
+            <div class="theme-opt" id="opt-dark" onclick="setTheme('dark')" title="Sombre">🌙</div>
+            <div class="theme-opt" id="opt-light" onclick="setTheme('light')" title="Clair">☀️</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section" id="notif-status-section">
+        <div class="settings-title">🔔 Notifications</div>
+        <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
+          Chargement…
+        </div>
+        <button class="btn-update" onclick="forceTokenRenewal()">Forcer le renouvellement</button>
+        <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Sécurité — Mot de passe</div>
+        <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
+          Modifier le mot de passe d'accès à l'application.
+        </div>
+        <div class="pw-row" style="margin-bottom:0.5rem;">
+          <input type="password" id="set-pw-new" placeholder="Nouveau mot de passe">
+        </div>
+        <div class="pw-row">
+          <input type="password" id="set-pw-conf" placeholder="Confirmer">
+          <button class="btn-update" onclick="changeAppPassword()">Enregistrer</button>
+        </div>
+        <div class="pw-feedback" id="set-pw-fb"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">📸 Photos — Page Démo</div>
+        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.85rem; line-height:1.6;">
+          Ces 5 photos apparaissent dans le diaporama de la page de démonstration publique.
+        </div>
+        <div class="dp-grid">
+          <div class="dp-item">
+            <div class="dp-num">Photo 1</div>
+            <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',1,'demo')">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 2</div>
+            <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',2,'demo')">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 3</div>
+            <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',3,'demo')">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 4</div>
+            <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',4,'demo')">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 5</div>
+            <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',5,'demo')">✕</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /.tabs-track -->
+  </div><!-- /.tab-scroll -->
+
+  <!-- Bottom nav -->
+  <!-- Quick Nav FAB -->
+  <button class="quick-nav-fab" id="quick-nav-fab" onclick="openQuickNav()">≡</button>
+  <div class="quick-nav-overlay" id="quick-nav-overlay" onclick="closeQuickNav()"></div>
+  <div class="quick-nav-sheet" id="quick-nav-sheet">
+    <div class="quick-nav-title">Aller vers…</div>
+    <div id="quick-nav-list"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-devis" onclick="switchTab('devis')">
+      <div class="nav-badge" id="badge-devis"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      <span class="nav-label">Devis</span>
+    </button>
+    <button class="nav-btn" id="nav-clients" onclick="switchTab('clients')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span class="nav-label">Clients</span>
+    </button>
+    <button class="nav-btn" id="nav-reglages" onclick="switchTab('reglages')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Réglages</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<div class="modal-overlay" id="retention-modal">
+  <div class="modal-box">
+    <div class="ret-modal-icon">⚠️</div>
+    <div class="ret-modal-title" id="ret-modal-title"></div>
+    <div class="ret-modal-body" id="ret-modal-body"></div>
+    <div class="ret-modal-btns">
+      <button class="modal-cancel" onclick="cancelRetention()">Annuler</button>
+      <button class="modal-confirm" onclick="confirmRetention()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="lang-modal">
+  <div class="modal-box">
+    <h3>Langue en cours d'utilisation</h3>
+    <p id="modal-msg"></p>
+    <select class="modal-sel" id="modal-sel"></select>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="cancelLangDisable()">Annuler</button>
+      <button class="modal-confirm" onclick="confirmLangDisable()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="theme-modal">
+  <div class="modal-box">
+    <h3>Thème en cours d'utilisation</h3>
+    <p id="theme-modal-msg"></p>
+    <select class="modal-sel" id="theme-modal-sel"></select>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="cancelThemeDisable()">Annuler</button>
+      <button class="modal-confirm" onclick="confirmThemeDisable()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="variant-modal">
+  <div class="modal-box variant-modal-box">
+    <h3 id="variant-modal-title">Couleurs</h3>
+    <div id="variant-std-row" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 10px;background:rgba(212,170,82,0.06);border-radius:8px;border:1px dashed rgba(212,170,82,0.3);">
+      <div id="variant-std-dot" style="width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2px dashed rgba(255,255,255,0.5);"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);opacity:0.8;">Standard actuelle</div>
+        <div id="variant-std-name" style="font-size:0.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      </div>
+    </div>
+    <div id="variant-all-list" class="variant-list"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeVariantModal()">Annuler</button>
+      <button class="modal-confirm" onclick="saveVariantConfig()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════
+// FIREBASE — Control (lecture devis)
+// ════════════════════════════════════════════════════
+const CONTROL_FB_CONFIG = {
+  apiKey:            "AIzaSyAwHbV2dueFQFL5eJCNkB0siVjdB_7AtKU",
+  authDomain:        "menu-pro-control.firebaseapp.com",
+  databaseURL:       "https://menu-pro-control-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "menu-pro-control",
+  storageBucket:     "menu-pro-control.firebasestorage.app",
+  messagingSenderId: "457842698651",
+  appId:             "1:457842698651:web:f5cbff82ec4cb729ded93e"
+};
+
+// ════════════════════════════════════════════════════
+// SAAS PLATFORM FIREBASE — données restaurants
+// ════════════════════════════════════════════════════
+const SAAS_FB_CONFIG = {
+  apiKey:            "AIzaSyCM6SiQoWQfsq_t-80EfiVplXV9p534_eI",
+  authDomain:        "menu-saas-platform.firebaseapp.com",
+  projectId:         "menu-saas-platform",
+  storageBucket:     "menu-saas-platform.firebasestorage.app",
+  messagingSenderId: "460781372428",
+  appId:             "1:460781372428:web:55c33bfb6f8f8d5582da29",
+  databaseURL:       "https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+// ════════════════════════════════════════════════════
+// CLIENTS — configs Firebase par client
+// ════════════════════════════════════════════════════
+const CLIENTS = [
+  {
+    name: 'Mozart Coffee Lounge',
+    slug: 'mozart',
+    url:  'https://mozart-cafe-menu.vercel.app',
+    langs: ['el','fr','en','ar','de'],
+    noEvents: true
+  },
+  {
+    name: 'Café Élysée',
+    slug: 'cafe-elysee',
+    url:  'https://cafe-elysee-dye1.vercel.app',
+    demoPage: true,
+    langs: ['el','fr','en','ar','de']
+  }
+];
+
+const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', ar:'العربية' };
+const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
+const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande:'🛒 Commande' };
+const CANAL_LABELS  = { whatsapp:'WhatsApp', viber:'Viber' };
+
+const ALL_THEMES_LIST = [
+  { id:'gold-noir',       name:'Gold Noir',                accent:'#c8a44e' },
+  { id:'neon-tokyo',      name:'Neon Pulse',               accent:'#00f5d4' },
+  { id:'botanical',       name:'Botanical Forest',         accent:'#7acc5a' },
+  { id:'rose-parisien',   name:'Rose Parisien',            accent:'#e890b0' },
+  { id:'midnight-luxe',   name:'Enseigne',                 accent:'#f0d060' },
+  { id:'velvet-luxe',     name:'Velvet Luxe',              accent:'#d4af37' },
+  { id:'prestige',        name:'Prestige',                 accent:'#c8a44e' },
+  { id:'santorin',        name:'Santorini',                accent:'#4db8ff' },
+  { id:'editorial',       name:'Éditorial',                accent:'#c0ccd8' },
+  { id:'dyn-bento',       name:'Dashboard Bento',          accent:'#ffffff' },
+  { id:'carte-classique', name:'Carte Classique', accent:'#d4b896' },
+  { id:'paper-elegant',   name:'Livre d\'Or (Papier)',      accent:'#e8e0d0' },
+  { id:'carte-sommelier',  name:'Sommelier',                  accent:'#b8a8c8' },
+  { id:'carte-bento',      name:'Bento Moderne',              accent:'#00c8d8' },
+  { id:'carte-telegraphe', name:'Télégraphe',                 accent:'#c8a070' },
+  { id:'carte-couture',    name:'Haute Couture',              accent:'#d8d8d8' },
+  { id:'carte-journal',    name:'Devanture',                  accent:'#e8a030' },
+  { id:'carte-voyage',     name:'Carnet de Voyage',           accent:'#d44040' },
+  { id:'carte-artisan',    name:"L'Atelier",                 accent:'#c08040' },
+  { id:'carte-ardoise',    name:'Ardoise Bistrot',            accent:'#e8e4dc' },
+  { id:'carte-maroc',      name:'Maroc & Épices',             accent:'#d4902c' },
+  { id:'livre-noir',        name:'Livre Noir',                 accent:'#c0c0cc' },
+  { id:'livre-botanique',   name:'Livre Botanique',            accent:'#7ec878' },
+  { id:'livre-azure',       name:'Livre Azur',                 accent:'#40a8d8' },
+  { id:'livre-rose',        name:'Livre Rose',                 accent:'#e880b0' },
+  { id:'livre-antique',     name:'Livre Antique',              accent:'#d4b870' },
+  { id:'livre-epure',       name:'Livre Épuré',                accent:'#d0d0d8' },
+  { id:'livre-cerise',      name:'Livre Cerise',               accent:'#e83040' },
+  { id:'livre-indigo',      name:'Livre Indigo',               accent:'#8080e8' },
+  { id:'livre-foret',       name:'Livre Forêt',                accent:'#c0b060' },
+];
+
+const THEME_VARIANTS = [
+  { family:'gold-noir', name:'Gold Noir', variants:[
+    {id:'gold-noir',color:'#c8a44e',name:'Gold Noir (standard)'},{id:'midnight',color:'#a67cff',name:'Minuit'},
+    {id:'forest',color:'#5ebd85',name:'Forêt'},{id:'ruby',color:'#ff6b6b',name:'Rubis'},
+    {id:'sapphire',color:'#4dabf5',name:'Saphir'},{id:'pearl',color:'#d0d0d0',name:'Perle'}
+  ]},
+  { family:'neon-tokyo', name:'Neon Pulse', variants:[
+    {id:'neon-tokyo',color:'#00f5d4',name:'Teal (standard)'},{id:'neon-pink',color:'#ff0080',name:'Rose'},
+    {id:'neon-purple',color:'#9d4edd',name:'Violet'},{id:'neon-green',color:'#39ff14',name:'Vert'},
+    {id:'neon-orange',color:'#ff6d00',name:'Orange'},{id:'neon-yellow',color:'#e9ff70',name:'Jaune'}
+  ]},
+  { family:'botanical', name:'Botanical Forest', variants:[
+    {id:'botanical',color:'#7acc5a',name:'Tropical (standard)'},{id:'botanical-autumn',color:'#d08c38',name:'Automne'},
+    {id:'botanical-sage',color:'#879f84',name:'Sauge'},{id:'botanical-earth',color:'#8b5a2b',name:'Terre'},
+    {id:'botanical-olive',color:'#556b2f',name:'Olive'},{id:'botanical-sand',color:'#d2b48c',name:'Sable'}
+  ]},
+  { family:'rose-parisien', name:'Rose Parisien', variants:[
+    {id:'rose-parisien',color:'#e890b0',name:'Rose (standard)'},{id:'rose-blue',color:'#80ccff',name:'Bleu'},
+    {id:'rose-lavender',color:'#9d50db',name:'Lavande'},{id:'rose-peach',color:'#e87055',name:'Pêche'},
+    {id:'rose-mint',color:'#1ac4a8',name:'Menthe'},{id:'rose-lemon',color:'#f0c040',name:'Citron'}
+  ]},
+  { family:'midnight-luxe', name:'Enseigne', variants:[
+    {id:'midnight-luxe',color:'#f0d060',name:'Or (standard)'},{id:'enseigne-silver',color:'#c0c0c0',name:'Argent'},
+    {id:'enseigne-copper',color:'#b87333',name:'Cuivre'},{id:'enseigne-emerald',color:'#50c878',name:'Émeraude'},
+    {id:'enseigne-sapphire',color:'#4488ee',name:'Saphir'},{id:'enseigne-ruby',color:'#e0115f',name:'Rubis'}
+  ]},
+  { family:'velvet-luxe', name:'Velvet Luxe', variants:[
+    {id:'velvet-luxe',color:'#d4af37',name:'Or (standard)'},{id:'velvet-red',color:'#c0102a',name:'Rouge'},
+    {id:'velvet-blue',color:'#2040c0',name:'Bleu'},{id:'velvet-green',color:'#1a7040',name:'Vert'},
+    {id:'velvet-purple',color:'#8040a0',name:'Violet'},{id:'velvet-black',color:'#888888',name:'Noir'}
+  ]},
+  { family:'prestige', name:'Prestige', variants:[
+    {id:'prestige',color:'#c8a44e',name:'Or (standard)'},{id:'prestige-silver',color:'#c0c0c0',name:'Argent'},
+    {id:'prestige-bronze',color:'#cd7f32',name:'Bronze'},{id:'prestige-emerald',color:'#28a030',name:'Émeraude'},
+    {id:'prestige-sapphire',color:'#3366cc',name:'Saphir'},{id:'prestige-ruby',color:'#c42028',name:'Rubis'}
+  ]},
+  { family:'santorin', name:'Santorini', variants:[
+    {id:'santorin',color:'#4db8ff',name:'Bleu (standard)'},{id:'santorin-sunset',color:'#ff9944',name:'Coucher de soleil'},
+    {id:'santorin-sand',color:'#c9a84c',name:'Sable'},{id:'santorin-sea',color:'#2e8b57',name:'Mer'},
+    {id:'santorin-coral',color:'#c0446c',name:'Corail'},{id:'santorin-white',color:'#f8f8f8',name:'Blanc'}
+  ]},
+  { family:'editorial', name:'Éditorial', variants:[
+    {id:'editorial',color:'#c0ccd8',name:'Ardoise (standard)'},{id:'editorial-azure',color:'#4a90d9',name:'Azure'},
+    {id:'editorial-terracotta',color:'#e07050',name:'Terracotta'},{id:'editorial-sage',color:'#6aaa72',name:'Sauge'},
+    {id:'editorial-plum',color:'#9a5aa0',name:'Prune'},{id:'editorial-pearl',color:'#d8ccc0',name:'Nacre'}
+  ]},
+  { family:'dyn-bento', name:'Dashboard Bento', variants:[
+    {id:'dyn-bento',color:'#ffffff',name:'Blanc (standard)'},{id:'dyn-bento-gold',color:'#c8a44e',name:'Or'},
+    {id:'dyn-bento-neon',color:'#00f5d4',name:'Néon'},{id:'dyn-bento-blue',color:'#1e90ff',name:'Bleu'},
+    {id:'dyn-bento-green',color:'#00fa9a',name:'Vert'},{id:'dyn-bento-pink',color:'#ff69b4',name:'Rose'}
+  ]}
+];
+
+const RETENTION_OPTS = [
+  { ms:86400000,    label:'24 heures' },
+  { ms:172800000,   label:'48 heures' },
+  { ms:259200000,   label:'72 heures' },
+  { ms:604800000,   label:'1 semaine' },
+  { ms:1209600000,  label:'2 semaines' },
+  { ms:1814400000,  label:'3 semaines' },
+  { ms:2592000000,  label:'1 mois' },
+  { ms:5184000000,  label:'2 mois' },
+  { ms:7776000000,  label:'3 mois' },
+  { ms:15552000000, label:'6 mois' },
+];
+
+// ════════════════════════════════════════════════════
+// SHA-256
+// ════════════════════════════════════════════════════
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ════════════════════════════════════════════════════
+// AUTH — Login / first run
+// ════════════════════════════════════════════════════
+let _isFirstRun = false;
+
+function initLogin() {
+  const stored = localStorage.getItem('ctrl_pw_hash');
+  if (!stored) {
+    _isFirstRun = true;
+    document.getElementById('first-run-note').style.display = 'block';
+    document.getElementById('login-pw').placeholder = 'Créer un mot de passe';
+    document.getElementById('login-pw2').style.display = 'block';
+    document.getElementById('login-btn').textContent = 'Créer le mot de passe';
+  }
+}
+
+async function tryLogin() {
+  const pw  = document.getElementById('login-pw').value.trim();
+  const err = document.getElementById('login-error');
+  if (!pw) { showErr(err, 'Saisir un mot de passe'); return; }
+
+  if (_isFirstRun) {
+    const pw2 = document.getElementById('login-pw2').value.trim();
+    if (pw !== pw2) { showErr(err, 'Les mots de passe ne correspondent pas'); return; }
+    if (pw.length < 4) { showErr(err, 'Minimum 4 caractères'); return; }
+    localStorage.setItem('ctrl_pw_hash', await sha256(pw));
+    err.style.display = 'none';
+    showApp();
+  } else {
+    const hash = await sha256(pw);
+    if (hash === localStorage.getItem('ctrl_pw_hash')) {
+      err.style.display = 'none';
+      showApp();
+    } else {
+      showErr(err, 'Mot de passe incorrect');
+    }
+  }
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+document.getElementById('login-pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { _isFirstRun ? document.getElementById('login-pw2').focus() : tryLogin(); }
+});
+document.getElementById('login-pw2').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+function logout() {
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-pw2').value = '';
+}
+
+// ════════════════════════════════════════════════════
+// SHOW APP
+// ════════════════════════════════════════════════════
+let _appStarted = false;
+let _pendingFcmToken = null;
+let _pushPlugin = null;
+let _devicereadyFired = false;
+
+function showApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  if (!_appStarted) {
+    _appStarted = true;
+    initFirebase();
+    buildClientsTab();
+    loadTheme();
+  }
+}
+
+// ════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════════════════════
+const TABS = ['devis', 'clients', 'reglages'];
+let _currentTab = 'devis';
+
+function switchTab(tab) {
+  _currentTab = tab;
+  const idx = TABS.indexOf(tab);
+  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 33.333) + '%)';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + tab).classList.add('active');
+  // FAB: visible only in Clients tab
+  const fab = document.getElementById('quick-nav-fab');
+  if (fab) fab.style.display = tab === 'clients' ? 'flex' : 'none';
+  if (tab === 'reglages') refreshNotifStatus();
+}
+
+// ─── Swipe between tabs ───
+(function() {
+  let _tx = 0, _ty = 0, _tt = 0;
+  document.addEventListener('touchstart', e => {
+    _tx = e.touches[0].clientX;
+    _ty = e.touches[0].clientY;
+    _tt = Date.now();
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _tx;
+    const dy = e.changedTouches[0].clientY - _ty;
+    const dt = Date.now() - _tt;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 2.0 && dt < 420) {
+      const idx = TABS.indexOf(_currentTab);
+      if (dx < 0 && idx < TABS.length - 1) switchTab(TABS[idx + 1]);
+      else if (dx > 0 && idx > 0) switchTab(TABS[idx - 1]);
+    }
+  }, { passive: true });
+})();
+
+// ════════════════════════════════════════════════════
+// FIREBASE INIT
+// ════════════════════════════════════════════════════
+let _controlDb = null;
+const _clientDbs = {};
+
+let _saasDb = null;
+
+function initFirebase() {
+  const controlApp = firebase.initializeApp(CONTROL_FB_CONFIG, 'control');
+  _controlDb = firebase.database(controlApp);
+  const saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform');
+  _saasDb = firebase.database(saasApp);
+  listenDevis();
+  loadClientsFromFirebase();
+  if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
+}
+
+// Charge dynamiquement la liste des restaurants depuis Firebase SaaS
+function loadClientsFromFirebase() {
+  if (!_saasDb) return;
+  _saasDb.ref('restaurants').once('value', snap => {
+    const data = snap.val() || {};
+    const loaded = Object.entries(data).map(([slug, r]) => ({
+      name:     (r.profile && r.profile.name)     || slug,
+      slug,
+      url:      (r.profile && r.profile.url)      || '',
+      langs:    (r.profile && r.profile.langs)    || ['fr'],
+      noEvents: !!(r.profile && r.profile.noEvents),
+      demoPage: !!(r.profile && r.profile.demoPage)
+    }));
+    if (loaded.length > 0) {
+      CLIENTS.length = 0;
+      loaded.forEach(cl => CLIENTS.push(cl));
+      buildClientsTab();
+    }
+  });
+}
+
+function getClientDb(slug) {
+  // SaaS : un seul Firebase platform, chemins préfixés par restaurants/{slug}/
+  if (!_saasDb) { console.warn('SaaS Firebase non initialisé'); return null; }
+  return {
+    ref: p => _saasDb.ref('restaurants/' + slug + '/' + p.replace(/^\//, ''))
+  };
+}
+
+// ════════════════════════════════════════════════════
+// DEVIS — temps réel
+// ════════════════════════════════════════════════════
+let _devisCache = {};
+let _initialTabDecided = false;
+
+function listenDevis() {
+  _controlDb.ref('/devis').on('value', snap => {
+    _devisCache = snap.val() || {};
+    renderDevis();
+  });
+}
+
+function renderDevis() {
+  const list  = document.getElementById('devis-list');
+  const empty = document.getElementById('devis-empty');
+  const keys  = Object.keys(_devisCache).sort((a, b) => b - a);
+  const newCount = keys.filter(k => !_devisCache[k].lu).length;
+
+  // Décision onglet initial : Devis si devis non traités, sinon Clients
+  if (!_initialTabDecided) {
+    _initialTabDecided = true;
+    const hasPending = keys.some(k => (_devisCache[k].statut || 'nouveau') !== 'traite');
+    if (!hasPending) switchTab('clients');
+  }
+
+  const badge = document.getElementById('badge-devis');
+  if (newCount > 0) { badge.textContent = newCount > 9 ? '9+' : newCount; badge.classList.add('show'); }
+  else badge.classList.remove('show');
+
+  list.querySelectorAll('.devis-card').forEach(el => el.remove());
+  if (keys.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const frag = document.createDocumentFragment();
+  keys.forEach(k => frag.appendChild(buildDevisCard(k, _devisCache[k])));
+  list.appendChild(frag);
+}
+
+function buildDevisCard(key, d) {
+  const card = document.createElement('div');
+  const statut = d.statut || 'nouveau';
+  card.className = 'devis-card ' + statut;
+  card.dataset.key = key;
+
+  const ts      = d.ts || parseInt(key);
+  const date    = new Date(ts);
+  const dateStr = date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) +
+                  ' · ' + date.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  const statusLabel = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[statut] || statut;
+
+  const styleName = STYLE_LABELS[d.style]  || d.style || '—';
+  const options   = (d.options || []).map(o => OPTION_LABELS[o] || o);
+  const canaux    = (d.canal  || []).map(c => CANAL_LABELS[c]  || c);
+  const langLabel = LANG_LABELS[d.langue]  || d.langue || '—';
+  const tags      = [styleName, ...options, ...canaux, langLabel];
+
+  const waMsg = buildWaMsg(d);
+  const waUrl = 'https://wa.me/' + (d.phone||'').replace(/\D/g,'') + '?text=' + encodeURIComponent(waMsg);
+
+  card.innerHTML =
+    '<div class="devis-summary" onclick="toggleDevisCard(\'' + key + '\')">' +
+      '<div class="devis-summary-left">' +
+        '<span class="devis-phone">' + (d.phone || '—') + '</span>' +
+        '<span class="devis-date">' + dateStr + '</span>' +
+      '</div>' +
+      '<div class="devis-summary-right">' +
+        '<div class="devis-new-dot"></div>' +
+        '<span class="devis-status-pill">' + statusLabel + '</span>' +
+        '<svg class="devis-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+    '</div>' +
+    '<div class="devis-body">' +
+      '<div class="devis-body-inner">' +
+        '<div class="devis-tags">' + tags.map(t => '<span class="devis-tag">' + t + '</span>').join('') + '</div>' +
+        '<div class="devis-price">' +
+          '<div class="devis-price-item">' +
+            '<span class="devis-price-label">Création</span>' +
+            '<span class="devis-price-val">' + (d.total_creation||0) + ' €</span>' +
+          '</div>' +
+          '<div class="devis-price-item">' +
+            '<span class="devis-price-label">Mensuel</span>' +
+            '<span class="devis-price-val">' + (d.total_mensuel||0) + ' €/mois</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="devis-actions">' +
+          '<select class="devis-status-sel" onchange="setDevisStatus(\'' + key + '\',this)">' +
+            '<option value="nouveau"  ' + (statut==='nouveau'  ?'selected':'') + '>🆕 Nouveau</option>' +
+            '<option value="en_cours" ' + (statut==='en_cours' ?'selected':'') + '>⏳ En cours</option>' +
+            '<option value="traite"   ' + (statut==='traite'   ?'selected':'') + '>✅ Traité</option>' +
+          '</select>' +
+          '<a class="devis-wa-btn" href="' + waUrl + '" target="_blank">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
+            'WhatsApp' +
+          '</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  // Auto-ouvrir les devis nouveaux
+  if (statut === 'nouveau') card.classList.add('open');
+  if (!d.lu) markDevisRead(key);
+  return card;
+}
+
+function toggleDevisCard(key) {
+  const card = document.querySelector('.devis-card[data-key="' + key + '"]');
+  if (card) card.classList.toggle('open');
+}
+
+function buildWaMsg(d) {
+  const lang  = d.langue || 'fr';
+  const style = d.style === 'papier' ? 'style Papier' : 'style Dynamique';
+  const opts  = (d.options||[]).map(o => OPTION_LABELS[o]||o).join(', ');
+
+  const m = {
+    fr: `Bonjour ! 👋\n\nMerci pour votre intérêt pour Menu Pro.\n\nVotre devis :\n• Style : ${style}\n• Options : ${opts||'Aucune'}\n• Création : ${d.total_creation||0} €\n• Mensuel : ${d.total_mensuel||0} €/mois\n\nJe reste disponible pour toute question. 😊`,
+    en: `Hello! 👋\n\nThank you for your interest in Menu Pro.\n\nYour quote:\n• Style: ${style}\n• Options: ${opts||'None'}\n• Setup: ${d.total_creation||0} €\n• Monthly: ${d.total_mensuel||0} €/month\n\nFeel free to ask any questions. 😊`,
+    ar: `مرحباً! 👋\n\nشكراً لاهتمامك بـ Menu Pro.\n\nعرض أسعارك:\n• النمط: ${style}\n• الخيارات: ${opts||'لا شيء'}\n• الإنشاء: ${d.total_creation||0} €\n• الشهري: ${d.total_mensuel||0} €/شهر\n\nأنا هنا لأي استفسار. 😊`,
+    el: `Γεια σας! 👋\n\nΕυχαριστούμε για το ενδιαφέρον σας.\n\nΠροσφορά:\n• Στυλ: ${style}\n• Επιλογές: ${opts||'Καμία'}\n• Δημιουργία: ${d.total_creation||0} €\n• Μηνιαίο: ${d.total_mensuel||0} €/μήνα\n\nΕίμαι διαθέσιμος. 😊`,
+    de: `Hallo! 👋\n\nVielen Dank für Ihr Interesse an Menu Pro.\n\nIhr Angebot:\n• Stil: ${style}\n• Optionen: ${opts||'Keine'}\n• Erstellung: ${d.total_creation||0} €\n• Monatlich: ${d.total_mensuel||0} €/Monat\n\nFür Fragen stehe ich gerne zur Verfügung. 😊`
+  };
+  return m[lang] || m.fr;
+}
+
+function markDevisRead(key) {
+  _controlDb.ref('/devis/' + key + '/lu').set(true);
+}
+
+function setDevisStatus(key, sel) {
+  const status = sel.value;
+  _controlDb.ref('/devis/' + key).update({ statut: status, lu: true });
+  const card = document.querySelector('.devis-card[data-key="' + key + '"]');
+  if (!card) return;
+
+  card.classList.remove('nouveau','en_cours','traite');
+  card.classList.add(status);
+
+  // Animate pill
+  const pill = card.querySelector('.devis-status-pill');
+  if (pill) {
+    pill.textContent = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[status] || status;
+    pill.classList.remove('pill-pop');
+    void pill.offsetWidth;
+    pill.classList.add('pill-pop');
+  }
+
+  // Pulse flash on card
+  card.classList.remove('status-flash');
+  void card.offsetWidth;
+  card.classList.add('status-flash');
+  card.addEventListener('animationend', () => card.classList.remove('status-flash'), { once: true });
+}
+
+// ════════════════════════════════════════════════════
+// CLIENTS TAB — BUILD CARDS
+// ════════════════════════════════════════════════════
+function buildClientsTab() {
+  const list = document.getElementById('clients-list');
+  list.innerHTML = '';
+  CLIENTS.forEach(client => {
+    list.appendChild(buildClientCard(client));
+    loadClientData(client);
+  });
+}
+
+function buildClientCard(client) {
+  const s   = client.slug;
+  const id  = s.replace(/-/g,'_');
+  const langs    = client.langs || ['fr'];
+  const langOpts = langs.map(l => '<option value="'+l+'">'+( LANG_LABELS[l]||l)+'</option>').join('');
+  const retOpts  = RETENTION_OPTS.map(o => '<option value="'+o.ms+'">'+o.label+'</option>').join('');
+
+  function togFeat(key, label, fn) {
+    return '<div class="feat-row"><span class="feat-label">'+label+'</span>'+
+           '<label class="toggle"><input type="checkbox" id="'+key+'-'+id+'" onchange="'+fn+'">'+
+           '<div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>';
+  }
+
+  const CTRL_CARTE_IDS  = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
+  const CTRL_LIVRE_IDS  = new Set(['paper-elegant','livre-noir','livre-botanique','livre-azure','livre-rose','livre-antique','livre-epure','livre-cerise','livre-indigo','livre-foret']);
+  const CTRL_ELEGANT_IDS = new Set(THEME_VARIANTS.map(t => t.family));
+  function _makeThemeRow(th) {
+    const btn = '<button class="variant-btn" onclick="openVariantPopup(\''+s+'\',\''+th.id+'\')">Couleurs</button>';
+    return '<div class="toggle-row"><span class="toggle-label">'+th.name+btn+'</span>'+
+           '<label class="toggle"><input type="checkbox" data-id="'+th.id+'" '+
+           'onchange="toggleThemeVis(\''+s+'\',\''+th.id+'\',this.checked)">'+
+           '<div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>';
+  }
+  const carteThemes   = ALL_THEMES_LIST.filter(th => CTRL_CARTE_IDS.has(th.id));
+  const livreThemes   = ALL_THEMES_LIST.filter(th => CTRL_LIVRE_IDS.has(th.id));
+  const elegantThemes = ALL_THEMES_LIST.filter(th => CTRL_ELEGANT_IDS.has(th.id));
+  const themeToggles =
+    (carteThemes.length   ? '<div class="theme-type-sep">🃏 Carte</div>'   + carteThemes.map(_makeThemeRow).join('')   : '') +
+    (livreThemes.length   ? '<div class="theme-type-sep">📖 Livre</div>'   + livreThemes.map(_makeThemeRow).join('')   : '') +
+    (elegantThemes.length ? '<div class="theme-type-sep">✨ Élégant</div>' + elegantThemes.map(_makeThemeRow).join('') : '');
+
+  const div = document.createElement('div');
+  div.className = 'client-card';
+  div.id = 'card-' + id;
+  div.innerHTML =
+    '<div class="card-top" onclick="toggleCard(\''+id+'\')">' +
+      '<span class="card-name">'+client.name+'</span>' +
+      '<div class="card-top-right">' +
+        '<div class="status-dot" id="status-'+id+'"></div>' +
+        '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card-body"><div class="card-body-inner">' +
+      '<div class="card-links">' +
+        '<a class="card-link" href="'+client.url+'" target="_blank">Menu ↗</a>' +
+        '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
+      '</div>' +
+
+      '<div class="section-label">🎨 VISIBILITÉ DES THÈMES (LICENCE)</div>' +
+      '<div class="feat-list" id="theme-toggles-'+s+'">'+themeToggles+'</div>' +
+
+      '<hr class="divider">' +
+      '<div class="section-label">⚙️ Boutons disponibles (licence)</div>' +
+      '<div class="feat-list">' +
+        togFeat('feat-btn-callBtn','🔔 Bouton sonnette',"writeFeatureBtn('"+s+"','callBtn',this.checked)") +
+        togFeat('feat-btn-orderUI','🛒 Interface commande',"writeFeatureBtn('"+s+"','orderUI',this.checked)") +
+        togFeat('feat-btn-photos','🖼️ Photos produits',"writeFeatureBtn('"+s+"','photos',this.checked)") +
+        (client.noEvents ? '' : togFeat('feat-btn-eventOverlay','🎉 Overlay fêtes',"writeFeatureBtn('"+s+"','eventOverlay',this.checked)")) +
+      '</div>' +
+
+      '<div class="section-label">🌐 Langues disponibles</div>' +
+      '<div class="feat-list">' +
+        langs.map(l =>
+          '<div class="lang-toggle-row"><span class="lang-toggle-label">'+(LANG_LABELS[l]||l)+'</span>' +
+          '<label class="toggle"><input type="checkbox" id="lang-en-'+l+'-'+id+'" checked ' +
+          'onchange="onLangToggle(\''+s+'\',\''+l+'\',this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>'
+        ).join('') +
+      '</div>' +
+
+      '<div class="section-label">🌐 Langues — Paramètres</div>' +
+      '<div class="lang-section">' +
+        '<div class="lang-row"><span class="lang-label">Langue affichée (1ère visite)</span>' +
+        '<select id="default-lang-'+id+'" class="lang-sel" onchange="writeDefaultLang(\''+s+'\',this.value)">'+langOpts+'</select></div>' +
+        '<div class="lang-row"><span class="lang-label">Langue admin (saisie)</span>' +
+        '<select id="primary-lang-'+id+'" class="lang-sel" onchange="writePrimaryLang(\''+s+'\',this.value)">'+langOpts+'</select></div>' +
+      '</div>' +
+
+      '<hr class="divider">' +
+      '<div class="section-label">Mot de passe admin</div>' +
+      '<div class="pw-row">' +
+        '<input type="password" id="pw-'+id+'" placeholder="Nouveau mot de passe">' +
+        '<button class="btn-update" onclick="updatePassword(\''+s+'\')">Mettre à jour</button>' +
+      '</div>' +
+      '<div class="pw-feedback" id="pwfb-'+id+'"></div>' +
+
+      '<hr class="divider">' +
+      '<div class="section-label">🗑️ Historique — Suppression automatique</div>' +
+      '<div class="retention-row"><span class="retention-label">🔔 Appels (serveur)</span>' +
+      '<select class="retention-sel" id="ret-calls-'+id+'" onchange="writeRetention(\''+s+'\',\'calls\',this)">'+retOpts+'</select></div>' +
+      '<div class="retention-row"><span class="retention-label">🛒 Commandes</span>' +
+      '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\''+s+'\',\'orders\',this)">'+retOpts+'</select></div>' +
+
+    '</div></div>';
+
+  return div;
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  if (card) card.classList.toggle('open');
+}
+
+async function openAdmin(e, slug) {
+  e.preventDefault();
+  const client = CLIENTS.find(c => c.slug === slug);
+  await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
+  window.open(client.url + '/admin.html?ctrl=1', '_blank');
+}
+
+// ════════════════════════════════════════════════════
+// LOAD CLIENT DATA
+// ════════════════════════════════════════════════════
+const _clientState   = {};
+const _clientVariants = {};
+
+function getClientState(slug) {
+  if (!_clientState[slug]) _clientState[slug] = { defaultLang:null, primaryLang:null, enabledLangs:{} };
+  return _clientState[slug];
+}
+
+function loadClientData(client) {
+  const s  = client.slug;
+  const id = s.replace(/-/g,'_');
+  const db = getClientDb(s);
+
+  db.ref('/config').on('value', snap => {
+    const cfg  = snap.val() || {};
+    const feat = cfg.features || {};
+    const state = getClientState(s);
+
+    const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
+    set('feat-btn-callBtn',    feat.callBtn);
+    set('feat-btn-orderUI',    feat.orderUI);
+    set('feat-btn-photos',     feat.photos);
+    set('feat-btn-eventOverlay', feat.eventOverlay);
+
+    if (!_clientVariants[s]) _clientVariants[s] = {};
+    const tv = feat.themeVariants || {};
+    Object.keys(tv).forEach(fam => { _clientVariants[s][fam] = tv[fam]; });
+
+    const enabledLangs = cfg.enabledLangs || {};
+    client.langs.forEach(l => {
+      state.enabledLangs[l] = enabledLangs[l] !== false;
+      const el = document.getElementById('lang-en-'+l+'-'+id);
+      if (el) el.checked = state.enabledLangs[l];
+    });
+
+    if (cfg.defaultLang) { state.defaultLang = cfg.defaultLang; const el = document.getElementById('default-lang-'+id); if (el) el.value = cfg.defaultLang; }
+    if (cfg.primaryLang) { state.primaryLang = cfg.primaryLang; const el = document.getElementById('primary-lang-'+id); if (el) el.value = cfg.primaryLang; }
+
+    const ret = cfg.retention || {};
+    const rc = document.getElementById('ret-calls-'+id);  if (rc  && ret.calls)  rc.value  = ret.calls;
+    const ro = document.getElementById('ret-orders-'+id); if (ro  && ret.orders) ro.value  = ret.orders;
+  });
+
+  db.ref('/menu').on('value', snap => {
+    const menu   = snap.val() || {};
+    const hidden = menu.hiddenThemes || {};
+    const container = document.getElementById('theme-toggles-'+s);
+    if (container) container.querySelectorAll('input[data-id]').forEach(cb => { cb.checked = !hidden[cb.dataset.id]; });
+
+  });
+
+  if (client.demoPage) {
+    db.ref('demoPage/heroSlides').once('value').then(snap => {
+      const photos = snap.val() || {};
+      [1,2,3,4,5].forEach(n => { showDemoPhoto('demo', n, photos[n] || ''); });
+    });
+  }
+
+  checkStatus(client.url).then(online => {
+    const dot = document.getElementById('status-'+id);
+    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(online ? 'online' : 'offline'); }
+  });
+}
+
+async function checkStatus(url) {
+  try { await fetch(url, {method:'HEAD',mode:'no-cors',cache:'no-store'}); return true; } catch { return false; }
+}
+
+// ════════════════════════════════════════════════════
+// WRITE HELPERS
+// ════════════════════════════════════════════════════
+const _CTRL_COLORS = [
+  '#C8A44E','#E8D5A0','#F0F0EB','#4A4A4A','#1E3A5F',
+  '#2B7FBE','#47A3A3','#2E7D52','#9B4DCA','#E91E8C',
+  '#D4A090','#E87B3A','#C73535','#8B6914','#5D4037'
+];
+const _CTRL_NAMES = [
+  'Or','Champagne','Crème','Anthracite','Marine',
+  'Bleu royal','Turquoise','Vert forêt','Violet','Rose vif',
+  'Rose poudré','Terracotta','Rouge','Brun doré','Brun profond'
+];
+
+function _colorDist(h1, h2) {
+  const p = h => { const s=h.replace('#',''); return [parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16)]; };
+  const [r1,g1,b1]=p(h1),[r2,g2,b2]=p(h2);
+  return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
+}
+function writeFeatureBtn(slug, btn, val) {
+  getClientDb(slug).ref('/config/features/' + btn).set(val);
+}
+function writeDefaultLang(slug, lang) {
+  getClientState(slug).defaultLang = lang;
+  getClientDb(slug).ref('/config/defaultLang').set(lang);
+  const el = document.getElementById('default-lang-'+slug.replace(/-/g,'_')); if (el) el.value = lang;
+}
+function writePrimaryLang(slug, lang) {
+  getClientState(slug).primaryLang = lang;
+  getClientDb(slug).ref('/config/primaryLang').set(lang);
+  const el = document.getElementById('primary-lang-'+slug.replace(/-/g,'_')); if (el) el.value = lang;
+}
+async function writeEnabledLang(slug, lang, enabled) {
+  getClientState(slug).enabledLangs[lang] = enabled;
+  await getClientDb(slug).ref('/config/enabledLangs/' + lang).set(enabled);
+}
+async function updatePassword(slug) {
+  const id    = slug.replace(/-/g,'_');
+  const input = document.getElementById('pw-'+id);
+  const fb    = document.getElementById('pwfb-'+id);
+  const pw    = input.value.trim();
+  if (!pw || pw.length < 4) { fb.className='pw-feedback err'; fb.textContent='Minimum 4 caractères'; return; }
+  const hash = await sha256(pw);
+  await getClientDb(slug).ref('/config/adminHash').set(hash);
+  fb.className='pw-feedback ok'; fb.textContent='✓ Mis à jour';
+  input.value = '';
+  setTimeout(() => { fb.textContent=''; }, 3000);
+}
+
+// ════════════════════════════════════════════════════
+// LANGUE — protection disable
+// ════════════════════════════════════════════════════
+let _pendingDisable = null;
+
+async function onLangToggle(slug, lang, checkbox) {
+  const state = getClientState(slug);
+  if (!checkbox.checked) {
+    const client    = CLIENTS.find(c => c.slug === slug);
+    const remaining = (client.langs||[]).filter(l => l !== lang && state.enabledLangs[l] !== false);
+    if (remaining.length === 0) { checkbox.checked = true; return; }
+    const isDefault = state.defaultLang === lang;
+    const isPrimary = state.primaryLang === lang;
+    if (isDefault || isPrimary) {
+      _pendingDisable = { slug, lang, checkbox };
+      const roles = [];
+      if (isDefault) roles.push('la langue affichée');
+      if (isPrimary) roles.push('la langue admin');
+      document.getElementById('modal-msg').innerHTML =
+        '<strong>'+(LANG_LABELS[lang]||lang)+'</strong> est actuellement '+roles.join(' et ')+'.<br>Choisissez une langue de remplacement :';
+      document.getElementById('modal-sel').innerHTML = remaining.map(l => '<option value="'+l+'">'+(LANG_LABELS[l]||l)+'</option>').join('');
+      document.getElementById('lang-modal').classList.add('open');
+      return;
+    }
+  }
+  await writeEnabledLang(slug, lang, checkbox.checked);
+}
+
+async function confirmLangDisable() {
+  if (!_pendingDisable) return;
+  const { slug, lang } = _pendingDisable;
+  const state = getClientState(slug);
+  const rep   = document.getElementById('modal-sel').value;
+  await writeEnabledLang(slug, lang, false);
+  if (state.defaultLang === lang) await writeDefaultLang(slug, rep);
+  if (state.primaryLang === lang) await writePrimaryLang(slug, rep);
+  document.getElementById('lang-modal').classList.remove('open');
+  _pendingDisable = null;
+}
+function cancelLangDisable() {
+  if (_pendingDisable) { _pendingDisable.checkbox.checked = true; _pendingDisable = null; }
+  document.getElementById('lang-modal').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════
+// THÈMES
+// ════════════════════════════════════════════════════
+let _pendingThemeDisable = null;
+
+window.toggleThemeVis = function(slug, themeId, isChecked) {
+  const db = getClientDb(slug);
+  if (!isChecked) {
+    db.ref('menu').once('value').then(snap => {
+      const data   = snap.val() || {};
+      const active = data.menuTheme || 'gold-noir';
+      const hidden = data.hiddenThemes || {};
+      if (active === themeId) {
+        _pendingThemeDisable = { slug, themeId, db };
+        document.getElementById('theme-modal-sel').innerHTML = ALL_THEMES_LIST
+          .filter(th => th.id !== themeId && !hidden[th.id])
+          .map(th => '<option value="'+th.id+'">'+th.name+'</option>').join('');
+        const name = (ALL_THEMES_LIST.find(t=>t.id===themeId)||{}).name || themeId;
+        document.getElementById('theme-modal-msg').textContent = 'Le thème "'+name+'" est actuellement utilisé. Choisissez un thème de remplacement :';
+        document.getElementById('theme-modal').classList.add('open');
+      } else {
+        db.ref('menu/hiddenThemes/'+themeId).set(true);
+      }
+    });
+  } else {
+    db.ref('menu/hiddenThemes/'+themeId).set(null);
+  }
+};
+
+window.confirmThemeDisable = function() {
+  if (!_pendingThemeDisable) return;
+  const { themeId, db } = _pendingThemeDisable;
+  const newTheme = document.getElementById('theme-modal-sel').value;
+  db.ref('menu').update({ menuTheme:newTheme, ['hiddenThemes/'+themeId]:true }).then(() => {
+    document.getElementById('theme-modal').classList.remove('open');
+    _pendingThemeDisable = null;
+  });
+};
+window.cancelThemeDisable = function() {
+  if (_pendingThemeDisable) {
+    const { slug, themeId } = _pendingThemeDisable;
+    const cb = document.querySelector('#theme-toggles-'+slug+' input[data-id="'+themeId+'"]');
+    if (cb) cb.checked = true;
+    _pendingThemeDisable = null;
+  }
+  document.getElementById('theme-modal').classList.remove('open');
+};
+
+// ════════════════════════════════════════════════════
+// VARIANTS
+// ════════════════════════════════════════════════════
+let _variantSlug = null, _variantFamily = null;
+
+function openVariantPopup(slug, themeId) {
+  const tv = THEME_VARIANTS.find(t => t.family === themeId);
+  _variantSlug = slug; _variantFamily = themeId;
+
+  const saved      = (_clientVariants[slug] && _clientVariants[slug][themeId]) || {};
+  const hiddenV    = saved.hidden || {};
+  const hiddenU    = saved.hiddenUniversal || {};
+  const curDef     = saved.default || (tv ? tv.variants[0].id : null);
+  const curDefHex  = saved.defaultHex || null;
+  const themeEntry = ALL_THEMES_LIST.find(t => t.id === themeId) || {};
+  const themeName  = tv ? tv.name : (themeEntry.name || themeId);
+
+  document.getElementById('variant-modal-title').textContent = themeName + ' — Couleurs';
+
+  // Swatch Standard actuelle
+  let stdColor, stdLabel;
+  if (curDefHex) {
+    stdColor = curDefHex;
+    const idx = _CTRL_COLORS.indexOf(curDefHex);
+    stdLabel = idx >= 0 ? _CTRL_NAMES[idx] : curDefHex;
+  } else if (tv) {
+    const defVariant = tv.variants.find(v => v.id === curDef) || tv.variants[0];
+    stdColor = defVariant.color;
+    stdLabel = defVariant.name;
+  } else {
+    stdColor = themeEntry.accent || '#c8a44e';
+    stdLabel = themeEntry.name || themeId;
+  }
+  document.getElementById('variant-std-dot').style.background = stdColor;
+  document.getElementById('variant-std-name').textContent = stdLabel;
+
+  const refColors = tv ? tv.variants.map(v => v.color) : [themeEntry.accent || '#c8a44e'];
+  const list = document.getElementById('variant-all-list');
+  list.innerHTML = '';
+
+  function makeItem(colorVal, colorLabel, dataType, isHidden, isStd, dataId) {
+    const keyVal = dataId !== undefined ? dataId : colorVal;
+    const item = document.createElement('div');
+    item.className = 'variant-item' + (isHidden ? ' is-hidden-color' : '');
+    const dot = document.createElement('div');
+    dot.className = 'variant-dot'; dot.style.background = colorVal;
+    if (isHidden) dot.style.opacity = '0.35';
+    const lbl = document.createElement('span');
+    lbl.className = 'variant-name'; lbl.textContent = colorLabel;
+    if (isHidden) lbl.style.opacity = '0.45';
+    const eye = document.createElement('button');
+    eye.className = 'variant-eye-btn' + (isHidden ? ' is-hidden' : '');
+    eye.textContent = isHidden ? '🙈' : '👁';
+    eye.dataset.val = keyVal; eye.dataset.type = dataType;
+    eye.title = isHidden ? 'Afficher' : 'Masquer';
+    eye.addEventListener('click', () => {
+      const nowHidden = eye.classList.toggle('is-hidden');
+      eye.textContent = nowHidden ? '🙈' : '👁';
+      eye.title = nowHidden ? 'Afficher' : 'Masquer';
+      item.classList.toggle('is-hidden-color', nowHidden);
+      dot.style.opacity = nowHidden ? '0.35' : '';
+      lbl.style.opacity = nowHidden ? '0.45' : '';
+      if (nowHidden) star.classList.remove('is-std');
+    });
+    const star = document.createElement('button');
+    star.className = 'variant-star-btn' + (isStd ? ' is-std' : '');
+    star.textContent = '⭐';
+    star.dataset.val = keyVal; star.dataset.type = dataType;
+    star.addEventListener('click', () => {
+      if (eye.classList.contains('is-hidden')) return;
+      list.querySelectorAll('.variant-star-btn').forEach(b => b.classList.remove('is-std'));
+      star.classList.add('is-std');
+      document.getElementById('variant-std-dot').style.background = colorVal;
+      document.getElementById('variant-std-name').textContent = colorLabel;
+    });
+    item.appendChild(dot); item.appendChild(lbl); item.appendChild(eye); item.appendChild(star);
+    return item;
+  }
+
+  if (tv) {
+    tv.variants.forEach(v => {
+      const isHidden = !!hiddenV[v.id];
+      const isStd = !isHidden && !curDefHex && v.id === curDef;
+      list.appendChild(makeItem(v.color, v.name, 'variant', isHidden, isStd, v.id));
+    });
+  }
+
+  _CTRL_COLORS.forEach((hex, i) => {
+    if (refColors.some(rc => _colorDist(hex, rc) < 55)) return;
+    const isHidden = !!hiddenU[hex.replace('#','')];
+    const isStd = !isHidden && curDefHex === hex;
+    list.appendChild(makeItem(hex, _CTRL_NAMES[i], 'univ', isHidden, isStd));
+  });
+
+  document.getElementById('variant-modal').classList.add('open');
+}
+
+// buildDefSel removed
+
+// onVariantCheck removed
+
+// onUnivCheck removed
+
+function _sanitizeFirebaseObj(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  const clean = {};
+  Object.keys(obj).forEach(k => {
+    const safeKey = k.replace(/[.#$\[\]/]/g, '');
+    if (safeKey) clean[safeKey] = _sanitizeFirebaseObj(obj[k]);
+  });
+  return clean;
+}
+
+function saveVariantConfig() {
+  if (!_variantSlug) {
+    document.getElementById('variant-modal').classList.remove('open');
+    return;
+  }
+  const tv = THEME_VARIANTS.find(t => t.family === _variantFamily);
+  const list = document.getElementById('variant-all-list');
+  const stdBtn = list ? list.querySelector('.variant-star-btn.is-std') : null;
+
+  // Build clean Firebase object explicitly — only alphanumeric + hyphen keys
+  const safeKey = k => k.replace(/[^a-zA-Z0-9\-_]/g, '');
+
+  const hiddenV = {}, hiddenU = {};
+  if (list) {
+    list.querySelectorAll('.variant-eye-btn.is-hidden').forEach(btn => {
+      const raw = btn.dataset.val || '';
+      if (btn.dataset.type === 'variant') {
+        const k = safeKey(raw);
+        if (k) hiddenV[k] = true;
+      } else {
+        const k = raw.replace('#','').replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+        if (k) hiddenU[k] = true;
+      }
+    });
+  }
+
+  // Determine default
+  let defVariant = null, defHex = null;
+  if (stdBtn) {
+    if (stdBtn.dataset.type === 'univ') {
+      defHex = stdBtn.dataset.val || null;
+      if (tv) defVariant = tv.variants[0].id;
+    } else {
+      defVariant = safeKey(stdBtn.dataset.val || '');
+    }
+  } else if (tv) {
+    const firstVis = tv.variants.find(v => !hiddenV[v.id]);
+    defVariant = firstVis ? firstVis.id : tv.variants[0].id;
+  }
+
+  document.getElementById('variant-modal').classList.remove('open');
+
+  // Build Firebase payload — use null for empty sub-objects (Firebase deletes null nodes)
+  const payload = {};
+  if (Object.keys(hiddenV).length > 0) payload.hidden = hiddenV;
+  if (Object.keys(hiddenU).length > 0) payload.hiddenUniversal = hiddenU;
+  if (defVariant) payload.default = defVariant;
+  if (defHex)     payload.defaultHex = defHex;
+
+  const writeData = Object.keys(payload).length > 0 ? payload : null;
+
+  if (!_clientVariants[_variantSlug]) _clientVariants[_variantSlug] = {};
+  _clientVariants[_variantSlug][_variantFamily] = writeData || {};
+
+  getClientDb(_variantSlug).ref('/config/features/themeVariants/'+_variantFamily)
+    .set(writeData)
+    .then(() => showToast('Couleurs enregistrées ✓'))
+    .catch(err => showToast('Err: ' + (err && err.message ? err.message : String(err))));
+}
+
+function closeVariantModal() { document.getElementById('variant-modal').classList.remove('open'); }
+
+// ════════════════════════════════════════════════════
+// RETENTION
+// ════════════════════════════════════════════════════
+let _pendingRetention = null;
+
+function writeRetention(slug, type, sel) {
+  const newMs  = parseInt(sel.value);
+  const newLbl = RETENTION_OPTS.find(o=>o.ms===newMs)?.label||'?';
+  getClientDb(slug).ref('/config/retention/'+type).once('value').then(snap => {
+    const curMs  = snap.val() || 604800000;
+    const curLbl = RETENTION_OPTS.find(o=>o.ms===curMs)?.label||'?';
+    _pendingRetention = { slug, type, newMs, prevMs:curMs, el:sel };
+    document.getElementById('ret-modal-title').textContent = 'Modifier la rétention des '+(type==='calls'?'appels':'commandes');
+    let body = 'Durée actuelle\u00a0: <strong>'+curLbl+'</strong><br>Nouvelle durée\u00a0: <strong>'+newLbl+'</strong>';
+    if (newMs < curMs) body += '<br><br><span class="warn">⚠️ Les données au-delà de <strong>'+newLbl+'</strong> seront cachées puis supprimées définitivement.</span>';
+    document.getElementById('ret-modal-body').innerHTML = body;
+    document.getElementById('retention-modal').classList.add('open');
+  });
+}
+function cancelRetention() {
+  if (_pendingRetention) { _pendingRetention.el.value = _pendingRetention.prevMs; _pendingRetention = null; }
+  document.getElementById('retention-modal').classList.remove('open');
+}
+async function confirmRetention() {
+  if (!_pendingRetention) return;
+  const { slug, type, newMs, prevMs } = _pendingRetention;
+  await getClientDb(slug).ref('/config/retention').update({
+    [type]:newMs, [type+'ChangedAt']:Date.now(), [type+'Previous']:prevMs, [type+'IsReduction']:newMs<prevMs
+  });
+  _pendingRetention = null;
+  document.getElementById('retention-modal').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════
+// DEMO PHOTOS — Cloudinary + Firebase demoPage/heroSlides
+// ════════════════════════════════════════════════════
+const DP_CLOUD  = 'dowi189l9';
+const DP_PRESET = 'menu_photos';
+const DP_MAX_W  = 1600;
+
+function showDemoPhoto(id, n, url) {
+  const img  = document.getElementById('dp-img-'+id+'-'+n);
+  const prev = document.getElementById('dp-prev-'+id+'-'+n);
+  if (!img || !prev) return;
+  if (!url) { img.src=''; img.style.display='none'; const cam=prev.querySelector('.dp-cam'); if(cam) cam.style.display=''; return; }
+  img.src = url; img.style.display = 'block';
+  const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = 'none';
+}
+
+function uploadDemoPhoto(slug, n, input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+  const id = slug.replace(/-/g,'_');
+  const db = getClientDb(slug);
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > DP_MAX_W) { h = Math.round(h * DP_MAX_W / w); w = DP_MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      // Aperçu local immédiat
+      showDemoPhoto(id, n, canvas.toDataURL('image/jpeg', 0.82));
+      showToast('Upload en cours…');
+
+      canvas.toBlob(async blob => {
+        try {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', DP_PRESET);
+          const res  = await fetch('https://api.cloudinary.com/v1_1/' + DP_CLOUD + '/image/upload', { method:'POST', body:fd });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+          showDemoPhoto(id, n, json.secure_url);
+          await db.ref('demoPage/heroSlides/' + n).set(json.secure_url);
+          showToast('Photo enregistrée ✓');
+        } catch(err) {
+          showDemoPhoto(id, n, '');
+          showToast('Erreur upload : ' + err.message);
+        }
+      }, 'image/jpeg', 0.82);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function deleteDemoPhoto(slug, n, id) {
+  await getClientDb(slug).ref('demoPage/heroSlides/' + n).set(null);
+  showDemoPhoto(id, n, '');
+  showToast('Photo supprimée');
+}
+
+// ════════════════════════════════════════════════════
+// QUICK NAV
+// ════════════════════════════════════════════════════
+function openQuickNav() {
+  const list = document.getElementById('quick-nav-list');
+  list.innerHTML = CLIENTS.map(c => {
+    const id  = c.slug.replace(/-/g,'_');
+    const dot = document.getElementById('status-'+id);
+    const col = dot && dot.classList.contains('online')  ? 'var(--green)' :
+                dot && dot.classList.contains('offline') ? 'var(--red)'   : 'var(--border)';
+    return '<div class="quick-nav-item" onclick="quickNavTo(\''+id+'\')">' +
+      '<div class="quick-nav-dot" style="background:'+col+'"></div>' +
+      '<span class="quick-nav-name">'+c.name+'</span></div>';
+  }).join('');
+  document.getElementById('quick-nav-overlay').classList.add('open');
+  document.getElementById('quick-nav-sheet').classList.add('open');
+}
+
+function closeQuickNav() {
+  document.getElementById('quick-nav-overlay').classList.remove('open');
+  document.getElementById('quick-nav-sheet').classList.remove('open');
+}
+
+function quickNavTo(id) {
+  closeQuickNav();
+  const card = document.getElementById('card-'+id);
+  if (!card) return;
+  if (!card.classList.contains('open')) card.classList.add('open');
+  setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'start' }), 120);
+}
+
+// ════════════════════════════════════════════════════
+// RÉGLAGES — THÈME APP
+// ════════════════════════════════════════════════════
+function setTheme(mode) {
+  document.documentElement.classList.toggle('light', mode === 'light');
+  localStorage.setItem('ctrl_theme', mode);
+  updateThemeOpts();
+}
+function loadTheme() {
+  if (localStorage.getItem('ctrl_theme') === 'light') document.documentElement.classList.add('light');
+  updateThemeOpts();
+}
+function updateThemeOpts() {
+  const light = document.documentElement.classList.contains('light');
+  document.getElementById('opt-dark').className  = 'theme-opt' + (!light ? ' active' : '');
+  document.getElementById('opt-light').className = 'theme-opt' + ( light ? ' active' : '');
+}
+
+// ════════════════════════════════════════════════════
+// RÉGLAGES — MOT DE PASSE APP
+// ════════════════════════════════════════════════════
+async function changeAppPassword() {
+  const n  = document.getElementById('set-pw-new').value.trim();
+  const c  = document.getElementById('set-pw-conf').value.trim();
+  const fb = document.getElementById('set-pw-fb');
+  if (!n || n.length < 4) { fb.className='pw-feedback err'; fb.textContent='Minimum 4 caractères'; return; }
+  if (n !== c) { fb.className='pw-feedback err'; fb.textContent='Les mots de passe ne correspondent pas'; return; }
+  localStorage.setItem('ctrl_pw_hash', await sha256(n));
+  fb.className='pw-feedback ok'; fb.textContent='✓ Mot de passe modifié';
+  document.getElementById('set-pw-new').value=''; document.getElementById('set-pw-conf').value='';
+  setTimeout(() => { fb.textContent=''; }, 3000);
+}
+
+// ════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function refreshNotifStatus() {
+  const el = document.getElementById('notif-status-info');
+  if (!el) return;
+  const lastReg = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
+  const tok = localStorage.getItem('ctrl_fcm_token_v') || '';
+  const hasCapacitor = !!(window.Capacitor && window.Capacitor.Plugins);
+  const hasPush = !!(_pushPlugin || (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications));
+  var diag = 'Capacitor : ' + (hasCapacitor ? '✅' : '⚠') + ' | Push plugin : ' + (hasPush ? '✅' : '⚠') + ' | deviceready : ' + (_devicereadyFired ? '✅' : '⚠');
+  if (!tok) {
+    el.innerHTML = '⚠ Aucun token enregistré.<br><small style="color:var(--muted);font-size:0.72rem">' + diag + '</small>';
+    return;
+  }
+  const diff = Date.now() - lastReg;
+  const hrs = Math.floor(diff / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  el.innerHTML = '✅ Token enregistré<br>Dernière MAJ : ' + new Date(lastReg).toLocaleString('fr-FR') + '<br>Il y a : ' + (hrs > 0 ? hrs + 'h ' : '') + mins + 'min';
+}
+
+function forceTokenRenewal() {
+  const fb = document.getElementById('notif-renewal-fb');
+  if (fb) { fb.textContent = '⏳ Renouvellement en cours…'; fb.style.color = 'var(--muted)'; }
+  localStorage.removeItem('ctrl_fcm_token_v');
+  localStorage.removeItem('ctrl_fcm_last_reg');
+  var push = _pushPlugin || (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications);
+  if (push) {
+    push.requestPermissions().then(function(result) {
+      if (result.receive === 'denied') {
+        if (fb) { fb.textContent = '⚠ Permission refusée — activez les notifs dans Paramètres Android.'; fb.style.color = '#e74c3c'; }
+        refreshNotifStatus(); return;
+      }
+      push.register()
+        .then(() => {
+          if (fb) { fb.textContent = '✓ Renouvellement lancé — attendez quelques secondes.'; fb.style.color = 'var(--success, #4caf50)'; }
+          setTimeout(refreshNotifStatus, 4000);
+        })
+        .catch(e => { if (fb) { fb.textContent = '⚠ Erreur register : ' + (e.message || e); fb.style.color = '#e74c3c'; } });
+    }).catch(() => {
+      push.register()
+        .then(() => {
+          if (fb) { fb.textContent = '✓ Renouvellement lancé.'; fb.style.color = 'var(--success, #4caf50)'; }
+          setTimeout(refreshNotifStatus, 4000);
+        })
+        .catch(e => { if (fb) { fb.textContent = '⚠ Erreur : ' + (e.message || e); fb.style.color = '#e74c3c'; } });
+    });
+  } else {
+    refreshNotifStatus();
+    if (fb) { fb.textContent = "⚠ Plugin non chargé — relancez l'application."; fb.style.color = '#e74c3c'; }
+  }
+}
+
+function saveControlToken(tokenValue) {
+  if (!_controlDb) { _pendingFcmToken = tokenValue; return; }
+  const deviceId = tokenValue.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
+  const lastTs  = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
+  const lastTok = localStorage.getItem('ctrl_fcm_token_v') || '';
+  if (tokenValue === lastTok && Date.now() - lastTs < 12 * 3600 * 1000) return;
+  localStorage.setItem('ctrl_fcm_token_v', tokenValue);
+  localStorage.setItem('ctrl_fcm_last_reg', String(Date.now()));
+  _controlDb.ref('/fcm_tokens/' + deviceId).set({ token: tokenValue, ts: Date.now() })
+    .then(() => { showToast('🔔 Notifications activées'); refreshNotifStatus(); })
+    .catch(() => setTimeout(() => saveControlToken(tokenValue), 5000));
+}
+
+// ════════════════════════════════════════════════════
+// CAPACITOR — PUSH NOTIFICATIONS
+// ════════════════════════════════════════════════════
+document.addEventListener('deviceready', () => {
+  _devicereadyFired = true;
+  _pushPlugin = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) || null;
+  if (_pushPlugin) {
+    const Push = _pushPlugin;
+    Push.createChannel({
+      id: 'devis_control', name: 'Demandes de devis',
+      importance: 5, visibility: 1,
+      sound: 'default',
+      vibration: true, lights: true, lightColor: '#c8a44e'
+    }).catch(() => {});
+    Push.requestPermissions().then(result => { if (result.receive === 'granted') Push.register(); }).catch(() => setTimeout(() => Push.register(), 5000));
+    Push.addListener('registration', token => saveControlToken(token.value));
+    Push.addListener('registrationError', () => setTimeout(() => Push.register(), 15000));
+    Push.addListener('pushNotificationReceived', notif => { showToast('📋 Nouveau devis reçu !'); switchTab('devis'); });
+    Push.addListener('pushNotificationActionPerformed', action => { switchTab('devis'); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const last = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
+        if (Date.now() - last > 6 * 3600 * 1000) Push.register().catch(() => {});
+      }
+    });
+  }
+}, false);
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+initLogin();
+</script>
+</body>
+</html>

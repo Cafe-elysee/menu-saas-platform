@@ -1,0 +1,35 @@
+{
+  "name": "Café Élysée — Interface Serveur",
+  "gcm_sender_id": "240164681993",
+  "short_name": "Élysée Serveur",
+  "description": "Εφαρμογή ειδοποιήσεων για το προσωπικό του Café Élysée Αθήνας",
+  "start_url": "/app.html",
+  "scope": "/app.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0c0a08",
+  "theme_color": "#c8a44e",
+  "lang": "el",
+  "categories": ["food", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Κλήσεις",
+      "url": "app.html#calls",
+      "description": "Άνοιγμα ιστορικού κλήσεων"
+    }
+  ]
+}
