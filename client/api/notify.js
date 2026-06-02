@@ -135,7 +135,7 @@ async function sendFCM(projectId, accessToken, entries, restaurantId, restaurant
           type:  type || 'bell',
           ts
         },
-        android: { priority: 'high', notification: { channel_id: 'commandes_serveur' } },
+        android: { priority: 'high', notification: { channel_id: 'mp_srv_v2' } },
         apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', 'content-available': 1 } } },
         webpush: { headers: { 'TTL': '86400', 'Urgency': 'high' } }
       }

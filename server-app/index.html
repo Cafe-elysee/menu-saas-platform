@@ -1246,24 +1246,20 @@ function createNotificationChannel() {
   if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.PushNotifications) return;
   var Push = window.Capacitor.Plugins.PushNotifications;
   if (!Push.createChannel) return;
-  // Supprime l'ancien canal s'il existe (pour forcer la récréation avec les bons réglages)
+  // Supprime les anciens canaux (états cassés mémorisés par Android)
   if (Push.deleteChannel) {
-    Push.deleteChannel({ id: 'commandes_serveur' }).catch(function() {}).finally(function() {
-      Push.createChannel({
-        id: 'commandes_serveur', name: 'Commandes & Appels',
-        description: 'Nouvelles commandes et appels de table',
-        importance: 5, visibility: 1, sound: 'default',
-        vibration: true, lights: true, lightColor: '#c8a44e'
-      }).catch(function() {});
-    });
-  } else {
+    Push.deleteChannel({ id: 'commandes_serveur' }).catch(function() {});
+    Push.deleteChannel({ id: 'commandes_serveur_v2' }).catch(function() {});
+  }
+  // Crée un canal frais avec une nouvelle ID
+  setTimeout(function() {
     Push.createChannel({
-      id: 'commandes_serveur', name: 'Commandes & Appels',
+      id: 'mp_srv_v2', name: 'Commandes & Appels',
       description: 'Nouvelles commandes et appels de table',
       importance: 5, visibility: 1, sound: 'default',
       vibration: true, lights: true, lightColor: '#c8a44e'
     }).catch(function() {});
-  }
+  }, 300);
 }
 
 function _openNotifSettings() {

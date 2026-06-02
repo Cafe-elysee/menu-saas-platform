@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
       const devUrl = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/restaurants/${rid}/devices.json?access_token=${token}`;
       const devRes = await httpsGet(devUrl);
       const devices = devRes.status === 200 && devRes.body && typeof devRes.body === 'object' ? devRes.body : {};
-      serverTokens[rid] = Object.keys(devices).length;
+      serverTokens[rid] = { count: Object.keys(devices).length, raw: devices };
 
       // Envoie un vrai FCM test à chaque device
       for (const [deviceId, d] of Object.entries(devices)) {
@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
             token: d.token,
             notification: { title: '🔔 Test diagnostic', body: 'Si tu vois ceci, FCM fonctionne !' },
             data: { type: 'bell', table: '99', ts: String(Date.now()) },
-            android: { priority: 'high', notification: { channel_id: 'commandes_serveur' } }
+            android: { priority: 'high', notification: { channel_id: 'mp_srv_v2' } }
           }
         });
         const fcmRes = await new Promise((resolve, reject) => {
