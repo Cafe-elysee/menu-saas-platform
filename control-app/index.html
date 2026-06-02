@@ -2043,16 +2043,17 @@ function loadClientData(client) {
   const s  = client.slug;
   const id = s.replace(/-/g,'_');
 
-  // Point de statut : vert = server-app a un token FCM, rouge = non enregistrée
-  _saasDb.ref('restaurants/' + s + '/devices').once('value').then(snap => {
-    const hasToken = snap.exists() && Object.values(snap.val() || {}).some(d => d && d.token);
-    const dot = document.getElementById('status-' + id);
-    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(hasToken ? 'online' : 'offline'); }
-  }).catch(() => {});
-
   if (_clientListeners.has(client.slug)) return;
   _clientListeners.add(client.slug);
   const db = getClientDb(s);
+
+  // Listener temps réel sur devices → point vert quand server-app connectée
+  db.ref('/devices').on('value', snap => {
+    const devices = snap.val() || {};
+    const hasToken = Object.values(devices).some(d => d && d.token);
+    const dot = document.getElementById('status-' + id);
+    if (dot) { dot.classList.remove('online','offline'); if (hasToken) dot.classList.add('online'); }
+  });
 
   db.ref('/config').on('value', snap => {
     const cfg  = snap.val() || {};
