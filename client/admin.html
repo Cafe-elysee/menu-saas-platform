@@ -3045,7 +3045,7 @@ function setupNotifFab() {
         method: 'POST',
         keepalive: true,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ table: 'info', message: msg, lang: currentLang || 'el', type: 'message' })
+        body: JSON.stringify({ restaurantId: _RID, table: 'info', message: msg, lang: currentLang || 'el', type: 'message' })
       });
       const data = await res.json();
 
