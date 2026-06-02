@@ -5708,7 +5708,13 @@ function loadAdminData() {
   // Puis mettre à jour depuis Firebase en arrière-plan
   _rref('menu').on('value', snap => {
     const data = snap.val();
-    if (!data) return;
+    if (!data) {
+      try { localStorage.removeItem(_PFX+'admin_data_v1'); } catch(_) {}
+      applyAdminData({});
+      buildCatPills();
+      renderMenu();
+      return;
+    }
     try { localStorage.setItem(_PFX+'admin_data_v1', JSON.stringify(data)); } catch(_) {}
     // Appliquer le thème visuel avant de re-rendre les cards
     if (data.menuTheme && data.menuTheme !== menuTheme && !_demo_theme) {
@@ -7713,9 +7719,16 @@ function applyTranslations() {
   // Dynamic elements
   document.getElementById('hero-tag').textContent = t.tagline;
   document.getElementById('hero-explore').textContent = t.explore;
-  document.getElementById('hero-sub-1').textContent = (t.sub && t.sub[0]) || '';
-  document.getElementById('hero-sub-2').textContent = (t.sub && t.sub[1]) || '';
-  document.getElementById('hero-sub-3').textContent = (t.sub && t.sub[2]) || '';
+  const _sub1 = (t.sub && t.sub[0]) || '';
+  const _sub2 = (t.sub && t.sub[1]) || '';
+  const _sub3 = (t.sub && t.sub[2]) || '';
+  document.getElementById('hero-sub-1').textContent = _sub1;
+  document.getElementById('hero-sub-2').textContent = _sub2;
+  document.getElementById('hero-sub-3').textContent = _sub3;
+  const _subGroups = document.querySelectorAll('.hero-sub-group');
+  if (_subGroups[0]) _subGroups[0].style.display = _sub1 ? '' : 'none';
+  if (_subGroups[1]) _subGroups[1].style.display = _sub2 ? '' : 'none';
+  if (_subGroups[2]) _subGroups[2].style.display = _sub3 ? '' : 'none';
   document.getElementById('no-res-txt').textContent = t.noRes;
   document.getElementById('al-lbl').textContent = t.alLabel;
   // Footer
