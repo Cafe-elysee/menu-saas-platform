@@ -2106,7 +2106,7 @@ function loadClientData(client) {
     });
   }
 
-  checkStatus(client.url).then(online => {
+  checkStatus('https://menu-saas-platform.vercel.app/?rid=' + id).then(online => {
     const dot = document.getElementById('status-'+id);
     if (dot) { dot.classList.remove('online','offline'); dot.classList.add(online ? 'online' : 'offline'); }
   });
