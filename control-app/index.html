@@ -563,6 +563,15 @@
     .pw-feedback { font-size: 0.72rem; margin-top: 0.3rem; min-height: 1em; }
     .pw-feedback.ok  { color: var(--green); }
     .pw-feedback.err { color: var(--red); }
+    .info-edit-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; }
+    .info-edit-lbl { font-size:0.72rem; color:var(--muted); width:28px; flex-shrink:0; }
+    .info-edit-wrap { display:flex; gap:0.4rem; flex:1; }
+    .info-edit-input { flex:1; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:0.82rem; color:var(--text); font-family:inherit; }
+    .info-edit-input:focus { outline:none; border-color:var(--gold); }
+    .info-edit-btn { background:var(--gold); color:#0a0908; border:none; border-radius:8px; padding:7px 12px; font-size:0.82rem; font-weight:700; cursor:pointer; flex-shrink:0; }
+    .info-edit-btn.warn { background:rgba(239,83,80,0.18); color:var(--red); border:1px solid rgba(239,83,80,0.35); }
+    .info-edit-btn.warn:hover { background:rgba(239,83,80,0.28); }
+    .info-edit-warn { font-size:0.7rem; color:var(--red); margin-bottom:0.5rem; min-height:1em; line-height:1.4; }
 
     .lang-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
     .lang-row { display: flex; align-items: center; justify-content: space-between; }
@@ -1030,7 +1039,7 @@
           <label class="nc-label">Nom du restaurant *</label>
           <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran" oninput="ncAutoRid(this.value)">
 
-          <label class="nc-label">Identifiant unique (rid)</label>
+          <label class="nc-label">ID unique du restaurant</label>
           <input type="text" id="nc-rid" class="nc-input" placeholder="ex: cafe-oran">
           <div class="nc-rid-hint">Généré automatiquement — tu peux le modifier</div>
 
@@ -1055,16 +1064,16 @@
           </div>
 
           <div class="nc-link-row">
-            <div class="nc-link-label">App Serveur — identifiant à entrer</div>
+            <div class="nc-link-label">App Serveur — ID à entrer au 1er lancement</div>
             <div class="nc-link-val" id="nc-rid-val"></div>
-            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier le rid')">Copier le rid</button>
+            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier l\'ID')">Copier l'ID</button>
           </div>
 
           <div class="nc-link-row">
             <div class="nc-link-label">Instructions pour le staff</div>
             <div class="nc-instructions">
               1. Installer <strong>MenuProServeur-v1.0.apk</strong> (Drive)<br>
-              2. Au premier lancement : entrer l'identifiant <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
+              2. Au premier lancement : entrer l'ID <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
               3. Le menu admin : ouvrir le lien ci-dessus
             </div>
           </div>
@@ -1899,6 +1908,23 @@ function buildClientCard(client) {
         '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
       '</div>' +
 
+      '<div class="section-label">✏️ Informations client</div>' +
+      '<div class="info-edit-row">' +
+        '<span class="info-edit-lbl">Nom</span>' +
+        '<div class="info-edit-wrap">' +
+          '<input type="text" class="info-edit-input" id="rename-'+id+'" value="'+client.name.replace(/'/g,"&#39;")+'" placeholder="Nom du restaurant">' +
+          '<button class="info-edit-btn" onclick="renameClient(\''+s+'\',\'rename-'+id+'\')">✓</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="info-edit-row">' +
+        '<span class="info-edit-lbl">ID</span>' +
+        '<div class="info-edit-wrap">' +
+          '<input type="text" class="info-edit-input" id="changeid-'+id+'" value="'+s+'" placeholder="nouvel-id">' +
+          '<button class="info-edit-btn warn" onclick="changeClientId(\''+s+'\',\'changeid-'+id+'\')">✓</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="info-edit-warn" id="idwarn-'+id+'"></div>' +
+
       '<div class="section-label">🎨 VISIBILITÉ DES THÈMES (LICENCE)</div>' +
       '<div class="feat-list" id="theme-toggles-'+s+'">'+themeToggles+'</div>' +
 
@@ -2122,6 +2148,37 @@ async function writeEnabledLang(slug, lang, enabled) {
   getClientState(slug).enabledLangs[lang] = enabled;
   await getClientDb(slug).ref('/config/enabledLangs/' + lang).set(enabled);
 }
+async function renameClient(slug, inputId) {
+  const input = document.getElementById(inputId);
+  const newName = (input.value || '').trim();
+  if (!newName) return;
+  await _saasDb.ref('restaurants/' + slug + '/profile/name').set(newName);
+  input.style.borderColor = 'var(--green)';
+  setTimeout(() => { input.style.borderColor = ''; }, 2000);
+}
+
+async function changeClientId(oldSlug, inputId) {
+  const input   = document.getElementById(inputId);
+  const warnEl  = document.getElementById('idwarn-' + oldSlug.replace(/-/g,'_'));
+  const newSlug = (input.value || '').trim().toLowerCase();
+  if (!newSlug || newSlug === oldSlug) return;
+  if (!/^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/.test(newSlug)) {
+    warnEl.textContent = '⚠ ID invalide (lettres minuscules, chiffres, tirets, min 3 car.)'; return;
+  }
+  const exists = await _saasDb.ref('restaurants/' + newSlug).once('value');
+  if (exists.exists()) { warnEl.textContent = '⚠ Cet ID existe déjà.'; return; }
+  warnEl.textContent = '⏳ Migration en cours…';
+  try {
+    const snap = await _saasDb.ref('restaurants/' + oldSlug).once('value');
+    await _saasDb.ref('restaurants/' + newSlug).set(snap.val());
+    await _saasDb.ref('restaurants/' + oldSlug).remove();
+    warnEl.style.color = 'var(--green)';
+    warnEl.textContent = '✓ ID changé. Les server-apps connectés doivent entrer le nouvel ID.';
+  } catch(e) {
+    warnEl.textContent = '⚠ Erreur : ' + (e.message || e);
+  }
+}
+
 async function updatePassword(slug) {
   const id    = slug.replace(/-/g,'_');
   const input = document.getElementById('pw-'+id);
