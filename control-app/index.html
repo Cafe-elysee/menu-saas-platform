@@ -1898,7 +1898,7 @@ function buildClientCard(client) {
       '<span class="card-name">'+client.name+'</span>' +
       '<div class="card-top-right">' +
         '<span class="client-status-badge active" id="active-badge-'+id+'">Actif</span>' +
-        '<div class="status-dot" id="status-'+id+'"></div>' +
+        '<div class="status-dot' + (_deviceStatus[s] ? ' online' : '') + '" id="status-'+id+'"></div>' +
         '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
     '</div>' +
@@ -2038,6 +2038,7 @@ function getClientState(slug) {
 }
 
 const _clientListeners = new Set();
+const _deviceStatus = {}; // cache: slug → true/false (server-app connectée)
 
 function loadClientData(client) {
   const s  = client.slug;
@@ -2051,6 +2052,7 @@ function loadClientData(client) {
   db.ref('/devices').on('value', snap => {
     const devices = snap.val() || {};
     const hasToken = Object.values(devices).some(d => d && d.token);
+    _deviceStatus[s] = hasToken;
     const dot = document.getElementById('status-' + id);
     if (dot) { dot.classList.remove('online','offline'); if (hasToken) dot.classList.add('online'); }
   });
@@ -2115,10 +2117,6 @@ function loadClientData(client) {
     });
   }
 
-  checkStatus('https://menu-saas-platform.vercel.app/?rid=' + id).then(online => {
-    const dot = document.getElementById('status-' + id);
-    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(online ? 'online' : 'offline'); }
-  });
 }
 
 
