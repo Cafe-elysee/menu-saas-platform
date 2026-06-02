@@ -675,9 +675,17 @@
     <div style="font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.6">
       Supprime la connexion actuelle et<br>demande un nouvel identifiant de restaurant.
     </div>
+
+    <div style="margin-top:28px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
+      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Notifications en arrière-plan</div>
+      <div style="font-size:0.78rem;color:var(--cream);line-height:1.7">Pour recevoir les notifications quand l'app est fermée :<br>
+        <span style="color:var(--gold)">Paramètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction</span>
+      </div>
+    </div>
   </section>
 
-</div>
+  </div><!-- /tabs-track -->
+</div><!-- /tabs-viewport -->
 
 <!-- Bottom navigation -->
 <nav class="bottom-nav">
@@ -1201,7 +1209,7 @@ function createNotificationChannel() {
       id: 'commandes_serveur', name: 'Commandes & Appels',
       description: 'Nouvelles commandes et appels de table',
       importance: 5, visibility: 1,
-      sound: 'sonnerie_commande',
+      sound: 'default',
       vibration: true, lights: true, lightColor: '#c8a44e'
     }).catch(function() {});
   }
@@ -1525,8 +1533,6 @@ function init() {
   updateMessagesBadge();
   startPolling();
   startOrdersListener();
-  setupNativePush();
-  _checkServerTokenInFirebase();
 
   document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });
   document.addEventListener('click',      unlockAudio, { once:true });
@@ -1551,6 +1557,11 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+document.addEventListener('deviceready', function() {
+  setupNativePush();
+  _checkServerTokenInFirebase();
+}, false);
 </script>
 </body>
 </html>
