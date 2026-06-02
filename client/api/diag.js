@@ -18,7 +18,7 @@ function base64url(buf) { return Buffer.from(buf).toString('base64').replace(/=/
 async function getToken(sa) {
   const now = Math.floor(Date.now()/1000);
   const h = base64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
-  const p = base64url(JSON.stringify({iss:sa.client_email,sub:sa.client_email,aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+3600,scope:'https://www.googleapis.com/auth/firebase.messaging https://www.googleapis.com/auth/firebase.database'}));
+  const p = base64url(JSON.stringify({iss:sa.client_email,sub:sa.client_email,aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+3600,scope:'https://www.googleapis.com/auth/firebase.messaging https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email'}));
   const sign = crypto.createSign('RSA-SHA256'); sign.update(h+'.'+p);
   const jwt = h+'.'+p+'.'+base64url(sign.sign(sa.private_key));
   const body = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`;
