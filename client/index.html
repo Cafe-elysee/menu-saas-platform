@@ -4993,8 +4993,8 @@
     <h1 class="hero-title" id="hero-title-text">Menu Pro</h1>
     <p class="hero-tagline" id="hero-tag">Μια εκλεπτυσμένη γαστρονομική εμπειρία</p>
     <p class="hero-sub" id="hero-sub">
-      <span class="hero-sub-group"><span id="hero-sub-1">Καφέδες εκλεκτοί</span><span class="hero-sub-dot"></span></span>
-      <span class="hero-sub-group"><span id="hero-sub-2">Γαστρονομία</span><span class="hero-sub-dot"></span></span>
+      <span class="hero-sub-group"><span id="hero-sub-1"></span><span class="hero-sub-dot"></span></span>
+      <span class="hero-sub-group"><span id="hero-sub-2"></span><span class="hero-sub-dot"></span></span>
       <span class="hero-sub-group"><span id="hero-sub-3"></span></span>
     </p>
   </div>
@@ -5255,7 +5255,7 @@ const UI = {
   },
   fr: {
     tagline:'Une expérience culinaire raffinée',
-    sub:['Cafés d\'exception','Plats gourmets','Ambiance élégante'],
+    sub:[],
     preTag:'Menu Pro',
     explore:'Menu',
     search:'Rechercher dans le menu…',
@@ -5285,7 +5285,7 @@ const UI = {
   },
   en: {
     tagline:'A refined culinary experience',
-    sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],
+    sub:[],
     preTag:'Menu Pro',
     explore:'Menu',
     search:'Search the menu…',
@@ -5345,7 +5345,7 @@ const UI = {
   },
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
-    sub:['Ausgewählte Kaffeespezialitäten','Gastronomische Gerichte','Elegantes Ambiente'],
+    sub:[],
     preTag:'Menu Pro',
     explore:'Speisekarte',
     search:'Speisekarte durchsuchen…',
@@ -7713,11 +7713,9 @@ function applyTranslations() {
   // Dynamic elements
   document.getElementById('hero-tag').textContent = t.tagline;
   document.getElementById('hero-explore').textContent = t.explore;
-  if (t.sub) {
-    document.getElementById('hero-sub-1').textContent = t.sub[0];
-    document.getElementById('hero-sub-2').textContent = t.sub[1];
-    document.getElementById('hero-sub-3').textContent = t.sub[2];
-  }
+  document.getElementById('hero-sub-1').textContent = (t.sub && t.sub[0]) || '';
+  document.getElementById('hero-sub-2').textContent = (t.sub && t.sub[1]) || '';
+  document.getElementById('hero-sub-3').textContent = (t.sub && t.sub[2]) || '';
   document.getElementById('no-res-txt').textContent = t.noRes;
   document.getElementById('al-lbl').textContent = t.alLabel;
   // Footer
