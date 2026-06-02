@@ -1904,7 +1904,7 @@ function buildClientCard(client) {
     '</div>' +
     '<div class="card-body"><div class="card-body-inner">' +
       '<div class="card-links">' +
-        '<a class="card-link" href="https://menu-saas-platform.vercel.app/?rid='+s+'" target="_blank">Menu ↗</a>' +
+        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'\',\'_system\')">Menu ↗</span>' +
         '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
       '</div>' +
 
@@ -1989,7 +1989,7 @@ function toggleCard(id) {
 async function openAdmin(e, slug) {
   e.preventDefault();
   await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
-  window.open('https://menu-saas-platform.vercel.app/admin.html?rid=' + slug + '&ctrl=1', '_blank');
+  window.open('https://menu-saas-platform.vercel.app/admin.html?rid=' + slug + '&ctrl=1', '_system');
 }
 
 async function toggleClientActive(slug) {
@@ -2040,10 +2040,18 @@ function getClientState(slug) {
 const _clientListeners = new Set();
 
 function loadClientData(client) {
-  if (_clientListeners.has(client.slug)) return;
-  _clientListeners.add(client.slug);
   const s  = client.slug;
   const id = s.replace(/-/g,'_');
+
+  // Point de statut : vert = server-app a un token FCM, rouge = non enregistrée
+  _saasDb.ref('restaurants/' + s + '/devices').once('value').then(snap => {
+    const hasToken = snap.exists() && Object.values(snap.val() || {}).some(d => d && d.token);
+    const dot = document.getElementById('status-' + id);
+    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(hasToken ? 'online' : 'offline'); }
+  }).catch(() => {});
+
+  if (_clientListeners.has(client.slug)) return;
+  _clientListeners.add(client.slug);
   const db = getClientDb(s);
 
   db.ref('/config').on('value', snap => {
@@ -2113,9 +2121,6 @@ function loadClientData(client) {
 }
 
 
-async function checkStatus(url) {
-  try { await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' }); return true; } catch { return false; }
-}
 
 // ════════════════════════════════════════════════════
 // WRITE HELPERS
