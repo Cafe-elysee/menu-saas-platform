@@ -281,17 +281,15 @@
     .devis-card.en_cours { border-left: 3px solid var(--gold); }
     .devis-card.traite   { opacity: 0.58; }
 
-    /* Swipe-to-delete devis */
-    .devis-card { position:relative; overflow:hidden; touch-action:pan-y; }
-    .devis-delete-bg {
-      position:absolute; right:0; top:0; bottom:0; width:80px;
-      background:var(--red); display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:1.2rem; opacity:0; transition:opacity 0.2s;
-      pointer-events:none;
+    /* Bouton supprimer devis */
+    .devis-card { position:relative; }
+    .devis-card-inner { }
+    .btn-del-devis {
+      background:rgba(239,83,80,0.12); color:var(--red);
+      border:1px solid rgba(239,83,80,0.3); border-radius:8px;
+      padding:6px 12px; font-size:0.78rem; font-family:inherit; cursor:pointer;
     }
-    .devis-card-inner { transition:transform 0.2s; }
-    .devis-card.swiping .devis-delete-bg { opacity:1; pointer-events:auto; }
-    .devis-card.swiping .devis-card-inner { transform:translateX(-80px); }
+    .btn-del-devis:active { background:rgba(239,83,80,0.22); }
 
     /* Bouton vider devis */
     .btn-vider-devis {
@@ -1734,7 +1732,6 @@ function buildDevisCard(key, d) {
   const waUrl = 'https://wa.me/' + (d.phone||'').replace(/\D/g,'') + '?text=' + encodeURIComponent(waMsg);
 
   card.innerHTML =
-    '<div class="devis-delete-bg" onclick="deleteDevis(\'' + key + '\')">🗑️</div>' +
     '<div class="devis-card-inner">' +
     '<div class="devis-summary" onclick="toggleDevisCard(\'' + key + '\')">' +
       '<div class="devis-summary-left">' +
@@ -1770,22 +1767,12 @@ function buildDevisCard(key, d) {
             '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
             'WhatsApp' +
           '</a>' +
+          '<button class="btn-del-devis" onclick="deleteDevis('' + key + '')">🗑️ Supprimer</button>' +
         '</div>' +
       '</div>' +
     '</div>' +
     '</div>'; // fin devis-card-inner
 
-  // Swipe to delete
-  let startX = 0, swiped = false;
-  card.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; swiped = false; }, { passive:true });
-  card.addEventListener('touchend', function(e) {
-    const dx = startX - e.changedTouches[0].clientX;
-    if (dx > 60) { card.classList.add('swiping'); swiped = true; }
-    else if (dx < -20) { card.classList.remove('swiping'); }
-  }, { passive:true });
-  document.addEventListener('touchstart', function(e) {
-    if (!card.contains(e.target) && swiped) { card.classList.remove('swiping'); swiped = false; }
-  }, { passive:true });
 
   // Auto-ouvrir les devis nouveaux
   if (statut === 'nouveau') card.classList.add('open');
@@ -1799,11 +1786,7 @@ function toggleDevisCard(key) {
 }
 
 function deleteDevis(key) {
-  if (!confirm('Supprimer ce devis définitivement ?')) {
-    const card = document.querySelector('.devis-card[data-key="' + key + '"]');
-    if (card) card.classList.remove('swiping');
-    return;
-  }
+  if (!confirm('Supprimer ce devis définitivement ?')) return;
   _controlDb.ref('/devis/' + key).remove();
 }
 
