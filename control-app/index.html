@@ -1004,6 +1004,7 @@
           <div class="devis-empty-icon">📋</div>
           Aucun devis pour l'instant.<br>Ils apparaîtront ici en temps réel.
         </div>
+        <div id="devis-cards"></div>
       </div>
     </div>
 
@@ -1536,6 +1537,7 @@ function initFirebase() {
   listenDevis();
   loadClientsFromFirebase();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
+  _checkControlTokenInFirebase();
 }
 
 // Charge dynamiquement la liste des restaurants depuis Firebase SaaS
@@ -1676,9 +1678,16 @@ function listenDevis() {
   });
 }
 
+let _devisRenderTimer = null;
 function renderDevis() {
-  const list  = document.getElementById('devis-list');
+  // Debounce : évite les doubles rendus si Firebase fire 2x de suite
+  clearTimeout(_devisRenderTimer);
+  _devisRenderTimer = setTimeout(_doRenderDevis, 30);
+}
+function _doRenderDevis() {
   const empty = document.getElementById('devis-empty');
+  const wrap  = document.getElementById('devis-cards');
+  if (!wrap) return;
   const keys  = Object.keys(_devisCache).sort((a, b) => b - a);
   const newCount = keys.filter(k => !_devisCache[k].lu).length;
 
@@ -1693,13 +1702,13 @@ function renderDevis() {
   if (newCount > 0) { badge.textContent = newCount > 9 ? '9+' : newCount; badge.classList.add('show'); }
   else badge.classList.remove('show');
 
-  list.querySelectorAll('.devis-card').forEach(el => el.remove());
+  wrap.innerHTML = '';
   if (keys.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
   const frag = document.createDocumentFragment();
   keys.forEach(k => frag.appendChild(buildDevisCard(k, _devisCache[k])));
-  list.appendChild(frag);
+  wrap.appendChild(frag);
 }
 
 function buildDevisCard(key, d) {
@@ -2037,7 +2046,11 @@ function getClientState(slug) {
   return _clientState[slug];
 }
 
+const _clientListeners = new Set();
+
 function loadClientData(client) {
+  if (_clientListeners.has(client.slug)) return;
+  _clientListeners.add(client.slug);
   const s  = client.slug;
   const id = s.replace(/-/g,'_');
   const db = getClientDb(s);
@@ -2680,6 +2693,20 @@ function forceTokenRenewal() {
     refreshNotifStatus();
     if (fb) { fb.textContent = "⚠ Plugin non chargé — relancez l'application."; fb.style.color = '#e74c3c'; }
   }
+}
+
+function _checkControlTokenInFirebase() {
+  var tok = localStorage.getItem('ctrl_fcm_token_v');
+  if (!tok || !_saasDb) return;
+  var deviceId = tok.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
+  _saasDb.ref('control/fcm_tokens/' + deviceId).once('value').then(function(snap) {
+    if (!snap.exists()) {
+      // Token absent du nouveau chemin → forcer ré-enregistrement
+      localStorage.removeItem('ctrl_fcm_token_v');
+      localStorage.removeItem('ctrl_fcm_last_reg');
+      if (_pushPlugin) _pushPlugin.register().catch(function() {});
+    }
+  }).catch(function() {});
 }
 
 function saveControlToken(tokenValue) {
