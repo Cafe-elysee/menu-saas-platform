@@ -1543,6 +1543,7 @@ function initFirebase() {
   loadClientsFromFirebase();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
   _checkControlTokenInFirebase();
+  setTimeout(refreshNotifStatus, 2000);
 }
 
 // Charge dynamiquement la liste des restaurants depuis Firebase SaaS
@@ -2638,19 +2639,34 @@ function showToast(msg) {
 function refreshNotifStatus() {
   const el = document.getElementById('notif-status-info');
   if (!el) return;
-  const lastReg = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
   const tok = localStorage.getItem('ctrl_fcm_token_v') || '';
-  const hasCapacitor = !!(window.Capacitor && window.Capacitor.Plugins);
-  const hasPush = !!(_pushPlugin || (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications));
-  var diag = 'Capacitor : ' + (hasCapacitor ? '✅' : '⚠') + ' | Push plugin : ' + (hasPush ? '✅' : '⚠') + ' | deviceready : ' + (_devicereadyFired ? '✅' : '⚠');
-  if (!tok) {
-    el.innerHTML = '⚠ Aucun token enregistré.<br><small style="color:var(--muted);font-size:0.72rem">' + diag + '</small>';
+  const hasPlugin = !!(_pushPlugin || (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications));
+
+  const line = (icon, txt) => '<div style="margin:3px 0">' + icon + ' ' + txt + '</div>';
+
+  let html = '';
+  html += line(hasPlugin ? '✅' : '❌', 'Plugin notifications : ' + (hasPlugin ? 'chargé' : 'NON CHARGÉ'));
+  html += line(_devicereadyFired ? '✅' : '❌', 'deviceready : ' + (_devicereadyFired ? 'reçu' : 'NON reçu'));
+  html += line(tok ? '✅' : '❌', 'Token local : ' + (tok ? tok.slice(-12) : 'ABSENT'));
+  html += line(_saasDb ? '✅' : '❌', 'Firebase SaaS : ' + (_saasDb ? 'connecté' : 'NON connecté'));
+
+  if (!tok || !_saasDb) {
+    el.innerHTML = html;
     return;
   }
-  const diff = Date.now() - lastReg;
-  const hrs = Math.floor(diff / 3600000);
-  const mins = Math.floor((diff % 3600000) / 60000);
-  el.innerHTML = '✅ Token enregistré<br>Dernière MAJ : ' + new Date(lastReg).toLocaleString('fr-FR') + '<br>Il y a : ' + (hrs > 0 ? hrs + 'h ' : '') + mins + 'min';
+
+  // Vérifie directement si le token est en Firebase
+  html += line('🔍', 'Token Firebase : vérification...');
+  el.innerHTML = html;
+  const deviceId = tok.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
+  _saasDb.ref('control/fcm_tokens/' + deviceId).once('value').then(snap => {
+    const inFb = snap.exists();
+    html = html.replace('🔍 Token Firebase : vérification...', (inFb ? '✅' : '❌') + ' Token Firebase : ' + (inFb ? 'PRÉSENT ✓ notifications OK' : 'ABSENT — écriture bloquée ?'));
+    el.innerHTML = html;
+  }).catch(err => {
+    html = html.replace('🔍 Token Firebase : vérification...', '❌ Token Firebase : ERREUR lecture — ' + (err && err.message || err));
+    el.innerHTML = html;
+  });
 }
 
 function _openNotifSettings() {
