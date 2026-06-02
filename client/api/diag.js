@@ -52,13 +52,59 @@ module.exports = async (req, res) => {
     const restaurants = restRes.status === 200 && restRes.body && typeof restRes.body === 'object'
       ? Object.keys(restRes.body) : [];
 
-    // Lire les tokens FCM de chaque restaurant
+    // Lire les tokens FCM de chaque restaurant + envoyer test FCM
     const serverTokens = {};
+    const fcmTestResults = {};
+
     for (const rid of restaurants) {
       const devUrl = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/restaurants/${rid}/devices.json?access_token=${token}`;
       const devRes = await httpsGet(devUrl);
-      serverTokens[rid] = devRes.status === 200 && devRes.body && typeof devRes.body === 'object'
-        ? Object.keys(devRes.body).length : 0;
+      const devices = devRes.status === 200 && devRes.body && typeof devRes.body === 'object' ? devRes.body : {};
+      serverTokens[rid] = Object.keys(devices).length;
+
+      // Envoie un vrai FCM test à chaque device
+      for (const [deviceId, d] of Object.entries(devices)) {
+        if (!d || !d.token) continue;
+        const payload = JSON.stringify({
+          message: {
+            token: d.token,
+            notification: { title: '🔔 Test diagnostic', body: 'Si tu vois ceci, FCM fonctionne !' },
+            data: { type: 'bell', table: '99', ts: String(Date.now()) },
+            android: { priority: 'high', notification: { channel_id: 'commandes_serveur' } }
+          }
+        });
+        const fcmRes = await new Promise((resolve, reject) => {
+          const u = new URL(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`);
+          const req = https.request({ hostname: u.hostname, path: u.pathname, method: 'POST',
+            headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+          }, r => { let d=''; r.on('data',c=>d+=c); r.on('end',()=>{ try{resolve({status:r.statusCode,body:JSON.parse(d)})}catch(e){resolve({status:r.statusCode,body:d})} }); });
+          req.on('error', reject); req.write(payload); req.end();
+        });
+        fcmTestResults[rid + '/' + deviceId] = { fcm_status: fcmRes.status, fcm_body: fcmRes.body };
+      }
+    }
+
+    // Test FCM pour control
+    const ctrlRes2 = ctrlRes.status === 200 && ctrlRes.body && typeof ctrlRes.body === 'object' ? ctrlRes.body : {};
+    const ctrlFcmResults = {};
+    for (const [deviceId, d] of Object.entries(ctrlRes2)) {
+      if (!d || !d.token) continue;
+      const payload = JSON.stringify({
+        message: {
+          token: d.token,
+          notification: { title: '📋 Test diagnostic', body: 'Si tu vois ceci, FCM Control fonctionne !' },
+          data: { type: 'devis', ts: String(Date.now()) },
+          android: { priority: 'high', notification: { channel_id: 'devis_control' } }
+        }
+      });
+      const fcmRes = await new Promise((resolve, reject) => {
+        const u = new URL(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`);
+        const req = https.request({ hostname: u.hostname, path: u.pathname, method: 'POST',
+          headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+        }, r => { let d=''; r.on('data',c=>d+=c); r.on('end',()=>{ try{resolve({status:r.statusCode,body:JSON.parse(d)})}catch(e){resolve({status:r.statusCode,body:d})} }); });
+        req.on('error', reject); req.write(payload); req.end();
+      });
+      ctrlFcmResults[deviceId] = { fcm_status: fcmRes.status, fcm_body: fcmRes.body };
     }
 
     res.status(200).json({
@@ -66,8 +112,8 @@ module.exports = async (req, res) => {
       control_fcm_tokens_count: ctrlTokens,
       restaurants_found: restaurants,
       server_fcm_tokens_per_restaurant: serverTokens,
-      rtdb_status_control: ctrlRes.status,
-      rtdb_status_restaurants: restRes.status
+      fcm_test_server: fcmTestResults,
+      fcm_test_control: ctrlFcmResults
     });
   } catch(err) {
     res.status(200).json({ error: err.message });
