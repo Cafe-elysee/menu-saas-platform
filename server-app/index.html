@@ -1218,14 +1218,16 @@ function getDeviceId() {
 function _checkServerTokenInFirebase() {
   if (!_RID || !window.Capacitor || !window.Capacitor.isNativePlatform()) return;
   var tok = localStorage.getItem(_PFX+'fcm_token');
-  if (!tok) return;
   var deviceId = getDeviceId();
-  _rref('devices/' + deviceId).once('value').then(function(snap) {
+  _rref('devices/' + deviceId + '/token').once('value').then(function(snap) {
     if (!snap.exists()) {
-      localStorage.removeItem(_PFX+'fcm_token');
-      localStorage.removeItem(_PFX+'fcm_last_reg');
-      var Push = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
-      if (Push) Push.register().catch(function() {});
+      if (tok) {
+        saveNativeToken(tok);
+      } else {
+        localStorage.removeItem(_PFX+'fcm_last_reg');
+        var Push = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+        if (Push) Push.register().catch(function() {});
+      }
     }
   }).catch(function() {});
 }
@@ -1330,26 +1332,13 @@ function setupNativePush() {
     }
   });
 
-  // ── Demande de permission et enregistrement APRÈS les listeners ──
-  var doRegister = function() {
-    Push.register().catch(function() {});
-    _updateNotifBanner(true);
-  };
-  var onDenied = function() { _updateNotifBanner(false); };
+  // ── Register toujours (le token FCM ne nécessite pas la permission d'affichage) ──
+  Push.register().catch(function() {});
 
-  Push.checkPermissions().then(function(status) {
-    if (status.receive === 'granted') {
-      doRegister();
-    } else {
-      Push.requestPermissions().then(function(r) {
-        if (r.receive === 'granted') doRegister(); else onDenied();
-      }).catch(function() { doRegister(); });
-    }
-  }).catch(function() {
-    Push.requestPermissions().then(function(r) {
-      if (r.receive === 'granted') doRegister(); else onDenied();
-    }).catch(function() { doRegister(); });
-  });
+  // ── Demande la permission d'affichage séparément (pour que les notifications apparaissent) ──
+  Push.requestPermissions().then(function(r) {
+    _updateNotifBanner(r.receive === 'granted');
+  }).catch(function() { _updateNotifBanner(false); });
 }
 /* ══════════════════════════════════════════════════════ */
 
