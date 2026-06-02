@@ -660,27 +660,25 @@
 
   <!-- Réglages -->
   <section class="tab-panel" id="panel-settings" style="padding:1.2rem 1rem">
-    <div style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Restaurant actif</div>
+    <div id="settings-section-title" style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Restaurant actif</div>
 
     <div style="background:rgba(200,164,78,0.07);border:1px solid rgba(200,164,78,0.2);border-radius:14px;padding:16px 18px;margin-bottom:24px">
-      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">ID restaurant</div>
+      <div id="settings-id-label" style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">ID restaurant</div>
       <div id="settings-rid" style="font-size:1.1rem;font-weight:700;color:var(--gold);font-family:monospace;letter-spacing:0.05em"></div>
       <div id="settings-name" style="font-size:0.8rem;color:var(--cream);margin-top:4px"></div>
     </div>
 
-    <button onclick="changeRestaurant()" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.35);background:transparent;color:var(--gold);font-family:inherit;font-size:0.9rem;font-weight:600;cursor:pointer;margin-bottom:12px">
+    <button id="settings-change-btn" onclick="changeRestaurant()" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.35);background:transparent;color:var(--gold);font-family:inherit;font-size:0.9rem;font-weight:600;cursor:pointer;margin-bottom:12px">
       🔄 Changer de restaurant
     </button>
 
-    <div style="font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.6">
-      Supprime la connexion actuelle et<br>demande un nouvel identifiant de restaurant.
+    <div id="settings-change-desc" style="font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.6">
+      Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.
     </div>
 
     <div style="margin-top:28px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
-      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Notifications en arrière-plan</div>
-      <div style="font-size:0.78rem;color:var(--cream);line-height:1.7">Pour recevoir les notifications quand l'app est fermée :<br>
-        <span style="color:var(--gold)">Paramètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction</span>
-      </div>
+      <div id="settings-notif-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Notifications en arrière-plan</div>
+      <div id="settings-notif-desc" style="font-size:0.78rem;color:var(--cream);line-height:1.7;white-space:pre-line"></div>
     </div>
   </section>
 
@@ -710,7 +708,7 @@
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </div>
-    <span class="nav-label">Réglages</span>
+    <span class="nav-label" id="nav-lbl-settings">Réglages</span>
   </button>
 </nav>
 
@@ -731,7 +729,11 @@ const T = {
     today:'Σήμερα', yesterday:'Χθες', history:'Ιστορικό',
     ordTable:'Τραπέζι', ordTakeaway:'Σερβίρισμα', ordTotal:'Σύνολο',
     ordPending:'Ελήφθη', ordProgress:'Σε εξέλιξη', ordDone:'Ολοκληρώθηκε',
-    msgAdmin:'Διαχειριστής', navCalls:'Κλήσεις', navOrders:'Παραγγελίες', navMessages:'Μηνύματα',
+    msgAdmin:'Διαχειριστής', navCalls:'Κλήσεις', navOrders:'Παραγγελίες', navMessages:'Μηνύματα', navSettings:'Ρυθμίσεις',
+    settingsTitle:'Ενεργό εστιατόριο', settingsIdLabel:'ID εστιατορίου',
+    settingsBtnChange:'🔄 Αλλαγή εστιατορίου', settingsChangeDesc:'Διαγράφει την τρέχουσα σύνδεση και ζητά νέο αναγνωριστικό εστιατορίου.',
+    settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
+    settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → Menu Pro → Μπαταρία → Χωρίς περιορισμούς',
   },
   fr: {
     hdrSub:'Interface Serveur', connWait:'En attente…', connOn:'Connecté',
@@ -743,7 +745,11 @@ const T = {
     today:'Aujourd\'hui', yesterday:'Hier', history:'Historique',
     ordTable:'Table', ordTakeaway:'À emporter', ordTotal:'Total',
     ordPending:'Reçue', ordProgress:'En cours', ordDone:'Terminée',
-    msgAdmin:'Administrateur', navCalls:'Appels', navOrders:'Commandes', navMessages:'Messages',
+    msgAdmin:'Administrateur', navCalls:'Appels', navOrders:'Commandes', navMessages:'Messages', navSettings:'Réglages',
+    settingsTitle:'Restaurant actif', settingsIdLabel:'ID restaurant',
+    settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.',
+    settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
+    settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -755,7 +761,11 @@ const T = {
     today:'Today', yesterday:'Yesterday', history:'History',
     ordTable:'Table', ordTakeaway:'Takeaway', ordTotal:'Total',
     ordPending:'Received', ordProgress:'In progress', ordDone:'Done',
-    msgAdmin:'Administrator', navCalls:'Calls', navOrders:'Orders', navMessages:'Messages',
+    msgAdmin:'Administrator', navCalls:'Calls', navOrders:'Orders', navMessages:'Messages', navSettings:'Settings',
+    settingsTitle:'Active restaurant', settingsIdLabel:'Restaurant ID',
+    settingsBtnChange:'🔄 Change restaurant', settingsChangeDesc:'Removes the current connection and asks for a new restaurant ID.',
+    settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
+    settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → Menu Pro Server → Battery → No restrictions',
   },
   de: {
     hdrSub:'Kellner-Interface', connWait:'Warten…', connOn:'Verbunden',
@@ -767,7 +777,11 @@ const T = {
     today:'Heute', yesterday:'Gestern', history:'Verlauf',
     ordTable:'Tisch', ordTakeaway:'Zum Mitnehmen', ordTotal:'Gesamt',
     ordPending:'Eingegangen', ordProgress:'In Bearbeitung', ordDone:'Erledigt',
-    msgAdmin:'Administrator', navCalls:'Anrufe', navOrders:'Bestellungen', navMessages:'Nachrichten',
+    msgAdmin:'Administrator', navCalls:'Anrufe', navOrders:'Bestellungen', navMessages:'Nachrichten', navSettings:'Einstellungen',
+    settingsTitle:'Aktives Restaurant', settingsIdLabel:'Restaurant-ID',
+    settingsBtnChange:'🔄 Restaurant wechseln', settingsChangeDesc:'Löscht die aktuelle Verbindung und fordert eine neue Restaurant-ID an.',
+    settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
+    settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → Menu Pro Server → Akku → Keine Einschränkungen',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -779,7 +793,11 @@ const T = {
     today:'اليوم', yesterday:'أمس', history:'السجل',
     ordTable:'طاولة', ordTakeaway:'للأخذ', ordTotal:'المجموع',
     ordPending:'مستلمة', ordProgress:'قيد التنفيذ', ordDone:'منتهية',
-    msgAdmin:'المدير', navCalls:'النداءات', navOrders:'الطلبات', navMessages:'الرسائل',
+    msgAdmin:'المدير', navCalls:'النداءات', navOrders:'الطلبات', navMessages:'الرسائل', navSettings:'الإعدادات',
+    settingsTitle:'المطعم النشط', settingsIdLabel:'معرّف المطعم',
+    settingsBtnChange:'🔄 تغيير المطعم', settingsChangeDesc:'يحذف الاتصال الحالي ويطلب معرّفاً جديداً للمطعم.',
+    settingsChangeConfirm:'تغيير المطعم؟\nسيتم حذف الاتصال الحالي.',
+    settingsNotifTitle:'الإشعارات في الخلفية', settingsNotifDesc:'لاستقبال الإشعارات عند إغلاق التطبيق:\nالإعدادات ← التطبيقات ← Menu Pro ← البطارية ← بلا قيود',
   }
 };
 
@@ -1101,6 +1119,13 @@ function applyLang() {
   document.getElementById('nav-lbl-calls').textContent    = t.navCalls;
   document.getElementById('nav-lbl-orders').textContent   = t.navOrders;
   document.getElementById('nav-lbl-messages').textContent = t.navMessages;
+  document.getElementById('nav-lbl-settings').textContent = t.navSettings;
+  document.getElementById('settings-section-title').textContent = t.settingsTitle;
+  document.getElementById('settings-id-label').textContent      = t.settingsIdLabel;
+  document.getElementById('settings-change-btn').childNodes[0].textContent = t.settingsBtnChange;
+  document.getElementById('settings-change-desc').textContent   = t.settingsChangeDesc;
+  document.getElementById('settings-notif-title').textContent   = t.settingsNotifTitle;
+  document.getElementById('settings-notif-desc').textContent    = t.settingsNotifDesc;
   document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.toggle('on', b.dataset.l === lang); });
   renderCalls();
   renderOrders();
@@ -1435,7 +1460,7 @@ function renderOrders() {
 
 /* ── CHANGEMENT DE RESTAURANT ── */
 function changeRestaurant() {
-  if (!confirm('Changer de restaurant ?\nLa connexion actuelle sera supprimée.')) return;
+  if (!confirm((T[lang] || T.fr).settingsChangeConfirm)) return;
   var deviceId = getDeviceId();
   _rref('devices/' + deviceId).remove().catch(function() {}).finally(function() {
     localStorage.removeItem('saas_rid');

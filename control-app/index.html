@@ -1534,8 +1534,11 @@ let _saasDb = null;
 function initFirebase() {
   const controlApp = firebase.initializeApp(CONTROL_FB_CONFIG, 'control');
   _controlDb = firebase.database(controlApp);
-  const saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform');
-  _saasDb = firebase.database(saasApp);
+  if (!_saasDb) {
+    let saasApp;
+    try { saasApp = firebase.app('saas-platform'); } catch(e) { saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform'); }
+    _saasDb = firebase.database(saasApp);
+  }
   listenDevis();
   loadClientsFromFirebase();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
@@ -2714,6 +2717,18 @@ function saveControlToken(tokenValue) {
 // ════════════════════════════════════════════════════
 document.addEventListener('deviceready', () => {
   _devicereadyFired = true;
+
+  // Pré-initialise _saasDb pour sauvegarder le token FCM même avant le login
+  if (!_saasDb) {
+    try {
+      let saasApp;
+      try { saasApp = firebase.app('saas-platform'); } catch(e) { saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform'); }
+      _saasDb = firebase.database(saasApp);
+      if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
+      _checkControlTokenInFirebase();
+    } catch(e) { console.warn('SaaS pre-init FCM:', e); }
+  }
+
   _pushPlugin = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) || null;
   if (_pushPlugin) {
     const Push = _pushPlugin;
