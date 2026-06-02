@@ -1232,14 +1232,14 @@ function _checkServerTokenInFirebase() {
 
 function saveNativeToken(token) {
   if (!token || !_RID) return;
-  var deviceId   = getDeviceId();
-  var stored     = localStorage.getItem(_PFX+'fcm_token');
-  var lastReg    = parseInt(localStorage.getItem(_PFX+'fcm_last_reg') || '0');
-  if (stored === token && Date.now() - lastReg < 12 * 60 * 60 * 1000) return;
+  var deviceId = getDeviceId();
   localStorage.setItem(_PFX+'fcm_token', token);
   _rref('devices/' + deviceId).set({ token: token, ts: Date.now(), lang: lang })
     .then(function() { localStorage.setItem(_PFX+'fcm_last_reg', String(Date.now())); })
-    .catch(function() { setTimeout(function() { saveNativeToken(token); }, 5000); });
+    .catch(function(err) {
+      console.error('FCM token save error:', err);
+      setTimeout(function() { saveNativeToken(token); }, 5000);
+    });
 }
 
 function createNotificationChannel() {

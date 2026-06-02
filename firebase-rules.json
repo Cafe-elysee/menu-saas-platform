@@ -11,6 +11,9 @@
         "sessions": { ".read": true,  ".write": true  },
         "logs":     { ".read": false, ".write": true  }
       }
+    },
+    "control": {
+      "fcm_tokens": { ".read": true, ".write": true }
     }
   }
 }
