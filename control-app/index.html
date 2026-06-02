@@ -2746,7 +2746,8 @@ document.addEventListener('deviceready', () => {
       sound: 'default',
       vibration: true, lights: true, lightColor: '#c8a44e'
     }).catch(() => {});
-    Push.requestPermissions().then(result => { if (result.receive === 'granted') Push.register(); }).catch(() => setTimeout(() => Push.register(), 5000));
+
+    // ── Listeners EN PREMIER, avant tout appel à register() ──
     Push.addListener('registration', token => saveControlToken(token.value));
     Push.addListener('registrationError', () => setTimeout(() => Push.register(), 15000));
     Push.addListener('pushNotificationReceived', notif => { showToast('📋 Nouveau devis reçu !'); switchTab('devis'); });
@@ -2757,6 +2758,19 @@ document.addEventListener('deviceready', () => {
         if (Date.now() - last > 6 * 3600 * 1000) Push.register().catch(() => {});
       }
     });
+
+    // ── Demande permission et register APRÈS les listeners ──
+    Push.requestPermissions().then(result => {
+      if (result.receive === 'granted') Push.register();
+      else {
+        const fb = document.getElementById('notif-renewal-fb');
+        if (fb) {
+          fb.innerHTML = '⚠ Permission refusée. <button onclick="_openNotifSettings()" style="margin-left:8px;padding:4px 10px;border-radius:6px;border:1px solid #e74c3c;background:rgba(231,76,60,0.12);color:#e74c3c;cursor:pointer;font-size:0.75rem">Ouvrir Paramètres</button>';
+          fb.style.color = '#e74c3c';
+        }
+        refreshNotifStatus();
+      }
+    }).catch(() => setTimeout(() => Push.register(), 5000));
   }
 }, false);
 

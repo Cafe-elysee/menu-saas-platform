@@ -1231,7 +1231,7 @@ function _checkServerTokenInFirebase() {
 }
 
 function saveNativeToken(token) {
-  if (!token) return;
+  if (!token || !_RID) return;
   var deviceId   = getDeviceId();
   var stored     = localStorage.getItem(_PFX+'fcm_token');
   var lastReg    = parseInt(localStorage.getItem(_PFX+'fcm_last_reg') || '0');
@@ -1245,12 +1245,22 @@ function saveNativeToken(token) {
 function createNotificationChannel() {
   if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.PushNotifications) return;
   var Push = window.Capacitor.Plugins.PushNotifications;
-  if (Push.createChannel) {
+  if (!Push.createChannel) return;
+  // Supprime l'ancien canal s'il existe (pour forcer la récréation avec les bons réglages)
+  if (Push.deleteChannel) {
+    Push.deleteChannel({ id: 'commandes_serveur' }).catch(function() {}).finally(function() {
+      Push.createChannel({
+        id: 'commandes_serveur', name: 'Commandes & Appels',
+        description: 'Nouvelles commandes et appels de table',
+        importance: 5, visibility: 1, sound: 'default',
+        vibration: true, lights: true, lightColor: '#c8a44e'
+      }).catch(function() {});
+    });
+  } else {
     Push.createChannel({
       id: 'commandes_serveur', name: 'Commandes & Appels',
       description: 'Nouvelles commandes et appels de table',
-      importance: 5, visibility: 1,
-      sound: 'default',
+      importance: 5, visibility: 1, sound: 'default',
       vibration: true, lights: true, lightColor: '#c8a44e'
     }).catch(function() {});
   }
@@ -1274,26 +1284,7 @@ function setupNativePush() {
 
   createNotificationChannel();
 
-  var doRegister = function() {
-    Push.register().catch(function() {});
-    _updateNotifBanner(true);
-  };
-  var onDenied = function() { _updateNotifBanner(false); };
-
-  Push.checkPermissions().then(function(status) {
-    if (status.receive === 'granted') {
-      doRegister();
-    } else {
-      Push.requestPermissions().then(function(r) {
-        if (r.receive === 'granted') doRegister(); else onDenied();
-      }).catch(function() { doRegister(); });
-    }
-  }).catch(function() {
-    Push.requestPermissions().then(function(r) {
-      if (r.receive === 'granted') doRegister(); else onDenied();
-    }).catch(function() { doRegister(); });
-  });
-
+  // ── Listeners enregistrés EN PREMIER, avant tout appel à register() ──
   Push.addListener('registration', function(token) { saveNativeToken(token.value); });
   Push.addListener('registrationError', function() { setTimeout(function() { Push.register(); }, 15000); });
 
@@ -1309,7 +1300,7 @@ function setupNativePush() {
       addMessage(text, parseInt(data.ts || '0') || Date.now());
       playMsgTone();
     } else if (data.type === 'order') {
-      /* commande — gérée par startOrdersListener via Firebase, rien à faire ici */
+      /* commande — gérée par startOrdersListener via Firebase */
     } else {
       nativeVibrate([300, 100, 300, 100, 600]);
       playRing();
@@ -1341,6 +1332,27 @@ function setupNativePush() {
       var lastReg = parseInt(localStorage.getItem(_PFX+'fcm_last_reg') || '0');
       if (Date.now() - lastReg > 6 * 60 * 60 * 1000) { Push.register(); }
     }
+  });
+
+  // ── Demande de permission et enregistrement APRÈS les listeners ──
+  var doRegister = function() {
+    Push.register().catch(function() {});
+    _updateNotifBanner(true);
+  };
+  var onDenied = function() { _updateNotifBanner(false); };
+
+  Push.checkPermissions().then(function(status) {
+    if (status.receive === 'granted') {
+      doRegister();
+    } else {
+      Push.requestPermissions().then(function(r) {
+        if (r.receive === 'granted') doRegister(); else onDenied();
+      }).catch(function() { doRegister(); });
+    }
+  }).catch(function() {
+    Push.requestPermissions().then(function(r) {
+      if (r.receive === 'granted') doRegister(); else onDenied();
+    }).catch(function() { doRegister(); });
   });
 }
 /* ══════════════════════════════════════════════════════ */

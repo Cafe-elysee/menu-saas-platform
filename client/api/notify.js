@@ -116,8 +116,8 @@ function buildBody(type, table, deviceLang, message) {
 }
 
 async function sendFCM(projectId, accessToken, entries, restaurantId, restaurantName, table, lang, type, message) {
-  let sent = 0;
-  for (const entry of entries) {
+  const ts = String(Date.now());
+  const results = await Promise.all(entries.map(async entry => {
     const deviceLang = entry.lang || lang || 'fr';
     const body_text  = buildBody(type, table, deviceLang, message);
     const emoji      = type === 'order' ? '🧾' : '🔔';
@@ -133,7 +133,7 @@ async function sendFCM(projectId, accessToken, entries, restaurantId, restaurant
           title: title_text,
           body:  body_text,
           type:  type || 'bell',
-          ts:    String(Date.now())
+          ts
         },
         android: { priority: 'high', notification: { channel_id: 'commandes_serveur' } },
         apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', 'content-available': 1 } } },
@@ -147,14 +147,14 @@ async function sendFCM(projectId, accessToken, entries, restaurantId, restaurant
         payload
       );
       console.log('FCM result:', res.status, entry.deviceId);
-      if (res.status === 200) {
-        sent++;
-      } else if ([404, 410].includes(res.status) || res.body?.error?.status === 'UNREGISTERED') {
+      if (res.status === 200) return 1;
+      if ([404, 410].includes(res.status) || res.body?.error?.status === 'UNREGISTERED') {
         await deleteToken(projectId, accessToken, restaurantId, entry.deviceId);
       }
     } catch(e) { console.error('FCM error:', e.message); }
-  }
-  return { sent, total: entries.length };
+    return 0;
+  }));
+  return { sent: results.reduce((a, b) => a + b, 0), total: entries.length };
 }
 
 module.exports = async (req, res) => {
