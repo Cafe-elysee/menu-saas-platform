@@ -52,11 +52,20 @@ module.exports = async (req, res) => {
     const restaurants = restRes.status === 200 && restRes.body && typeof restRes.body === 'object'
       ? Object.keys(restRes.body) : [];
 
+    // Lire les tokens FCM de chaque restaurant
+    const serverTokens = {};
+    for (const rid of restaurants) {
+      const devUrl = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/restaurants/${rid}/devices.json?access_token=${token}`;
+      const devRes = await httpsGet(devUrl);
+      serverTokens[rid] = devRes.status === 200 && devRes.body && typeof devRes.body === 'object'
+        ? Object.keys(devRes.body).length : 0;
+    }
+
     res.status(200).json({
       service_account_project: projectId,
-      service_account_email: sa.client_email,
       control_fcm_tokens_count: ctrlTokens,
       restaurants_found: restaurants,
+      server_fcm_tokens_per_restaurant: serverTokens,
       rtdb_status_control: ctrlRes.status,
       rtdb_status_restaurants: restRes.status
     });
