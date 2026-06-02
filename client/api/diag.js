@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
             token: d.token,
             notification: { title: '🔔 Test diagnostic', body: 'Si tu vois ceci, FCM fonctionne !' },
             data: { type: 'bell', table: '99', ts: String(Date.now()) },
-            android: { priority: 'high', notification: { channel_id: 'mp_srv_v2' } }
+            android: { priority: 'high', notification: { channel_id: 'mp_srv_v3', notification_priority: 'PRIORITY_MAX' } }
           }
         });
         const fcmRes = await new Promise((resolve, reject) => {

@@ -1267,15 +1267,13 @@ function createNotificationChannel() {
     Push.deleteChannel({ id: 'commandes_serveur_v2' }).catch(function() {});
     Push.deleteChannel({ id: 'mp_srv_v2' }).catch(function() {});
   }
-  // Canal créé en Java (MainActivity) — JS confirme les paramètres
-  setTimeout(function() {
-    Push.createChannel({
-      id: 'mp_srv_v3', name: 'Commandes & Appels',
-      description: 'Nouvelles commandes et appels de table',
-      importance: 5, visibility: 1, sound: 'default',
-      vibration: true, lights: true, lightColor: '#c8a44e'
-    }).catch(function() {});
-  }, 300);
+  // Canal créé immédiatement (même séquence que control-app)
+  Push.createChannel({
+    id: 'mp_srv_v3', name: 'Commandes & Appels',
+    description: 'Nouvelles commandes et appels de table',
+    importance: 5, visibility: 1, sound: 'default',
+    vibration: true, lights: true, lightColor: '#c8a44e'
+  }).catch(function() {});
 }
 
 function _openNotifSettings() {

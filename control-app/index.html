@@ -2113,7 +2113,7 @@ function loadClientData(client) {
 }
 
 async function checkStatus(url) {
-  try { await fetch(url, {method:'HEAD',mode:'no-cors',cache:'no-store'}); return true; } catch { return false; }
+  try { await fetch(url, {method:'GET',mode:'no-cors',cache:'no-store'}); return true; } catch { return false; }
 }
 
 // ════════════════════════════════════════════════════
