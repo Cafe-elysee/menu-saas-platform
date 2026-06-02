@@ -2517,7 +2517,6 @@ function uploadDemoPhoto(slug, n, input) {
   input.value = '';
   if (!file) return;
   const id = slug.replace(/-/g,'_');
-  const db = getClientDb(slug);
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -2542,7 +2541,7 @@ function uploadDemoPhoto(slug, n, input) {
           const json = await res.json();
           if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
           showDemoPhoto(id, n, json.secure_url);
-          await db.ref('demoPage/heroSlides/' + n).set(json.secure_url);
+          await _saasDb.ref('demoPage/heroSlides/' + n).set(json.secure_url);
           showToast('Photo enregistrée ✓');
         } catch(err) {
           showDemoPhoto(id, n, '');
@@ -2556,7 +2555,7 @@ function uploadDemoPhoto(slug, n, input) {
 }
 
 async function deleteDemoPhoto(slug, n, id) {
-  await getClientDb(slug).ref('demoPage/heroSlides/' + n).set(null);
+  await _saasDb.ref('demoPage/heroSlides/' + n).set(null);
   showDemoPhoto(id, n, '');
   showToast('Photo supprimée');
 }
