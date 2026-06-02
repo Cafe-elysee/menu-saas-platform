@@ -2653,6 +2653,11 @@ function refreshNotifStatus() {
   el.innerHTML = '✅ Token enregistré<br>Dernière MAJ : ' + new Date(lastReg).toLocaleString('fr-FR') + '<br>Il y a : ' + (hrs > 0 ? hrs + 'h ' : '') + mins + 'min';
 }
 
+function _openNotifSettings() {
+  const NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
+  if (NS) NS.openNotifications();
+}
+
 function forceTokenRenewal() {
   const fb = document.getElementById('notif-renewal-fb');
   if (fb) { fb.textContent = '⏳ Renouvellement en cours…'; fb.style.color = 'var(--muted)'; }
@@ -2662,7 +2667,10 @@ function forceTokenRenewal() {
   if (push) {
     push.requestPermissions().then(function(result) {
       if (result.receive === 'denied') {
-        if (fb) { fb.textContent = '⚠ Permission refusée — activez les notifs dans Paramètres Android.'; fb.style.color = '#e74c3c'; }
+        if (fb) {
+          fb.innerHTML = '⚠ Permission refusée. <button onclick="_openNotifSettings()" style="margin-left:8px;padding:4px 10px;border-radius:6px;border:1px solid #e74c3c;background:rgba(231,76,60,0.12);color:#e74c3c;cursor:pointer;font-size:0.75rem">Ouvrir Paramètres</button>';
+          fb.style.color = '#e74c3c';
+        }
         refreshNotifStatus(); return;
       }
       push.register()

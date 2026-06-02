@@ -620,6 +620,13 @@
   </div>
 </header>
 
+<!-- Bannière permission notifications -->
+<div id="notif-perm-banner" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(239,83,80,0.12);border-bottom:1px solid rgba(239,83,80,0.3);flex-shrink:0">
+  <span style="font-size:1.1rem">🔔</span>
+  <span id="notif-perm-txt" style="flex:1;font-size:0.78rem;color:#ef5350;line-height:1.4">Notifications désactivées — touchez pour activer</span>
+  <button onclick="_openNotifSettings()" style="flex-shrink:0;padding:6px 12px;border-radius:8px;border:1px solid rgba(239,83,80,0.5);background:rgba(239,83,80,0.15);color:#ef5350;font-size:0.75rem;font-weight:700;cursor:pointer">Activer</button>
+</div>
+
 <!-- Swipeable content -->
 <div class="tabs-viewport">
   <div class="tabs-track" id="tabs-track">
@@ -734,6 +741,7 @@ const T = {
     settingsBtnChange:'🔄 Αλλαγή εστιατορίου', settingsChangeDesc:'Διαγράφει την τρέχουσα σύνδεση και ζητά νέο αναγνωριστικό εστιατορίου.',
     settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
     settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → Menu Pro → Μπαταρία → Χωρίς περιορισμούς',
+    notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.',
   },
   fr: {
     hdrSub:'Interface Serveur', connWait:'En attente…', connOn:'Connecté',
@@ -750,6 +758,7 @@ const T = {
     settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.',
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
     settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
+    notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -766,6 +775,7 @@ const T = {
     settingsBtnChange:'🔄 Change restaurant', settingsChangeDesc:'Removes the current connection and asks for a new restaurant ID.',
     settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
     settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → Menu Pro Server → Battery → No restrictions',
+    notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable',
   },
   de: {
     hdrSub:'Kellner-Interface', connWait:'Warten…', connOn:'Verbunden',
@@ -782,6 +792,7 @@ const T = {
     settingsBtnChange:'🔄 Restaurant wechseln', settingsChangeDesc:'Löscht die aktuelle Verbindung und fordert eine neue Restaurant-ID an.',
     settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
     settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → Menu Pro Server → Akku → Keine Einschränkungen',
+    notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -798,6 +809,7 @@ const T = {
     settingsBtnChange:'🔄 تغيير المطعم', settingsChangeDesc:'يحذف الاتصال الحالي ويطلب معرّفاً جديداً للمطعم.',
     settingsChangeConfirm:'تغيير المطعم؟\nسيتم حذف الاتصال الحالي.',
     settingsNotifTitle:'الإشعارات في الخلفية', settingsNotifDesc:'لاستقبال الإشعارات عند إغلاق التطبيق:\nالإعدادات ← التطبيقات ← Menu Pro ← البطارية ← بلا قيود',
+    notifBannerTxt:'الإشعارات معطّلة — اضغط للتفعيل', notifBannerBtn:'تفعيل',
   }
 };
 
@@ -1126,6 +1138,10 @@ function applyLang() {
   document.getElementById('settings-change-desc').textContent   = t.settingsChangeDesc;
   document.getElementById('settings-notif-title').textContent   = t.settingsNotifTitle;
   document.getElementById('settings-notif-desc').textContent    = t.settingsNotifDesc;
+  var notifTxt = document.getElementById('notif-perm-txt');
+  var notifBtn = document.querySelector('#notif-perm-banner button');
+  if (notifTxt) notifTxt.textContent = t.notifBannerTxt;
+  if (notifBtn) notifBtn.textContent = t.notifBannerBtn;
   document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.toggle('on', b.dataset.l === lang); });
   renderCalls();
   renderOrders();
@@ -1240,6 +1256,16 @@ function createNotificationChannel() {
   }
 }
 
+function _openNotifSettings() {
+  var NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
+  if (NS) NS.openNotifications();
+}
+
+function _updateNotifBanner(granted) {
+  var banner = document.getElementById('notif-perm-banner');
+  if (banner) banner.style.display = granted ? 'none' : 'flex';
+}
+
 function setupNativePush() {
   if (isDemo) return;
   if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
@@ -1248,9 +1274,25 @@ function setupNativePush() {
 
   createNotificationChannel();
 
-  Push.requestPermissions().then(function(result) {
-    if (result.receive === 'granted') { Push.register(); }
-  }).catch(function() { setTimeout(function() { Push.register(); }, 5000); });
+  var doRegister = function() {
+    Push.register().catch(function() {});
+    _updateNotifBanner(true);
+  };
+  var onDenied = function() { _updateNotifBanner(false); };
+
+  Push.checkPermissions().then(function(status) {
+    if (status.receive === 'granted') {
+      doRegister();
+    } else {
+      Push.requestPermissions().then(function(r) {
+        if (r.receive === 'granted') doRegister(); else onDenied();
+      }).catch(function() { doRegister(); });
+    }
+  }).catch(function() {
+    Push.requestPermissions().then(function(r) {
+      if (r.receive === 'granted') doRegister(); else onDenied();
+    }).catch(function() { doRegister(); });
+  });
 
   Push.addListener('registration', function(token) { saveNativeToken(token.value); });
   Push.addListener('registrationError', function() { setTimeout(function() { Push.register(); }, 15000); });
