@@ -1760,6 +1760,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Λειτουργία παραγγελίας',
     visBtnNote:    'Σημείωμα πελατών',
     secEvents:'Ενεργή Γιορτή', badgeEventsNone:'Καμία',
+    secTables:'Τραπέζια & QR Codes', taglineLabel:'Σύνθημα (κάτω από το όνομα)',
     secTheme:'Σχεδίαση', badgeTheme:'Design',
     secOrders:'Παραγγελίες',
     scDesign:'🎨 Σχεδίαση', scHero:'🖼️ Εικόνα', scInfos:'ℹ️ Πληροφορίες',
@@ -1866,6 +1867,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Mode commande',
     visBtnNote:    'Note clients',
     secEvents:'Fête active', badgeEventsNone:'Aucune',
+    secTables:'Tables & QR Codes', taglineLabel:'Slogan (sous le nom)',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Commandes',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -1972,6 +1974,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Order mode',
     visBtnNote:    'Customer note',
     secEvents:'Active Event', badgeEventsNone:'None',
+    secTables:'Tables & QR Codes', taglineLabel:'Tagline (below the name)',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Orders',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Info',
@@ -2078,6 +2081,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Bestellmodus',
     visBtnNote:    'Kunden-Notiz',
     secEvents:'Aktives Fest', badgeEventsNone:'Kein',
+    secTables:'Tische & QR-Codes', taglineLabel:'Slogan (unter dem Namen)',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Bestellungen',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -2184,6 +2188,7 @@ const ADMIN_UI = {
     visBtnOrder:   'وضع الطلب',
     visBtnNote:    'ملاحظة العملاء',
     secEvents:'الاحتفال النشط', badgeEventsNone:'لا شيء',
+    secTables:'الطاولات ورموز QR', taglineLabel:'شعار (تحت الاسم)',
     secTheme:'تصميم', badgeTheme:'Design',
     secOrders:'الطلبات',
     scDesign:'🎨 تصميم', scHero:'🖼️ الصورة', scInfos:'ℹ️ معلومات',
@@ -3315,6 +3320,13 @@ function applyAdminUI(l) {
   if (photosBtn2) photosBtn2.title = t.visBtnPhotos;
   const orderBtn2 = $('toggle-order-btn');
   if (orderBtn2) orderBtn2.title = t.visBtnOrder;
+  // Titre de la section Tables & QR codes
+  const secTabHd = $('sec-hd-tables');
+  if (secTabHd) {
+    const badgeTab = secTabHd.querySelector('.sec-badge');
+    secTabHd.textContent = (t.secTables || 'Tables & QR Codes') + ' ';
+    if (badgeTab) secTabHd.appendChild(badgeTab);
+  }
   // Titre de la section fêtes traduit
   const secEvHd = $('sec-hd-events');
   if (secEvHd) {
