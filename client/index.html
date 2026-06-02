@@ -6080,9 +6080,9 @@ function applyAdminData(data) {
   if (!data) return;
   try {
 
-    // Remplacer les catégories
+    // Remplacer les catégories — toujours vider, repeupler si présentes
+    CATS.length = 0;
     if (Array.isArray(data.cats) && data.cats.length > 0) {
-      CATS.length = 0;
       data.cats.forEach(c => {
         // Migration flipPhoto → flipPhotos (3 slots)
         const fp = c.flipPhotos || (c.flipPhoto ? [c.flipPhoto] : []);
@@ -6098,9 +6098,9 @@ function applyAdminData(data) {
       });
     }
 
-    // Remplacer les produits — normaliser chaque item pour éviter les crashes
+    // Remplacer les produits — toujours vider, repeupler si présents
+    ITEMS.length = 0;
     if (Array.isArray(data.items) && data.items.length > 0) {
-      ITEMS.length = 0;
       data.items.forEach(item => {
         if (!item) return;
         const n  = item.name      || {};
