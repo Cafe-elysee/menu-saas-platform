@@ -2106,15 +2106,14 @@ function loadClientData(client) {
     });
   }
 
-  checkStatus('https://menu-saas-platform.vercel.app/?rid=' + id).then(online => {
-    const dot = document.getElementById('status-'+id);
-    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(online ? 'online' : 'offline'); }
-  });
+  _saasDb.ref('restaurants/' + id + '/devices').once('value').then(snap => {
+    const devices = snap.val() || {};
+    const hasToken = Object.values(devices).some(d => d && d.token);
+    const dot = document.getElementById('status-' + id);
+    if (dot) { dot.classList.remove('online','offline'); dot.classList.add(hasToken ? 'online' : 'offline'); }
+  }).catch(() => {});
 }
 
-async function checkStatus(url) {
-  try { await fetch(url, {method:'GET',mode:'no-cors',cache:'no-store'}); return true; } catch { return false; }
-}
 
 // ════════════════════════════════════════════════════
 // WRITE HELPERS
