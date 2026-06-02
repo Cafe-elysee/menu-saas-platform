@@ -115,46 +115,67 @@ function buildBody(type, table, deviceLang, message) {
   return (BELL[deviceLang] || BELL.fr)(table);
 }
 
-async function sendFCM(projectId, accessToken, entries, restaurantId, restaurantName, table, lang, type, message) {
-  const ts = String(Date.now());
-  const results = await Promise.all(entries.map(async entry => {
-    const deviceLang = entry.lang || lang || 'fr';
-    const body_text  = buildBody(type, table, deviceLang, message);
-    const emoji      = type === 'order' ? '🧾' : '🔔';
-    const title_text = `${emoji} ${restaurantName}`;
-    const payload = JSON.stringify({
-      message: {
-        token: entry.token,
-        notification: { title: title_text, body: body_text },
-        data: {
-          restaurantId,
-          table: String(table),
-          lang:  deviceLang,
-          title: title_text,
-          body:  body_text,
-          type:  type || 'bell',
-          ts
-        },
-        android: { priority: 'high', notification: { channel_id: 'mp_srv_v3', notification_priority: 'PRIORITY_MAX', default_sound: true, default_vibrate_timings: true } },
-        apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', 'content-available': 1 } } },
-        webpush: { headers: { 'TTL': '86400', 'Urgency': 'high' } }
-      }
-    });
+async function sendOneFCM(projectId, accessToken, entry, payload, restaurantId, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const res = await httpsRequest(
         `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
         { method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } },
         payload
       );
-      console.log('FCM result:', res.status, entry.deviceId);
       if (res.status === 200) return 1;
       if ([404, 410].includes(res.status) || res.body?.error?.status === 'UNREGISTERED') {
         await deleteToken(projectId, accessToken, restaurantId, entry.deviceId);
+        return 0;
       }
-    } catch(e) { console.error('FCM error:', e.message); }
-    return 0;
-  }));
-  return { sent: results.reduce((a, b) => a + b, 0), total: entries.length };
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt < retries) await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+        continue;
+      }
+      return 0;
+    } catch(e) {
+      console.error('FCM error attempt', attempt, e.message);
+      if (attempt < retries) await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
+    }
+  }
+  return 0;
+}
+
+async function sendFCM(projectId, accessToken, entries, restaurantId, restaurantName, table, lang, type, message) {
+  const ts = String(Date.now());
+  // Limite de 8 appels FCM simultanés pour éviter le timeout Vercel
+  const CONCURRENCY = 8;
+  let sent = 0;
+  for (let i = 0; i < entries.length; i += CONCURRENCY) {
+    const batch = entries.slice(i, i + CONCURRENCY);
+    const results = await Promise.all(batch.map(async entry => {
+      const deviceLang = entry.lang || lang || 'fr';
+      const body_text  = buildBody(type, table, deviceLang, message);
+      const emoji      = type === 'order' ? '🧾' : '🔔';
+      const title_text = `${emoji} ${restaurantName}`;
+      const payload = JSON.stringify({
+        message: {
+          token: entry.token,
+          notification: { title: title_text, body: body_text },
+          data: {
+            restaurantId,
+            table: String(table),
+            lang:  deviceLang,
+            title: title_text,
+            body:  body_text,
+            type:  type || 'bell',
+            ts
+          },
+          android: { priority: 'high', notification: { channel_id: 'mp_srv_v3', notification_priority: 'PRIORITY_MAX', default_sound: true, default_vibrate_timings: true } },
+          apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', 'content-available': 1 } } },
+          webpush: { headers: { 'TTL': '86400', 'Urgency': 'high' } }
+        }
+      });
+      return sendOneFCM(projectId, accessToken, entry, payload, restaurantId);
+    }));
+    sent += results.reduce((a, b) => a + b, 0);
+  }
+  return { sent, total: entries.length };
 }
 
 module.exports = async (req, res) => {

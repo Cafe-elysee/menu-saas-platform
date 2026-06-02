@@ -6935,7 +6935,7 @@ async function confirmOrder() {
   btn.disabled = true;
   btn.textContent = t.cartSending || 'Envoi en cours…';
 
-  const orderId = Date.now();
+  const orderId = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
   const items   = cartItems.map(c => ({
     id: c.id,
     name: c.nameObj ? (c.nameObj.fr || c.nameObj[lang] || Object.values(c.nameObj)[0] || '') : (c.name || ''),

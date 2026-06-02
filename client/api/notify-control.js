@@ -114,18 +114,25 @@ module.exports = async (req, res) => {
           }
         }
       });
-      try {
-        const r = await httpsRequest(
-          `https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`,
-          { method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } },
-          payload
-        );
-        if (r.status === 200) {
-          sent++;
-        } else if ([404, 410].includes(r.status) || r.body?.error?.status === 'UNREGISTERED') {
-          await deleteToken(sa.project_id, accessToken, entry.deviceId);
+      let ok = false;
+      for (let attempt = 0; attempt <= 2 && !ok; attempt++) {
+        try {
+          const r = await httpsRequest(
+            `https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`,
+            { method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } },
+            payload
+          );
+          if (r.status === 200) { sent++; ok = true; }
+          else if ([404, 410].includes(r.status) || r.body?.error?.status === 'UNREGISTERED') {
+            await deleteToken(sa.project_id, accessToken, entry.deviceId); ok = true;
+          } else if (r.status === 429 || r.status >= 500) {
+            if (attempt < 2) await new Promise(res => setTimeout(res, 400 * (attempt + 1)));
+          } else { ok = true; }
+        } catch(e) {
+          console.error('FCM error attempt', attempt, e.message);
+          if (attempt < 2) await new Promise(res => setTimeout(res, 300 * (attempt + 1)));
         }
-      } catch(e) { console.error('FCM error:', e.message); }
+      }
     }
 
     res.status(200).json({ sent, total: entries.length });

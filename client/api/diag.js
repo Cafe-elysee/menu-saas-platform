@@ -31,8 +31,13 @@ async function getToken(sa) {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
+  // Sécurisation : token secret requis
+  const secret = process.env.DIAG_SECRET;
+  const provided = req.query.secret || req.headers['x-diag-secret'];
+  if (!secret || provided !== secret) {
+    res.status(403).json({ error: 'Forbidden' }); return;
+  }
   try {
     const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
     if (!raw) { res.status(200).json({ error: 'Aucune variable PLATFORM_SERVICE_ACCOUNT ni FIREBASE_SERVICE_ACCOUNT trouvée' }); return; }

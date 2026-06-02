@@ -1,10 +1,53 @@
 {
   "rules": {
     "restaurants": {
-      ".read": true,
-      ".write": true
+      "$rid": {
+        ".read": true,
+
+        "menu":    { ".write": true },
+        "profile": { ".write": true },
+        "config":  { ".write": true },
+        "logs":    { ".write": true },
+        "sessions":{ ".write": true },
+
+        "orders": {
+          ".write": true,
+          "$orderId": {
+            ".validate": "newData.hasChildren(['table','items','ts']) && newData.child('ts').isNumber()"
+          }
+        },
+
+        "calls": {
+          ".write": true,
+          "$callId": {
+            ".validate": "newData.hasChildren(['table','ts']) && newData.child('ts').isNumber()"
+          }
+        },
+
+        "devices": {
+          "$deviceId": {
+            ".write": true,
+            ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
+          }
+        }
+      }
     },
+
     "control": {
+      "fcm_tokens": {
+        "$deviceId": {
+          ".read": false,
+          ".write": true,
+          ".validate": "!newData.exists() || (newData.hasChildren(['token','ts']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber())"
+        }
+      },
+      "fcm_tokens_read": {
+        ".read": false,
+        ".write": false
+      }
+    },
+
+    "demoPage": {
       ".read": true,
       ".write": true
     }
