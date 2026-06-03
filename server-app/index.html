@@ -1409,10 +1409,12 @@ setInterval(function() { if (calls.length) renderCalls(); if (messages.length) r
 /* ── TABS ── */
 var TABS = ['calls', 'orders', 'messages', 'settings'];
 var currentTab = 'calls';
+var _tabDecided = false;
 
 function switchTab(tab) {
   nativeVibrate([30]);
   currentTab = tab;
+  if (tab !== 'settings') localStorage.setItem(_PFX + 'last_tab', tab);
   var idx = TABS.indexOf(tab);
   document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 100) + '%)';
   TABS.forEach(function(t) {
@@ -1455,7 +1457,28 @@ function startOrdersListener() {
     orders = snap.val() || {};
     renderOrders();
     updateOrdersTabBadge();
+    if (!_tabDecided) { _tabDecided = true; _applyInitialTab(); }
   });
+}
+
+function _applyInitialTab() {
+  _rref('/config/features').once('value').then(function(snap) {
+    var feat         = snap.val() || {};
+    var callEnabled  = feat.callBtn !== false;
+    var orderEnabled = feat.orderUI !== false;
+
+    var hasPendingCalls  = calls.some(function(c) { return c.status !== 'done'; });
+    var hasPendingOrders = Object.values(orders).some(function(o) { return o.status !== 'done'; });
+
+    var tab;
+    if      (hasPendingOrders)            tab = 'orders';
+    else if (hasPendingCalls)             tab = 'calls';
+    else if (orderEnabled)                tab = 'orders';
+    else if (callEnabled)                 tab = 'calls';
+    else                                  tab = localStorage.getItem(_PFX + 'last_tab') || 'calls';
+
+    if (tab !== currentTab) switchTab(tab);
+  }).catch(function() {});
 }
 
 function setOrderStatus(orderId, status) {
@@ -1661,10 +1684,6 @@ function init() {
     var elName = document.getElementById('settings-name');
     if (elRid)  elRid.textContent  = _RID;
     if (elName) elName.textContent = name !== _RID ? name : '';
-  }).catch(function() {});
-  // Optionnel : basculer sur l'onglet commandes si configuré
-  _rref('menu/info/showOrderUI').once('value').then(function(snap) {
-    if (snap.val()) switchTab('orders');
   }).catch(function() {});
 }
 
