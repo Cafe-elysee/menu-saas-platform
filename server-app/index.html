@@ -127,13 +127,13 @@
     }
     .header-sub { display:none; }
     .header-right { display:flex; align-items:center; gap:8px; }
-    .lang-wrap { display:flex; gap:3px; }
-    .lang-btn {
-      background:none; border:1px solid transparent;
-      color:var(--muted); font-size:0.65rem; font-weight:500;
-      padding:4px 7px; border-radius:8px; transition:var(--tr);
+    .lang-select {
+      background:rgba(200,164,78,0.09); border:1px solid var(--bord2);
+      color:var(--gold); font-size:0.72rem; font-weight:500;
+      padding:4px 8px; border-radius:8px; cursor:pointer; outline:none;
+      -webkit-appearance:none; appearance:none; min-width:44px; text-align:center;
     }
-    .lang-btn.on { border-color:var(--bord2); color:var(--gold); background:rgba(200,164,78,0.09); }
+    html.light .lang-select { background:rgba(200,164,78,0.14); }
     .conn-badge {
       display:flex; align-items:center; gap:5px;
       padding:5px 10px; border-radius:20px;
@@ -575,7 +575,7 @@
     <div class="header-sub" id="hdr-sub">Interface Serveur</div>
   </div>
   <div class="header-right">
-    <div class="lang-wrap" id="lang-wrap"></div>
+    <select id="lang-select" class="lang-select"></select>
     <button class="theme-btn" id="theme-btn" aria-label="Thème">
       <svg id="theme-ico"><use id="theme-ico-use" href="#i-moon"/></svg>
     </button>
@@ -1179,34 +1179,34 @@ function applyLang() {
   var notifBtn = document.querySelector('#notif-perm-banner button');
   if (notifTxt) notifTxt.textContent = t.notifBannerTxt;
   if (notifBtn) notifBtn.textContent = t.notifBannerBtn;
-  document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.toggle('on', b.dataset.l === lang); });
+  var _ls = document.getElementById('lang-select'); if (_ls) _ls.value = lang;
   renderCalls();
   renderOrders();
   renderMessages();
 }
 
 function buildLangBtns() {
-  var wrap = document.getElementById('lang-wrap');
-  wrap.innerHTML = '';
+  var sel = document.getElementById('lang-select');
+  sel.innerHTML = '';
   Object.keys(LANGS).forEach(function(l) {
     if (enabledLangs[l] === false) return;
-    var btn = document.createElement('button');
-    btn.className = 'lang-btn' + (l === lang ? ' on' : '');
-    btn.dataset.l = l;
-    btn.textContent = LANGS[l];
-    btn.addEventListener('click', function() {
-      lang = l;
-      localStorage.setItem(_PFX+'app_lang', l);
-      var deviceId = getDeviceId();
-      _rref('devices/' + deviceId + '/lang').set(l).catch(function() {});
-      applyLang();
-    });
-    wrap.appendChild(btn);
+    var opt = document.createElement('option');
+    opt.value = l;
+    opt.textContent = LANGS[l];
+    if (l === lang) opt.selected = true;
+    sel.appendChild(opt);
   });
+  sel.onchange = function() {
+    lang = sel.value;
+    localStorage.setItem(_PFX+'app_lang', lang);
+    _rref('devices/' + getDeviceId() + '/lang').set(lang).catch(function() {});
+    applyLang();
+  };
   if (enabledLangs[lang] === false) {
     var first = Object.keys(LANGS).find(function(l) { return enabledLangs[l] !== false; });
     if (first) {
       lang = first;
+      sel.value = lang;
       localStorage.setItem(_PFX+'app_lang', first);
       _rref('devices/' + getDeviceId() + '/lang').set(first).catch(function() {});
       applyLang();

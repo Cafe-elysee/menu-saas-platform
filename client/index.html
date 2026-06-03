@@ -5617,10 +5617,26 @@ function loadAdminData() {
   init_after_data();
 
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
+  // Appliquer le cache immédiatement pour éviter le décalage d'affichage
+  (function() {
+    const cached = localStorage.getItem(_RID + '_prof_name');
+    if (cached) {
+      _restaurantName = cached;
+      const heroTitle = document.getElementById('hero-title-text');
+      if (heroTitle) heroTitle.textContent = cached;
+      const ccName = document.getElementById('cc-name-wrap');
+      if (ccName) ccName.textContent = cached;
+      const preTitle = document.getElementById('pre-title');
+      if (preTitle) preTitle.textContent = cached;
+      const ftCr = document.getElementById('ft-cr');
+      if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + cached;
+    }
+  })();
   _rref('profile/name').once('value').then(snap => {
     const name = snap.val() || '';
     if (name) {
       _restaurantName = name;
+      localStorage.setItem(_RID + '_prof_name', name);
       const heroTitle = document.getElementById('hero-title-text');
       if (heroTitle) heroTitle.textContent = name;
       const ccName = document.getElementById('cc-name-wrap');
