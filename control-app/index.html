@@ -1659,8 +1659,7 @@ async function createNewClient() {
     document.getElementById('nc-form').style.display = 'none';
     document.getElementById('nc-result').classList.add('show');
 
-    // Recharger la liste des clients
-    loadClientsFromFirebase();
+    // Le listener Firebase existant détecte le nouveau client et reconstruit automatiquement
 
   } catch(e) {
     err.textContent = 'Erreur : ' + (e.message || e);
@@ -2021,18 +2020,20 @@ function askDeleteClient(slug, name) {
 function closeDelModal() {
   _deleteSlug = null;
   document.getElementById('del-modal').classList.remove('show');
+  const btn = document.getElementById('del-confirm-btn');
+  btn.textContent = 'Supprimer'; btn.disabled = false;
 }
 async function confirmDeleteClient() {
   if (!_deleteSlug) return;
+  const slug = _deleteSlug;
   const btn = document.getElementById('del-confirm-btn');
   btn.textContent = 'Suppression…'; btn.disabled = true;
   try {
-    await _saasDb.ref('restaurants/' + _deleteSlug).remove();
+    await _saasDb.ref('restaurants/' + slug).remove();
     closeDelModal();
-    // Retirer de CLIENTS et reconstruire
-    const idx = CLIENTS.findIndex(c => c.slug === _deleteSlug);
-    if (idx !== -1) CLIENTS.splice(idx, 1);
-    buildClientsTab();
+    // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
+    const cardEl = document.getElementById('card-' + slug.replace(/-/g,'_'));
+    if (cardEl) cardEl.remove();
   } catch(e) {
     btn.textContent = 'Supprimer'; btn.disabled = false;
     alert('Erreur : ' + e.message);
