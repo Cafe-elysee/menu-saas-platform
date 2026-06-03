@@ -1,33 +1,32 @@
 {
   "rules": {
     "restaurants": {
-      "$rid": {
-        ".read": true,
+      ".read": true,
 
-        "menu":    { ".write": true },
-        "profile": { ".write": true },
-        "config":  { ".write": true },
-        "logs":    { ".write": true },
-        "sessions":{ ".write": true },
+      "$rid": {
+        ".write": true,
+
+        "devices": {
+          "$deviceId": {
+            ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
+          }
+        },
 
         "orders": {
-          ".write": true,
           "$orderId": {
-            ".validate": "newData.hasChildren(['table','items','ts']) && newData.child('ts').isNumber()"
+            ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
         "calls": {
-          ".write": true,
           "$callId": {
-            ".validate": "newData.hasChildren(['table','ts']) && newData.child('ts').isNumber()"
+            ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
-        "devices": {
-          "$deviceId": {
-            ".write": true,
-            ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
+        "messages": {
+          "$msgId": {
+            ".validate": "!newData.exists() || (newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length < 500 && newData.child('ts').isNumber())"
           }
         }
       }
@@ -40,10 +39,6 @@
           ".write": true,
           ".validate": "!newData.exists() || (newData.hasChildren(['token','ts']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber())"
         }
-      },
-      "fcm_tokens_read": {
-        ".read": false,
-        ".write": false
       }
     },
 

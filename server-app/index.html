@@ -948,11 +948,16 @@ function loadMessages() {
 function startMessagesListener() {
   _rref('messages').on('value', function(snap) {
     var data = snap.val() || {};
+    var cutoff = Date.now() - 30 * 24 * 3600 * 1000; // 30 jours
+    var toDelete = {};
     var changed = false;
+
     Object.entries(data).forEach(function(entry) {
       var fbTs = parseInt(entry[0]);
       var fbMsg = entry[1];
       if (!fbTs || !fbMsg || !fbMsg.text) return;
+      // Supprimer les messages > 30 jours
+      if (fbTs < cutoff) { toDelete[entry[0]] = null; return; }
       var exists = messages.some(function(m) {
         var mTs = m.ts instanceof Date ? m.ts.getTime() : +m.ts;
         return Math.abs(mTs - fbTs) < 2000;
@@ -962,6 +967,12 @@ function startMessagesListener() {
         changed = true;
       }
     });
+
+    // Nettoyage Firebase des messages anciens
+    if (Object.keys(toDelete).length > 0) {
+      _rref('messages').update(toDelete).catch(function() {});
+    }
+
     if (changed) {
       messages.sort(function(a, b) {
         var at = a.ts instanceof Date ? a.ts.getTime() : +a.ts;

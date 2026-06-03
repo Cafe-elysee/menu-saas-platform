@@ -6959,7 +6959,7 @@ async function confirmOrder() {
     await _rref('orders/' + orderId).set(order);
 
     // Log commande
-    _rref('logs/orders/' + orderId).set({ ts: orderId, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
+    _rref('logs/orders/' + orderId).set({ ts, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
 
     // Historique local
     saveOrderToHistory(orderId, tableNum, items, total);
