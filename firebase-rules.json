@@ -28,6 +28,12 @@
           "$msgId": {
             ".validate": "!newData.exists() || (newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length < 500 && newData.child('ts').isNumber())"
           }
+        },
+
+        "analytics": {
+          "$dateKey": {
+            ".validate": "!newData.exists() || newData.child('createdAt').isNumber()"
+          }
         }
       }
     },

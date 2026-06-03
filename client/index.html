@@ -6929,6 +6929,11 @@ function promptTableNumber(t) {
   });
 }
 
+function _analyticsDay() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 async function confirmOrder() {
   if (isDemo) { showDemoAction(); return; }
   const t          = UI[lang];
@@ -6973,6 +6978,22 @@ async function confirmOrder() {
 
   try {
     await _rref('orders/' + orderId).set(order);
+
+    // Analytics agrégat — fire-and-forget, n'impacte pas le flux commande
+    try {
+      const _aDay = _analyticsDay();
+      const _aRef = _rref('analytics/' + _aDay);
+      _aRef.child('createdAt').transaction(v => v || ts);
+      if (!isTakeaway && /^\d+$/.test(String(tableNum))) {
+        _aRef.child('orders/' + String(tableNum)).transaction(v => (v||0) + 1);
+      }
+      items.forEach(it => {
+        _aRef.child('products/' + String(it.id)).transaction(cur => ({
+          qty: ((cur && cur.qty) || 0) + (it.qty || 1),
+          name: it.name || String(it.id)
+        }));
+      });
+    } catch(_) {}
 
     // Log commande
     _rref('logs/orders/' + orderId).set({ ts, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
@@ -8821,6 +8842,10 @@ function confirmTableCall() {
     const _callTs = Date.now();
     _rref('calls/lastCall').set({ table: String(num), ts: _callTs, lang: lang || 'fr' });
     _rref('calls/' + _callTs).set({ table: String(num), ts: _callTs, lang: lang || 'fr', status: 'received', createdAt: _callTs });
+    // Analytics agrégat — fire-and-forget
+    const _aDay = _analyticsDay();
+    _rref('analytics/' + _aDay + '/createdAt').transaction(v => v || _callTs);
+    _rref('analytics/' + _aDay + '/calls/' + String(num)).transaction(v => (v||0) + 1);
   } catch(e) {}
 
   // 3. Vercel Function → FCM — app fermée (notification push)

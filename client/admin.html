@@ -5910,8 +5910,8 @@ let _adminCurrentPeriod = 'week';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
 let _adminAllOrders     = {};
-let _adminCallsData     = {};
-let _adminCallsListener = null;
+let _analyticsData      = {};
+let _analyticsListener  = null;
 
 function switchAdminTab(tab) {
   _adminCurrentTab = tab;
@@ -5926,7 +5926,7 @@ function switchAdminTab(tab) {
   _updateScFabVisibility();
   if (isOrders) {
     if (!ordersListener) startOrdersListener();
-    startAdminCallsListener();
+    startAnalyticsListener();
     requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
   }
 }
@@ -5980,30 +5980,31 @@ function computeAnalytics() {
   const [from, to] = _getAnalyticsPeriod();
   const ordersByTable = {}, callsByTable = {}, productsSold = {};
 
-  Object.values(_adminAllOrders).forEach(o => {
-    const ts = o.createdAt || o.ts || 0;
-    if (ts < from || ts > to) return;
-    const tbl = o.tableNum && /^[1-9]\d*$/.test(String(o.tableNum)) ? String(o.tableNum) : null;
-    if (tbl) ordersByTable[tbl] = (ordersByTable[tbl] || 0) + 1;
-    (o.items || []).forEach(it => {
-      const k = String(it.id ?? it.name ?? '?');
-      if (!productsSold[k]) {
-        const live = adminData?.items?.find(i => i.id == it.id);
-        const nm = live ? (live.name?.[currentLang] || live.name?.fr || it.name || k) : (it.name || k);
-        productsSold[k] = { name: nm, qty: 0 };
-      }
-      productsSold[k].qty += (it.qty || 1);
+  Object.entries(_analyticsData).forEach(([dateKey, day]) => {
+    if (!day || typeof day !== 'object') return;
+    const dayTs = day.createdAt || new Date(dateKey + 'T00:00:00').getTime();
+    // Exclure si la journée entière est hors période
+    if ((dayTs + 86400000) < from || dayTs > to) return;
+
+    if (day.orders) Object.entries(day.orders).forEach(([tbl, cnt]) => {
+      if (/^[1-9]\d*$/.test(tbl)) ordersByTable[tbl] = (ordersByTable[tbl]||0) + (cnt||0);
+    });
+    if (day.calls) Object.entries(day.calls).forEach(([tbl, cnt]) => {
+      if (/^[1-9]\d*$/.test(tbl)) callsByTable[tbl] = (callsByTable[tbl]||0) + (cnt||0);
+    });
+    if (day.products) Object.entries(day.products).forEach(([id, data]) => {
+      const qty  = typeof data === 'object' ? (data.qty || 0) : (data || 0);
+      const sNm  = typeof data === 'object' ? (data.name || null) : null;
+      const live = adminData?.items?.find(i => String(i.id) === String(id));
+      const nm   = live
+        ? (live.name?.[currentLang] || live.name?.fr || sNm || id)
+        : (sNm || ('Produit #' + id));
+      if (!productsSold[id]) productsSold[id] = { name: nm, qty: 0 };
+      productsSold[id].qty += qty;
     });
   });
 
-  Object.values(_adminCallsData).forEach(c => {
-    const ts = c.ts || 0;
-    if (ts < from || ts > to) return;
-    const tbl = String(c.table || '');
-    if (/^[1-9]\d*$/.test(tbl)) callsByTable[tbl] = (callsByTable[tbl] || 0) + 1;
-  });
-
-  const top10 = arr => arr.sort((a,b) => b.value - a.value).slice(0, 10);
+  const top10 = arr => arr.sort((a,b) => b.value - a.value).slice(0,10);
   return {
     ordersByTable: top10(Object.entries(ordersByTable).map(([l,v]) => ({label:l, value:v}))),
     callsByTable:  top10(Object.entries(callsByTable).map(([l,v])  => ({label:l, value:v}))),
@@ -6122,15 +6123,52 @@ function updateAnalytics() {
 }
 
 /* ── Listener appels pour analytics ── */
-function startAdminCallsListener() {
-  if (_adminCallsListener) return;
-  _adminCallsListener = _rref('calls').on('value', snap => {
-    const raw = snap.val() || {};
-    _adminCallsData = {};
-    Object.entries(raw).forEach(([id, c]) => {
-      if (id !== 'lastCall' && c && c.ts) _adminCallsData[id] = c;
-    });
+function startAnalyticsListener() {
+  if (_analyticsListener) return;
+  _analyticsListener = _rref('analytics').on('value', snap => {
+    _analyticsData = snap.val() || {};
+    _cleanupOldAnalytics();
     if (_adminCurrentTab === 'orders') updateAnalytics();
+  }, () => {
+    // Erreur lecture (ex: pas de données) — ne rien faire
+    if (_adminCurrentTab === 'orders') updateAnalytics();
+  });
+  // Backfill one-time : agréger les commandes existantes qui n'ont pas encore d'agrégat
+  _rref('analytics').once('value').then(snap => {
+    _backfillAnalyticsFromOrders(snap.val() || {});
+  }).catch(() => {});
+}
+
+function _cleanupOldAnalytics() {
+  const cutoff = Date.now() - 365 * 86400000;
+  const toDelete = {};
+  Object.entries(_analyticsData).forEach(([k, day]) => {
+    const ts = (day && day.createdAt) || new Date(k + 'T00:00:00').getTime();
+    if (ts < cutoff) { toDelete[k] = null; delete _analyticsData[k]; }
+  });
+  if (Object.keys(toDelete).length) _rref('analytics').update(toDelete).catch(() => {});
+}
+
+function _backfillAnalyticsFromOrders(existing) {
+  // Pour chaque commande brute qui n'a pas encore d'agrégat, créer l'agrégat
+  const pending = {};
+  Object.values(_adminAllOrders).forEach(o => {
+    if (!o.createdAt) return;
+    const d = new Date(o.createdAt);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (existing[key]) return; // déjà agrégé
+    if (!pending[key]) pending[key] = { createdAt: new Date(key + 'T00:00:00').getTime(), orders: {}, products: {} };
+    const tbl = String(o.tableNum || '');
+    if (/^[1-9]d*$/.test(tbl)) pending[key].orders[tbl] = (pending[key].orders[tbl] || 0) + 1;
+    (o.items || []).forEach(it => {
+      const id = String(it.id ?? '?');
+      if (!pending[key].products[id]) pending[key].products[id] = { qty: 0, name: it.name || id };
+      pending[key].products[id].qty += (it.qty || 1);
+    });
+  });
+  if (!Object.keys(pending).length) return;
+  Object.entries(pending).forEach(([k, data]) => {
+    _rref('analytics/' + k).update(data).catch(() => {});
   });
 }
 
