@@ -1015,73 +1015,6 @@
       <div class="clients-list" id="clients-list"></div>
     </div>
 
-    <!-- MODAL CONFIRMATION SUPPRESSION -->
-    <div id="del-modal" onclick="if(event.target===this)closeDelModal()">
-      <div class="del-box">
-        <div class="del-icon">🗑️</div>
-        <div class="del-title">Supprimer le client</div>
-        <div class="del-warn"><span class="del-name" id="del-client-name"></span><br>Toutes les données (menu, commandes, config) seront supprimées définitivement.</div>
-        <div class="del-actions">
-          <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
-          <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL NOUVEAU CLIENT -->
-    <div id="nc-modal" onclick="if(event.target===this)closeNewClientModal()">
-      <div class="nc-box">
-        <div class="nc-title">Nouveau client</div>
-        <div class="nc-sub">Création automatique Firebase</div>
-
-        <div id="nc-form">
-          <label class="nc-label">Nom du restaurant *</label>
-          <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran" oninput="ncAutoRid(this.value)">
-
-          <label class="nc-label">ID unique du restaurant</label>
-          <input type="text" id="nc-rid" class="nc-input" placeholder="ex: cafe-oran">
-          <div class="nc-rid-hint">Généré automatiquement — tu peux le modifier</div>
-
-          <label class="nc-label">Mot de passe admin *</label>
-          <input type="password" id="nc-pwd" class="nc-input" placeholder="Minimum 6 caractères">
-
-          <div class="nc-err" id="nc-err"></div>
-
-          <div class="nc-actions">
-            <button class="nc-btn-cancel" onclick="closeNewClientModal()">Annuler</button>
-            <button class="nc-btn-create" id="nc-create-btn" onclick="createNewClient()">Créer le client</button>
-          </div>
-        </div>
-
-        <div class="nc-result" id="nc-result">
-          <div class="nc-result-title">✓ Client créé avec succès !</div>
-
-          <div class="nc-link-row">
-            <div class="nc-link-label">Lien Admin — à donner au client</div>
-            <div class="nc-link-val" id="nc-admin-url"></div>
-            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-admin-url','Copier')">Copier</button>
-          </div>
-
-          <div class="nc-link-row">
-            <div class="nc-link-label">App Serveur — ID à entrer au 1er lancement</div>
-            <div class="nc-link-val" id="nc-rid-val"></div>
-            <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier l\'ID')">Copier l'ID</button>
-          </div>
-
-          <div class="nc-link-row">
-            <div class="nc-link-label">Instructions pour le staff</div>
-            <div class="nc-instructions">
-              1. Installer <strong>MenuProServeur-v1.0.apk</strong> (Drive)<br>
-              2. Au premier lancement : entrer l'ID <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
-              3. Le menu admin : ouvrir le lien ci-dessus
-            </div>
-          </div>
-
-          <button class="nc-btn-create" style="width:100%;margin-top:16px" onclick="closeNewClientModal()">Fermer</button>
-        </div>
-      </div>
-    </div>
-
     <!-- TAB RÉGLAGES -->
     <div class="tab-pane" id="pane-reglages">
       <div class="section-title">Réglages</div>
@@ -1204,6 +1137,71 @@
 </div>
 
 <!-- ══════════════ MODALS ══════════════ -->
+
+<div id="del-modal" onclick="if(event.target===this)closeDelModal()">
+  <div class="del-box">
+    <div class="del-icon">🗑️</div>
+    <div class="del-title">Supprimer le client</div>
+    <div class="del-warn"><span class="del-name" id="del-client-name"></span><br>Toutes les données (menu, commandes, config) seront supprimées définitivement.</div>
+    <div class="del-actions">
+      <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
+      <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div id="nc-modal" onclick="if(event.target===this)closeNewClientModal()">
+  <div class="nc-box">
+    <div class="nc-title">Nouveau client</div>
+    <div class="nc-sub">Création automatique Firebase</div>
+
+    <div id="nc-form">
+      <label class="nc-label">Nom du restaurant *</label>
+      <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran" oninput="ncAutoRid(this.value)">
+
+      <label class="nc-label">ID unique du restaurant</label>
+      <input type="text" id="nc-rid" class="nc-input" placeholder="ex: cafe-oran">
+      <div class="nc-rid-hint">Généré automatiquement — tu peux le modifier</div>
+
+      <label class="nc-label">Mot de passe admin *</label>
+      <input type="password" id="nc-pwd" class="nc-input" placeholder="Minimum 6 caractères">
+
+      <div class="nc-err" id="nc-err"></div>
+
+      <div class="nc-actions">
+        <button class="nc-btn-cancel" onclick="closeNewClientModal()">Annuler</button>
+        <button class="nc-btn-create" id="nc-create-btn" onclick="createNewClient()">Créer le client</button>
+      </div>
+    </div>
+
+    <div class="nc-result" id="nc-result">
+      <div class="nc-result-title">✓ Client créé avec succès !</div>
+
+      <div class="nc-link-row">
+        <div class="nc-link-label">Lien Admin — à donner au client</div>
+        <div class="nc-link-val" id="nc-admin-url"></div>
+        <button class="nc-copy-btn" onclick="ncCopy(this,'nc-admin-url','Copier')">Copier</button>
+      </div>
+
+      <div class="nc-link-row">
+        <div class="nc-link-label">App Serveur — ID à entrer au 1er lancement</div>
+        <div class="nc-link-val" id="nc-rid-val"></div>
+        <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier l\'ID')">Copier l'ID</button>
+      </div>
+
+      <div class="nc-link-row">
+        <div class="nc-link-label">Instructions pour le staff</div>
+        <div class="nc-instructions">
+          1. Installer <strong>MenuProServeur-v1.0.apk</strong> (Drive)<br>
+          2. Au premier lancement : entrer l'ID <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
+          3. Le menu admin : ouvrir le lien ci-dessus
+        </div>
+      </div>
+
+      <button class="nc-btn-create" style="width:100%;margin-top:16px" onclick="closeNewClientModal()">Fermer</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="retention-modal">
   <div class="modal-box">
