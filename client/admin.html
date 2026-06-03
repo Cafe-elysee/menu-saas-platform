@@ -3583,6 +3583,7 @@ function setGlobalLang(l) {
   renderThemeSelector();
   renderEventsChips();
   if (_lastAdminOrders.length) renderOrdersAdmin(_lastAdminOrders);
+  if (_adminCurrentTab === 'orders') updateAnalytics();
 }
 
 function switchInfoLang(l) {
