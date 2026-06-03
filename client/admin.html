@@ -1780,6 +1780,7 @@ const ADMIN_UI = {
     notifSending:  'Αποστολή…',
     notifOk:       '✓ Ειδοποίηση στάλθηκε σε {n} συσκευή(ές)',
     notifNoToken:  '⚠ Καμία συνδεδεμένη συσκευή',
+    notifSaved:    '✓ Μήνυμα αποθηκεύτηκε — ορατό στην επόμενη εκκίνηση',
     notifErrSrv:   '✗ Σφάλμα διακομιστή: {e}',
     notifErrNet:   '✗ Σφάλμα δικτύου: {e}',
     showInMenu:    'Εμφάνιση στο μενού',
@@ -1887,6 +1888,7 @@ const ADMIN_UI = {
     notifSending:  'Envoi…',
     notifOk:       '✓ Notification envoyée à {n} appareil(s)',
     notifNoToken:  '⚠ Aucun appareil connecté',
+    notifSaved:    '✓ Message enregistré — visible au prochain lancement de l\'app serveur',
     notifErrSrv:   '✗ Erreur serveur : {e}',
     notifErrNet:   '✗ Erreur réseau : {e}',
     showInMenu:    'Afficher dans le menu',
@@ -1994,6 +1996,7 @@ const ADMIN_UI = {
     notifSending:  'Sending…',
     notifOk:       '✓ Notification sent to {n} device(s)',
     notifNoToken:  '⚠ No connected devices',
+    notifSaved:    '✓ Message saved — visible on next server app launch',
     notifErrSrv:   '✗ Server error: {e}',
     notifErrNet:   '✗ Network error: {e}',
     showInMenu:    'Show in menu',
@@ -2101,6 +2104,7 @@ const ADMIN_UI = {
     notifSending:  'Wird gesendet…',
     notifOk:       '✓ Benachrichtigung an {n} Gerät(e) gesendet',
     notifNoToken:  '⚠ Keine verbundenen Geräte',
+    notifSaved:    '✓ Nachricht gespeichert — beim nächsten Start sichtbar',
     notifErrSrv:   '✗ Serverfehler: {e}',
     notifErrNet:   '✗ Netzwerkfehler: {e}',
     showInMenu:    'Im Menü anzeigen',
@@ -2208,6 +2212,7 @@ const ADMIN_UI = {
     notifSending:  'جارٍ الإرسال…',
     notifOk:       '✓ تم الإرسال إلى {n} جهاز(أجهزة)',
     notifNoToken:  '⚠ لا توجد أجهزة متصلة',
+    notifSaved:    '✓ تم حفظ الرسالة — ستظهر عند الإطلاق التالي',
     notifErrSrv:   '✗ خطأ في الخادم: {e}',
     notifErrNet:   '✗ خطأ في الشبكة: {e}',
     showInMenu:    'عرض في القائمة',
@@ -3055,7 +3060,12 @@ function setupNotifFab() {
       } else if (data.error) {
         showToastMsg((tn.notifErrSrv || '').replace('{e}', data.error), true);
       } else if (data.reason === 'no_tokens') {
-        showToastMsg(tn.notifNoToken, true);
+        if (data.saved) {
+          closeModal();
+          showToastMsg(tn.notifSaved || '✓ Message enregistré');
+        } else {
+          showToastMsg(tn.notifNoToken, true);
+        }
       } else {
         showToastMsg('⚠ ' + JSON.stringify(data), true);
       }

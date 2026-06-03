@@ -93,6 +93,18 @@ async function logNotification(projectId, accessToken, restaurantId, logEntry) {
   } catch(e) { console.warn('Log error:', e.message); }
 }
 
+// ── Sauvegarde un message admin dans Firebase (historique persistant) ──
+async function saveMessageToFirebase(projectId, accessToken, restaurantId, message, ts, lang) {
+  try {
+    const body = JSON.stringify({ text: message, ts, lang: lang || 'fr' });
+    const url = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/restaurants/${restaurantId}/messages/${ts}.json?access_token=${accessToken}`;
+    await httpsRequest(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+    }, body);
+  } catch(e) { console.warn('Save message error:', e.message); }
+}
+
 // ── Supprime un token invalide ──
 async function deleteToken(projectId, accessToken, restaurantId, deviceId) {
   try {
@@ -199,20 +211,29 @@ module.exports = async (req, res) => {
 
     const sa           = JSON.parse(process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT);
     const accessToken  = await getAccessToken(sa);
+    const ts           = Date.now();
+
+    // Messages admin : toujours sauvegarder dans Firebase (historique même sans app connectée)
+    if (type === 'message' && message) {
+      await saveMessageToFirebase(sa.project_id, accessToken, restaurantId, message, ts, lang);
+    }
+
     const entries      = await getFCMEntries(sa.project_id, accessToken, restaurantId);
     const restaurantName = await getRestaurantName(sa.project_id, accessToken, restaurantId);
 
     console.log(`Tokens found: ${entries.length} for ${restaurantId}`);
 
     if (entries.length === 0) {
-      res.status(200).json({ sent: 0, reason: 'no_tokens' }); return;
+      const saved = type === 'message' && !!message;
+      res.status(200).json({ sent: 0, reason: 'no_tokens', saved }); return;
     }
 
     const result = await sendFCM(sa.project_id, accessToken, entries, restaurantId, restaurantName, table, lang, type || 'bell', message || null);
 
     // Log
-    await logNotification(sa.project_id, accessToken, restaurantId, { ts: Date.now(), table, type: type || 'bell', sent: result.sent });
+    await logNotification(sa.project_id, accessToken, restaurantId, { ts, table, type: type || 'bell', sent: result.sent });
 
+    if (type === 'message' && message) result.saved = true;
     console.log('Result:', JSON.stringify(result));
     res.status(200).json(result);
 

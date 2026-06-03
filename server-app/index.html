@@ -945,6 +945,37 @@ function loadMessages() {
   } catch(_) { messages = []; }
 }
 
+function startMessagesListener() {
+  _rref('messages').on('value', function(snap) {
+    var data = snap.val() || {};
+    var changed = false;
+    Object.entries(data).forEach(function(entry) {
+      var fbTs = parseInt(entry[0]);
+      var fbMsg = entry[1];
+      if (!fbTs || !fbMsg || !fbMsg.text) return;
+      var exists = messages.some(function(m) {
+        var mTs = m.ts instanceof Date ? m.ts.getTime() : +m.ts;
+        return Math.abs(mTs - fbTs) < 2000;
+      });
+      if (!exists) {
+        messages.unshift({ id: fbTs, text: fbMsg.text, ts: new Date(fbTs), read: false });
+        changed = true;
+      }
+    });
+    if (changed) {
+      messages.sort(function(a, b) {
+        var at = a.ts instanceof Date ? a.ts.getTime() : +a.ts;
+        var bt = b.ts instanceof Date ? b.ts.getTime() : +b.ts;
+        return bt - at;
+      });
+      if (messages.length > 100) messages.length = 100;
+      saveMessages();
+      renderMessages();
+      updateMessagesBadge();
+    }
+  });
+}
+
 /* ── RECEIVE CALL ── */
 function receiveCall(table, ts) {
   playRing();
@@ -1653,6 +1684,7 @@ function init() {
 
   loadCalls();
   loadMessages();
+  startMessagesListener();
   buildLangBtns();
   _rref('menu/items').once('value').then(function(snap) {
     var raw = snap.val();
