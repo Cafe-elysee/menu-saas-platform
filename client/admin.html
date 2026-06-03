@@ -1435,6 +1435,7 @@
   <button id="sc-cats-btn"   onclick="scGo('sec-cats')">📂 Catégories</button>
   <button id="sc-prods-btn"  onclick="scGo('sec-produits')">🍽️ Produits</button>
   <button id="sc-orders-btn" onclick="scGo('orders-admin-section')" style="display:none">🧾 Commandes</button>
+  <button id="sc-tables-btn" onclick="scGo('tables-admin-section')" style="display:none">🪑 Tables & QR</button>
 </div>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
@@ -1764,7 +1765,7 @@ const ADMIN_UI = {
     secTheme:'Σχεδίαση', badgeTheme:'Design',
     secOrders:'Παραγγελίες',
     scDesign:'🎨 Σχεδίαση', scHero:'🖼️ Εικόνα', scInfos:'ℹ️ Πληροφορίες',
-    scNote:'📢 Σημείωμα', scCats:'📂 Κατηγορίες', scProds:'🍽️ Προϊόντα', scOrders:'🧾 Παραγγελίες',
+    scNote:'📢 Σημείωμα', scCats:'📂 Κατηγορίες', scProds:'🍽️ Προϊόντα', scOrders:'🧾 Παραγγελίες', scTables:'🪑 Τραπέζια & QR',
     modePaper:'📄 Κατάλογος', modePhoto:'🖼️ Φωτογραφίες', modeSonet:'🔔 Σερβιτόρος', modeOrder:'🛒 Παραγγελίες',
     modePaperShort:'Κατάλογος', modePhotoShort:'Φωτογραφίες', modeSonetShort:'Σερβιτόρος', modeOrderShort:'Παραγγελίες',
     catPhotosLabel:'📄 Κατάλογος',
@@ -1872,7 +1873,7 @@ const ADMIN_UI = {
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Commandes',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
-    scNote:'📢 Note', scCats:'📂 Catégories', scProds:'🍽️ Produits', scOrders:'🧾 Commandes',
+    scNote:'📢 Note', scCats:'📂 Catégories', scProds:'🍽️ Produits', scOrders:'🧾 Commandes', scTables:'🪑 Tables & QR',
     modePaper:'📄 Style Papier', modePhoto:'🖼️ Style Dynamique', modeSonet:'🔔 Mode Sonnette', modeOrder:'🛒 Mode Commande',
     modePaperShort:'Papier', modePhotoShort:'Dynamique', modeSonetShort:'Sonnette', modeOrderShort:'Commande',
     catPhotosLabel:'📄 Style Papier',
@@ -1980,7 +1981,7 @@ const ADMIN_UI = {
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Orders',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Info',
-    scNote:'📢 Note', scCats:'📂 Categories', scProds:'🍽️ Products', scOrders:'🧾 Orders',
+    scNote:'📢 Note', scCats:'📂 Categories', scProds:'🍽️ Products', scOrders:'🧾 Orders', scTables:'🪑 Tables & QR',
     modePaper:'📄 Print mode', modePhoto:'🖼️ Dynamic Style', modeSonet:'🔔 Waiter mode', modeOrder:'🛒 Order mode',
     modePaperShort:'Print', modePhotoShort:'Dynamic', modeSonetShort:'Waiter', modeOrderShort:'Order',
     catPhotosLabel:'📄 Print mode',
@@ -2088,7 +2089,7 @@ const ADMIN_UI = {
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Bestellungen',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
-    scNote:'📢 Notiz', scCats:'📂 Kategorien', scProds:'🍽️ Produkte', scOrders:'🧾 Bestellungen',
+    scNote:'📢 Notiz', scCats:'📂 Kategorien', scProds:'🍽️ Produkte', scOrders:'🧾 Bestellungen', scTables:'🪑 Tische & QR',
     modePaper:'📄 Druckmodus', modePhoto:'🖼️ Dynamischer Stil', modeSonet:'🔔 Kellnermodus', modeOrder:'🛒 Bestellmodus',
     modePaperShort:'Druck', modePhotoShort:'Dynamisch', modeSonetShort:'Kellner', modeOrderShort:'Bestell.',
     catPhotosLabel:'📄 Druckmodus',
@@ -2196,7 +2197,7 @@ const ADMIN_UI = {
     secTheme:'تصميم', badgeTheme:'Design',
     secOrders:'الطلبات',
     scDesign:'🎨 تصميم', scHero:'🖼️ الصورة', scInfos:'ℹ️ معلومات',
-    scNote:'📢 ملاحظة', scCats:'📂 الفئات', scProds:'🍽️ المنتجات', scOrders:'🧾 الطلبات',
+    scNote:'📢 ملاحظة', scCats:'📂 الفئات', scProds:'🍽️ المنتجات', scOrders:'🧾 الطلبات', scTables:'🪑 الطاولات & QR',
     modePaper:'📄 وضع الورق', modePhoto:'🖼️ وضع الصور', modeSonet:'🔔 وضع النادل', modeOrder:'🛒 وضع الطلب',
     modePaperShort:'ورق', modePhotoShort:'صور', modeSonetShort:'نادل', modeOrderShort:'طلب',
     catPhotosLabel:'📄 وضع الورق',
@@ -3285,7 +3286,7 @@ function applyAdminUI(l) {
   });
 
   // Shortcut buttons
-  const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders' };
+  const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders','sc-tables-btn':'scTables' };
   Object.entries(scMap).forEach(([id, key]) => { const el = $(id); if (el) el.textContent = t[key] || el.textContent; });
 
   // Theme section title + badge
@@ -5418,6 +5419,8 @@ function syncStyleAdminUI(mode) {
   if (tablesSection) tablesSection.style.display = (showOrder && _featOk('tableSystem')) ? 'block' : 'none';
   const scOrdersBtn = document.getElementById('sc-orders-btn');
   if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
+  const scTablesBtn = document.getElementById('sc-tables-btn');
+  if (scTablesBtn) scTablesBtn.style.display = (showOrder && _featOk('tableSystem')) ? '' : 'none';
 
   // Toggles : toujours affichés (sous réserve de la licence)
   const callBtn   = document.getElementById('toggle-call-btn');
