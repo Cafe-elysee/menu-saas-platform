@@ -6935,14 +6935,15 @@ async function confirmOrder() {
   btn.disabled = true;
   btn.textContent = t.cartSending || 'Envoi en cours…';
 
-  const orderId = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  const ts      = Date.now();
+  const orderId = ts + '_' + Math.random().toString(36).slice(2, 7);
   const items   = cartItems.map(c => ({
     id: c.id,
     name: c.nameObj ? (c.nameObj.fr || c.nameObj[lang] || Object.values(c.nameObj)[0] || '') : (c.name || ''),
     price: c.price, qty: c.qty
   }));
   const total   = getCartTotal().toFixed(2) + ' €';
-  const order   = { tableNum, items, total, status: 'pending', createdAt: orderId };
+  const order   = { tableNum, table: isTakeaway ? 'takeaway' : String(tableNum), ts, items, total, status: 'pending', createdAt: ts };
 
   // Notification push envoyée AVANT et INDEPENDAMMENT de Firebase
   // keepalive:true garantit que la requête aboutit même si la page est fermée ou naviguée
