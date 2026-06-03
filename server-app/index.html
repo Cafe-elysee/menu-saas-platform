@@ -713,7 +713,7 @@ const T = {
     settingsBtnChange:'🔄 Αλλαγή εστιατορίου', settingsChangeDesc:'Διαγράφει την τρέχουσα σύνδεση και ζητά νέο αναγνωριστικό εστιατορίου.',
     settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
     settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → Menu Pro → Μπαταρία → Χωρίς περιορισμούς',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Επαναεγγραφή FCM',
+    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Επαναεγγραφή FCM', settingsFcmNoToken:'❌ Κανένα token FCM',
     notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.',
   },
   fr: {
@@ -731,7 +731,7 @@ const T = {
     settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.',
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
     settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-enregistrer FCM',
+    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-enregistrer FCM', settingsFcmNoToken:'❌ Pas de token FCM',
     notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer',
   },
   en: {
@@ -749,7 +749,7 @@ const T = {
     settingsBtnChange:'🔄 Change restaurant', settingsChangeDesc:'Removes the current connection and asks for a new restaurant ID.',
     settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
     settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → Menu Pro Server → Battery → No restrictions',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-register FCM',
+    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-register FCM', settingsFcmNoToken:'❌ No FCM token',
     notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable',
   },
   de: {
@@ -767,7 +767,7 @@ const T = {
     settingsBtnChange:'🔄 Restaurant wechseln', settingsChangeDesc:'Löscht die aktuelle Verbindung und fordert eine neue Restaurant-ID an.',
     settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
     settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → Menu Pro Server → Akku → Keine Einschränkungen',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 FCM neu registrieren',
+    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 FCM neu registrieren', settingsFcmNoToken:'❌ Kein FCM-Token',
     notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren',
   },
   ar: {
@@ -785,7 +785,7 @@ const T = {
     settingsBtnChange:'🔄 تغيير المطعم', settingsChangeDesc:'يحذف الاتصال الحالي ويطلب معرّفاً جديداً للمطعم.',
     settingsChangeConfirm:'تغيير المطعم؟\nسيتم حذف الاتصال الحالي.',
     settingsNotifTitle:'الإشعارات في الخلفية', settingsNotifDesc:'لاستقبال الإشعارات عند إغلاق التطبيق:\nالإعدادات ← التطبيقات ← Menu Pro ← البطارية ← بلا قيود',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 إعادة تسجيل FCM',
+    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 إعادة تسجيل FCM', settingsFcmNoToken:'❌ لا يوجد رمز FCM',
     notifBannerTxt:'الإشعارات معطّلة — اضغط للتفعيل', notifBannerBtn:'تفعيل',
   }
 };
@@ -1027,7 +1027,7 @@ function renderCalls() {
     el.dataset.id = String(c.id);
     el.innerHTML =
       '<div class="call-badge">' +
-        '<div class="call-badge-lbl">Table</div>' +
+        '<div class="call-badge-lbl">' + t.ordTable + '</div>' +
         '<div class="call-badge-num">' + escapeHtml(c.table) + '</div>' +
       '</div>' +
       '<div class="call-meta">' +
@@ -1304,7 +1304,7 @@ function _updateFcmStatus(msg, color) {
     el.textContent = '✅ ' + tok.substring(0, 14) + '… (' + ago + ')';
     el.style.color = '#4caf50';
   } else {
-    el.textContent = '❌ Pas de token FCM';
+    el.textContent = (T[lang] || T.fr).settingsFcmNoToken;
     el.style.color = '#e74c3c';
   }
 }
