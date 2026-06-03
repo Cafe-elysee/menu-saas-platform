@@ -595,8 +595,7 @@
     .sec-body-inner { padding:16px 16px 18px; transition:padding 0.25s ease; }
     .adm-section.collapsed .sec-body-inner { padding-top:0; padding-bottom:0; }
 
-    /* ── TABLES ── */
-    #tables-admin-section { display:none; }
+    /* ── TABLES (visibility managed by tab panel) ── */
     .tables-count-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
     .tables-count-input { width:72px; padding:8px 12px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); color:var(--cream); font-family:'Outfit',inherit; font-size:1rem; font-weight:600; text-align:center; }
     .tables-count-btn { padding:8px 18px; border-radius:10px; border:none; background:var(--gold); color:#0c0a08; font-family:'Outfit',inherit; font-size:0.85rem; font-weight:700; cursor:pointer; }
@@ -1019,8 +1018,7 @@
     html.light .adm-sel-popup { background:rgba(253,246,237,0.95); }
     html.light .adm-sel-popup button { color:var(--cream); }
     html.light .adm-sel-popup button:hover { background:rgba(168,104,64,0.1); }
-    /* ── Panneau Commandes ── */
-    #orders-admin-section { display:none; }
+    /* ── Panneau Commandes (visibility managed by tab panel) ── */
     /* En mode papier : cacher toute la section photo des produits (upload, preview, label, toggle) */
     body[data-style="paper"] .photo-form-group { display:none !important; }
     /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
@@ -1341,6 +1339,98 @@
     font-family: 'Outfit', sans-serif; letter-spacing: 0.03em;
   }
   body.demo-mode #demo-banner { display: block; }
+
+  /* ── ADMIN ONGLETS ── */
+  #admin-tabs-bar {
+    display:flex; gap:0; margin:0 0 20px;
+    border-radius:14px; overflow:hidden;
+    border:1.5px solid var(--border); background:var(--bg);
+    position:sticky; top:60px; z-index:90;
+  }
+  html.light #admin-tabs-bar { background:var(--bg2); }
+  @media(max-width:599px) { #admin-tabs-bar { top:52px; } }
+  .admin-tab-btn {
+    flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+    padding:12px 10px; background:none; border:none;
+    color:var(--muted); font-family:inherit; font-size:0.8rem; font-weight:600;
+    cursor:pointer; transition:all 0.2s; letter-spacing:0.02em; line-height:1.2;
+  }
+  .admin-tab-btn:hover { color:var(--gold); background:rgba(200,164,78,0.06); }
+  .admin-tab-btn.active {
+    color:var(--gold); background:rgba(200,164,78,0.1);
+    box-shadow:inset 0 -2.5px 0 var(--gold);
+  }
+  .admin-tab-btn svg { flex-shrink:0; opacity:0.65; transition:opacity 0.2s; }
+  .admin-tab-btn.active svg { opacity:1; }
+  .tab-label { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* ── ANALYTICS FILTER ── */
+  .analytics-filter-bar {
+    background:var(--bg); border:1.5px solid var(--border);
+    border-radius:14px; padding:14px 16px; margin-bottom:16px;
+  }
+  html.light .analytics-filter-bar { background:var(--bg2); }
+  .analytics-filter-label {
+    font-size:0.65rem; font-weight:700; letter-spacing:0.13em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:10px;
+  }
+  .filter-pills-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .filter-pill {
+    padding:6px 12px; border-radius:20px;
+    border:1px solid var(--border); background:none;
+    color:var(--muted); font-family:inherit; font-size:0.72rem; font-weight:600;
+    cursor:pointer; transition:all 0.18s; white-space:nowrap;
+  }
+  .filter-pill:hover { border-color:rgba(200,164,78,0.5); color:var(--gold); }
+  .filter-pill.active { background:rgba(200,164,78,0.13); border-color:var(--gold); color:var(--gold); }
+  .filter-custom-range {
+    display:none; align-items:center; gap:8px; flex-wrap:wrap;
+    margin-top:10px; padding-top:10px; border-top:1px solid var(--border);
+  }
+  .filter-custom-range.show { display:flex; }
+  .filter-date-input {
+    flex:1; min-width:130px; padding:7px 10px; border-radius:8px;
+    border:1px solid var(--border); background:var(--bg2); color:var(--cream);
+    font-family:inherit; font-size:0.76rem; cursor:pointer; outline:none;
+    color-scheme:dark;
+  }
+  html.light .filter-date-input { background:#fff; color-scheme:light; }
+  .filter-date-input:focus { border-color:var(--gold); }
+  .filter-date-sep { color:var(--muted); font-size:0.82rem; font-weight:600; }
+  /* ── CHARTS ── */
+  .chart-svg-wrap svg { display:block; overflow:visible; }
+  .chart-bar {
+    transform-origin:center bottom; transform-box:fill-box;
+    transform:scaleY(0);
+  }
+  .chart-bar.anim {
+    transition:transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    transform:scaleY(1);
+  }
+  .chart-val-lbl { opacity:0; }
+  .chart-val-lbl.anim { opacity:1; transition:opacity 0.25s; }
+  .chart-empty {
+    text-align:center; color:var(--muted); font-size:0.82rem;
+    padding:28px 0 10px; font-style:italic;
+  }
+  /* ── PRODUCTS TOP ── */
+  .products-top-list { display:flex; flex-direction:column; }
+  .prod-top-row {
+    display:grid; grid-template-columns:26px 1fr 36px;
+    align-items:center; gap:10px;
+    padding:9px 0; border-bottom:1px solid rgba(200,164,78,0.07);
+  }
+  .prod-top-row:last-child { border-bottom:none; }
+  .prod-top-rank { font-size:0.72rem; font-weight:800; color:var(--muted); text-align:center; }
+  .prod-top-rank.first { font-size:1rem; line-height:1; }
+  .prod-top-body { display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .prod-top-name {
+    font-size:0.82rem; font-weight:600; color:var(--cream);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .prod-top-bar-wrap { height:3px; background:rgba(200,164,78,0.1); border-radius:2px; overflow:hidden; }
+  .prod-top-bar { height:100%; background:var(--gold); border-radius:2px; width:0; transition:width 0.55s cubic-bezier(0.22,1,0.36,1); }
+  .prod-top-qty { font-size:0.8rem; font-weight:700; color:var(--gold); text-align:right; }
+
   body.demo-mode #adm-wrap { padding-top: 36px; }
 
   /* Réduction de taille pour les textes en écriture grecque (Crimson Pro Greek ≈ 10% plus large visuellement) */
@@ -1436,9 +1526,25 @@
   <button id="sc-prods-btn"  onclick="scGo('sec-produits')">🍽️ Produits</button>
   <button id="sc-orders-btn" onclick="scGo('orders-admin-section')" style="display:none">🧾 Commandes</button>
   <button id="sc-tables-btn" onclick="scGo('tables-admin-section')" style="display:none">🪑 Tables & QR</button>
+  <button id="sc-analytics-btn" onclick="scGo('analytics-section')" style="display:none">📊 Statistiques</button>
 </div>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
+
+  <!-- ── ONGLETS ADMIN ── -->
+  <div id="admin-tabs-bar">
+    <button class="admin-tab-btn active" id="admin-tab-display" onclick="switchAdminTab('display')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span class="tab-label">Affichage Menu</span>
+    </button>
+    <button class="admin-tab-btn" id="admin-tab-orders" onclick="switchAdminTab('orders')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="tab-label">Commandes &amp; Appels</span>
+    </button>
+  </div>
+
+  <!-- ── PANEL 1 : Affichage Menu ── -->
+  <div id="admin-panel-display" class="admin-panel">
 
   <!-- ── THÈME VISUEL ── -->
   <div class="adm-section" id="sec-theme">
@@ -1561,13 +1667,46 @@
     <div id="products-area"></div>
   </div>
 
-  <!-- ── COMMANDES (visible seulement en mode Commande) ── -->
-  <div class="adm-section" id="orders-admin-section">
-    <div class="sec-hd" id="sec-hd-orders">Commandes en temps réel <span class="sec-badge" id="orders-count-badge">0</span></div>
-    <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
+  </div><!-- /admin-panel-display -->
+
+  <!-- ── PANEL 2 : Commandes & Appels ── -->
+  <div id="admin-panel-orders" class="admin-panel" style="display:none">
+  <!-- ── ANALYTICS ── -->
+  <div id="analytics-section" class="analytics-filter-bar">
+    <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
+    <div class="filter-pills-row">
+      <button class="filter-pill active" id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
+      <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
+      <button class="filter-pill"        id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
+      <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
+      <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
+    </div>
+    <div class="filter-custom-range" id="analytics-custom-range">
+      <input type="date" id="analytics-date-start" class="filter-date-input" onchange="applyCustomDateRange()">
+      <span class="filter-date-sep">→</span>
+      <input type="date" id="analytics-date-end" class="filter-date-input" onchange="applyCustomDateRange()">
+    </div>
   </div>
 
-  <!-- ── TABLES QR (visible seulement en mode Commande) ── -->
+  <!-- ── GRAPHIQUE COMMANDES ── -->
+  <div class="adm-section" id="chart-orders-section">
+    <div class="sec-hd"><span style="margin-right:6px">🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
+    <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
+  </div>
+
+  <!-- ── GRAPHIQUE APPELS ── -->
+  <div class="adm-section" id="chart-calls-section">
+    <div class="sec-hd"><span style="margin-right:6px">🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
+    <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
+  </div>
+
+  <!-- ── PRODUITS LES PLUS VENDUS ── -->
+  <div class="adm-section" id="chart-products-section">
+    <div class="sec-hd"><span style="margin-right:6px">📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
+    <div id="chart-products-wrap"></div>
+  </div>
+
+  <!-- ── TABLES QR (déplacé depuis panel 1) ── -->
   <div class="adm-section" id="tables-admin-section">
     <div class="sec-hd" id="sec-hd-tables">Tables &amp; QR codes <span class="sec-badge" id="tables-count-badge">0</span></div>
     <div class="sec-body-inner" id="tables-body">
@@ -1581,7 +1720,15 @@
     </div>
   </div>
 
-</div>
+  <!-- ── COMMANDES TEMPS RÉEL (déplacé depuis panel 1) ── -->
+  <div class="adm-section" id="orders-admin-section">
+    <div class="sec-hd" id="sec-hd-orders">Commandes en temps réel <span class="sec-badge" id="orders-count-badge">0</span></div>
+    <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
+  </div>
+
+  </div><!-- /admin-panel-orders -->
+
+</div><!-- /adm-wrap -->
 
 <!-- Save bar (caché, gardé pour compatibilité) -->
 <div class="save-bar" id="save-bar" style="display:none">
@@ -1792,6 +1939,12 @@ const ADMIN_UI = {
     noneIco:       '— Καμία —',
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
+    tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις',
+    analyticsTitle:'Περίοδος ανάλυσης',
+    filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
+    chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
+    chartProductsTitle:'Κορυφαία προϊόντα', chartEmpty:'Δεν υπάρχουν δεδομένα', chartTopN:'top 10',
+    scAnalytics:'📊 Στατιστικά',
     btnDelLogo:    'Διαγραφή λογοτύπου',
   },
   fr: {
@@ -1900,6 +2053,12 @@ const ADMIN_UI = {
     noneIco:       '— Aucune —',
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
+    tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels',
+    analyticsTitle:'Période d\'analyse',
+    filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
+    chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
+    chartProductsTitle:'Produits les plus vendus', chartEmpty:'Aucune donnée sur cette période', chartTopN:'top 10',
+    scAnalytics:'📊 Statistiques',
     btnDelLogo:    'Supprimer le logo',
   },
   en: {
@@ -2008,6 +2167,12 @@ const ADMIN_UI = {
     noneIco:       '— None —',
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
+    tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls',
+    analyticsTitle:'Analysis period',
+    filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
+    chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
+    chartProductsTitle:'Top products', chartEmpty:'No data for this period', chartTopN:'top 10',
+    scAnalytics:'📊 Statistics',
     btnDelLogo:    'Delete logo',
   },
   de: {
@@ -2116,6 +2281,12 @@ const ADMIN_UI = {
     noneIco:       '— Keines —',
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
+    tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe',
+    analyticsTitle:'Analysezeitraum',
+    filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
+    chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
+    chartProductsTitle:'Top-Produkte', chartEmpty:'Keine Daten für diesen Zeitraum', chartTopN:'top 10',
+    scAnalytics:'📊 Statistiken',
     btnDelLogo:    'Logo löschen',
   },
   ar: {
@@ -2224,6 +2395,12 @@ const ADMIN_UI = {
     noneIco:       '— لا شيء —',
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
+    tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات',
+    analyticsTitle:'فترة التحليل',
+    filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
+    chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
+    chartProductsTitle:'أفضل المنتجات', chartEmpty:'لا توجد بيانات لهذه الفترة', chartTopN:'top 10',
+    scAnalytics:'📊 إحصائيات',
     btnDelLogo:    'حذف الشعار',
   },
 };
@@ -2993,14 +3170,23 @@ function renderHeroImageSection() {
 
 /* ─── FAB NAVIGATION RACCOURCIS ─── */
 function scGo(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (!section) return;
-  const header  = document.querySelector('.adm-header');
-  const headerH = header ? header.getBoundingClientRect().height : 0;
-  const top     = section.getBoundingClientRect().top + window.scrollY - headerH - 16;
-  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  const panel2Ids = ['analytics-section','chart-orders-section','chart-calls-section','chart-products-section','tables-admin-section','orders-admin-section'];
+  const targetTab = panel2Ids.includes(sectionId) ? 'orders' : 'display';
+  const doScroll = () => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const header  = document.querySelector('.adm-header');
+    const headerH = header ? header.getBoundingClientRect().height : 0;
+    const tabBarH = document.getElementById('admin-tabs-bar')?.getBoundingClientRect().height || 0;
+    const top = section.getBoundingClientRect().top + window.scrollY - headerH - tabBarH - 12;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  };
   document.getElementById('sc-popup').classList.remove('open');
   document.getElementById('sc-fab').classList.remove('open');
+  if (targetTab !== _adminCurrentTab) {
+    switchAdminTab(targetTab);
+    setTimeout(doScroll, 80);
+  } else { doScroll(); }
 }
 
 (function setupScFab() {
@@ -3286,8 +3472,18 @@ function applyAdminUI(l) {
   });
 
   // Shortcut buttons
-  const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders','sc-tables-btn':'scTables' };
+  const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders','sc-tables-btn':'scTables','sc-analytics-btn':'scAnalytics' };
   Object.entries(scMap).forEach(([id, key]) => { const el = $(id); if (el) el.textContent = t[key] || el.textContent; });
+  // Onglets
+  const _tabD = $('admin-tab-display'), _tabO = $('admin-tab-orders');
+  if (_tabD) { const _s = _tabD.querySelector('.tab-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
+  if (_tabO) { const _s = _tabO.querySelector('.tab-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
+  // Analytics texts
+  const _afl = $('analytics-filter-label'); if (_afl) _afl.textContent = t.analyticsTitle || _afl.textContent;
+  const _pillMap = { 'filter-pill-7d':'filter7d','filter-pill-today':'filterToday','filter-pill-30d':'filter30d','filter-pill-12m':'filter12m','filter-pill-custom':'filterCustom' };
+  Object.entries(_pillMap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
+  const _cmap = { 'chart-orders-title':'chartOrdersTitle','chart-calls-title':'chartCallsTitle','chart-products-title':'chartProductsTitle' };
+  Object.entries(_cmap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
 
   // Theme section title + badge
   const themeHd = $('sec-hd-theme');
@@ -5412,15 +5608,17 @@ function syncStyleAdminUI(mode) {
   // showCallBtn / showOrderUI — indépendamment du style visuel choisi.
   const showOrder = adminData?.info?.showOrderUI !== false;
 
-  // Section commandes : visible si l'interface commande est activée (peu importe le style)
-  const ordersSection = document.getElementById('orders-admin-section');
-  if (ordersSection) ordersSection.style.display = showOrder ? 'block' : 'none';
+  // Onglet 2 : visible seulement si la fonctionnalité commande est licenciée (control-app)
+  const _tab2Btn = document.getElementById('admin-tab-orders');
+  if (_tab2Btn) {
+    const _canTab2 = _featOk('orderUI');
+    _tab2Btn.style.display = _canTab2 ? '' : 'none';
+    if (!_canTab2 && _adminCurrentTab === 'orders') switchAdminTab('display');
+  }
+  // Tables section : visible si tableSystem activé (dans le panel 2)
   const tablesSection = document.getElementById('tables-admin-section');
-  if (tablesSection) tablesSection.style.display = (showOrder && _featOk('tableSystem')) ? 'block' : 'none';
-  const scOrdersBtn = document.getElementById('sc-orders-btn');
-  if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
-  const scTablesBtn = document.getElementById('sc-tables-btn');
-  if (scTablesBtn) scTablesBtn.style.display = (showOrder && _featOk('tableSystem')) ? '' : 'none';
+  if (tablesSection) tablesSection.style.display = _featOk('tableSystem') ? '' : 'none';
+  _updateScFabVisibility();
 
   // Toggles : toujours affichés (sous réserve de la licence)
   const callBtn   = document.getElementById('toggle-call-btn');
@@ -5473,11 +5671,13 @@ function startOrdersListener() {
   if (ordersListener) return;
   ordersListener = _rref('orders').on('value', snap => {
     const data = snap.val() || {};
+    _adminAllOrders = data;
     const orders = Object.entries(data)
       .map(([id, o]) => ({ id, ...o }))
       .filter(o => o.status !== 'done' || (Date.now() - o.createdAt < 7 * 24 * 3600000))
       .sort((a, b) => b.createdAt - a.createdAt);
     renderOrdersAdmin(orders);
+    if (_adminCurrentTab === 'orders') updateAnalytics();
   });
 }
 
@@ -5700,6 +5900,261 @@ function closeIconModal() {
   document.getElementById('ico-modal-overlay').classList.remove('open');
   _icoModalCi = null;
 }
+
+/* ═══════════════════════════════════════════════════════
+   ANALYTICS — Onglets + Graphiques
+   ═══════════════════════════════════════════════════════ */
+
+let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
+let _adminCurrentPeriod = 'week';
+let _adminCustomStart   = null;
+let _adminCustomEnd     = null;
+let _adminAllOrders     = {};
+let _adminCallsData     = {};
+let _adminCallsListener = null;
+
+function switchAdminTab(tab) {
+  _adminCurrentTab = tab;
+  const isOrders = tab === 'orders';
+  const p1 = document.getElementById('admin-panel-display');
+  const p2 = document.getElementById('admin-panel-orders');
+  if (p1) p1.style.display = isOrders ? 'none' : '';
+  if (p2) p2.style.display = isOrders ? '' : 'none';
+  document.getElementById('admin-tab-display')?.classList.toggle('active', !isOrders);
+  document.getElementById('admin-tab-orders')?.classList.toggle('active', isOrders);
+  localStorage.setItem(_PFX + 'adm_tab', tab);
+  _updateScFabVisibility();
+  if (isOrders) {
+    if (!ordersListener) startOrdersListener();
+    startAdminCallsListener();
+    requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
+  }
+}
+
+function _updateScFabVisibility() {
+  const isOrders = _adminCurrentTab === 'orders';
+  const showOrder = adminData?.info?.showOrderUI !== false;
+  const hasTables = _featOk('tableSystem');
+  const tab1Ids = ['sc-design-btn','sc-hero-btn','sc-infos-btn','sc-note-btn','sc-cats-btn','sc-prods-btn'];
+  tab1Ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = isOrders ? 'none' : ''; });
+  const scOrders = document.getElementById('sc-orders-btn');
+  if (scOrders) scOrders.style.display = (isOrders && showOrder) ? '' : 'none';
+  const scTables = document.getElementById('sc-tables-btn');
+  if (scTables) scTables.style.display = (isOrders && hasTables) ? '' : 'none';
+  const scAnalytics = document.getElementById('sc-analytics-btn');
+  if (scAnalytics) scAnalytics.style.display = isOrders ? '' : 'none';
+}
+
+/* ── Filtre de période ── */
+function setAnalyticsPeriod(period) {
+  _adminCurrentPeriod = period;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.period === period));
+  const cr = document.getElementById('analytics-custom-range');
+  if (cr) cr.classList.toggle('show', period === 'custom');
+  updateAnalytics();
+}
+
+function applyCustomDateRange() {
+  const s = document.getElementById('analytics-date-start')?.value;
+  const e = document.getElementById('analytics-date-end')?.value;
+  if (!s || !e) return;
+  const sd = new Date(s); sd.setHours(0,0,0,0);
+  const ed = new Date(e); ed.setHours(23,59,59,999);
+  _adminCustomStart = sd.getTime();
+  _adminCustomEnd   = ed.getTime();
+  updateAnalytics();
+}
+
+function _getAnalyticsPeriod() {
+  if (_adminCurrentPeriod === 'custom' && _adminCustomStart && _adminCustomEnd) {
+    return [_adminCustomStart, _adminCustomEnd];
+  }
+  const now = Date.now();
+  const d = new Date(); d.setHours(0,0,0,0);
+  const map = { today: d.getTime(), week: now - 7*86400000, month: now - 30*86400000, year: now - 365*86400000 };
+  return [map[_adminCurrentPeriod] ?? (now - 7*86400000), now];
+}
+
+/* ── Calcul analytics ── */
+function computeAnalytics() {
+  const [from, to] = _getAnalyticsPeriod();
+  const ordersByTable = {}, callsByTable = {}, productsSold = {};
+
+  Object.values(_adminAllOrders).forEach(o => {
+    const ts = o.createdAt || o.ts || 0;
+    if (ts < from || ts > to) return;
+    const tbl = o.tableNum && /^[1-9]\d*$/.test(String(o.tableNum)) ? String(o.tableNum) : null;
+    if (tbl) ordersByTable[tbl] = (ordersByTable[tbl] || 0) + 1;
+    (o.items || []).forEach(it => {
+      const k = String(it.id ?? it.name ?? '?');
+      if (!productsSold[k]) {
+        const live = adminData?.items?.find(i => i.id == it.id);
+        const nm = live ? (live.name?.[currentLang] || live.name?.fr || it.name || k) : (it.name || k);
+        productsSold[k] = { name: nm, qty: 0 };
+      }
+      productsSold[k].qty += (it.qty || 1);
+    });
+  });
+
+  Object.values(_adminCallsData).forEach(c => {
+    const ts = c.ts || 0;
+    if (ts < from || ts > to) return;
+    const tbl = String(c.table || '');
+    if (/^[1-9]\d*$/.test(tbl)) callsByTable[tbl] = (callsByTable[tbl] || 0) + 1;
+  });
+
+  const top10 = arr => arr.sort((a,b) => b.value - a.value).slice(0, 10);
+  return {
+    ordersByTable: top10(Object.entries(ordersByTable).map(([l,v]) => ({label:l, value:v}))),
+    callsByTable:  top10(Object.entries(callsByTable).map(([l,v])  => ({label:l, value:v}))),
+    productsSold:  top10(Object.entries(productsSold).map(([,p])   => ({label:p.name, value:p.qty}))),
+  };
+}
+
+/* ── Rendu graphique en barres SVG ── */
+function buildBarChart(containerId, data, opts) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  if (!data.length) { container.innerHTML = '<div class="chart-empty">' + (t.chartEmpty || 'Aucune donnée') + '</div>'; return; }
+
+  const W   = Math.max(container.clientWidth || 0, 280);
+  const H   = 175;
+  const PL  = 32, PR = 8, PT = 24, PB = 30;
+  const IW  = W - PL - PR, IH = H - PT - PB;
+  const N   = data.length;
+  const SLOT = IW / N;
+  const BW   = Math.max(8, Math.min(SLOT * 0.62, 44));
+  const MAX  = Math.max(...data.map(d => d.value), 1);
+  const color = opts.color || 'var(--gold)';
+  const cid   = 'cg-' + containerId;
+
+  // Y ticks
+  const rawStep = MAX / 4;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+  const step = Math.ceil(rawStep / mag) * mag || 1;
+  const yTicks = [0,1,2,3,4].map(i => i * step);
+  const yMax = yTicks[4];
+
+  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
+  svg += '<defs><linearGradient id="' + cid + '" x1="0" y1="0" x2="0" y2="1">';
+  svg += '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.82"/>';
+  svg += '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.3"/>';
+  svg += '</linearGradient></defs>';
+
+  // Grid + y labels
+  yTicks.forEach((v,i) => {
+    const y = (PT + IH - (v / yMax) * IH).toFixed(1);
+    const dash = i > 0 ? ' stroke-dasharray="3,4"' : '';
+    svg += '<line x1="' + PL + '" y1="' + y + '" x2="' + (W - PR) + '" y2="' + y + '" stroke="rgba(200,164,78,0.09)" stroke-width="1"' + dash + '/>';
+    svg += '<text x="' + (PL - 4) + '" y="' + (parseFloat(y) + 3.5).toFixed(1) + '" text-anchor="end" font-size="8.5" fill="rgba(200,164,78,0.35)" font-family="Outfit,sans-serif">' + v + '</text>';
+  });
+
+  // Bars
+  const baseY = PT + IH;
+  data.forEach((d, i) => {
+    const isTop = i === 0;
+    const bh    = Math.max(2, (d.value / yMax) * IH);
+    const bx    = (PL + i * SLOT + (SLOT - BW) / 2).toFixed(1);
+    const by    = (baseY - bh).toFixed(1);
+    const r     = Math.min(3, BW / 2);
+    const fill  = isTop ? color : ('url(#' + cid + ')');
+
+    svg += '<rect class="chart-bar" x="' + bx + '" y="' + baseY + '" width="' + BW.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="' + r + '" fill="' + fill + '" data-by="' + by + '"/>';
+    // Value label (shown after animation)
+    const vlbl = isTop ? color : 'rgba(200,164,78,0.55)';
+    svg += '<text class="chart-val-lbl" x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (parseFloat(by) - 5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="' + vlbl + '">' + d.value + '</text>';
+    // X label
+    const lbl = String(d.label).length > 7 ? String(d.label).substring(0,6) + '…' : String(d.label);
+    svg += '<text x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="8.5" fill="rgba(200,164,78,0.42)" font-family="Outfit,sans-serif">' + lbl + '</text>';
+  });
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Animate
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    container.querySelectorAll('.chart-bar').forEach((bar, i) => {
+      const targetY = bar.dataset.by;
+      setTimeout(() => {
+        bar.style.transition = 'none';
+        bar.setAttribute('y', targetY);
+        requestAnimationFrame(() => {
+          bar.classList.add('anim');
+          const vl = container.querySelectorAll('.chart-val-lbl')[i];
+          if (vl) setTimeout(() => vl.classList.add('anim'), 320);
+        });
+      }, i * 38);
+    });
+  }));
+}
+
+/* ── Rendu produits ── */
+function buildProductsChart(containerId, data) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  if (!data.length) { container.innerHTML = '<div class="chart-empty">' + (t.chartEmpty || 'Aucune donnée') + '</div>'; return; }
+  const maxQ = data[0].value;
+  container.innerHTML = '<div class="products-top-list">' +
+    data.map((d, i) => {
+      const pct = maxQ > 0 ? (d.value / maxQ * 100).toFixed(1) : 0;
+      const rank = i === 0 ? '<span class="prod-top-rank first">🏆</span>' : '<span class="prod-top-rank">' + (i+1) + '</span>';
+      const nm = String(d.label).length > 32 ? String(d.label).substring(0,31) + '…' : String(d.label);
+      return '<div class="prod-top-row">' + rank +
+        '<div class="prod-top-body"><div class="prod-top-name" title="' + String(d.label).replace(/"/g,'&quot;') + '">' + nm + '</div>' +
+        '<div class="prod-top-bar-wrap"><div class="prod-top-bar" data-w="' + pct + '"></div></div></div>' +
+        '<div class="prod-top-qty">' + d.value + '</div></div>';
+    }).join('') + '</div>';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    container.querySelectorAll('.prod-top-bar').forEach((b, i) => {
+      setTimeout(() => { b.style.width = b.dataset.w + '%'; }, i * 45);
+    });
+  }));
+}
+
+/* ── Mise à jour complète des graphiques ── */
+function updateAnalytics() {
+  if (document.getElementById('admin-panel-orders')?.style.display === 'none') return;
+  const { ordersByTable, callsByTable, productsSold } = computeAnalytics();
+  buildBarChart('chart-orders-wrap', ordersByTable, { color:'var(--gold)' });
+  buildBarChart('chart-calls-wrap',  callsByTable,  { color:'#5fb8e0' });
+  buildProductsChart('chart-products-wrap', productsSold);
+}
+
+/* ── Listener appels pour analytics ── */
+function startAdminCallsListener() {
+  if (_adminCallsListener) return;
+  _adminCallsListener = _rref('calls').on('value', snap => {
+    const raw = snap.val() || {};
+    _adminCallsData = {};
+    Object.entries(raw).forEach(([id, c]) => {
+      if (id !== 'lastCall' && c && c.ts) _adminCallsData[id] = c;
+    });
+    if (_adminCurrentTab === 'orders') updateAnalytics();
+  });
+}
+
+/* ── Resize — re-rendre les graphiques ── */
+let _analyticsResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_analyticsResizeTimer);
+  _analyticsResizeTimer = setTimeout(() => {
+    if (_adminCurrentTab === 'orders') updateAnalytics();
+  }, 200);
+});
+
+/* ── Restaurer l'onglet actif au chargement ── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (_adminCurrentTab === 'orders') {
+    const p1 = document.getElementById('admin-panel-display');
+    const p2 = document.getElementById('admin-panel-orders');
+    if (p1) p1.style.display = 'none';
+    if (p2) p2.style.display = '';
+    document.getElementById('admin-tab-display')?.classList.remove('active');
+    document.getElementById('admin-tab-orders')?.classList.add('active');
+  }
+});
+
 </script>
 
 <!-- ── Icon Modal ── -->
