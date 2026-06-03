@@ -855,43 +855,36 @@ function deletionCutoffTs(ret) {
   return Date.now() - ret.ms;
 }
 
-/* ── CALLS PERSISTENCE ── */
-var CALLS_KEY = _PFX + 'calls_v1';
-function saveCalls() {
-  try {
-    localStorage.setItem(CALLS_KEY, JSON.stringify(
-      calls.map(function(c) { return Object.assign({}, c, { ts: c.ts instanceof Date ? c.ts.getTime() : c.ts }); })
-    ));
-  } catch(_) {}
-}
-function loadCalls() {
-  try {
-    calls = JSON.parse(localStorage.getItem(CALLS_KEY) || '[]')
-      .map(function(c) { return Object.assign({}, c, { ts: new Date(c.ts), status: c.status || 'received' }); });
-  } catch(_) { calls = []; }
-  // Supprime les entrées invalides (table non numérique = faux appel issu d'une commande)
-  calls = calls.filter(function(c) { return /^\d+$/.test(String(c.table)); });
-  // Supprime les doublons issus de l'ancien bug (même table, < 10 secondes d'écart)
-  var seen = [];
-  calls = calls.filter(function(c) {
-    var tsNum = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
-    var dup = seen.some(function(s) {
-      return String(s.table) === String(c.table) && Math.abs(s.ts - tsNum) < 10000;
-    });
-    if (!dup) seen.push({ table: c.table, ts: tsNum });
-    return !dup;
+/* ── CALLS — Firebase listener ── */
+function startCallsListener() {
+  _rref('calls').on('value', function(snap) {
+    var raw = snap.val() || {};
+    calls = Object.entries(raw)
+      .filter(function(e) { return e[0] !== 'lastCall' && e[1] && e[1].ts; })
+      .map(function(e) {
+        var c = e[1];
+        return { id: e[0], table: String(c.table), ts: new Date(c.ts), status: c.status || 'received', lang: c.lang || 'fr' };
+      })
+      .filter(function(c) { return /^\d+$/.test(String(c.table)); })
+      .sort(function(a, b) { return b.ts - a.ts; });
+    renderCalls();
+    updateCallsBadge();
+    if (!_callsReady) { _callsReady = true; _maybeApplyInitialTab(); }
+  }, function() {
+    if (!_callsReady) { _callsReady = true; _maybeApplyInitialTab(); }
   });
-  saveCalls();
-  cleanupCallsFromStorage();
 }
-function cleanupCallsFromStorage() {
+
+function cleanupCalls() {
   var cutoff = deletionCutoffTs(_retCalls);
-  var before = calls.length;
-  calls = calls.filter(function(c) {
+  var toDelete = {};
+  calls.forEach(function(c) {
     var ts = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
-    return ts >= cutoff;
+    if (ts < cutoff) toDelete[c.id] = null;
   });
-  if (calls.length !== before) saveCalls();
+  if (Object.keys(toDelete).length > 0) {
+    _rref('calls').update(toDelete).catch(function(e) { console.error(e); });
+  }
 }
 
 /* ── MESSAGES PERSISTENCE ── */
@@ -955,7 +948,6 @@ function startMessagesListener() {
 /* ── RECEIVE CALL ── */
 function receiveCall(table, ts) {
   playRing();
-  addCallToHistory(table, ts);
   nativeVibrate([200, 80, 200, 80, 350]);
 }
 
@@ -969,18 +961,6 @@ function nativeVibrate(pattern) {
   }
 }
 
-
-function addCallToHistory(table, ts) {
-  var tsNum = ts ? (ts instanceof Date ? ts.getTime() : +ts) : Date.now();
-  var dup = calls.some(function(c) {
-    var cTs = c.ts instanceof Date ? c.ts.getTime() : +c.ts;
-    return String(c.table) === String(table) && Math.abs(cTs - tsNum) < 10000;
-  });
-  if (dup) return;
-  calls.unshift({ table: table, ts: new Date(tsNum), id: Date.now(), status: 'received' });
-  saveCalls();
-  renderCalls();
-}
 
 function addMessage(text, ts) {
   messages.unshift({ id: Date.now(), text: text, ts: new Date(ts || Date.now()), read: false });
@@ -1014,10 +994,9 @@ function formatDay(date, t) {
 function toggleStatus(id) {
   var c = calls.find(function(x) { return x.id === id; });
   if (!c) return;
-  c.status = c.status === 'done' ? 'received' : 'done';
+  var newStatus = c.status === 'done' ? 'received' : 'done';
   nativeVibrate([50, 30, 80]);
-  saveCalls();
-  renderCalls();
+  _rref('calls/' + id + '/status').set(newStatus).catch(function(e) { console.error(e); });
 }
 function renderCalls() {
   var list = document.getElementById('calls-list');
@@ -1373,7 +1352,6 @@ function setupNativePush() {
     } else {
       nativeVibrate([300, 100, 300, 100, 600]);
       playRing();
-      addCallToHistory(table, parseInt(data.ts || '0') || Date.now());
     }
   });
 
@@ -1429,6 +1407,10 @@ setInterval(function() { if (calls.length) renderCalls(); if (messages.length) r
 var TABS = ['calls', 'orders', 'messages', 'settings'];
 var currentTab = 'calls';
 var _tabDecided = false;
+var _callsReady = false, _ordersReady = false;
+function _maybeApplyInitialTab() {
+  if (_callsReady && _ordersReady && !_tabDecided) { _tabDecided = true; _applyInitialTab(); }
+}
 
 function switchTab(tab) {
   nativeVibrate([30]);
@@ -1476,7 +1458,7 @@ function startOrdersListener() {
     orders = snap.val() || {};
     renderOrders();
     updateOrdersTabBadge();
-    if (!_tabDecided) { _tabDecided = true; _applyInitialTab(); }
+    if (!_ordersReady) { _ordersReady = true; _maybeApplyInitialTab(); }
   });
 }
 
@@ -1664,13 +1646,12 @@ function init() {
     var r = snap.val() || {};
     _retCalls  = { ms: r.calls  || 604800000, changedAt: r.callsChangedAt  || 0, previous: r.callsPrevious  || r.calls  || 604800000, isReduction: r.callsIsReduction  || false };
     _retOrders = { ms: r.orders || 604800000, changedAt: r.ordersChangedAt || 0, previous: r.ordersPrevious || r.orders || 604800000, isReduction: r.ordersIsReduction || false };
-    cleanupCallsFromStorage();
     renderCalls();
     renderOrders();
+    cleanupCalls();
     cleanupOrders();
   });
 
-  loadCalls();
   loadMessages();
   startMessagesListener();
   buildLangBtns();
@@ -1687,6 +1668,7 @@ function init() {
   applyLang();
   updateMessagesBadge();
   startPolling();
+  startCallsListener();
   startOrdersListener();
 
   document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });

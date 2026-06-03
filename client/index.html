@@ -8818,11 +8818,9 @@ function confirmTableCall() {
 
   // 2. Firebase Realtime Database — app ouverte (temps réel)
   try {
-    _rref('calls/lastCall').set({
-      table: String(num),
-      ts: Date.now(),
-      lang: lang || 'fr'
-    });
+    const _callTs = Date.now();
+    _rref('calls/lastCall').set({ table: String(num), ts: _callTs, lang: lang || 'fr' });
+    _rref('calls/' + _callTs).set({ table: String(num), ts: _callTs, lang: lang || 'fr', status: 'received', createdAt: _callTs });
   } catch(e) {}
 
   // 3. Vercel Function → FCM — app fermée (notification push)
