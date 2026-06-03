@@ -567,15 +567,6 @@
   </symbol>
 </svg>
 
-<!-- Alert banner -->
-<div id="call-alert">
-  <div class="alert-ring"><svg><use href="#i-bell"/></svg></div>
-  <div class="alert-info">
-    <div class="alert-title" id="alert-title">Appel entrant</div>
-    <div class="alert-sub"  id="alert-sub">Table —</div>
-  </div>
-  <button class="alert-close" id="alert-close"><svg><use href="#i-x"/></svg></button>
-</div>
 
 <!-- Header -->
 <header class="app-header">
@@ -803,7 +794,6 @@ const _cachedAppLang = localStorage.getItem(_PFX+'app_lang_cache');
 let lang = localStorage.getItem(_PFX+'app_lang') || _cachedAppLang || 'fr';
 let calls    = [];
 let messages = [];
-let alertTimer = null;
 let audioCtx   = null;
 let menuItemsMap = {};
 
@@ -965,7 +955,6 @@ function startMessagesListener() {
 /* ── RECEIVE CALL ── */
 function receiveCall(table, ts) {
   playRing();
-  showAlert(table);
   addCallToHistory(table, ts);
   nativeVibrate([200, 80, 200, 80, 350]);
 }
@@ -980,15 +969,6 @@ function nativeVibrate(pattern) {
   }
 }
 
-function showAlert(table) {
-  var t = T[lang];
-  document.getElementById('alert-title').textContent = t.alertTitle;
-  document.getElementById('alert-sub').textContent   = t.alertSub.replace('{n}', table);
-  var el = document.getElementById('call-alert');
-  el.classList.add('show');
-  clearTimeout(alertTimer);
-  alertTimer = setTimeout(function() { el.classList.remove('show'); }, 9000);
-}
 
 function addCallToHistory(table, ts) {
   var tsNum = ts ? (ts instanceof Date ? ts.getTime() : +ts) : Date.now();
@@ -1393,7 +1373,6 @@ function setupNativePush() {
     } else {
       nativeVibrate([300, 100, 300, 100, 600]);
       playRing();
-      showAlert(table);
       addCallToHistory(table, parseInt(data.ts || '0') || Date.now());
     }
   });
@@ -1443,10 +1422,6 @@ document.getElementById('theme-btn').addEventListener('click', function() {
   var isLight = document.documentElement.classList.toggle('light');
   localStorage.setItem(_PFX+'app_theme', isLight ? 'light' : 'dark');
   updateThemeIcon();
-});
-document.getElementById('alert-close').addEventListener('click', function() {
-  document.getElementById('call-alert').classList.remove('show');
-  clearTimeout(alertTimer);
 });
 setInterval(function() { if (calls.length) renderCalls(); if (messages.length) renderMessages(); }, 30000);
 
