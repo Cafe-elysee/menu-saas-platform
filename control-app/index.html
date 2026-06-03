@@ -1547,9 +1547,17 @@ function initFirebase() {
 }
 
 // Charge dynamiquement la liste des restaurants depuis Firebase SaaS
+let _lastClientsFingerprint = '';
+
+function _detachClientListeners(slug) {
+  if (!_saasDb) return;
+  _saasDb.ref('restaurants/' + slug + '/devices').off();
+  _saasDb.ref('restaurants/' + slug + '/config').off();
+  _saasDb.ref('restaurants/' + slug + '/menu').off();
+}
+
 function loadClientsFromFirebase() {
   if (!_saasDb) return;
-  // on() au lieu de once() → mise à jour automatique en temps réel
   _saasDb.ref('restaurants').on('value', snap => {
     const data = snap.val() || {};
     const SAAS_URL = 'https://menu-saas-platform.vercel.app';
@@ -1557,10 +1565,16 @@ function loadClientsFromFirebase() {
       name:     (r.profile && r.profile.name)     || slug,
       slug,
       url:      SAAS_URL,
-      langs:    (r.profile && r.profile.langs)    || ['fr'],
+      langs:    (r.profile && r.profile.langs)    || ['fr','en','el','de','ar'],
       noEvents: !!(r.profile && r.profile.noEvents),
       demoPage: !!(r.profile && r.profile.demoPage)
     }));
+    // Ne reconstruire les cartes que si la liste des clients change structurellement
+    const fp = loaded.map(c => c.slug + '|' + c.name + '|' + (c.langs || []).join('+')).sort().join(',');
+    if (fp === _lastClientsFingerprint) return;
+    _lastClientsFingerprint = fp;
+    CLIENTS.forEach(c => _detachClientListeners(c.slug));
+    _clientListeners.clear();
     CLIENTS.length = 0;
     loaded.forEach(cl => CLIENTS.push(cl));
     buildClientsTab();
@@ -1626,7 +1640,7 @@ async function createNewClient() {
     const ts   = Date.now();
 
     await _saasDb.ref('restaurants/' + rid).set({
-      profile: { name, createdAt: ts },
+      profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
         adminHash: hash,
         tableCount: 0,
@@ -2654,23 +2668,15 @@ function refreshNotifStatus() {
   html += line(tok ? '✅' : '❌', 'Token local : ' + (tok ? tok.slice(-12) : 'ABSENT'));
   html += line(_saasDb ? '✅' : '❌', 'Firebase SaaS : ' + (_saasDb ? 'connecté' : 'NON connecté'));
 
+  // Vérifie via la date du dernier enregistrement (lecture Firebase bloquée par les rules)
+  const lastReg = localStorage.getItem('ctrl_fcm_last_reg');
+  const regOk = tok && lastReg && (Date.now() - parseInt(lastReg)) < 30 * 24 * 3600 * 1000;
+  html += line(regOk ? '✅' : (tok ? '⚠️' : '❌'), 'Token Firebase : ' + (regOk ? 'enregistré ✓ — notifications OK' : (tok ? 'pas encore envoyé' : 'ABSENT')));
+
   if (!tok || !_saasDb) {
     el.innerHTML = html;
     return;
   }
-
-  // Vérifie directement si le token est en Firebase
-  html += line('🔍', 'Token Firebase : vérification...');
-  el.innerHTML = html;
-  const deviceId = tok.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
-  _saasDb.ref('control/fcm_tokens/' + deviceId).once('value').then(snap => {
-    const inFb = snap.exists();
-    html = html.replace('🔍 Token Firebase : vérification...', (inFb ? '✅' : '❌') + ' Token Firebase : ' + (inFb ? 'PRÉSENT ✓ notifications OK' : 'ABSENT — écriture bloquée ?'));
-    el.innerHTML = html;
-  }).catch(err => {
-    html = html.replace('🔍 Token Firebase : vérification...', '❌ Token Firebase : ERREUR lecture — ' + (err && err.message || err));
-    el.innerHTML = html;
-  });
 }
 
 function _openNotifSettings() {
@@ -2715,16 +2721,14 @@ function forceTokenRenewal() {
 
 function _checkControlTokenInFirebase() {
   var tok = localStorage.getItem('ctrl_fcm_token_v');
-  if (!tok || !_saasDb) return;
-  var deviceId = tok.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
-  _saasDb.ref('control/fcm_tokens/' + deviceId).once('value').then(function(snap) {
-    if (!snap.exists()) {
-      // Token absent du nouveau chemin → forcer ré-enregistrement
-      localStorage.removeItem('ctrl_fcm_token_v');
-      localStorage.removeItem('ctrl_fcm_last_reg');
-      if (_pushPlugin) _pushPlugin.register().catch(function() {});
-    }
-  }).catch(function() {});
+  var lastReg = localStorage.getItem('ctrl_fcm_last_reg');
+  if (!tok) return;
+  // Si jamais enregistré ou enregistrement trop ancien (>7j) → forcer ré-enregistrement
+  if (!lastReg || (Date.now() - parseInt(lastReg)) > 7 * 24 * 3600 * 1000) {
+    localStorage.removeItem('ctrl_fcm_token_v');
+    localStorage.removeItem('ctrl_fcm_last_reg');
+    if (_pushPlugin) _pushPlugin.register().catch(function() {});
+  }
 }
 
 function saveControlToken(tokenValue) {
