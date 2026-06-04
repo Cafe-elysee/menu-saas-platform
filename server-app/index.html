@@ -1504,6 +1504,9 @@ function renderOrders() {
   var noEl = document.getElementById('no-orders-msg');
   if (!list) return;
 
+  var panel = document.getElementById('panel-orders');
+  var savedScroll = panel ? panel.scrollTop : 0;
+
   var arr = Object.entries(orders)
     .map(function(e) { return Object.assign({ id: e[0] }, e[1]); })
     .filter(function(o) { return o.status !== 'done' || (o.createdAt >= displayCutoffTs(_retOrders)); })
@@ -1567,6 +1570,8 @@ function renderOrders() {
     card.querySelector('.order-card-hd').addEventListener('click', function() { card.classList.toggle('collapsed'); });
     list.appendChild(card);
   });
+
+  if (panel && savedScroll) panel.scrollTop = savedScroll;
 }
 
 /* ── CHANGEMENT DE RESTAURANT ── */
