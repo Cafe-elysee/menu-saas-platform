@@ -6609,7 +6609,9 @@ document.addEventListener('DOMContentLoaded', () => {
     var dy = e.changedTouches[0].clientY - _ay;
     _ax = _ay = null;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-    if (dx < 0 && _adminCurrentTab === 'display') switchAdminTab('orders');
+    var tab2Btn = document.getElementById('admin-tab-orders');
+    var tab2Ok = tab2Btn && tab2Btn.style.display !== 'none';
+    if (dx < 0 && _adminCurrentTab === 'display' && tab2Ok) switchAdminTab('orders');
     else if (dx > 0 && _adminCurrentTab === 'orders') switchAdminTab('display');
   }, { passive:true });
 })();
