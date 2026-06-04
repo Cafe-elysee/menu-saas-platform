@@ -1942,14 +1942,14 @@ function buildClientCard(client) {
         '<span class="info-edit-lbl">Nom</span>' +
         '<div class="info-edit-wrap">' +
           '<input type="text" class="info-edit-input" id="rename-'+id+'" value="'+client.name.replace(/'/g,"&#39;")+'" placeholder="Nom du restaurant">' +
-          '<button class="info-edit-btn" onclick="renameClient(\''+s+'\',\'rename-'+id+'\')">✓</button>' +
+          '<button class="btn-update" onclick="renameClient(\''+s+'\',\'rename-'+id+'\')">Mettre à jour</button>' +
         '</div>' +
       '</div>' +
       '<div class="info-edit-row">' +
         '<span class="info-edit-lbl">ID</span>' +
         '<div class="info-edit-wrap">' +
           '<input type="text" class="info-edit-input" id="changeid-'+id+'" value="'+s+'" placeholder="nouvel-id">' +
-          '<button class="info-edit-btn warn" onclick="changeClientId(\''+s+'\',\'changeid-'+id+'\')">✓</button>' +
+          '<button class="btn-update" onclick="changeClientId(\''+s+'\',\'changeid-'+id+'\')">Mettre à jour</button>' +
         '</div>' +
       '</div>' +
       '<div class="info-edit-warn" id="idwarn-'+id+'"></div>' +
