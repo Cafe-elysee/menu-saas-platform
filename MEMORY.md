@@ -18,12 +18,11 @@
 
 ### 1. Autonomie totale
 Ne laisser à Malek QUE : actions navigateur, installation APK, credentials expirés.
-Ne jamais lister des fichiers "à faire", ne jamais demander confirmation pour des actions techniques.
 
 ### 2. Pipeline après chaque modification
 1. Mettre à jour `STATE.md`
 2. Git push (bon compte + commit + push)
-3. **Rebuild APK OBLIGATOIRE** si `server-app/` ou `control-app/` touchés → copier à la racine → confirmer taille. Ne jamais oublier, ne jamais demander confirmation. Les fichiers `client/` (Vercel) ne nécessitent pas de rebuild.
+3. **Rebuild APK OBLIGATOIRE** si `server-app/` ou `control-app/` touchés → copier à la racine → confirmer taille
 4. Mettre à jour `MEMORY.md` si nouvelle info structurelle
 
 ### 3. Comptes git
@@ -33,10 +32,7 @@ Ne jamais lister des fichiers "à faire", ne jamais demander confirmation pour d
 | `menu-pro-demo` | `mozart-cafe-menu` | `mozartcafe.contact@gmail.com` |
 
 ### 4. Audit obligatoire avant chaque modif de code
-Vérifier l'impact sur les fonctionnalités existantes. Ne jamais "c'est fait" sans vérification grep/lecture.
-
 ### 5. Fichiers HTML volumineux → Node.js pour les remplacements
-
 ### 6. Git pull obligatoire en début de session
 
 ---
@@ -45,13 +41,10 @@ Vérifier l'impact sur les fonctionnalités existantes. Ne jamais "c'est fait" s
 
 | Service | Compte | Détail |
 |---------|--------|--------|
-| GitHub SaaS | `Cafe-elysee` | email : `malek24593636@gmail.com` |
-| GitHub Démo | `mozart-cafe-menu` | email : `mozartcafe.contact@gmail.com` |
+| GitHub SaaS | `Cafe-elysee` | `malek24593636@gmail.com` |
 | Vercel SaaS | `malek24593636@gmail.com` | https://menu-saas-platform.vercel.app/ |
-| Vercel Démo | `mozartcafe.contact@gmail.com` | https://menu-pro-demo.vercel.app/ |
 | Firebase SaaS | `mozartcafe.contact@gmail.com` | projet `menu-saas-platform` |
-| Firebase Control | `mozartcafe.contact@gmail.com` | projet `menu-pro-control` (devis uniquement) |
-| Cloudinary | `dowi189l9` | preset `menu_photos` — isolation par `/{rid}/` |
+| Cloudinary | `dowi189l9` | preset `menu_photos` — isolation `/{rid}/` |
 | Restaurant demo | `?rid=demo` | mot de passe : `MenuPro2026` |
 
 ---
@@ -78,7 +71,7 @@ restaurants/{rid}/
   orders/{id}/    ← { tableNum, table, ts, items, total, status, createdAt }
   calls/lastCall  ← { table, ts, lang }
   devices/{deviceId}/  ← tokens FCM server-app
-  messages/{ts}/  ← { text, ts, lang } — cleanup auto 30j
+  messages/{ts}/  ← { text, ts, lang } — cleanup 30j
   analytics/{YYYY-MM-DD}/  ← { createdAt, orders:{tbl:cnt}, calls:{tbl:cnt}, products:{id:{qty,name}} }
 
 control/
@@ -98,81 +91,39 @@ control/
 
 ---
 
-## Système FCM
-
-| App | Token dans | Envoyé par |
-|-----|-----------|------------|
-| Server-app | `restaurants/{rid}/devices/{deviceId}` | `/api/notify` |
-| Control-app | `control/fcm_tokens/{deviceId}` | `/api/notify-control` |
-
-**Messages admin** : sauvegardés dans `restaurants/{rid}/messages/{ts}` même sans app connectée. Server-app charge l'historique via `startMessagesListener()`. Cleanup auto 30j.
-
----
-
-## Langues — Deux paramètres
-
-| Paramètre | Chemin Firebase | Effet |
-|-----------|----------------|-------|
-| `defaultLang` | `config/defaultLang` | Langue affichée au menu client à la 1ère visite |
-| `primaryLang` | `config/primaryLang` | Langue de saisie admin + défaut server-app |
-
----
-
-## Rétention — Defaults
-
-- 1 semaine (604800000 ms) pour appels et commandes — sauvé dans Firebase à la création
-- Messages admin : cleanup auto 30 jours dans Firebase
-
----
-
-## Onglet initial server-app
-
-1. Commandes en attente → Commandes (priorité absolue)
-2. Appels en attente (sans commandes) → Appels
-3. Commande seule OU les deux activées → Commandes
-4. Sonnette seule → Appels
-5. Aucune option → dernier onglet visité ou Appels
-
----
-
 ## Points techniques critiques
 
-### Modals control-app hors tabs-track (IMPORTANT)
-`#del-modal` et `#nc-modal` doivent être placés **après la fermeture de `#app`**, jamais dans `.tabs-track`. En WebView Android, `position:fixed` dans un parent transformé perd son ancrage au viewport → zone tactile décalée → boutons non cliquables.
-
 ### Section Statistiques admin — stats-card (IMPORTANT)
-La section Statistiques utilise la classe `.stats-card` (PAS `adm-section`). Le JS `setupCollapsible()` enveloppe les `adm-section` dans `sec-body > sec-body-inner` — ce wrapping casse le rendu des graphiques Firebase. La section a son propre collapse via `toggleStatsCard()` (CSS max-height, état localStorage).
-
-### Graphiques analytics — animation CSS @keyframes
-Les barres SVG utilisent `@keyframes chartBarGrow` + CSS custom property `--bar-i` pour le délai. Pas de manipulation JS de classe `.anim` — trop fragile. Les barres sont rendues à leur position finale dès le départ.
+Classe `.stats-card` OBLIGATOIRE (jamais `adm-section`). Le JS `setupCollapsible()` wrapping casse les graphiques Firebase. Collapse via `toggleStatsCard()` CSS max-height + localStorage.
 
 ### Listeners analytics — démarrage au chargement
-`startOrdersListener()` et `startAnalyticsListener()` sont appelés depuis `switchAdminTab` ET depuis `DOMContentLoaded` si `_adminCurrentTab === 'orders'`. Sans ce double démarrage, un refresh sur l'onglet 2 ne charge pas les graphiques.
+`startOrdersListener()` + `startAnalyticsListener()` depuis `switchAdminTab` ET depuis `DOMContentLoaded` si onglet 2 actif. Sinon refresh sur onglet 2 → graphiques vides.
+
+### FAB visibilité — _updateScFabVisibility en dernier
+Dans `syncStyleAdminUI`, `_updateScFabVisibility()` DOIT être appelé en DERNIER (après `scNoteBtn.style.display`). Sinon Note réapparaît sur onglet 2.
+
+### Modals control-app hors tabs-track
+`#del-modal` et `#nc-modal` après fermeture `#app`. Position:fixed dans parent transformé → zone tactile cassée sur Android.
+
+### escapeHtml — partout sur données Firebase
+- server-app : fonction `escapeHtml` définie, utilisée partout ✅
+- control-app : fonction `escapeHtml` définie (depuis audit 2026-06-04), `client.name` escapé ✅
+- admin.html : fonction `esc()` définie, utilisée ✅
+
+### Graphiques analytics — animation CSS @keyframes
+Barres SVG utilisent `@keyframes chartBarGrow` + CSS custom property `--bar-i`. Pas de manipulation JS de classe `.anim`.
 
 ### Backfill analytics
-`_backfillAnalyticsFromOrders()` s'exécute depuis le listener orders (après que `_adminAllOrders` est peuplé), avec `_analyticsBackfillDone` flag pour ne tourner qu'une fois par session. Utilise `o.createdAt || o.ts` pour couvrir les anciennes commandes.
+`_backfillAnalyticsFromOrders()` dans le listener orders avec `_analyticsBackfillDone` flag. Utilise `o.createdAt || o.ts`.
 
-### Commandes — Structure Firebase obligatoire
+### Commandes — Structure Firebase
 ```js
 { tableNum, table: String(tableNum), ts: Date.now(), items, total, status:'pending', createdAt: ts }
 ```
 
-### FCM sécurité
-- 3 tentatives backoff | max 8 simultanés | token invalide supprimé sur 404/410
-- Canal `mp_srv_v3` créé en Java natif (MainActivity.java server-app)
-
-### escapeHtml
-Appliqué sur toutes les données Firebase avant `innerHTML` dans server-app et control-app.
-
 ---
 
 ## Risques Capacitor — Google Drive corrompt les fichiers
-
-| Fichier | Fix |
-|---------|-----|
-| `capacitor.plugins.json` vide | Remettre entrées PushNotificationsPlugin |
-| `build.gradle` node_modules vide | Copier depuis l'autre app |
-| `capacitor.config.json` avec bloc `server.url` | Supprimer ce bloc |
 
 Ordre de vérification si push absent : plugins.json → settings.gradle → build.gradle → node_modules build.gradle → MainActivity.java
 
@@ -180,8 +131,7 @@ Ordre de vérification si push absent : plugins.json → settings.gradle → bui
 
 ## Vercel — Notes
 
-- `FIREBASE_SERVICE_ACCOUNT` "Needs Attention" = cosmétique → Redeploy (pas Rotate)
-- `DIAG_SECRET` = `Malek2026Diag` — URL diag : `https://menu-saas-platform.vercel.app/api/diag?secret=Malek2026Diag`
+- `DIAG_SECRET` = `Malek2026Diag` — URL : `https://menu-saas-platform.vercel.app/api/diag?secret=Malek2026Diag`
 
 ---
 
@@ -191,7 +141,7 @@ Ordre de vérification si push absent : plugins.json → settings.gradle → bui
 restaurants/$rid/devices/$deviceId  → token<300, ts number, lang string
 restaurants/$rid/orders/$orderId    → table + ts number
 restaurants/$rid/calls/$callId      → table + ts number
-restaurants/$rid/messages/$msgId   → text string<500, ts number
+restaurants/$rid/messages/$msgId   → text<500, ts number
 restaurants/$rid/analytics/$dateKey → createdAt number
 control/fcm_tokens/$deviceId        → lecture bloquée, écriture validée
 demoPage/                           → lecture + écriture publique
@@ -201,35 +151,20 @@ demoPage/                           → lecture + écriture publique
 
 ## 🔒 État fonctionnel — 2026-06-04
 
-**Commit de référence : `01f24f5`**
+**Commit de référence : `955bffb`** (après audit complet)
 
-Ce que couvre cet état (tout validé par Malek) :
 - FCM sonnette, commandes, messages admin ✅
-- Commandes Firebase (structure validée) ✅
-- Control-app : langues 5, carte stable, rétention 1 semaine, modals hors tabs-track ✅
-- Control-app : bouton confirmer suppression toujours actif ✅
-- Control-app : toggles rechargés correctement après création/suppression client ✅
-- Control-app : un seul listener Firebase restaurants ✅
-- Control-app : labels Nom/ID au-dessus des champs, boutons "Mettre à jour" style unifié ✅
-- Server-app : onglet initial intelligent, messages persistants, cleanup 30j ✅
-- Server-app : nom restaurant dès le démarrage, dropdown langue compact ✅
-- Server-app : appels persistants Firebase, rétention via control-app ✅
-- Server-app : scroll conservé au changement de statut commande ✅
-- Menu client : nom restaurant en cache localStorage ✅
-- Admin : 2 onglets Affichage Menu / Commandes & Appels ✅
-- Admin : section Statistiques — carte unique réductible (chevron + état sauvegardé) ✅
-- Admin : graphiques SVG top 10 (commandes/appels/produits) dans la carte Statistiques ✅
-- Admin : animation graphiques CSS @keyframes (barres toujours visibles) ✅
-- Admin : listeners démarrés au refresh sur onglet 2 ✅
-- Admin : backfill analytics robuste (createdAt + ts fallback, regex corrigée) ✅
-- Admin : labels axes X/Y plus lisibles, tri croissant à valeur égale ✅
-- Admin : FAB raccourcis contextuels, swipe mobile, desktop responsive ✅
-- Analytics agrégats Firebase : 12 mois, cleanup 365j, backfill ✅
-- Bottom nav unified 3 apps (pill+gold) ✅
-- Firebase rules v3 + analytics appliquées ✅
-- Audit complet 2026-06-04 ✅
+- Control-app : labels Nom/ID, boutons Mettre à jour, escapeHtml, erreur modal ✅
+- Server-app : onglet initial, messages, scroll, 5 langues ✅
+- Admin : section Statistiques réductible, graphiques fonctionnels ✅
+- Admin : traductions 5 langues complètes (tables, graphiques, badges, commandes) ✅
+- Admin : FAB onglet 2 correct au refresh ✅
+- Analytics : backfill robuste, période 30j défaut ✅
+- Bottom nav unified, swipe, desktop responsive ✅
+- Firebase rules v3 + analytics ✅
+- Audit sécurité + traductions complet 2026-06-04 ✅
 
-**Note build APK** : `npx cap sync` ne copie jamais `index.html` automatiquement — copie manuelle obligatoire vers `android/app/src/main/assets/public/index.html` avant chaque build.
+**Note build APK** : copie manuelle `index.html` obligatoire avant chaque build.
 
 ---
 
@@ -249,8 +184,8 @@ G:\Mon Drive\menu-saas-platform\
 ├── client/       → Vercel SaaS
 ├── control-app/  → APK Control
 ├── server-app/   → APK Serveur
-├── demo-page/    → Page démo (repo séparé, ignoré par git SaaS)
+├── demo-page/    → Page démo (repo séparé)
 ├── BUILD.md
-├── STATE.md      → état courant + état fonctionnel
-└── MEMORY.md     → ce fichier
+├── STATE.md
+└── MEMORY.md
 ```
