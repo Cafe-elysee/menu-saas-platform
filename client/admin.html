@@ -5666,7 +5666,6 @@ function renderThemeSelector() {
   grid.innerHTML = '';
   grid.classList.remove('mode-simple');
   const hiddenData = hiddenThemesData || {};
-  const themeVariants = _currentFeatures?.themeVariants || {};
   const layoutFamilies = new Set(LAYOUTS_DATA.map(l => l.family));
 
   const makeSep = txt => { const d=document.createElement('div'); d.className='theme-grid-sep'; d.textContent=txt; return d; };
@@ -5719,11 +5718,7 @@ function renderThemeSelector() {
     });
   }
 
-  const visibleLayouts = LAYOUTS_DATA.filter(l => {
-    if (hiddenData[l.family]) return false;
-    const hv = (themeVariants[l.family]||{}).hidden||{};
-    return l.variants.some(v => !hv[v.id]);
-  });
+  const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenData[l.family]);
   if (visibleLayouts.length > 0) {
     const lbl = currentLang==='en'?'Elegant':currentLang==='de'?'Elegant':currentLang==='ar'?'أنيق':'Élégant';
     grid.appendChild(makeSep(lbl));
@@ -5898,19 +5893,10 @@ function _styleOk(mode) {
 function applyFeatures(features) {
   _currentFeatures = features;
 
-  // Si le thème actif est une variante cachée → revenir à la default de la famille
-  const _tv = features?.themeVariants || {};
-  const _activeLayout = LAYOUTS_DATA.find(l => l.variants.some(v => v.id === currentMenuTheme));
-  if (_activeLayout) {
-    const _varCfg = _tv[_activeLayout.family] || {};
-    if ((_varCfg.hidden || {})[currentMenuTheme]) {
-      saveMenuTheme(_varCfg.default || _activeLayout.variants[0].id);
-    }
-  }
 
-  // Afficher/masquer la section Fêtes selon la licence Control (bouton Control)
+  // Section Fêtes toujours visible
   const secEvents = document.getElementById('sec-events');
-  if (secEvents) secEvents.style.display = _featOk('eventOverlay') ? '' : 'none';
+  if (secEvents) secEvents.style.display = '';
 
   // Si une feature devient non-licenciée, désactiver aussi la fonctionnalité côté menu/client
   if (adminData?.info) {
@@ -5922,14 +5908,6 @@ function applyFeatures(features) {
       adminData.info.showCallBtn = false;
       _rref('menu/info/showCallBtn').set(false);
     }
-    if (!_featOk('photos') && adminData.info.showPhotos !== false) {
-      adminData.info.showPhotos = false;
-      _rref('menu/info/showPhotos').set(false);
-    }
-  }
-  // Overlay Fêtes : désactiver l'événement actif si la licence est retirée
-  if (!_featOk('eventOverlay') && currentActiveEvent) {
-    saveActiveEvent('');
   }
 
   // Re-appliquer l'UI pour prendre en compte les contraintes de licence
@@ -6005,7 +5983,6 @@ function syncStyleAdminUI(mode) {
   if (photosBtn) photosBtn.style.display = '';
   // Contraintes de licence : masquer les boutons non licenciés (dual-path: flat ou nested)
   if (callBtn   && !_featOk('callBtn')) callBtn.style.display   = 'none';
-  if (photosBtn && !_featOk('photos'))  photosBtn.style.display = 'none';
   if (orderBtn  && !_featOk('orderUI')) orderBtn.style.display  = 'none';
 
   // FAB notification visible uniquement si sonnette OU commande est licenciée depuis Control

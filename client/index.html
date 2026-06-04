@@ -5727,20 +5727,17 @@ function loadAdminData() {
     // Chip table masqué au client — numéro de table jamais affiché dans le menu
   });
 
-  // Licence overlay fêtes (depuis Control)
-  _rref('/config/features/buttons/eventOverlay').on('value', snap => {
-    _eventOverlayLicensed = snap.val() !== false;
-    if (!_eventOverlayLicensed) delete document.body.dataset.activeEvent;
-    setupEventsOverlay();
-  });
+  // Overlay fêtes toujours actif
+  _eventOverlayLicensed = true;
+  setupEventsOverlay();
 
-  // Variantes de thème : si la variante active est masquée → basculer sur la default
+  // Variantes de thème : toujours toutes visibles — plus de restriction par licence
   _rref('/config/features/themeVariants').on('value', snap => {
     const themeVariants = snap.val() || {};
     const family = _themeFamily(menuTheme);
     const varConfig      = themeVariants[family] || {};
     const hiddenVariants = varConfig.hidden || {};
-    if (!hiddenVariants[menuTheme]) return; // variante visible → rien à faire
+    if (!hiddenVariants[menuTheme]) return;
     const defaultTheme = varConfig.default || family;
     menuTheme = defaultTheme;
     document.documentElement.dataset.menuTheme = menuTheme;
@@ -6097,7 +6094,6 @@ function setupEventsOverlay() {
   }
 
   if (!overlay) return;
-  if (!_eventOverlayLicensed) { _clearAll(); return; }
 
   var activeEvent = document.body.dataset.activeEvent || '';
   var cfg = EVENTS_CONFIG[activeEvent];

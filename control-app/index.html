@@ -1664,7 +1664,7 @@ async function createNewClient() {
         active: true,
         features: {
           callBtn: true, orderUI: true, photos: true,
-          tableSystem: true, qrOrdering: true
+          tableSystem: true, qrOrdering: true, eventOverlay: true
         },
         retention: { calls: 604800000, orders: 604800000 }
       }
@@ -1956,16 +1956,11 @@ function buildClientCard(client) {
       '</div>' +
       '<div class="info-edit-warn" id="idwarn-'+id+'"></div>' +
 
-      '<div class="section-label">🎨 VISIBILITÉ DES THÈMES (LICENCE)</div>' +
-      '<div class="feat-list" id="theme-toggles-'+s+'">'+themeToggles+'</div>' +
-
       '<hr class="divider">' +
       '<div class="section-label">⚙️ Boutons disponibles (licence)</div>' +
       '<div class="feat-list">' +
         togFeat('feat-btn-callBtn','🔔 Bouton sonnette',"writeFeatureBtn('"+s+"','callBtn',this.checked)") +
         togFeat('feat-btn-qrSystem','🛒 Système de commande QR',"writeQRSystem('"+s+"',this.checked)") +
-        togFeat('feat-btn-photos','🖼️ Photos produits',"writeFeatureBtn('"+s+"','photos',this.checked)") +
-        (client.noEvents ? '' : togFeat('feat-btn-eventOverlay','🎉 Overlay fêtes',"writeFeatureBtn('"+s+"','eventOverlay',this.checked)")) +
       '</div>' +
 
       '<div class="section-label">🌐 Langues disponibles</div>' +
@@ -2112,12 +2107,7 @@ function loadClientData(client) {
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
     set('feat-btn-callBtn',  feat.callBtn);
     set('feat-btn-qrSystem', feat.orderUI !== false && feat.tableSystem !== false && feat.qrOrdering !== false);
-    set('feat-btn-photos',   feat.photos);
-    set('feat-btn-eventOverlay', feat.eventOverlay);
-
     if (!_clientVariants[s]) _clientVariants[s] = {};
-    const tv = feat.themeVariants || {};
-    Object.keys(tv).forEach(fam => { _clientVariants[s][fam] = tv[fam]; });
 
     const enabledLangs = cfg.enabledLangs || {};
     client.langs.forEach(l => {
@@ -2134,13 +2124,6 @@ function loadClientData(client) {
     const ro = document.getElementById('ret-orders-'+id); if (ro  && ret.orders) ro.value  = ret.orders;
   });
 
-  db.ref('/menu').on('value', snap => {
-    const menu   = snap.val() || {};
-    const hidden = menu.hiddenThemes || {};
-    const container = document.getElementById('theme-toggles-'+s);
-    if (container) container.querySelectorAll('input[data-id]').forEach(cb => { cb.checked = !hidden[cb.dataset.id]; });
-
-  });
 
   if (client.demoPage) {
     db.ref('demoPage/heroSlides').once('value').then(snap => {
