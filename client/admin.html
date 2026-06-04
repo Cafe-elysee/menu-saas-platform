@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="el">
 <head>
   <meta charset="UTF-8">
@@ -1969,8 +1969,8 @@
             <button class="qr-cp"    data-center="image" onclick="qrSetCenter('image')">🖼 Image</button>
           </div>
           <div id="qr-ctr-text" class="qr-ctr-sub" style="display:none">
-            <input type="text" class="qr-ctxt" id="qr-center-text" maxlength="4" placeholder="☕" oninput="qrUpdatePreview()">
-            <div class="qr-ctxt-h">Affiché au centre — 4 caractères max</div>
+            <input type="text" class="qr-ctxt" id="qr-center-text" maxlength="7" placeholder="☕" oninput="qrUpdatePreview()">
+            <div class="qr-ctxt-h">Affiché au centre — 7 caractères max · fond transparent</div>
           </div>
           <div id="qr-ctr-img" class="qr-ctr-sub" style="display:none">
             <label class="qr-upl">
@@ -6746,14 +6746,13 @@ function _qrBuildSVG(url, size) {
 
   // Centre
   let center = '';
-  const cSz = size * 0.2, cx = (size-cSz)/2, cy = (size-cSz)/2, cPad = m*0.8;
+  const cSz = size * 0.22, cx = (size-cSz)/2, cy = (size-cSz)/2;
   if (_QR.centerType === 'text' && _QR.centerText.trim()) {
-    const fs = Math.round(cSz*0.56), txt = _QR.centerText.trim().slice(0,4);
-    center = `<rect x="${cx-cPad}" y="${cy-cPad}" width="${cSz+cPad*2}" height="${cSz+cPad*2}" rx="${cPad}" fill="${bg}"/>`;
-    center += `<text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" fill="${fg}" font-family="Outfit,sans-serif">${txt}</text>`;
+    const txt = _QR.centerText.trim().slice(0, 7);
+    const fs  = Math.round(cSz * Math.min(0.58, 2.6 / Math.max(txt.length, 1)));
+    center = `<text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" fill="${fg}" font-family="Outfit,sans-serif" textLength="${Math.round(cSz*0.9)}" lengthAdjust="spacingAndGlyphs">${txt}</text>`;
   } else if (_QR.centerType === 'image' && _QR.centerImg) {
-    center = `<rect x="${cx-cPad}" y="${cy-cPad}" width="${cSz+cPad*2}" height="${cSz+cPad*2}" rx="${cPad}" fill="${bg}"/>`;
-    center += `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
+    center = `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/>${mods}${eyes}${center}</svg>`;
