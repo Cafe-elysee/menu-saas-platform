@@ -5765,6 +5765,7 @@ function startOrdersListener() {
       .sort((a, b) => b.createdAt - a.createdAt);
     renderOrdersAdmin(orders);
     if (_adminCurrentTab === 'orders') updateAnalytics();
+    if (!_analyticsBackfillDone) { _analyticsBackfillDone = true; _backfillAnalyticsFromOrders(_analyticsData); }
   });
 }
 
@@ -5996,9 +5997,10 @@ let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
 let _adminCurrentPeriod = 'week';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
-let _adminAllOrders     = {};
-let _analyticsData      = {};
-let _analyticsListener  = null;
+let _adminAllOrders        = {};
+let _analyticsData         = {};
+let _analyticsListener     = null;
+let _analyticsBackfillDone = false;
 
 function switchAdminTab(tab) {
   if (tab === _adminCurrentTab) return;
@@ -6249,7 +6251,7 @@ function _backfillAnalyticsFromOrders(existing) {
     if (existing[key]) return; // déjà agrégé
     if (!pending[key]) pending[key] = { createdAt: new Date(key + 'T00:00:00').getTime(), orders: {}, products: {} };
     const tbl = String(o.tableNum || '');
-    if (/^[1-9]d*$/.test(tbl)) pending[key].orders[tbl] = (pending[key].orders[tbl] || 0) + 1;
+    if (/^[1-9]\d*$/.test(tbl)) pending[key].orders[tbl] = (pending[key].orders[tbl] || 0) + 1;
     (o.items || []).forEach(it => {
       const id = String(it.id ?? '?');
       if (!pending[key].products[id]) pending[key].products[id] = { qty: 0, name: it.name || id };
