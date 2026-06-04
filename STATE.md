@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-06
+## Dernière mise à jour : 2026-06-07
 
 ---
 
@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `5d3ccc9` (2026-06-06)
+**Commit** : `à mettre à jour après push` (2026-06-07)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
@@ -77,7 +77,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - Message "Aucune commande" traduit au changement de langue ✅
 - FAB onglet 2 correct au refresh ✅
 
-### Admin panel — QR Codes ✅ (ajouté post-955bffb)
+### Admin panel — QR Codes ✅
 - Bouton "QR ↗" et boutons Ouvrir/Copier par table ✅
 - Popup personnalisation complet :
   - Picker couleur HSV custom (carré saturation/valeur + slider teinte) ✅
@@ -89,7 +89,10 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
   - Centre transparent (sans fond blanc) ✅
   - Aperçu SVG vectoriel temps réel ✅
   - Bouton retour Android ferme le popup ✅
+  - **Scroll admin bloqué pendant que le popup est ouvert** ✅
 - PDF 2 colonnes haute résolution téléchargeable ✅
+  - **Fond blanc (plus de noir)** ✅
+  - **ID retiré du contenu et du nom de fichier** ✅
 - Aperçu QR adapté à la taille du conteneur (SVG 100%) ✅
 
 ---
@@ -105,8 +108,9 @@ Utilise `.stats-card` (jamais `adm-section`). Collapse via `toggleStatsCard()` C
 ### Modals control-app hors tabs-track
 `#del-modal` et `#nc-modal` après fermeture `#app`. Position:fixed dans parent transformé → zone tactile décalée sur Android.
 
-### QR Popup — bouton retour Android
+### QR Popup — bouton retour Android + scroll lock
 `history.pushState({qrModal:true},'')` à l'ouverture + listener `popstate` pour fermer → bouton retour natif Android fonctionne.
+`document.body.style.overflow='hidden'` + sauvegarde `_qrScrollY` à l'ouverture → scroll admin bloqué, position restaurée à la fermeture.
 
 ### QR Picker HSV
 `_QR._hsv = {h:0,s:1,v:1}` initialisé dans `_QR`. Fonctions `_hsvToHex`, `_hexToHsv`, `_qrUpdateHsvUI`, `_qrInitHsvEvents`. Drag sur carré SV + slider teinte, touch + mouse.
@@ -127,7 +131,7 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## Audit complet — 2026-06-04 ✅ + QR 2026-06-06 ✅
+## Audit complet — 2026-06-04 ✅ + QR 2026-06-06 ✅ + PDF/Scroll 2026-06-07 ✅
 
 | Point | Statut |
 |-------|--------|
@@ -140,6 +144,8 @@ demoPage/                           → lecture + écriture publique
 | FCM retry, concurrence max 8, token invalide supprimé | ✅ |
 | Firebase rules v3 appliquées | ✅ |
 | QR codes — popup complet avec picker HSV, styles, PDF | ✅ |
+| PDF QR fond blanc, ID retiré du contenu et du nom de fichier | ✅ |
+| Scroll admin bloqué quand popup QR ouvert (position restaurée à la fermeture) | ✅ |
 | DIAG_SECRET retiré de MEMORY.md | ✅ |
 
 ---

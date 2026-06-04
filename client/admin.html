@@ -6801,8 +6801,11 @@ function _qrInitUI() {
 }
 
 let _qrHistoryPushed = false;
+let _qrScrollY = 0;
 function openQRModal() {
   if (!_tableCount) return;
+  _qrScrollY = window.scrollY;
+  document.body.style.overflow = 'hidden';
   document.getElementById('qr-modal').classList.add('open');
   history.pushState({ qrModal: true }, '');
   _qrHistoryPushed = true;
@@ -6810,12 +6813,16 @@ function openQRModal() {
 }
 function closeQRModal() {
   document.getElementById('qr-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  window.scrollTo(0, _qrScrollY);
   if (_qrHistoryPushed) { _qrHistoryPushed = false; history.back(); }
 }
 window.addEventListener('popstate', () => {
   if (document.getElementById('qr-modal').classList.contains('open')) {
     _qrHistoryPushed = false;
     document.getElementById('qr-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    window.scrollTo(0, _qrScrollY);
   }
 });
 
