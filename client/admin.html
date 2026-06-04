@@ -637,8 +637,8 @@
     .qr-preset { width:20px; height:20px; border-radius:5px; border:1.5px solid transparent; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
     .qr-preset:hover { transform:scale(1.2); border-color:rgba(255,255,255,0.25); }
     .qr-preset.on { border-color:var(--gold) !important; transform:scale(1.15); }
-    .qr-style-grid { display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; }
-    .qr-sc { padding:5px 9px; border-radius:8px; border:1.5px solid rgba(200,164,78,0.14); background:rgba(255,255,255,0.025); color:var(--muted); font-size:0.67rem; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:4px; transition:all 0.18s; flex-shrink:0; white-space:nowrap; }
+    .qr-style-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+    .qr-sc { padding:5px 8px; border-radius:8px; border:1.5px solid rgba(200,164,78,0.14); background:rgba(255,255,255,0.025); color:var(--muted); font-size:0.67rem; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:4px; transition:all 0.18s; white-space:nowrap; justify-content:center; }
     .qr-sc:hover { border-color:rgba(200,164,78,0.38); color:var(--cream); background:rgba(200,164,78,0.04); }
     .qr-sc.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.09); }
     .qr-sc-ico { width:14px; height:14px; flex-shrink:0; }
