@@ -3142,6 +3142,33 @@
       .hero-bg-img.loaded { animation:none !important; }
     }
 
+    /* ── Desktop élégant ── */
+    @media(min-width:1024px) {
+      /* Cards produits : hover effect */
+      .card:hover {
+        transform:translateY(-3px);
+        box-shadow:0 12px 32px rgba(0,0,0,0.3);
+        border-color:rgba(200,164,78,0.25);
+      }
+      /* Menu-wrap centré avec séparateur décoratif */
+      #menu-wrap { max-width:1100px; }
+      /* Footer plus aéré */
+      #footer { padding:48px 40px 80px; max-width:1100px; }
+      /* Catégorie sticky */
+      .cat-pills-wrap {
+        position:sticky; top:0; z-index:20;
+        backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      }
+      /* Sheet (popup produit) centré */
+      #sheet { max-width:620px; border-radius:24px 24px 0 0; }
+      /* Cart bar plus compact et arrondi */
+      #cart-bar { max-width:640px; left:50%; right:auto; transform:translateX(-50%); border-radius:20px 20px 0 0; }
+    }
+    @media(min-width:1400px) {
+      .cards { grid-template-columns:repeat(4,1fr); gap:18px; }
+      #menu-wrap { max-width:1300px; padding:0 40px 80px; }
+    }
+
     /* ── Desktop : hero-scroll visible, séparé du contenu ── */
     @media(min-width:1025px) {
       #hero { justify-content:flex-start; }
@@ -6984,7 +7011,9 @@ async function confirmOrder() {
       const _aDay = _analyticsDay();
       const _aRef = _rref('analytics/' + _aDay);
       _aRef.child('createdAt').transaction(v => v || ts);
-      if (!isTakeaway && /^\d+$/.test(String(tableNum))) {
+      if (isTakeaway) {
+        _aRef.child('orders/takeaway').transaction(v => (v||0) + 1);
+      } else if (/^\d+$/.test(String(tableNum))) {
         _aRef.child('orders/' + String(tableNum)).transaction(v => (v||0) + 1);
       }
       items.forEach(it => {

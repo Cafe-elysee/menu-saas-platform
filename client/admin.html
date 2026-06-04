@@ -259,7 +259,7 @@
 
     /* ── SAVED TOAST ── */
     #toast {
-      position:fixed; bottom:110px; left:50%;
+      position:fixed; bottom:calc(var(--admin-nav-h) + 102px); left:50%;
       transform:translateX(-50%) translateY(0);
       background:var(--bg3); border:1px solid var(--bord2); border-radius:12px;
       padding:12px 22px; font-size:0.84rem; color:var(--green);
@@ -312,8 +312,8 @@
     html[dir="rtl"] .sc-popup button { text-align:right; }
 
     /* ── MAIN LAYOUT ── */
-    .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px 90px; }
-    @media(min-width:900px) { .adm-wrap { padding:28px 24px 90px; } }
+    .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px calc(var(--admin-nav-h) + 80px); }
+    @media(min-width:900px) { .adm-wrap { padding:28px 24px calc(var(--admin-nav-h) + 80px); } }
 
     /* ── HERO IMAGE SECTION ── */
     .hero-img-card {
@@ -451,7 +451,7 @@
 
     /* ── FAB NOTIFICATION ── */
     #fab-notif {
-      position:fixed; bottom:100px; right:20px;
+      position:fixed; bottom:calc(var(--admin-nav-h) + 92px); right:20px;
       width:52px; height:52px; border-radius:50%;
       background:linear-gradient(135deg,#5a9e4a,#7ebd6a);
       color:#fff; display:flex; align-items:center; justify-content:center;
@@ -944,7 +944,7 @@
     /* ── SAVE FAB (remplace save-bar) ── */
     .save-bar { display:none; } /* gardé pour compatibilité JS, masqué visuellement */
     #fab-save {
-      position:fixed; bottom:28px; right:20px;
+      position:fixed; bottom:calc(var(--admin-nav-h) + 20px); right:20px;
       width:60px; height:60px; border-radius:50%;
       background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
       color:#0c0a08;
@@ -1181,6 +1181,23 @@
       .login-box { max-width:420px; padding:44px 36px; }
     }
 
+    /* ── Desktop élégant ── */
+    @media(min-width:900px) {
+      /* Sections : cards avec shadow sur desktop */
+      .adm-section {
+        box-shadow:0 2px 18px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.1);
+        border-radius:18px;
+      }
+      html.light .adm-section {
+        box-shadow:0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+      }
+      /* Charts un peu plus hauts */
+      .chart-svg-wrap svg { min-height:190px; }
+      /* Analytics filter bar ombre */
+      .analytics-filter-bar {
+        box-shadow:0 2px 12px rgba(0,0,0,0.1);
+      }
+    }
     @media(min-width:1100px) {
       .adm-wrap { max-width:1200px; }
       .adm-header { padding:10px 48px; }
@@ -1340,29 +1357,81 @@
   }
   body.demo-mode #demo-banner { display: block; }
 
-  /* ── ADMIN ONGLETS ── */
-  #admin-tabs-bar {
-    display:flex; gap:0; margin:0 0 20px;
-    border-radius:14px; overflow:hidden;
-    border:1.5px solid var(--border); background:var(--bg);
-    position:sticky; top:60px; z-index:90;
+  /* ── ADMIN BOTTOM NAV ── */
+  :root { --admin-nav-h: 62px; }
+  #admin-bottom-nav {
+    position:fixed; bottom:0; left:0; right:0;
+    height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
+    background:rgba(10,9,8,0.97);
+    backdrop-filter:blur(32px) saturate(200%);
+    -webkit-backdrop-filter:blur(32px) saturate(200%);
+    border-top:1px solid rgba(200,164,78,0.1);
+    box-shadow:0 -8px 32px rgba(0,0,0,0.3);
+    display:flex; align-items:stretch;
+    z-index:500;
+    padding-bottom:env(safe-area-inset-bottom);
   }
-  html.light #admin-tabs-bar { background:var(--bg2); }
-  @media(max-width:599px) { #admin-tabs-bar { top:52px; } }
-  .admin-tab-btn {
-    flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
-    padding:12px 10px; background:none; border:none;
-    color:var(--muted); font-family:inherit; font-size:0.8rem; font-weight:600;
-    cursor:pointer; transition:all 0.2s; letter-spacing:0.02em; line-height:1.2;
+  html.light #admin-bottom-nav {
+    background:rgba(245,240,232,0.97);
+    border-top-color:rgba(168,104,64,0.18);
+    box-shadow:0 -4px 20px rgba(0,0,0,0.06);
   }
-  .admin-tab-btn:hover { color:var(--gold); background:rgba(200,164,78,0.06); }
-  .admin-tab-btn.active {
-    color:var(--gold); background:rgba(200,164,78,0.1);
-    box-shadow:inset 0 -2.5px 0 var(--gold);
+  .admin-nav-btn {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:5px; padding:8px 4px 10px;
+    color:var(--muted); transition:color 0.22s;
+    position:relative; background:none; border:none;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+    font-family:inherit;
   }
-  .admin-tab-btn svg { flex-shrink:0; opacity:0.65; transition:opacity 0.2s; }
-  .admin-tab-btn.active svg { opacity:1; }
-  .tab-label { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .admin-nav-btn::before {
+    content:'';
+    position:absolute; top:10px; left:50%;
+    transform:translateX(-50%) scaleX(0);
+    width:64px; height:38px;
+    background:rgba(200,164,78,0.1);
+    border-radius:12px;
+    transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s;
+    opacity:0;
+  }
+  .admin-nav-btn.on::before { transform:translateX(-50%) scaleX(1); opacity:1; }
+  .admin-nav-btn.on { color:var(--gold); }
+  .admin-nav-btn:active { opacity:0.7; }
+  .admin-nav-icon {
+    width:24px; height:24px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position:relative; z-index:1;
+  }
+  .admin-nav-icon svg { width:22px; height:22px; }
+  .admin-nav-btn.on .admin-nav-icon { transform:translateY(-2px) scale(1.1); }
+  .admin-nav-label {
+    font-size:0.58rem; font-weight:500; letter-spacing:0.04em; line-height:1;
+    position:relative; z-index:1; transition:font-weight 0.2s;
+    white-space:nowrap;
+  }
+  .admin-nav-btn.on .admin-nav-label { font-weight:700; }
+  /* Transitions panneau */
+  .admin-panel { transition:opacity 0.18s ease, transform 0.18s ease; }
+  .admin-panel.tab-out-left  { opacity:0; transform:translateX(-22px); pointer-events:none; }
+  .admin-panel.tab-out-right { opacity:0; transform:translateX(22px);  pointer-events:none; }
+  @keyframes tabInRight { from { opacity:0; transform:translateX(22px);  } to { opacity:1; transform:none; } }
+  @keyframes tabInLeft  { from { opacity:0; transform:translateX(-22px); } to { opacity:1; transform:none; } }
+  .admin-panel.tab-in-right { animation:tabInRight 0.2s ease both; }
+  .admin-panel.tab-in-left  { animation:tabInLeft  0.2s ease both; }
+  /* Desktop — bottom nav centered + floating */
+  @media(min-width:768px) {
+    #admin-bottom-nav {
+      max-width:520px; left:50%; right:auto;
+      transform:translateX(-50%);
+      border-radius:20px 20px 0 0;
+      box-shadow:0 -6px 28px rgba(0,0,0,0.25), 0 0 0 1px rgba(200,164,78,0.08);
+    }
+    html.light #admin-bottom-nav {
+      box-shadow:0 -4px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.12);
+    }
+  }
   /* ── ANALYTICS FILTER ── */
   .analytics-filter-bar {
     background:var(--bg); border:1.5px solid var(--border);
@@ -1530,18 +1599,6 @@
 </div>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
-
-  <!-- ── ONGLETS ADMIN ── -->
-  <div id="admin-tabs-bar">
-    <button class="admin-tab-btn active" id="admin-tab-display" onclick="switchAdminTab('display')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      <span class="tab-label">Affichage Menu</span>
-    </button>
-    <button class="admin-tab-btn" id="admin-tab-orders" onclick="switchAdminTab('orders')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span class="tab-label">Commandes &amp; Appels</span>
-    </button>
-  </div>
 
   <!-- ── PANEL 1 : Affichage Menu ── -->
   <div id="admin-panel-display" class="admin-panel">
@@ -1755,6 +1812,27 @@
 </button>
 
 <!-- Modal notification -->
+<!-- ── ADMIN BOTTOM NAV ── -->
+<nav id="admin-bottom-nav" aria-label="Navigation">
+  <button class="admin-nav-btn on" id="admin-tab-display" onclick="switchAdminTab('display')">
+    <div class="admin-nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+    </div>
+    <span class="admin-nav-label tab-label">Affichage Menu</span>
+  </button>
+  <button class="admin-nav-btn" id="admin-tab-orders" onclick="switchAdminTab('orders')">
+    <div class="admin-nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <span class="admin-nav-label tab-label">Commandes &amp; Appels</span>
+  </button>
+</nav>
+
 <div id="notif-modal">
   <div class="notif-box">
     <div class="notif-title" id="notif-title-txt">Notifier les serveurs</div>
@@ -3476,8 +3554,8 @@ function applyAdminUI(l) {
   Object.entries(scMap).forEach(([id, key]) => { const el = $(id); if (el) el.textContent = t[key] || el.textContent; });
   // Onglets
   const _tabD = $('admin-tab-display'), _tabO = $('admin-tab-orders');
-  if (_tabD) { const _s = _tabD.querySelector('.tab-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
-  if (_tabO) { const _s = _tabO.querySelector('.tab-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
+  if (_tabD) { const _s = _tabD.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
+  if (_tabO) { const _s = _tabO.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
   // Analytics texts
   const _afl = $('analytics-filter-label'); if (_afl) _afl.textContent = t.analyticsTitle || _afl.textContent;
   const _pillMap = { 'filter-pill-7d':'filter7d','filter-pill-today':'filterToday','filter-pill-30d':'filter30d','filter-pill-12m':'filter12m','filter-pill-custom':'filterCustom' };
@@ -5915,14 +5993,29 @@ let _analyticsData      = {};
 let _analyticsListener  = null;
 
 function switchAdminTab(tab) {
+  if (tab === _adminCurrentTab) return;
+  const wasOrders = _adminCurrentTab === 'orders';
   _adminCurrentTab = tab;
   const isOrders = tab === 'orders';
   const p1 = document.getElementById('admin-panel-display');
   const p2 = document.getElementById('admin-panel-orders');
-  if (p1) p1.style.display = isOrders ? 'none' : '';
-  if (p2) p2.style.display = isOrders ? '' : 'none';
-  document.getElementById('admin-tab-display')?.classList.toggle('active', !isOrders);
-  document.getElementById('admin-tab-orders')?.classList.toggle('active', isOrders);
+  const outCls = isOrders ? 'tab-out-left' : 'tab-out-right';
+  const inCls  = isOrders ? 'tab-in-right' : 'tab-in-left';
+  const hiding = isOrders ? p1 : p2;
+  const showing = isOrders ? p2 : p1;
+  if (hiding) {
+    hiding.classList.add(outCls);
+    setTimeout(() => { hiding.style.display = 'none'; hiding.classList.remove(outCls); }, 180);
+  }
+  if (showing) {
+    showing.style.display = '';
+    showing.classList.remove('tab-out-left','tab-out-right','tab-in-left','tab-in-right');
+    void showing.offsetWidth;
+    showing.classList.add(inCls);
+    setTimeout(() => showing.classList.remove(inCls), 220);
+  }
+  document.getElementById('admin-tab-display')?.classList.toggle('on', !isOrders);
+  document.getElementById('admin-tab-orders')?.classList.toggle('on', isOrders);
   localStorage.setItem(_PFX + 'adm_tab', tab);
   _updateScFabVisibility();
   if (isOrders) {
@@ -5988,7 +6081,12 @@ function computeAnalytics() {
     if ((dayTs + 86400000) < from || dayTs > to) return;
 
     if (day.orders) Object.entries(day.orders).forEach(([tbl, cnt]) => {
-      if (/^[1-9]\d*$/.test(tbl)) ordersByTable[tbl] = (ordersByTable[tbl]||0) + (cnt||0);
+      if (/^[1-9]\d*$/.test(tbl)) {
+        ordersByTable[tbl] = (ordersByTable[tbl]||0) + (cnt||0);
+      } else if (tbl === 'takeaway') {
+        const _tw = (ADMIN_UI[currentLang]||ADMIN_UI.fr).ordTakeaway || 'À emporter';
+        ordersByTable[_tw] = (ordersByTable[_tw]||0) + (cnt||0);
+      }
     });
     if (day.calls) Object.entries(day.calls).forEach(([tbl, cnt]) => {
       if (/^[1-9]\d*$/.test(tbl)) callsByTable[tbl] = (callsByTable[tbl]||0) + (cnt||0);
@@ -6189,10 +6287,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const p2 = document.getElementById('admin-panel-orders');
     if (p1) p1.style.display = 'none';
     if (p2) p2.style.display = '';
-    document.getElementById('admin-tab-display')?.classList.remove('active');
-    document.getElementById('admin-tab-orders')?.classList.add('active');
+    document.getElementById('admin-tab-display')?.classList.remove('on');
+    document.getElementById('admin-tab-orders')?.classList.add('on');
   }
 });
+
+
+/* ── SWIPE ADMIN (mobile uniquement) ── */
+(function() {
+  var _ax = null, _ay = null;
+  document.addEventListener('touchstart', function(e) {
+    _ax = e.touches[0].clientX;
+    _ay = e.touches[0].clientY;
+  }, { passive:true });
+  document.addEventListener('touchend', function(e) {
+    if (_ax === null) return;
+    var dx = e.changedTouches[0].clientX - _ax;
+    var dy = e.changedTouches[0].clientY - _ay;
+    _ax = _ay = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0 && _adminCurrentTab === 'display') switchAdminTab('orders');
+    else if (dx > 0 && _adminCurrentTab === 'orders') switchAdminTab('display');
+  }, { passive:true });
+})();
 
 </script>
 
