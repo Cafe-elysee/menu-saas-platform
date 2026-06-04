@@ -607,43 +607,72 @@
     .table-url-copy:active,.table-url-copy.copied { background:rgba(200,164,78,0.15); color:var(--gold); border-color:var(--gold); }
     html.light .tables-count-input { background:var(--bg2); }
     html.light .table-url-row { background:var(--bg2); }
-    .qr-pdf-btn { margin-left:auto; font-size:0.75rem; color:var(--gold); background:transparent; padding:6px 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-family:inherit; transition:border-color 0.2s, background 0.2s; }
-    .qr-pdf-btn:hover { border-color:var(--gold); background:rgba(200,164,78,0.08); }
+    .qr-pdf-btn { margin-left:auto; font-size:0.74rem; color:var(--gold); background:transparent; padding:6px 13px; border:1px solid rgba(200,164,78,0.38); border-radius:9px; cursor:pointer; font-family:inherit; transition:all 0.2s; display:inline-flex; align-items:center; gap:5px; font-weight:600; }
+    .qr-pdf-btn:hover { border-color:var(--gold); background:rgba(200,164,78,0.1); transform:translateY(-1px); }
     /* ── QR MODAL ── */
-    #qr-modal { display:none; position:fixed; inset:0; z-index:2200; background:rgba(0,0,0,0.72); align-items:center; justify-content:center; padding:16px; }
-    #qr-modal.open { display:flex; }
-    .qr-box { background:var(--bg2); border:1.5px solid var(--bord2); border-radius:20px; width:100%; max-width:400px; overflow:hidden; max-height:90vh; overflow-y:auto; box-shadow:0 24px 60px rgba(0,0,0,0.55); }
-    html.light .qr-box { background:#fff; }
-    .qr-hd { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
-    .qr-hd-title { font-family:'Crimson Pro',serif; font-size:1.15rem; color:var(--gold); }
-    .qr-hd-close { background:transparent; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; padding:4px 8px; border-radius:8px; line-height:1; }
-    .qr-hd-close:hover { color:var(--cream); background:rgba(255,255,255,0.08); }
-    .qr-body { padding:18px 20px; }
-    .qr-sect { margin-bottom:18px; }
-    .qr-sect-lbl { font-size:0.68rem; font-weight:700; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px; }
-    .qr-color-row { display:flex; align-items:center; gap:10px; }
-    .qr-color-swatch { width:34px; height:34px; border-radius:8px; border:2px solid var(--border); cursor:pointer; padding:0; flex-shrink:0; }
-    .qr-color-hex { background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:7px 10px; font-family:monospace; font-size:0.84rem; color:var(--cream); width:96px; outline:none; transition:border-color 0.2s; }
-    .qr-color-hex:focus { border-color:var(--gold); }
-    html.light .qr-color-hex { background:var(--bg2); }
-    .qr-pills { display:flex; gap:6px; flex-wrap:wrap; }
-    .qr-pill { padding:6px 13px; border-radius:10px; border:1.5px solid var(--border); background:transparent; color:var(--muted); font-size:0.78rem; cursor:pointer; font-family:inherit; transition:all 0.18s; }
-    .qr-pill:hover { border-color:rgba(200,164,78,0.5); color:var(--cream); }
-    .qr-pill.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
-    .qr-center-extra { margin-top:10px; }
-    .qr-text-input { width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--cream); font-family:inherit; font-size:0.84rem; outline:none; transition:border-color 0.2s; }
-    .qr-text-input:focus { border-color:var(--gold); }
-    html.light .qr-text-input { background:var(--bg2); }
-    .qr-upload-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:8px; border:1.5px dashed var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.78rem; cursor:pointer; transition:all 0.18s; }
-    .qr-upload-btn:hover { border-color:var(--gold); color:var(--gold); }
-    .qr-upload-fname { font-size:0.7rem; color:var(--gold); margin-top:5px; }
-    .qr-preview-area { display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 0 4px; }
-    #qr-preview-canvas { border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.3); }
-    .qr-preview-sub { font-size:0.68rem; color:var(--muted); }
-    .qr-dl-btn { width:100%; padding:13px; background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; transition:opacity 0.2s; }
-    .qr-dl-btn:hover { opacity:0.9; }
-    .qr-dl-btn:disabled { opacity:0.4; cursor:not-allowed; }
-    .qr-dl-status { font-size:0.75rem; color:var(--muted); text-align:center; margin-top:8px; min-height:18px; }
+    #qr-modal { display:none; position:fixed; inset:0; z-index:2200; background:rgba(4,2,1,0.84); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:12px; }
+    #qr-modal.open { display:flex; animation:_qrIn 0.24s cubic-bezier(0.22,1,0.36,1); }
+    @keyframes _qrIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+    .qr-wrap { background:linear-gradient(155deg,#1a1510 0%,#100d09 100%); border:1px solid rgba(200,164,78,0.2); border-radius:22px; width:100%; max-width:560px; box-shadow:0 40px 100px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.04); max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
+    html.light .qr-wrap { background:linear-gradient(155deg,#fefcf8 0%,#f5f0e8 100%); border-color:rgba(168,104,64,0.22); box-shadow:0 24px 60px rgba(0,0,0,0.18); }
+    .qr-head { display:flex; align-items:center; padding:18px 22px 16px; border-bottom:1px solid rgba(200,164,78,0.1); flex-shrink:0; gap:12px; }
+    .qr-head-ico { width:36px; height:36px; background:linear-gradient(135deg,rgba(200,164,78,0.22),rgba(200,164,78,0.06)); border:1px solid rgba(200,164,78,0.28); border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0; }
+    .qr-head-info { flex:1; min-width:0; }
+    .qr-head-ttl { font-family:'Crimson Pro',serif; font-size:1.18rem; color:var(--cream); line-height:1.2; }
+    .qr-head-sub { font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:2px; }
+    .qr-head-x { width:30px; height:30px; background:transparent; border:none; color:var(--muted); font-size:0.9rem; cursor:pointer; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:all 0.18s; flex-shrink:0; }
+    .qr-head-x:hover { color:var(--cream); background:rgba(255,255,255,0.07); }
+    .qr-content { display:flex; flex:1; min-height:0; }
+    .qr-left { padding:20px; overflow-y:auto; flex:1; min-width:0; display:flex; flex-direction:column; gap:18px; }
+    .qr-right { display:none; width:220px; flex-shrink:0; border-left:1px solid rgba(200,164,78,0.08); padding:24px 20px 20px; flex-direction:column; align-items:center; justify-content:space-between; gap:16px; }
+    @media(min-width:480px) { .qr-right { display:flex; } }
+    .qr-grp { display:flex; flex-direction:column; gap:8px; }
+    .qr-grp-lbl { font-size:0.62rem; font-weight:700; color:rgba(200,164,78,0.65); letter-spacing:0.14em; text-transform:uppercase; }
+    .qr-clr-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .qr-clr-pick { width:30px; height:30px; border-radius:8px; border:2px solid rgba(200,164,78,0.3); cursor:pointer; padding:0; transition:transform 0.15s; flex-shrink:0; }
+    .qr-clr-pick:hover { transform:scale(1.08); }
+    .qr-hex { flex:1; min-width:72px; max-width:92px; background:rgba(255,255,255,0.05); border:1.5px solid rgba(200,164,78,0.18); border-radius:8px; padding:5px 9px; font-family:monospace; font-size:0.8rem; color:var(--cream); outline:none; transition:border-color 0.2s; }
+    .qr-hex:focus { border-color:var(--gold); background:rgba(200,164,78,0.04); }
+    html.light .qr-hex { background:rgba(0,0,0,0.04); }
+    .qr-presets { display:flex; gap:5px; flex-wrap:wrap; }
+    .qr-preset { width:20px; height:20px; border-radius:5px; border:1.5px solid transparent; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
+    .qr-preset:hover { transform:scale(1.2); border-color:rgba(255,255,255,0.25); }
+    .qr-preset.on { border-color:var(--gold) !important; transform:scale(1.15); }
+    .qr-style-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .qr-sc { padding:8px 10px 8px 8px; border-radius:11px; border:1.5px solid rgba(200,164,78,0.14); background:rgba(255,255,255,0.025); color:var(--muted); font-size:0.74rem; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:8px; transition:all 0.18s; }
+    .qr-sc:hover { border-color:rgba(200,164,78,0.38); color:var(--cream); background:rgba(200,164,78,0.04); }
+    .qr-sc.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.09); }
+    .qr-sc-ico { width:28px; height:28px; flex-shrink:0; }
+    html.light .qr-sc { background:rgba(0,0,0,0.025); border-color:rgba(168,104,64,0.18); }
+    html.light .qr-sc.on { background:rgba(168,104,64,0.1); border-color:rgba(168,104,64,0.55); }
+    .qr-eye-row,.qr-ctr-row { display:flex; gap:7px; }
+    .qr-ep,.qr-cp { flex:1; padding:7px 4px; border-radius:9px; border:1.5px solid rgba(200,164,78,0.14); background:rgba(255,255,255,0.025); color:var(--muted); font-size:0.73rem; cursor:pointer; font-family:inherit; text-align:center; transition:all 0.18s; }
+    .qr-ep:hover,.qr-cp:hover { border-color:rgba(200,164,78,0.38); color:var(--cream); }
+    .qr-ep.on,.qr-cp.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.09); }
+    .qr-ctr-sub { margin-top:10px; }
+    .qr-ctxt { width:100%; background:rgba(255,255,255,0.05); border:1.5px solid rgba(200,164,78,0.18); border-radius:9px; padding:10px 12px; color:var(--cream); font-family:inherit; font-size:1.1rem; text-align:center; letter-spacing:0.12em; outline:none; transition:border-color 0.2s; }
+    .qr-ctxt:focus { border-color:var(--gold); background:rgba(200,164,78,0.04); }
+    html.light .qr-ctxt { background:rgba(0,0,0,0.04); }
+    .qr-ctxt-h { font-size:0.63rem; color:var(--muted); text-align:center; margin-top:4px; }
+    .qr-upl { display:flex; align-items:center; justify-content:center; gap:7px; padding:10px 14px; border-radius:10px; border:1.5px dashed rgba(200,164,78,0.28); color:var(--muted); font-family:inherit; font-size:0.78rem; cursor:pointer; transition:all 0.2s; width:100%; }
+    .qr-upl:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.04); }
+    .qr-fname { font-size:0.66rem; color:var(--gold); text-align:center; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .qr-prev-box { background:rgba(255,255,255,0.04); border:1px solid rgba(200,164,78,0.12); border-radius:16px; padding:14px; display:flex; align-items:center; justify-content:center; }
+    html.light .qr-prev-box { background:rgba(0,0,0,0.03); }
+    #qr-svg-prev { display:block; border-radius:6px; overflow:hidden; width:156px; height:156px; }
+    .qr-prev-lbl { font-size:0.63rem; color:var(--muted); text-align:center; margin-top:8px; }
+    .qr-dl-wrap { width:100%; }
+    .qr-dl-btn { width:100%; padding:12px; background:linear-gradient(135deg,#d4a94e 0%,#a87828 100%); color:#0a0800; border:none; border-radius:12px; font-size:0.88rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:7px; transition:all 0.22s; letter-spacing:0.02em; }
+    .qr-dl-btn:hover { opacity:0.92; transform:translateY(-1px); box-shadow:0 8px 24px rgba(200,164,78,0.32); }
+    .qr-dl-btn:active { transform:scale(0.98); }
+    .qr-dl-btn:disabled { opacity:0.38; cursor:not-allowed; transform:none; box-shadow:none; }
+    .qr-dl-st { font-size:0.68rem; text-align:center; margin-top:7px; min-height:16px; color:var(--muted); transition:color 0.2s; }
+    .qr-dl-st.ok { color:#7ebd6a; }
+    /* Mobile: stacked */
+    .qr-mob-prev { display:flex; flex-direction:column; align-items:center; gap:10px; padding:18px 20px 0; }
+    @media(min-width:480px) { .qr-mob-prev { display:none; } }
+    .qr-mob-dl { padding:0 20px 18px; }
+    @media(min-width:480px) { .qr-mob-dl { display:none; } }
 
     .sec-badge {
       font-family:'Outfit','Noto Sans',sans-serif; font-size:0.62rem; font-weight:600;
@@ -1889,61 +1918,85 @@
 
 <!-- ── QR CODES MODAL ── -->
 <div id="qr-modal" onclick="if(event.target===this)closeQRModal()">
-  <div class="qr-box">
-    <div class="qr-hd">
-      <span class="qr-hd-title">🎨 Personnaliser les QR codes</span>
-      <button class="qr-hd-close" onclick="closeQRModal()">✕</button>
+  <div class="qr-wrap">
+    <!-- Header -->
+    <div class="qr-head">
+      <div class="qr-head-ico">🎨</div>
+      <div class="qr-head-info">
+        <div class="qr-head-ttl">Personnaliser les QR codes</div>
+        <div class="qr-head-sub" id="qr-head-sub">Chargement…</div>
+      </div>
+      <button class="qr-head-x" onclick="closeQRModal()" title="Fermer">✕</button>
     </div>
-    <div class="qr-body">
-      <!-- Couleur -->
-      <div class="qr-sect">
-        <div class="qr-sect-lbl">Couleur</div>
-        <div class="qr-color-row">
-          <input type="color" id="qr-color-pick" class="qr-color-swatch" value="#000000" oninput="qrSetColor(this.value)">
-          <input type="text"  id="qr-color-hex"  class="qr-color-hex"    value="#000000" maxlength="7" placeholder="#000000" oninput="qrHexInput(this.value)">
+    <!-- Mobile : aperçu en haut -->
+    <div class="qr-mob-prev">
+      <div class="qr-prev-box"><div id="qr-svg-prev-mob" style="width:156px;height:156px;border-radius:6px;overflow:hidden"></div></div>
+      <div class="qr-prev-lbl">Aperçu · Table 1</div>
+    </div>
+    <!-- Contenu principal -->
+    <div class="qr-content">
+      <!-- Options -->
+      <div class="qr-left">
+        <!-- Couleur -->
+        <div class="qr-grp">
+          <div class="qr-grp-lbl">Couleur des modules</div>
+          <div class="qr-clr-row">
+            <input type="color" id="qr-clr-pick" class="qr-clr-pick" value="#000000" oninput="qrSetColor(this.value)">
+            <input type="text"  id="qr-clr-hex"  class="qr-hex" value="#000000" maxlength="7" spellcheck="false" oninput="qrHexInput(this.value)">
+            <div class="qr-presets" id="qr-presets"></div>
+          </div>
+        </div>
+        <!-- Style des modules -->
+        <div class="qr-grp">
+          <div class="qr-grp-lbl">Style des modules</div>
+          <div class="qr-style-grid" id="qr-style-grid"></div>
+        </div>
+        <!-- Style des coins -->
+        <div class="qr-grp">
+          <div class="qr-grp-lbl">Style des coins (finder)</div>
+          <div class="qr-eye-row">
+            <button class="qr-ep on" data-eye="square"  onclick="qrSetEye('square')">□ Carré</button>
+            <button class="qr-ep"    data-eye="rounded" onclick="qrSetEye('rounded')">▢ Arrondi</button>
+            <button class="qr-ep"    data-eye="circle"  onclick="qrSetEye('circle')">○ Cercle</button>
+          </div>
+        </div>
+        <!-- Centre -->
+        <div class="qr-grp">
+          <div class="qr-grp-lbl">Centre du QR code</div>
+          <div class="qr-ctr-row">
+            <button class="qr-cp on" data-center="none"  onclick="qrSetCenter('none')">Aucun</button>
+            <button class="qr-cp"    data-center="text"  onclick="qrSetCenter('text')">✏ Texte</button>
+            <button class="qr-cp"    data-center="image" onclick="qrSetCenter('image')">🖼 Image</button>
+          </div>
+          <div id="qr-ctr-text" class="qr-ctr-sub" style="display:none">
+            <input type="text" class="qr-ctxt" id="qr-center-text" maxlength="4" placeholder="☕" oninput="qrUpdatePreview()">
+            <div class="qr-ctxt-h">Affiché au centre — 4 caractères max</div>
+          </div>
+          <div id="qr-ctr-img" class="qr-ctr-sub" style="display:none">
+            <label class="qr-upl">
+              📎 Choisir une image (logo, icône…)
+              <input type="file" id="qr-center-file" accept="image/*" style="display:none" onchange="qrLoadImage(this)">
+            </label>
+            <div class="qr-fname" id="qr-upload-fname"></div>
+          </div>
         </div>
       </div>
-      <!-- Style des modules -->
-      <div class="qr-sect">
-        <div class="qr-sect-lbl">Style des modules</div>
-        <div class="qr-pills">
-          <button class="qr-pill on"  data-style="square"  onclick="qrSetStyle('square')">⬛ Carré</button>
-          <button class="qr-pill"     data-style="rounded" onclick="qrSetStyle('rounded')">▣ Arrondi</button>
-          <button class="qr-pill"     data-style="dots"    onclick="qrSetStyle('dots')">⚫ Points</button>
-          <button class="qr-pill"     data-style="classy"  onclick="qrSetStyle('classy')">💎 Élégant</button>
+      <!-- Desktop : aperçu + télécharger -->
+      <div class="qr-right">
+        <div>
+          <div class="qr-prev-box"><div id="qr-svg-prev" style="width:156px;height:156px;border-radius:6px;overflow:hidden"></div></div>
+          <div class="qr-prev-lbl">Aperçu · Table 1</div>
+        </div>
+        <div class="qr-dl-wrap">
+          <button class="qr-dl-btn" id="qr-dl-btn" onclick="qrDownloadPDF()">📥 Télécharger PDF</button>
+          <div class="qr-dl-st" id="qr-dl-st"></div>
         </div>
       </div>
-      <!-- Centre du QR -->
-      <div class="qr-sect">
-        <div class="qr-sect-lbl">Centre du QR code</div>
-        <div class="qr-pills">
-          <button class="qr-pill on"  data-center="none"  onclick="qrSetCenter('none')">Aucun</button>
-          <button class="qr-pill"     data-center="text"  onclick="qrSetCenter('text')">✏️ Texte</button>
-          <button class="qr-pill"     data-center="image" onclick="qrSetCenter('image')">🖼️ Image</button>
-        </div>
-        <div class="qr-center-extra" id="qr-center-text-wrap" style="display:none">
-          <input type="text" class="qr-text-input" id="qr-center-text" maxlength="4" placeholder="Ex: ☕ ou N°" oninput="qrUpdatePreview()">
-          <div style="font-size:0.68rem;color:var(--muted);margin-top:4px">4 caractères max</div>
-        </div>
-        <div class="qr-center-extra" id="qr-center-image-wrap" style="display:none">
-          <label class="qr-upload-btn">
-            📎 Choisir une image
-            <input type="file" id="qr-center-file" accept="image/*" style="display:none" onchange="qrLoadImage(this)">
-          </label>
-          <div class="qr-upload-fname" id="qr-upload-fname"></div>
-        </div>
-      </div>
-      <!-- Aperçu -->
-      <div class="qr-sect">
-        <div class="qr-sect-lbl">Aperçu — Table 1</div>
-        <div class="qr-preview-area">
-          <canvas id="qr-preview-canvas" width="200" height="200"></canvas>
-          <div class="qr-preview-sub">Les QR de toutes les tables auront ce style</div>
-        </div>
-      </div>
-      <!-- Télécharger -->
-      <button class="qr-dl-btn" id="qr-dl-btn" onclick="qrDownloadPDF()">📥 Télécharger le PDF</button>
-      <div class="qr-dl-status" id="qr-dl-status"></div>
+    </div>
+    <!-- Mobile : télécharger en bas -->
+    <div class="qr-mob-dl">
+      <button class="qr-dl-btn" id="qr-dl-btn-m" onclick="qrDownloadPDF()">📥 Télécharger PDF</button>
+      <div class="qr-dl-st" id="qr-dl-st-m"></div>
     </div>
   </div>
 </div>
@@ -6520,13 +6573,34 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════════
-   QR CODES MODAL
+   QR CODES MODAL — SVG vectoriel haute qualité
 ═══════════════════════════════════════════ */
-const _qrState = { color:'#000000', dotStyle:'square', centerType:'none', centerText:'', centerImageData:null };
-let _qrLibsReady = false;
+const _QR = {
+  color:'#000000', bgColor:'#ffffff',
+  dotStyle:'square', eyeStyle:'square',
+  centerType:'none', centerText:'', centerImg:null,
+  libsReady:false
+};
+
+const _QR_PRESETS = [
+  { color:'#0a0a0a', label:'Noir' },
+  { color:'#a07828', label:'Doré' },
+  { color:'#0d2137', label:'Marine' },
+  { color:'#133319', label:'Forêt' },
+  { color:'#2e0a0a', label:'Bordeaux' },
+  { color:'#1a0a2e', label:'Mauve' },
+];
+
+const _QR_STYLES = [
+  { id:'square',       label:'Carré',      path:'M1 1h6v6H1z M3 3h2v2H3z' },
+  { id:'rounded',      label:'Arrondi',    path:'M2 1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z M3.5 3a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5z' },
+  { id:'dots',         label:'Points',     path:'M4 2.5A1.5 1.5 0 1 0 4 5.5 1.5 1.5 0 0 0 4 2.5z M1.5 2A.5.5 0 1 0 1.5 3 .5.5 0 0 0 1.5 2z M6.5 2A.5.5 0 1 0 6.5 3 .5.5 0 0 0 6.5 2z' },
+  { id:'extra-rounded',label:'Extra',      path:'M2.5 1h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 1 5.5v-3A1.5 1.5 0 0 1 2.5 1z M3 3h2v2H3z' },
+  { id:'classy',       label:'Élégant',    path:'M1 1h6v4.5a1.5 1.5 0 0 1-1.5 1.5H1V1z M3 3h2v1.5a.5.5 0 0 1-.5.5H3V3z' },
+];
 
 function _qrLoadLibs() {
-  if (_qrLibsReady) return Promise.resolve();
+  if (_QR.libsReady) return Promise.resolve();
   const load = src => new Promise((res, rej) => {
     if (document.querySelector('script[src="'+src+'"]')) { res(); return; }
     const s = document.createElement('script');
@@ -6536,186 +6610,253 @@ function _qrLoadLibs() {
   return Promise.all([
     load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js'),
     load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-  ]).then(() => { _qrLibsReady = true; });
+  ]).then(() => { _QR.libsReady = true; });
+}
+
+function _qrInitUI() {
+  // Presets swatches
+  const pc = document.getElementById('qr-presets');
+  if (pc && !pc.children.length) {
+    _QR_PRESETS.forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'qr-preset';
+      b.title = p.label;
+      b.style.background = p.color;
+      b.onclick = () => qrSetColor(p.color);
+      pc.appendChild(b);
+    });
+  }
+  // Style cards
+  const sg = document.getElementById('qr-style-grid');
+  if (sg && !sg.children.length) {
+    _QR_STYLES.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'qr-sc' + (s.id === _QR.dotStyle ? ' on' : '');
+      b.dataset.style = s.id;
+      b.onclick = () => qrSetStyle(s.id);
+      const ic = document.createElement('svg');
+      ic.setAttribute('viewBox','0 0 8 8');
+      ic.setAttribute('xmlns','http://www.w3.org/2000/svg');
+      ic.className = 'qr-sc-ico';
+      ic.innerHTML = '<path d="'+s.path+'" fill="currentColor"/>';
+      b.appendChild(ic);
+      b.appendChild(document.createTextNode(' '+s.label));
+      sg.appendChild(b);
+    });
+  }
+  // Header sub
+  const sub = document.getElementById('qr-head-sub');
+  if (sub) sub.textContent = _tableCount + ' table' + (_tableCount > 1 ? 's' : '') + ' · Menu Pro';
 }
 
 function openQRModal() {
   if (!_tableCount) return;
   document.getElementById('qr-modal').classList.add('open');
-  _qrLoadLibs().then(qrUpdatePreview);
+  _qrLoadLibs().then(() => { _qrInitUI(); qrUpdatePreview(); });
 }
 function closeQRModal() { document.getElementById('qr-modal').classList.remove('open'); }
 
 function qrSetColor(v) {
-  _qrState.color = v;
-  document.getElementById('qr-color-pick').value = v;
-  document.getElementById('qr-color-hex').value = v;
+  _QR.color = v;
+  document.getElementById('qr-clr-pick').value = v;
+  document.getElementById('qr-clr-hex').value = v;
+  document.querySelectorAll('.qr-preset').forEach((b,i) => b.classList.toggle('on', _QR_PRESETS[i]?.color === v));
   qrUpdatePreview();
 }
 function qrHexInput(v) {
-  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
-    _qrState.color = v;
-    document.getElementById('qr-color-pick').value = v;
-    qrUpdatePreview();
-  }
+  if (/^#[0-9a-fA-F]{6}$/.test(v.trim())) { _QR.color = v.trim(); document.getElementById('qr-clr-pick').value = v.trim(); qrUpdatePreview(); }
 }
 function qrSetStyle(s) {
-  _qrState.dotStyle = s;
-  document.querySelectorAll('.qr-pill[data-style]').forEach(p => p.classList.toggle('on', p.dataset.style === s));
+  _QR.dotStyle = s;
+  document.querySelectorAll('.qr-sc').forEach(b => b.classList.toggle('on', b.dataset.style === s));
+  qrUpdatePreview();
+}
+function qrSetEye(e) {
+  _QR.eyeStyle = e;
+  document.querySelectorAll('.qr-ep').forEach(b => b.classList.toggle('on', b.dataset.eye === e));
   qrUpdatePreview();
 }
 function qrSetCenter(t) {
-  _qrState.centerType = t;
-  document.querySelectorAll('.qr-pill[data-center]').forEach(p => p.classList.toggle('on', p.dataset.center === t));
-  document.getElementById('qr-center-text-wrap').style.display  = t === 'text'  ? '' : 'none';
-  document.getElementById('qr-center-image-wrap').style.display = t === 'image' ? '' : 'none';
+  _QR.centerType = t;
+  document.querySelectorAll('.qr-cp').forEach(b => b.classList.toggle('on', b.dataset.center === t));
+  document.getElementById('qr-ctr-text').style.display  = t === 'text'  ? '' : 'none';
+  document.getElementById('qr-ctr-img').style.display   = t === 'image' ? '' : 'none';
   qrUpdatePreview();
 }
 function qrLoadImage(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('qr-upload-fname').textContent = file.name;
-  const reader = new FileReader();
-  reader.onload = e => { _qrState.centerImageData = e.target.result; qrUpdatePreview(); };
-  reader.readAsDataURL(file);
+  const f = input.files[0]; if (!f) return;
+  document.getElementById('qr-upload-fname').textContent = f.name;
+  const r = new FileReader();
+  r.onload = e => { _QR.centerImg = e.target.result; qrUpdatePreview(); };
+  r.readAsDataURL(f);
 }
 
-function _qrDraw(canvas, url) {
-  return new Promise(resolve => {
-    if (!window.qrcode) { resolve(); return; }
-    const SIZE = canvas.width;
-    const ctx = canvas.getContext('2d');
-    const qr = qrcode(0, 'M');
-    qr.addData(url);
-    qr.make();
-    const N = qr.getModuleCount();
-    const mod = Math.floor((SIZE * 0.86) / N);
-    const off = Math.round((SIZE - N * mod) / 2);
+/* ── SVG QR Generator ── */
+function _qrBuildSVG(url, size) {
+  if (!window.qrcode) return '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'"></svg>';
+  const ecLevel = _QR.centerType !== 'none' ? 'H' : 'M';
+  const qr = qrcode(0, ecLevel);
+  qr.addData(url);
+  qr.make();
+  const N = qr.getModuleCount();
+  const QZ = 3, total = N + QZ * 2;
+  const m = size / total; // module size
+  const fg = _QR.color, bg = _QR.bgColor || '#ffffff';
 
-    ctx.clearRect(0, 0, SIZE, SIZE);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, SIZE, SIZE);
-    ctx.fillStyle = _qrState.color;
+  function modPath(x, y, s, style) {
+    const r1 = s*0.38, r2 = s*0.48, r3 = s*0.42;
+    if (style === 'rounded')       return `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r1}" fill="${fg}"/>`;
+    if (style === 'dots')          return `<circle cx="${x+s/2}" cy="${y+s/2}" r="${s*0.44}" fill="${fg}"/>`;
+    if (style === 'extra-rounded') return `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r2}" fill="${fg}"/>`;
+    if (style === 'classy')        return `<path d="M${x} ${y}h${s}v${s-r3}a${r3} ${r3} 0 0 1-${r3} ${r3}H${x}z" fill="${fg}"/>`;
+    return `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${fg}"/>`;
+  }
 
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        if (!qr.isDark(r, c)) continue;
-        const x = off + c * mod, y = off + r * mod;
-        const isFinder = (r<7&&c<7)||(r<7&&c>=N-7)||(r>=N-7&&c<7);
-        const st = _qrState.dotStyle;
-        if (st === 'square' || isFinder) {
-          ctx.fillRect(x, y, mod, mod);
-        } else if (st === 'rounded') {
-          const rad = mod * 0.32;
-          ctx.beginPath(); ctx.moveTo(x+rad,y);
-          ctx.arcTo(x+mod,y,x+mod,y+mod,rad); ctx.arcTo(x+mod,y+mod,x,y+mod,rad);
-          ctx.arcTo(x,y+mod,x,y,rad); ctx.arcTo(x,y,x+mod,y,rad);
-          ctx.closePath(); ctx.fill();
-        } else if (st === 'dots') {
-          ctx.beginPath(); ctx.arc(x+mod/2,y+mod/2,mod*0.43,0,Math.PI*2); ctx.fill();
-        } else if (st === 'classy') {
-          const rad = mod * 0.42;
-          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+mod,y);
-          ctx.lineTo(x+mod,y+mod-rad); ctx.arcTo(x+mod,y+mod,x+mod-rad,y+mod,rad);
-          ctx.lineTo(x,y+mod); ctx.closePath(); ctx.fill();
-        }
-      }
+  function eyeSVG(ex, ey) {
+    const outerS = m*7, innerS = m*3, pad = m;
+    const sep = m; // white ring separator width
+    let out = '';
+    if (_QR.eyeStyle === 'circle') {
+      const R = outerS/2, ri = (outerS-sep*2)/2, cx = ex+outerS/2, cy2 = ey+outerS/2;
+      out += `<circle cx="${cx}" cy="${cy2}" r="${R}" fill="${fg}"/>`;
+      out += `<circle cx="${cx}" cy="${cy2}" r="${ri}" fill="${bg}"/>`;
+      out += `<circle cx="${cx}" cy="${cy2}" r="${m*1.5}" fill="${fg}"/>`;
+    } else {
+      const r1 = _QR.eyeStyle === 'rounded' ? m*0.8 : 0;
+      const r2 = _QR.eyeStyle === 'rounded' ? m*0.4 : 0;
+      out += `<rect x="${ex}" y="${ey}" width="${outerS}" height="${outerS}" rx="${r1}" fill="${fg}"/>`;
+      out += `<rect x="${ex+sep}" y="${ey+sep}" width="${outerS-sep*2}" height="${outerS-sep*2}" rx="${Math.max(0,r1-sep)}" fill="${bg}"/>`;
+      out += `<rect x="${ex+pad*2}" y="${ey+pad*2}" width="${innerS}" height="${innerS}" rx="${r2}" fill="${fg}"/>`;
     }
+    return out;
+  }
 
-    // Centre overlay
-    const cSz = SIZE * 0.22;
-    const cx = (SIZE-cSz)/2, cy = (SIZE-cSz)/2;
-    if (_qrState.centerType === 'text' && _qrState.centerText.trim()) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx-3,cy-3,cSz+6,cSz+6);
-      ctx.fillStyle = _qrState.color;
-      ctx.font = 'bold '+Math.round(cSz*0.5)+'px Outfit,sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(_qrState.centerText.trim().slice(0,4), SIZE/2, SIZE/2);
-      resolve();
-    } else if (_qrState.centerType === 'image' && _qrState.centerImageData) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(cx-3,cy-3,cSz+6,cSz+6);
-        ctx.drawImage(img,cx,cy,cSz,cSz);
-        resolve();
-      };
-      img.onerror = resolve;
-      img.src = _qrState.centerImageData;
-    } else { resolve(); }
-  });
+  const finderPos = [[0,0],[0,N-7],[N-7,0]];
+  const isFinder = (r,c) => finderPos.some(([fr,fc]) => r>=fr && r<fr+7 && c>=fc && c<fc+7);
+
+  let mods = '', eyes = '';
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      if (!qr.isDark(r,c)) continue;
+      if (isFinder(r,c)) continue;
+      mods += modPath((c+QZ)*m, (r+QZ)*m, m, _QR.dotStyle);
+    }
+  }
+  finderPos.forEach(([fr,fc]) => { eyes += eyeSVG((fc+QZ)*m, (fr+QZ)*m); });
+
+  // Centre
+  let center = '';
+  const cSz = size * 0.2, cx = (size-cSz)/2, cy = (size-cSz)/2, cPad = m*0.8;
+  if (_QR.centerType === 'text' && _QR.centerText.trim()) {
+    const fs = Math.round(cSz*0.56), txt = _QR.centerText.trim().slice(0,4);
+    center = `<rect x="${cx-cPad}" y="${cy-cPad}" width="${cSz+cPad*2}" height="${cSz+cPad*2}" rx="${cPad}" fill="${bg}"/>`;
+    center += `<text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" fill="${fg}" font-family="Outfit,sans-serif">${txt}</text>`;
+  } else if (_QR.centerType === 'image' && _QR.centerImg) {
+    center = `<rect x="${cx-cPad}" y="${cy-cPad}" width="${cSz+cPad*2}" height="${cSz+cPad*2}" rx="${cPad}" fill="${bg}"/>`;
+    center += `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/>${mods}${eyes}${center}</svg>`;
+}
+
+function _qrInjectSVG(containerId, url, size) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = _qrBuildSVG(url, size);
 }
 
 function qrUpdatePreview() {
-  const canvas = document.getElementById('qr-preview-canvas');
-  if (!canvas || !_qrLibsReady) return;
-  _qrState.centerText = document.getElementById('qr-center-text')?.value || '';
+  if (!_QR.libsReady) return;
+  _QR.centerText = document.getElementById('qr-center-text')?.value || '';
   const base = location.href.replace(/admin\.html.*$/, 'index.html');
-  _qrDraw(canvas, base + '?rid=' + _RID + '&table=1');
+  const url = base + '?rid=' + _RID + '&table=1';
+  _qrInjectSVG('qr-svg-prev', url, 300);
+  _qrInjectSVG('qr-svg-prev-mob', url, 300);
+}
+
+function _qrSvgToPng(svgStr, size) {
+  return new Promise(resolve => {
+    const blob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = size;
+      cv.getContext('2d').drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
 }
 
 async function qrDownloadPDF() {
-  if (!_qrLibsReady) { await _qrLoadLibs(); }
+  if (!_QR.libsReady) { await _qrLoadLibs(); }
   if (!_tableCount || !window.jspdf) return;
-  const btn = document.getElementById('qr-dl-btn');
-  const status = document.getElementById('qr-dl-status');
-  btn.disabled = true;
-  status.textContent = 'Génération en cours…';
+  _QR.centerText = document.getElementById('qr-center-text')?.value || '';
+  const btns = ['qr-dl-btn','qr-dl-btn-m'].map(id => document.getElementById(id)).filter(Boolean);
+  const sts  = ['qr-dl-st','qr-dl-st-m'].map(id => document.getElementById(id)).filter(Boolean);
+  btns.forEach(b => { b.disabled = true; b.innerHTML = '⏳ Génération…'; });
+  sts.forEach(s => { s.textContent = ''; s.className = 'qr-dl-st'; });
 
-  const { jsPDF } = window.jspdf;
-  _qrState.centerText = document.getElementById('qr-center-text')?.value || '';
   const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  const { jsPDF } = window.jspdf;
+  const RNAME = adminData?.info?.name || _RID;
+  const PNG_SIZE = 600;
 
-  // Génération canvas pour chaque table
-  const SIZE = 300;
-  const qrImages = [];
+  // Générer PNG haute résolution pour chaque table
+  const imgs = [];
   for (let i = 1; i <= _tableCount; i++) {
-    const cv = document.createElement('canvas');
-    cv.width = SIZE; cv.height = SIZE;
-    await _qrDraw(cv, base + '?rid=' + _RID + '&table=' + i);
-    qrImages.push(cv.toDataURL('image/png'));
+    const svg = _qrBuildSVG(base + '?rid=' + _RID + '&table=' + i, PNG_SIZE);
+    const png = await _qrSvgToPng(svg, PNG_SIZE);
+    imgs.push(png);
   }
 
-  // Construction PDF A4
+  // PDF A4 — 2 colonnes pour de grands QR élégants
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const title = adminData?.info?.name || _RID;
-  const QR_MM = 52, COL = 3, MARGIN = 12, TOP = MARGIN + 14;
-  const CELL_W = (210 - MARGIN*2) / COL;
-  const ROW_H  = QR_MM + 18;
-  const ROWS_PER_PAGE = Math.floor((297 - TOP - MARGIN) / ROW_H);
-  let col = 0, row = 0, page = 1;
+  const COL=2, MARGIN=14, QR_MM=72, CELL_W=(210-MARGIN*2)/COL, TOP=MARGIN+16;
+  const ROW_H = QR_MM + 22, ROWS_PP = Math.floor((297-TOP-MARGIN)/ROW_H);
+  let col=0, row=0, pageN=1, total=Math.ceil(_tableCount/(COL*ROWS_PP));
 
-  const addHeader = () => {
-    doc.setFillColor(15,13,10);
+  const addHdr = () => {
+    doc.setFillColor(10,8,6);
     doc.rect(0,0,210,297,'F');
+    // Gold accent bar
+    doc.setFillColor(180,140,60);
+    doc.rect(0,0,210,2,'F');
     doc.setTextColor(200,164,78);
-    doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(title, 105, MARGIN, {align:'center'});
-    doc.setFontSize(8); doc.setTextColor(120,105,82);
-    doc.text('QR Codes — Scannez pour accéder au menu', 105, MARGIN+5.5, {align:'center'});
+    doc.setFontSize(18); doc.setFont('helvetica','bold');
+    doc.text(RNAME, 105, MARGIN+2, {align:'center'});
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(110,95,72);
+    doc.text('QR CODES · SCANNEZ POUR COMMANDER', 105, MARGIN+8, {align:'center'});
+    if (total > 1) { doc.setFontSize(6.5); doc.setTextColor(80,70,55); doc.text('Page '+pageN+' / '+total, 105, 291, {align:'center'}); }
   };
-  addHeader();
+  addHdr();
 
-  for (let i = 0; i < qrImages.length; i++) {
-    const x = MARGIN + col * CELL_W + (CELL_W - QR_MM) / 2;
-    const y = TOP + row * ROW_H;
+  for (let i = 0; i < imgs.length; i++) {
+    if (!imgs[i]) continue;
+    const x = MARGIN + col*CELL_W + (CELL_W-QR_MM)/2;
+    const y = TOP + row*ROW_H;
+    // Card background
+    doc.setFillColor(22,18,12);
+    doc.roundedRect(x-4, y-4, QR_MM+8, QR_MM+16, 4, 4, 'F');
+    // White QR background
     doc.setFillColor(255,255,255);
-    doc.roundedRect(x-2,y-2,QR_MM+4,QR_MM+4,3,3,'F');
-    doc.addImage(qrImages[i],'PNG',x,y,QR_MM,QR_MM);
-    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(200,164,78);
-    doc.text('Table '+(i+1), x+QR_MM/2, y+QR_MM+7, {align:'center'});
+    doc.roundedRect(x-1, y-1, QR_MM+2, QR_MM+2, 2, 2, 'F');
+    doc.addImage(imgs[i],'PNG',x,y,QR_MM,QR_MM);
+    // Label
+    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(200,164,78);
+    doc.text('TABLE '+(i+1), x+QR_MM/2, y+QR_MM+9, {align:'center'});
     col++;
-    if (col >= COL) { col = 0; row++; }
-    if (row >= ROWS_PER_PAGE && i < qrImages.length-1) {
-      row = 0; col = 0; page++; doc.addPage(); addHeader();
-    }
+    if (col >= COL) { col=0; row++; }
+    if (row >= ROWS_PP && i < imgs.length-1) { row=0; col=0; pageN++; doc.addPage(); addHdr(); }
   }
 
-  doc.save('qr-tables-' + _RID + '.pdf');
-  btn.disabled = false;
-  status.textContent = '✅ PDF téléchargé !';
-  setTimeout(() => { status.textContent = ''; }, 3000);
+  doc.save('QR-Tables-'+_RID+'.pdf');
+  btns.forEach(b => { b.disabled=false; b.innerHTML='📥 Télécharger PDF'; });
+  sts.forEach(s => { s.textContent='✅ PDF téléchargé !'; s.className='qr-dl-st ok'; });
+  setTimeout(() => sts.forEach(s => { s.textContent=''; s.className='qr-dl-st'; }), 4000);
 }
 
 </script>
