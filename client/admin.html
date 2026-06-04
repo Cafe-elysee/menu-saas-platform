@@ -1432,6 +1432,10 @@
       box-shadow:0 -4px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.12);
     }
   }
+  /* ── STATS OUTER SECTION ── */
+  .stats-outer-section > .sec-body { overflow: visible; }
+  .stats-outer-section .adm-section:hover { transform: none; }
+
   /* ── ANALYTICS FILTER ── */
   .analytics-filter-bar {
     background:var(--bg); border:1.5px solid var(--border);
@@ -1595,7 +1599,7 @@
   <button id="sc-prods-btn"  onclick="scGo('sec-produits')">🍽️ Produits</button>
   <button id="sc-orders-btn" onclick="scGo('orders-admin-section')" style="display:none">🧾 Commandes</button>
   <button id="sc-tables-btn" onclick="scGo('tables-admin-section')" style="display:none">🪑 Tables & QR</button>
-  <button id="sc-analytics-btn" onclick="scGo('analytics-section')" style="display:none">📊 Statistiques</button>
+  <button id="sc-analytics-btn" onclick="scGo('stats-section')" style="display:none">📊 Statistiques</button>
 </div>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
@@ -1728,39 +1732,42 @@
 
   <!-- ── PANEL 2 : Commandes & Appels ── -->
   <div id="admin-panel-orders" class="admin-panel" style="display:none">
-  <!-- ── ANALYTICS ── -->
-  <div id="analytics-section" class="analytics-filter-bar">
-    <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
-    <div class="filter-pills-row">
-      <button class="filter-pill active" id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
-      <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
-      <button class="filter-pill"        id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
-      <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
-      <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
+  <!-- ── STATISTIQUES ── -->
+  <div class="adm-section stats-outer-section" id="stats-section">
+    <div class="sec-hd" id="sec-hd-stats">
+      <span style="margin-right:4px">📊</span><span id="stats-section-title">Statistiques</span>
     </div>
-    <div class="filter-custom-range" id="analytics-custom-range">
-      <input type="date" id="analytics-date-start" class="filter-date-input" onchange="applyCustomDateRange()">
-      <span class="filter-date-sep">→</span>
-      <input type="date" id="analytics-date-end" class="filter-date-input" onchange="applyCustomDateRange()">
+    <!-- Filtre de période -->
+    <div id="analytics-section" class="analytics-filter-bar">
+      <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
+      <div class="filter-pills-row">
+        <button class="filter-pill active" id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
+        <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
+        <button class="filter-pill"        id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
+        <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
+        <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
+      </div>
+      <div class="filter-custom-range" id="analytics-custom-range">
+        <input type="date" id="analytics-date-start" class="filter-date-input" onchange="applyCustomDateRange()">
+        <span class="filter-date-sep">→</span>
+        <input type="date" id="analytics-date-end" class="filter-date-input" onchange="applyCustomDateRange()">
+      </div>
     </div>
-  </div>
-
-  <!-- ── GRAPHIQUE COMMANDES ── -->
-  <div class="adm-section" id="chart-orders-section">
-    <div class="sec-hd"><span style="margin-right:6px">🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
-    <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
-  </div>
-
-  <!-- ── GRAPHIQUE APPELS ── -->
-  <div class="adm-section" id="chart-calls-section">
-    <div class="sec-hd"><span style="margin-right:6px">🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
-    <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
-  </div>
-
-  <!-- ── PRODUITS LES PLUS VENDUS ── -->
-  <div class="adm-section" id="chart-products-section">
-    <div class="sec-hd"><span style="margin-right:6px">📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
-    <div id="chart-products-wrap"></div>
+    <!-- Graphique commandes -->
+    <div class="adm-section" id="chart-orders-section">
+      <div class="sec-hd"><span style="margin-right:6px">🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
+      <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
+    </div>
+    <!-- Graphique appels -->
+    <div class="adm-section" id="chart-calls-section">
+      <div class="sec-hd"><span style="margin-right:6px">🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
+      <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
+    </div>
+    <!-- Graphique produits -->
+    <div class="adm-section" id="chart-products-section">
+      <div class="sec-hd"><span style="margin-right:6px">📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
+      <div id="chart-products-wrap"></div>
+    </div>
   </div>
 
   <!-- ── TABLES QR (déplacé depuis panel 1) ── -->
@@ -2022,7 +2029,7 @@ const ADMIN_UI = {
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
     chartProductsTitle:'Κορυφαία προϊόντα', chartEmpty:'Δεν υπάρχουν δεδομένα', chartTopN:'top 10',
-    scAnalytics:'📊 Στατιστικά',
+    scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
     btnDelLogo:    'Διαγραφή λογοτύπου',
   },
   fr: {
@@ -2136,7 +2143,7 @@ const ADMIN_UI = {
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
     chartProductsTitle:'Produits les plus vendus', chartEmpty:'Aucune donnée sur cette période', chartTopN:'top 10',
-    scAnalytics:'📊 Statistiques',
+    scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
     btnDelLogo:    'Supprimer le logo',
   },
   en: {
@@ -2250,7 +2257,7 @@ const ADMIN_UI = {
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
     chartProductsTitle:'Top products', chartEmpty:'No data for this period', chartTopN:'top 10',
-    scAnalytics:'📊 Statistics',
+    scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
     btnDelLogo:    'Delete logo',
   },
   de: {
@@ -2364,7 +2371,7 @@ const ADMIN_UI = {
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
     chartProductsTitle:'Top-Produkte', chartEmpty:'Keine Daten für diesen Zeitraum', chartTopN:'top 10',
-    scAnalytics:'📊 Statistiken',
+    scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
     btnDelLogo:    'Logo löschen',
   },
   ar: {
@@ -2478,7 +2485,7 @@ const ADMIN_UI = {
     filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
     chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
     chartProductsTitle:'أفضل المنتجات', chartEmpty:'لا توجد بيانات لهذه الفترة', chartTopN:'top 10',
-    scAnalytics:'📊 إحصائيات',
+    scAnalytics:'📊 إحصائيات', statsSectionTitle:'إحصائيات',
     btnDelLogo:    'حذف الشعار',
   },
 };
@@ -3248,7 +3255,7 @@ function renderHeroImageSection() {
 
 /* ─── FAB NAVIGATION RACCOURCIS ─── */
 function scGo(sectionId) {
-  const panel2Ids = ['analytics-section','chart-orders-section','chart-calls-section','chart-products-section','tables-admin-section','orders-admin-section'];
+  const panel2Ids = ['stats-section','analytics-section','chart-orders-section','chart-calls-section','chart-products-section','tables-admin-section','orders-admin-section'];
   const targetTab = panel2Ids.includes(sectionId) ? 'orders' : 'display';
   const doScroll = () => {
     const section = document.getElementById(sectionId);
@@ -3557,6 +3564,7 @@ function applyAdminUI(l) {
   if (_tabD) { const _s = _tabD.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
   if (_tabO) { const _s = _tabO.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
   // Analytics texts
+  const _ssl = $('stats-section-title'); if (_ssl) _ssl.textContent = t.statsSectionTitle || _ssl.textContent;
   const _afl = $('analytics-filter-label'); if (_afl) _afl.textContent = t.analyticsTitle || _afl.textContent;
   const _pillMap = { 'filter-pill-7d':'filter7d','filter-pill-today':'filterToday','filter-pill-30d':'filter30d','filter-pill-12m':'filter12m','filter-pill-custom':'filterCustom' };
   Object.entries(_pillMap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
