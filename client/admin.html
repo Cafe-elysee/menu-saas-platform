@@ -6309,6 +6309,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (p2) p2.style.display = '';
     document.getElementById('admin-tab-display')?.classList.remove('on');
     document.getElementById('admin-tab-orders')?.classList.add('on');
+    if (!ordersListener) startOrdersListener();
+    startAnalyticsListener();
+    requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
   }
 });
 
