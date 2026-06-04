@@ -131,7 +131,7 @@ Ordre de vérification si push absent : plugins.json → settings.gradle → bui
 
 ## Vercel — Notes
 
-- `DIAG_SECRET` = `Malek2026Diag` — URL : `https://menu-saas-platform.vercel.app/api/diag?secret=Malek2026Diag`
+- `DIAG_SECRET` — voir Vercel env vars (ne jamais écrire la valeur dans ce fichier)
 
 ---
 
