@@ -518,6 +518,20 @@
   </div>
 </div>
 
+<!-- ÉCRAN FORFAIT MENU QR — service serveur non inclus -->
+<div id="srv-forfait-screen" style="display:none;position:fixed;inset:0;z-index:10000;background:#0f0d0a;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <div style="max-width:320px;width:100%">
+    <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid rgba(200,164,78,0.25);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">📋</div>
+    <div id="srv-forfait-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:12px">Forfait Menu QR</div>
+    <div id="srv-forfait-msg" style="font-size:0.85rem;color:#7a6a52;line-height:1.9">Ce forfait n'inclut pas le service serveur.<br>Contactez l'administrateur pour activer le forfait Commandes & Services.</div>
+    <div style="margin-top:36px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
+      <div style="height:1px;width:24px;background:#c8a44e"></div>
+      <div style="font-size:0.58rem;letter-spacing:0.22em;color:#c8a44e;text-transform:uppercase">Menu Pro</div>
+      <div style="height:1px;width:24px;background:#c8a44e"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ÉCRAN CONFIGURATION (premier lancement) -->
 <div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:#0f0d0a;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:340px;width:100%">
@@ -1467,6 +1481,25 @@ function _applyInitialTab() {
     var feat         = snap.val() || {};
     var callEnabled  = feat.callBtn !== false;
     var orderEnabled = feat.orderUI !== false;
+
+    // Forfait Menu QR : aucun service serveur — afficher écran bloquant
+    if (!callEnabled && !orderEnabled) {
+      var _FORFAIT = {
+        fr: { title:'Forfait Menu QR', msg:'Ce forfait n\'inclut pas le service serveur.<br>Contactez l\'administrateur pour activer le forfait Commandes & Services.' },
+        en: { title:'QR Menu Plan',    msg:'This plan does not include the server service.<br>Contact the administrator to activate the Orders & Services plan.' },
+        el: { title:'Πακέτο Menu QR',  msg:'Αυτό το πακέτο δεν περιλαμβάνει την υπηρεσία σερβιτόρου.<br>Επικοινωνήστε με τον διαχειριστή.' },
+        de: { title:'QR-Menü-Paket',   msg:'Dieses Paket beinhaltet nicht den Serverdienst.<br>Kontaktieren Sie den Administrator.' },
+        ar: { title:'باقة قائمة QR',   msg:'هذه الباقة لا تتضمن خدمة النادل.<br>تواصل مع المسؤول لتفعيل باقة الطلبات والخدمات.' }
+      };
+      var fp = _FORFAIT[lang] || _FORFAIT.fr;
+      var fs = document.getElementById('srv-forfait-screen');
+      if (fs) {
+        document.getElementById('srv-forfait-title').textContent = fp.title;
+        document.getElementById('srv-forfait-msg').innerHTML = fp.msg;
+        fs.style.display = 'flex';
+      }
+      return;
+    }
 
     var hasPendingCalls  = calls.some(function(c) { return c.status !== 'done'; });
     var hasPendingOrders = Object.values(orders).some(function(o) { return o.status !== 'done'; });
