@@ -1457,8 +1457,14 @@
     font-size:0.88rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
     color:var(--text); border-bottom:1px solid var(--border);
     display:flex; align-items:center; gap:10px;
+    cursor:pointer; user-select:none;
   }
-  .stats-card-body { padding:16px 16px 18px; }
+  .stats-card-hd:hover { color:var(--gold); }
+  .stats-card-chevron { margin-left:auto; transition:transform 0.3s; }
+  .stats-card.collapsed .stats-card-chevron { transform:rotate(-90deg); }
+  .stats-card-body { padding:16px 16px 18px; overflow:hidden; max-height:2000px; transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.25s; }
+  .stats-card.collapsed .stats-card-body { max-height:0; padding-top:0; padding-bottom:0; }
+  .stats-card.collapsed .stats-card-hd { border-bottom-color:transparent; }
   .chart-block { padding-top: 1rem; margin-top: 0.25rem; border-top: 1px solid var(--border); }
   .chart-block:first-of-type { padding-top: 0; margin-top: 0; border-top: none; }
   .chart-block-hd { display:flex; align-items:center; gap:0.5rem; font-size:0.8rem; font-weight:600; color:var(--text); margin-bottom:0.75rem; }
@@ -1759,8 +1765,9 @@
   <div id="admin-panel-orders" class="admin-panel" style="display:none">
   <!-- ── STATISTIQUES ── -->
   <div class="stats-card" id="stats-section">
-    <div class="stats-card-hd" id="sec-hd-stats">
+    <div class="stats-card-hd" id="sec-hd-stats" onclick="toggleStatsCard()">
       <span>📊</span><span id="stats-section-title">Statistiques</span>
+      <span class="stats-card-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
     </div>
     <div class="stats-card-body">
       <!-- Filtre de période -->
@@ -3279,6 +3286,21 @@ function renderHeroImageSection() {
     });
   });
 })();
+
+/* ─── STATS CARD COLLAPSE ─── */
+(function() {
+  const KEY = _PFX + 'stats_collapsed';
+  const card = document.getElementById('stats-section');
+  if (card && localStorage.getItem(KEY) === '1') card.classList.add('collapsed');
+})();
+function toggleStatsCard() {
+  const card = document.getElementById('stats-section');
+  if (!card) return;
+  const closing = !card.classList.contains('collapsed');
+  card.classList.toggle('collapsed');
+  localStorage.setItem(_PFX + 'stats_collapsed', closing ? '1' : '0');
+  if (!closing) requestAnimationFrame(() => requestAnimationFrame(() => { if (_adminCurrentTab === 'orders') updateAnalytics(); }));
+}
 
 /* ─── FAB NAVIGATION RACCOURCIS ─── */
 function scGo(sectionId) {
