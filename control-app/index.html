@@ -1935,7 +1935,7 @@ function buildClientCard(client) {
     '</div>' +
     '<div class="card-body"><div class="card-body-inner">' +
       '<div class="card-links">' +
-        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'\',\'_system\')">Menu ↗</span>' +
+        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'&table=1\',\'_system\')">Menu ↗</span>' +
         '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
       '</div>' +
 
@@ -1963,9 +1963,7 @@ function buildClientCard(client) {
       '<div class="section-label">⚙️ Boutons disponibles (licence)</div>' +
       '<div class="feat-list">' +
         togFeat('feat-btn-callBtn','🔔 Bouton sonnette',"writeFeatureBtn('"+s+"','callBtn',this.checked)") +
-        togFeat('feat-btn-orderUI','🛒 Interface commande',"writeFeatureBtn('"+s+"','orderUI',this.checked)") +
-        togFeat('feat-btn-tableSystem','📍 Système de tables QR',"writeFeatureBtn('"+s+"','tableSystem',this.checked)") +
-        togFeat('feat-btn-qrOrdering','📷 Commande QR (sans prompt table)',"writeFeatureBtn('"+s+"','qrOrdering',this.checked)") +
+        togFeat('feat-btn-qrSystem','🛒 Système de commande QR',"writeQRSystem('"+s+"',this.checked)") +
         togFeat('feat-btn-photos','🖼️ Photos produits',"writeFeatureBtn('"+s+"','photos',this.checked)") +
         (client.noEvents ? '' : togFeat('feat-btn-eventOverlay','🎉 Overlay fêtes',"writeFeatureBtn('"+s+"','eventOverlay',this.checked)")) +
       '</div>' +
@@ -2112,11 +2110,9 @@ function loadClientData(client) {
     }
 
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
-    set('feat-btn-callBtn',      feat.callBtn);
-    set('feat-btn-orderUI',      feat.orderUI);
-    set('feat-btn-tableSystem',  feat.tableSystem);
-    set('feat-btn-qrOrdering',   feat.qrOrdering);
-    set('feat-btn-photos',     feat.photos);
+    set('feat-btn-callBtn',  feat.callBtn);
+    set('feat-btn-qrSystem', feat.orderUI !== false && feat.tableSystem !== false && feat.qrOrdering !== false);
+    set('feat-btn-photos',   feat.photos);
     set('feat-btn-eventOverlay', feat.eventOverlay);
 
     if (!_clientVariants[s]) _clientVariants[s] = {};
@@ -2178,6 +2174,12 @@ function _colorDist(h1, h2) {
 }
 function writeFeatureBtn(slug, btn, val) {
   getClientDb(slug).ref('/config/features/' + btn).set(val);
+}
+function writeQRSystem(slug, val) {
+  const db = getClientDb(slug);
+  db.ref('/config/features/orderUI').set(val);
+  db.ref('/config/features/tableSystem').set(val);
+  db.ref('/config/features/qrOrdering').set(val);
 }
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;

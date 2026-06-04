@@ -5266,6 +5266,7 @@ const UI = {
     notifiedTable:'Σερβιτόρος ειδοποιήθηκε · Τραπέζι {n} ✓',
     tableTitle:'Κλήση σερβιτόρου',
     tableDesc:'Εισάγετε τον αριθμό τραπεζιού σας',
+    callConfirmQR:'Κλήση σερβιτόρου;',
     tableConfirm:'Επιβεβαίωση',
     tableCancel:'Ακύρωση',
     alLabel:'Λεπτομέρειες',
@@ -5296,6 +5297,7 @@ const UI = {
     notifiedTable:'Serveur notifié · Table {n} ✓',
     tableTitle:'Appeler le serveur',
     tableDesc:'Entrez votre numéro de table',
+    callConfirmQR:'Appeler le serveur ?',
     tableConfirm:'Confirmer',
     tableCancel:'Annuler',
     alLabel:'Détails',
@@ -5326,6 +5328,7 @@ const UI = {
     notifiedTable:'Waiter notified · Table {n} ✓',
     tableTitle:'Call the waiter',
     tableDesc:'Enter your table number',
+    callConfirmQR:'Call the waiter?',
     tableConfirm:'Confirm',
     tableCancel:'Cancel',
     alLabel:'Details',
@@ -5356,6 +5359,7 @@ const UI = {
     notifiedTable:'تم إخطار النادل · طاولة {n} ✓',
     tableTitle:'استدعاء النادل',
     tableDesc:'أدخل رقم طاولتك',
+    callConfirmQR:'استدعاء النادل؟',
     tableConfirm:'تأكيد',
     tableCancel:'إلغاء',
     alLabel:'التفاصيل',
@@ -5386,6 +5390,7 @@ const UI = {
     notifiedTable:'Kellner benachrichtigt · Tisch {n} ✓',
     tableTitle:'Kellner rufen',
     tableDesc:'Geben Sie Ihre Tischnummer ein',
+    callConfirmQR:'Kellner rufen?',
     tableConfirm:'Bestätigen',
     tableCancel:'Abbrechen',
     alLabel:'Details',
@@ -7262,14 +7267,21 @@ let _cartModalInHistory  = false;
 function openTableModal() {
   const t = UI[lang];
   document.getElementById('tbl-title').textContent = t.tableTitle;
-  document.getElementById('tbl-desc').textContent = t.tableDesc;
   document.getElementById('tbl-confirm').textContent = t.tableConfirm;
   document.getElementById('tbl-cancel').textContent = t.tableCancel;
   const inp = document.getElementById('table-num');
-  inp.value = '';
-  inp.classList.remove('err');
+  if (_TID) {
+    // Mode QR : confirmation simple, pas de saisie
+    document.getElementById('tbl-desc').textContent = t.callConfirmQR || t.tableTitle + ' ?';
+    inp.style.display = 'none';
+  } else {
+    document.getElementById('tbl-desc').textContent = t.tableDesc;
+    inp.style.display = '';
+    inp.value = '';
+    inp.classList.remove('err');
+    setTimeout(() => inp.focus(), 380);
+  }
   document.getElementById('table-modal').classList.add('on');
-  setTimeout(() => inp.focus(), 380);
   if (!_tableModalInHistory) {
     history.pushState({ modal: 'table-modal' }, '');
     _tableModalInHistory = true;
@@ -8836,14 +8848,21 @@ function setupScrollObserver() {
    TABLE NUMBER MODAL
 ================================================ */
 function confirmTableCall() {
-  const inp = document.getElementById('table-num');
-  const raw = inp.value.trim();
-  const num = parseInt(raw, 10);
-  if (!raw || isNaN(num) || num < 1 || num > 99) {
-    inp.classList.add('err');
-    setTimeout(() => inp.classList.remove('err'), 500);
-    inp.focus();
-    return;
+  let num;
+  if (_TID) {
+    // Mode QR : numéro de table depuis l'URL, pas de saisie
+    num = _TID;
+  } else {
+    const inp = document.getElementById('table-num');
+    const raw = inp.value.trim();
+    const parsed = parseInt(raw, 10);
+    if (!raw || isNaN(parsed) || parsed < 1 || parsed > 99) {
+      inp.classList.add('err');
+      setTimeout(() => inp.classList.remove('err'), 500);
+      inp.focus();
+      return;
+    }
+    num = parsed;
   }
   closeTableModal();
 
