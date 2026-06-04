@@ -6594,11 +6594,13 @@ document.addEventListener('DOMContentLoaded', () => {
 (function() {
   var _ax = null, _ay = null;
   document.addEventListener('touchstart', function(e) {
+    if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = null; return; }
     _ax = e.touches[0].clientX;
     _ay = e.touches[0].clientY;
   }, { passive:true });
   document.addEventListener('touchend', function(e) {
     if (_ax === null) return;
+    if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = null; return; }
     var dx = e.changedTouches[0].clientX - _ax;
     var dy = e.changedTouches[0].clientY - _ay;
     _ax = _ay = null;
@@ -6802,6 +6804,7 @@ function _qrInitUI() {
 
 let _qrHistoryPushed = false;
 let _qrScrollY = 0;
+let _qrSavedTab = null;
 function _qrLockScroll() {
   _qrScrollY = window.scrollY;
   document.documentElement.style.overflow = 'hidden';
@@ -6814,6 +6817,7 @@ function _qrUnlockScroll() {
 }
 function openQRModal() {
   if (!_tableCount) return;
+  _qrSavedTab = _adminCurrentTab;
   _qrLockScroll();
   document.getElementById('qr-modal').classList.add('open');
   history.pushState({ qrModal: true }, '');
@@ -6823,6 +6827,8 @@ function openQRModal() {
 function closeQRModal() {
   document.getElementById('qr-modal').classList.remove('open');
   _qrUnlockScroll();
+  if (_qrSavedTab && _qrSavedTab !== _adminCurrentTab) switchAdminTab(_qrSavedTab);
+  _qrSavedTab = null;
   if (_qrHistoryPushed) { _qrHistoryPushed = false; history.back(); }
 }
 window.addEventListener('popstate', () => {
@@ -6830,6 +6836,8 @@ window.addEventListener('popstate', () => {
     _qrHistoryPushed = false;
     document.getElementById('qr-modal').classList.remove('open');
     _qrUnlockScroll();
+    if (_qrSavedTab && _qrSavedTab !== _adminCurrentTab) switchAdminTab(_qrSavedTab);
+    _qrSavedTab = null;
   }
 });
 
