@@ -1432,10 +1432,35 @@
       box-shadow:0 -4px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.12);
     }
   }
-  /* ── STATS OUTER SECTION ── */
-  .stats-outer-section > .sec-body { overflow: visible; }
+  /* ── STATS CARD (même visuel qu'adm-section, sans wrap JS) ── */
+  .stats-card {
+    margin-bottom:16px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.018) 100%);
+    border:1px solid rgba(200,164,78,0.14);
+    border-left:3px solid rgba(200,164,78,0.5);
+    border-right:3px solid rgba(200,164,78,0.5);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  html.light .stats-card {
+    background:linear-gradient(160deg,#ffffff 0%,#faf7f2 100%);
+    border-color:rgba(168,104,64,0.15);
+    box-shadow:0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  @media(min-width:900px) {
+    .stats-card { box-shadow:0 2px 18px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.1); border-radius:18px; }
+    html.light .stats-card { box-shadow:0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04); }
+  }
+  .stats-card-hd {
+    padding:16px 18px 14px;
+    font-size:0.88rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--text); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:10px;
+  }
+  .stats-card-body { padding:16px 16px 18px; }
   .chart-block { padding-top: 1rem; margin-top: 0.25rem; border-top: 1px solid var(--border); }
-  .chart-block:first-child { padding-top: 0; margin-top: 0; border-top: none; }
+  .chart-block:first-of-type { padding-top: 0; margin-top: 0; border-top: none; }
   .chart-block-hd { display:flex; align-items:center; gap:0.5rem; font-size:0.8rem; font-weight:600; color:var(--text); margin-bottom:0.75rem; }
 
   /* ── ANALYTICS FILTER ── */
@@ -1733,40 +1758,42 @@
   <!-- ── PANEL 2 : Commandes & Appels ── -->
   <div id="admin-panel-orders" class="admin-panel" style="display:none">
   <!-- ── STATISTIQUES ── -->
-  <div class="adm-section stats-outer-section" id="stats-section">
-    <div class="sec-hd" id="sec-hd-stats">
-      <span style="margin-right:4px">📊</span><span id="stats-section-title">Statistiques</span>
+  <div class="stats-card" id="stats-section">
+    <div class="stats-card-hd" id="sec-hd-stats">
+      <span>📊</span><span id="stats-section-title">Statistiques</span>
     </div>
-    <!-- Filtre de période -->
-    <div id="analytics-section" class="analytics-filter-bar">
-      <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
-      <div class="filter-pills-row">
-        <button class="filter-pill"        id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
-        <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
-        <button class="filter-pill active"  id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
-        <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
-        <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
+    <div class="stats-card-body">
+      <!-- Filtre de période -->
+      <div id="analytics-section" class="analytics-filter-bar">
+        <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
+        <div class="filter-pills-row">
+          <button class="filter-pill"        id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
+          <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
+          <button class="filter-pill active" id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
+          <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
+          <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
+        </div>
+        <div class="filter-custom-range" id="analytics-custom-range">
+          <input type="date" id="analytics-date-start" class="filter-date-input" onchange="applyCustomDateRange()">
+          <span class="filter-date-sep">→</span>
+          <input type="date" id="analytics-date-end" class="filter-date-input" onchange="applyCustomDateRange()">
+        </div>
       </div>
-      <div class="filter-custom-range" id="analytics-custom-range">
-        <input type="date" id="analytics-date-start" class="filter-date-input" onchange="applyCustomDateRange()">
-        <span class="filter-date-sep">→</span>
-        <input type="date" id="analytics-date-end" class="filter-date-input" onchange="applyCustomDateRange()">
+      <!-- Graphique commandes -->
+      <div class="chart-block" id="chart-orders-section">
+        <div class="chart-block-hd"><span>🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
+        <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
       </div>
-    </div>
-    <!-- Graphique commandes -->
-    <div class="chart-block" id="chart-orders-section">
-      <div class="chart-block-hd"><span>🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
-      <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
-    </div>
-    <!-- Graphique appels -->
-    <div class="chart-block" id="chart-calls-section">
-      <div class="chart-block-hd"><span>🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
-      <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
-    </div>
-    <!-- Graphique produits -->
-    <div class="chart-block" id="chart-products-section">
-      <div class="chart-block-hd"><span>📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
-      <div id="chart-products-wrap"></div>
+      <!-- Graphique appels -->
+      <div class="chart-block" id="chart-calls-section">
+        <div class="chart-block-hd"><span>🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
+        <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
+      </div>
+      <!-- Graphique produits -->
+      <div class="chart-block" id="chart-products-section">
+        <div class="chart-block-hd"><span>📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
+        <div id="chart-products-wrap"></div>
+      </div>
     </div>
   </div>
 
