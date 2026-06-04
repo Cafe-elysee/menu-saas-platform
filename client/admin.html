@@ -602,10 +602,48 @@
     .table-url-row { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 12px; }
     .table-url-num { font-weight:700; color:var(--gold); font-size:0.82rem; min-width:60px; }
     .table-url-link { flex:1; font-size:0.72rem; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:monospace; }
-    .table-url-copy { padding:4px 10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Outfit',inherit; font-size:0.72rem; cursor:pointer; flex-shrink:0; }
-    .table-url-copy:active, .table-url-copy.copied { background:rgba(200,164,78,0.15); color:var(--gold); border-color:var(--gold); }
+    .table-url-copy,.table-url-open { padding:4px 10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Outfit',inherit; font-size:0.72rem; cursor:pointer; flex-shrink:0; transition:color 0.18s,border-color 0.18s,background 0.18s; }
+    .table-url-copy:hover,.table-url-open:hover { color:var(--gold); border-color:var(--gold); }
+    .table-url-copy:active,.table-url-copy.copied { background:rgba(200,164,78,0.15); color:var(--gold); border-color:var(--gold); }
     html.light .tables-count-input { background:var(--bg2); }
     html.light .table-url-row { background:var(--bg2); }
+    .qr-pdf-btn { margin-left:auto; font-size:0.75rem; color:var(--gold); background:transparent; padding:6px 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-family:inherit; transition:border-color 0.2s, background 0.2s; }
+    .qr-pdf-btn:hover { border-color:var(--gold); background:rgba(200,164,78,0.08); }
+    /* ── QR MODAL ── */
+    #qr-modal { display:none; position:fixed; inset:0; z-index:2200; background:rgba(0,0,0,0.72); align-items:center; justify-content:center; padding:16px; }
+    #qr-modal.open { display:flex; }
+    .qr-box { background:var(--bg2); border:1.5px solid var(--bord2); border-radius:20px; width:100%; max-width:400px; overflow:hidden; max-height:90vh; overflow-y:auto; box-shadow:0 24px 60px rgba(0,0,0,0.55); }
+    html.light .qr-box { background:#fff; }
+    .qr-hd { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+    .qr-hd-title { font-family:'Crimson Pro',serif; font-size:1.15rem; color:var(--gold); }
+    .qr-hd-close { background:transparent; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; padding:4px 8px; border-radius:8px; line-height:1; }
+    .qr-hd-close:hover { color:var(--cream); background:rgba(255,255,255,0.08); }
+    .qr-body { padding:18px 20px; }
+    .qr-sect { margin-bottom:18px; }
+    .qr-sect-lbl { font-size:0.68rem; font-weight:700; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px; }
+    .qr-color-row { display:flex; align-items:center; gap:10px; }
+    .qr-color-swatch { width:34px; height:34px; border-radius:8px; border:2px solid var(--border); cursor:pointer; padding:0; flex-shrink:0; }
+    .qr-color-hex { background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:7px 10px; font-family:monospace; font-size:0.84rem; color:var(--cream); width:96px; outline:none; transition:border-color 0.2s; }
+    .qr-color-hex:focus { border-color:var(--gold); }
+    html.light .qr-color-hex { background:var(--bg2); }
+    .qr-pills { display:flex; gap:6px; flex-wrap:wrap; }
+    .qr-pill { padding:6px 13px; border-radius:10px; border:1.5px solid var(--border); background:transparent; color:var(--muted); font-size:0.78rem; cursor:pointer; font-family:inherit; transition:all 0.18s; }
+    .qr-pill:hover { border-color:rgba(200,164,78,0.5); color:var(--cream); }
+    .qr-pill.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
+    .qr-center-extra { margin-top:10px; }
+    .qr-text-input { width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--cream); font-family:inherit; font-size:0.84rem; outline:none; transition:border-color 0.2s; }
+    .qr-text-input:focus { border-color:var(--gold); }
+    html.light .qr-text-input { background:var(--bg2); }
+    .qr-upload-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:8px; border:1.5px dashed var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.78rem; cursor:pointer; transition:all 0.18s; }
+    .qr-upload-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .qr-upload-fname { font-size:0.7rem; color:var(--gold); margin-top:5px; }
+    .qr-preview-area { display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 0 4px; }
+    #qr-preview-canvas { border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+    .qr-preview-sub { font-size:0.68rem; color:var(--muted); }
+    .qr-dl-btn { width:100%; padding:13px; background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; transition:opacity 0.2s; }
+    .qr-dl-btn:hover { opacity:0.9; }
+    .qr-dl-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .qr-dl-status { font-size:0.75rem; color:var(--muted); text-align:center; margin-top:8px; min-height:18px; }
 
     .sec-badge {
       font-family:'Outfit','Noto Sans',sans-serif; font-size:0.62rem; font-weight:600;
@@ -1833,7 +1871,7 @@
         <input type="number" id="tables-count-input" class="tables-count-input" min="1" max="99" value="1" inputmode="numeric">
         <button class="tables-count-btn" id="tables-count-save">Générer</button>
         <span style="font-size:0.78rem;color:var(--muted)">tables</span>
-        <a id="qr-generator-link" href="qr-generator.html" target="_blank" style="margin-left:auto;font-size:0.75rem;color:var(--gold);text-decoration:none;padding:6px 12px;border:1px solid var(--border);border-radius:8px;">🖨 PDF QR</a>
+        <button id="qr-pdf-btn" class="qr-pdf-btn" onclick="openQRModal()">🖨 PDF QR</button>
       </div>
       <div class="tables-url-list" id="tables-url-list"></div>
     </div>
@@ -1848,6 +1886,67 @@
   </div><!-- /admin-panel-orders -->
 
 </div><!-- /adm-wrap -->
+
+<!-- ── QR CODES MODAL ── -->
+<div id="qr-modal" onclick="if(event.target===this)closeQRModal()">
+  <div class="qr-box">
+    <div class="qr-hd">
+      <span class="qr-hd-title">🎨 Personnaliser les QR codes</span>
+      <button class="qr-hd-close" onclick="closeQRModal()">✕</button>
+    </div>
+    <div class="qr-body">
+      <!-- Couleur -->
+      <div class="qr-sect">
+        <div class="qr-sect-lbl">Couleur</div>
+        <div class="qr-color-row">
+          <input type="color" id="qr-color-pick" class="qr-color-swatch" value="#000000" oninput="qrSetColor(this.value)">
+          <input type="text"  id="qr-color-hex"  class="qr-color-hex"    value="#000000" maxlength="7" placeholder="#000000" oninput="qrHexInput(this.value)">
+        </div>
+      </div>
+      <!-- Style des modules -->
+      <div class="qr-sect">
+        <div class="qr-sect-lbl">Style des modules</div>
+        <div class="qr-pills">
+          <button class="qr-pill on"  data-style="square"  onclick="qrSetStyle('square')">⬛ Carré</button>
+          <button class="qr-pill"     data-style="rounded" onclick="qrSetStyle('rounded')">▣ Arrondi</button>
+          <button class="qr-pill"     data-style="dots"    onclick="qrSetStyle('dots')">⚫ Points</button>
+          <button class="qr-pill"     data-style="classy"  onclick="qrSetStyle('classy')">💎 Élégant</button>
+        </div>
+      </div>
+      <!-- Centre du QR -->
+      <div class="qr-sect">
+        <div class="qr-sect-lbl">Centre du QR code</div>
+        <div class="qr-pills">
+          <button class="qr-pill on"  data-center="none"  onclick="qrSetCenter('none')">Aucun</button>
+          <button class="qr-pill"     data-center="text"  onclick="qrSetCenter('text')">✏️ Texte</button>
+          <button class="qr-pill"     data-center="image" onclick="qrSetCenter('image')">🖼️ Image</button>
+        </div>
+        <div class="qr-center-extra" id="qr-center-text-wrap" style="display:none">
+          <input type="text" class="qr-text-input" id="qr-center-text" maxlength="4" placeholder="Ex: ☕ ou N°" oninput="qrUpdatePreview()">
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:4px">4 caractères max</div>
+        </div>
+        <div class="qr-center-extra" id="qr-center-image-wrap" style="display:none">
+          <label class="qr-upload-btn">
+            📎 Choisir une image
+            <input type="file" id="qr-center-file" accept="image/*" style="display:none" onchange="qrLoadImage(this)">
+          </label>
+          <div class="qr-upload-fname" id="qr-upload-fname"></div>
+        </div>
+      </div>
+      <!-- Aperçu -->
+      <div class="qr-sect">
+        <div class="qr-sect-lbl">Aperçu — Table 1</div>
+        <div class="qr-preview-area">
+          <canvas id="qr-preview-canvas" width="200" height="200"></canvas>
+          <div class="qr-preview-sub">Les QR de toutes les tables auront ce style</div>
+        </div>
+      </div>
+      <!-- Télécharger -->
+      <button class="qr-dl-btn" id="qr-dl-btn" onclick="qrDownloadPDF()">📥 Télécharger le PDF</button>
+      <div class="qr-dl-status" id="qr-dl-status"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Save bar (caché, gardé pour compatibilité) -->
 <div class="save-bar" id="save-bar" style="display:none">
@@ -5963,10 +6062,6 @@ function _logAction(type, extra) {
 let _tableCount = 0;
 
 function loadTableSystem() {
-  // Mettre à jour le lien PDF QR avec le rid courant
-  const qrLink = document.getElementById('qr-generator-link');
-  if (qrLink) qrLink.href = 'qr-generator.html?rid=' + _RID;
-
   _rref('config/tableCount').on('value', snap => {
     const n = parseInt(snap.val()) || 0;
     _tableCount = n;
@@ -5999,6 +6094,7 @@ function renderTableURLs(n) {
       '<div class="table-url-row">' +
         '<div class="table-url-num">' + (t.tblLabel || 'Table') + ' ' + i + '</div>' +
         '<div class="table-url-link" title="' + url + '">' + url + '</div>' +
+        '<button class="table-url-open" onclick="window.open(\'' + url + '\',\'_blank\')">↗ Ouvrir</button>' +
         '<button class="table-url-copy" onclick="copyTableURL(this,\'' + url + '\')">' + (t.tblCopy || 'Copier') + '</button>' +
       '</div>');
   }
@@ -6422,6 +6518,205 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (dx > 0 && _adminCurrentTab === 'orders') switchAdminTab('display');
   }, { passive:true });
 })();
+
+/* ═══════════════════════════════════════════
+   QR CODES MODAL
+═══════════════════════════════════════════ */
+const _qrState = { color:'#000000', dotStyle:'square', centerType:'none', centerText:'', centerImageData:null };
+let _qrLibsReady = false;
+
+function _qrLoadLibs() {
+  if (_qrLibsReady) return Promise.resolve();
+  const load = src => new Promise((res, rej) => {
+    if (document.querySelector('script[src="'+src+'"]')) { res(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return Promise.all([
+    load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js'),
+    load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+  ]).then(() => { _qrLibsReady = true; });
+}
+
+function openQRModal() {
+  if (!_tableCount) return;
+  document.getElementById('qr-modal').classList.add('open');
+  _qrLoadLibs().then(qrUpdatePreview);
+}
+function closeQRModal() { document.getElementById('qr-modal').classList.remove('open'); }
+
+function qrSetColor(v) {
+  _qrState.color = v;
+  document.getElementById('qr-color-pick').value = v;
+  document.getElementById('qr-color-hex').value = v;
+  qrUpdatePreview();
+}
+function qrHexInput(v) {
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    _qrState.color = v;
+    document.getElementById('qr-color-pick').value = v;
+    qrUpdatePreview();
+  }
+}
+function qrSetStyle(s) {
+  _qrState.dotStyle = s;
+  document.querySelectorAll('.qr-pill[data-style]').forEach(p => p.classList.toggle('on', p.dataset.style === s));
+  qrUpdatePreview();
+}
+function qrSetCenter(t) {
+  _qrState.centerType = t;
+  document.querySelectorAll('.qr-pill[data-center]').forEach(p => p.classList.toggle('on', p.dataset.center === t));
+  document.getElementById('qr-center-text-wrap').style.display  = t === 'text'  ? '' : 'none';
+  document.getElementById('qr-center-image-wrap').style.display = t === 'image' ? '' : 'none';
+  qrUpdatePreview();
+}
+function qrLoadImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('qr-upload-fname').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => { _qrState.centerImageData = e.target.result; qrUpdatePreview(); };
+  reader.readAsDataURL(file);
+}
+
+function _qrDraw(canvas, url) {
+  return new Promise(resolve => {
+    if (!window.qrcode) { resolve(); return; }
+    const SIZE = canvas.width;
+    const ctx = canvas.getContext('2d');
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    const N = qr.getModuleCount();
+    const mod = Math.floor((SIZE * 0.86) / N);
+    const off = Math.round((SIZE - N * mod) / 2);
+
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = _qrState.color;
+
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        if (!qr.isDark(r, c)) continue;
+        const x = off + c * mod, y = off + r * mod;
+        const isFinder = (r<7&&c<7)||(r<7&&c>=N-7)||(r>=N-7&&c<7);
+        const st = _qrState.dotStyle;
+        if (st === 'square' || isFinder) {
+          ctx.fillRect(x, y, mod, mod);
+        } else if (st === 'rounded') {
+          const rad = mod * 0.32;
+          ctx.beginPath(); ctx.moveTo(x+rad,y);
+          ctx.arcTo(x+mod,y,x+mod,y+mod,rad); ctx.arcTo(x+mod,y+mod,x,y+mod,rad);
+          ctx.arcTo(x,y+mod,x,y,rad); ctx.arcTo(x,y,x+mod,y,rad);
+          ctx.closePath(); ctx.fill();
+        } else if (st === 'dots') {
+          ctx.beginPath(); ctx.arc(x+mod/2,y+mod/2,mod*0.43,0,Math.PI*2); ctx.fill();
+        } else if (st === 'classy') {
+          const rad = mod * 0.42;
+          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+mod,y);
+          ctx.lineTo(x+mod,y+mod-rad); ctx.arcTo(x+mod,y+mod,x+mod-rad,y+mod,rad);
+          ctx.lineTo(x,y+mod); ctx.closePath(); ctx.fill();
+        }
+      }
+    }
+
+    // Centre overlay
+    const cSz = SIZE * 0.22;
+    const cx = (SIZE-cSz)/2, cy = (SIZE-cSz)/2;
+    if (_qrState.centerType === 'text' && _qrState.centerText.trim()) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(cx-3,cy-3,cSz+6,cSz+6);
+      ctx.fillStyle = _qrState.color;
+      ctx.font = 'bold '+Math.round(cSz*0.5)+'px Outfit,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(_qrState.centerText.trim().slice(0,4), SIZE/2, SIZE/2);
+      resolve();
+    } else if (_qrState.centerType === 'image' && _qrState.centerImageData) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(cx-3,cy-3,cSz+6,cSz+6);
+        ctx.drawImage(img,cx,cy,cSz,cSz);
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = _qrState.centerImageData;
+    } else { resolve(); }
+  });
+}
+
+function qrUpdatePreview() {
+  const canvas = document.getElementById('qr-preview-canvas');
+  if (!canvas || !_qrLibsReady) return;
+  _qrState.centerText = document.getElementById('qr-center-text')?.value || '';
+  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  _qrDraw(canvas, base + '?rid=' + _RID + '&table=1');
+}
+
+async function qrDownloadPDF() {
+  if (!_qrLibsReady) { await _qrLoadLibs(); }
+  if (!_tableCount || !window.jspdf) return;
+  const btn = document.getElementById('qr-dl-btn');
+  const status = document.getElementById('qr-dl-status');
+  btn.disabled = true;
+  status.textContent = 'Génération en cours…';
+
+  const { jsPDF } = window.jspdf;
+  _qrState.centerText = document.getElementById('qr-center-text')?.value || '';
+  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+
+  // Génération canvas pour chaque table
+  const SIZE = 300;
+  const qrImages = [];
+  for (let i = 1; i <= _tableCount; i++) {
+    const cv = document.createElement('canvas');
+    cv.width = SIZE; cv.height = SIZE;
+    await _qrDraw(cv, base + '?rid=' + _RID + '&table=' + i);
+    qrImages.push(cv.toDataURL('image/png'));
+  }
+
+  // Construction PDF A4
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const title = adminData?.info?.name || _RID;
+  const QR_MM = 52, COL = 3, MARGIN = 12, TOP = MARGIN + 14;
+  const CELL_W = (210 - MARGIN*2) / COL;
+  const ROW_H  = QR_MM + 18;
+  const ROWS_PER_PAGE = Math.floor((297 - TOP - MARGIN) / ROW_H);
+  let col = 0, row = 0, page = 1;
+
+  const addHeader = () => {
+    doc.setFillColor(15,13,10);
+    doc.rect(0,0,210,297,'F');
+    doc.setTextColor(200,164,78);
+    doc.setFontSize(16); doc.setFont('helvetica','bold');
+    doc.text(title, 105, MARGIN, {align:'center'});
+    doc.setFontSize(8); doc.setTextColor(120,105,82);
+    doc.text('QR Codes — Scannez pour accéder au menu', 105, MARGIN+5.5, {align:'center'});
+  };
+  addHeader();
+
+  for (let i = 0; i < qrImages.length; i++) {
+    const x = MARGIN + col * CELL_W + (CELL_W - QR_MM) / 2;
+    const y = TOP + row * ROW_H;
+    doc.setFillColor(255,255,255);
+    doc.roundedRect(x-2,y-2,QR_MM+4,QR_MM+4,3,3,'F');
+    doc.addImage(qrImages[i],'PNG',x,y,QR_MM,QR_MM);
+    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(200,164,78);
+    doc.text('Table '+(i+1), x+QR_MM/2, y+QR_MM+7, {align:'center'});
+    col++;
+    if (col >= COL) { col = 0; row++; }
+    if (row >= ROWS_PER_PAGE && i < qrImages.length-1) {
+      row = 0; col = 0; page++; doc.addPage(); addHeader();
+    }
+  }
+
+  doc.save('qr-tables-' + _RID + '.pdf');
+  btn.disabled = false;
+  status.textContent = '✅ PDF téléchargé !';
+  setTimeout(() => { status.textContent = ''; }, 3000);
+}
 
 </script>
 
