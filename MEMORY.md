@@ -1,5 +1,5 @@
 # MEMORY — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-04
+## Dernière mise à jour : 2026-06-06
 
 ---
 
@@ -96,6 +96,9 @@ control/
 ### Section Statistiques admin — stats-card (IMPORTANT)
 Classe `.stats-card` OBLIGATOIRE (jamais `adm-section`). Le JS `setupCollapsible()` wrapping casse les graphiques Firebase. Collapse via `toggleStatsCard()` CSS max-height + localStorage.
 
+### Graphiques analytics — pleine largeur
+Graphiques pleine largeur au refresh. Ordre périodes correct. Design stats-card identique aux autres cartes admin.
+
 ### Listeners analytics — démarrage au chargement
 `startOrdersListener()` + `startAnalyticsListener()` depuis `switchAdminTab` ET depuis `DOMContentLoaded` si onglet 2 actif. Sinon refresh sur onglet 2 → graphiques vides.
 
@@ -107,7 +110,7 @@ Dans `syncStyleAdminUI`, `_updateScFabVisibility()` DOIT être appelé en DERNIE
 
 ### escapeHtml — partout sur données Firebase
 - server-app : fonction `escapeHtml` définie, utilisée partout ✅
-- control-app : fonction `escapeHtml` définie (depuis audit 2026-06-04), `client.name` escapé ✅
+- control-app : fonction `escapeHtml` définie, `client.name` escapé ✅
 - admin.html : fonction `esc()` définie, utilisée ✅
 
 ### Graphiques analytics — animation CSS @keyframes
@@ -120,6 +123,15 @@ Barres SVG utilisent `@keyframes chartBarGrow` + CSS custom property `--bar-i`. 
 ```js
 { tableNum, table: String(tableNum), ts: Date.now(), items, total, status:'pending', createdAt: ts }
 ```
+
+### QR Codes admin — Architecture (ajouté 2026-06-06)
+- Popup ouvert via `openQRModal()` — `history.pushState({qrModal:true},'')` + listener `popstate` → bouton retour Android ferme le popup
+- `_QR` objet : `{ color, bgColor, dotStyle, eyeStyle, centerType, centerText, centerImg, libsReady, _hsv:{h,s,v} }`
+- `_hsv` initialisé à `{h:0, s:1, v:1}` → couleur #ff0000 (rouge vif) — saturation et valeur à 100% par défaut
+- Fonctions HSV : `_hsvToHex(h,s,v)`, `_hexToHsv(hex)`, `_qrUpdateHsvUI()`, `_qrInitHsvEvents()`
+- 5 styles modules dans `_QR_STYLES` : square, rounded, dots, extra-rounded, classy
+- Grille styles : `grid-template-columns:repeat(3,1fr)` → 2 lignes de boutons compacts
+- PDF : jsPDF 2 colonnes haute résolution, librairies chargées à la demande
 
 ---
 
@@ -149,28 +161,29 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## 🔒 État fonctionnel — 2026-06-04
+## 🔒 État fonctionnel — 2026-06-06
 
-**Commit de référence : `955bffb`** (après audit complet)
+**Commit de référence : `5d3ccc9`** (après audit QR + corrections graphiques)
 
 - FCM sonnette, commandes, messages admin ✅
 - Control-app : labels Nom/ID, boutons Mettre à jour, escapeHtml, erreur modal ✅
 - Server-app : onglet initial, messages, scroll, 5 langues ✅
-- Admin : section Statistiques réductible, graphiques fonctionnels ✅
-- Admin : traductions 5 langues complètes (tables, graphiques, badges, commandes) ✅
+- Admin : section Statistiques réductible, graphiques fonctionnels pleine largeur ✅
+- Admin : traductions 5 langues complètes ✅
 - Admin : FAB onglet 2 correct au refresh ✅
 - Analytics : backfill robuste, période 30j défaut ✅
 - Bottom nav unified, swipe, desktop responsive ✅
 - Firebase rules v3 + analytics ✅
-- Audit sécurité + traductions complet 2026-06-04 ✅
+- QR codes : popup complet, picker HSV, 5 styles, PDF, bouton retour Android ✅
+- DIAG_SECRET retiré de MEMORY.md ✅
 
 **Note build APK** : copie manuelle `index.html` obligatoire avant chaque build.
+APKs actuels (2026-06-04) restent valides — aucun fichier APK touché depuis.
 
 ---
 
 ## À faire
 
-- [ ] **Tables & QR codes** — corriger système de création et téléchargement
 - [ ] **Page démo** — corrections à définir
 - [ ] Passer Firebase en Blaze avant 80 restaurants actifs
 - [ ] APKs signés release
