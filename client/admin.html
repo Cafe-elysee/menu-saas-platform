@@ -3306,15 +3306,35 @@ function toggleStatsCard() {
 function scGo(sectionId) {
   const panel2Ids = ['stats-section','analytics-section','chart-orders-section','chart-calls-section','chart-products-section','tables-admin-section','orders-admin-section'];
   const targetTab = panel2Ids.includes(sectionId) ? 'orders' : 'display';
+
+  const expandSection = () => {
+    if (sectionId === 'stats-section') {
+      const card = document.getElementById('stats-section');
+      if (card && card.classList.contains('collapsed')) toggleStatsCard();
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el && el.classList.contains('adm-section') && el.classList.contains('collapsed')) {
+        el.classList.remove('collapsed');
+        const saved = JSON.parse(localStorage.getItem(_PFX + 'adm_sections') || '{}');
+        saved[sectionId] = false;
+        localStorage.setItem(_PFX + 'adm_sections', JSON.stringify(saved));
+      }
+    }
+  };
+
   const doScroll = () => {
+    expandSection();
     const section = document.getElementById(sectionId);
     if (!section) return;
-    const header  = document.querySelector('.adm-header');
-    const headerH = header ? header.getBoundingClientRect().height : 0;
-    const tabBarH = document.getElementById('admin-tabs-bar')?.getBoundingClientRect().height || 0;
-    const top = section.getBoundingClientRect().top + window.scrollY - headerH - tabBarH - 12;
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    setTimeout(() => {
+      const header  = document.querySelector('.adm-header');
+      const headerH = header ? header.getBoundingClientRect().height : 0;
+      const tabBarH = document.getElementById('admin-tabs-bar')?.getBoundingClientRect().height || 0;
+      const top = section.getBoundingClientRect().top + window.scrollY - headerH - tabBarH - 12;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }, 50);
   };
+
   document.getElementById('sc-popup').classList.remove('open');
   document.getElementById('sc-fab').classList.remove('open');
   if (targetTab !== _adminCurrentTab) {
@@ -6339,6 +6359,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!ordersListener) startOrdersListener();
     startAnalyticsListener();
     requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
+    _updateScFabVisibility();
   }
 });
 
