@@ -1,5 +1,5 @@
 # MEMORY — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-06
+## Dernière mise à jour : 2026-06-07
 
 ---
 
@@ -124,14 +124,15 @@ Barres SVG utilisent `@keyframes chartBarGrow` + CSS custom property `--bar-i`. 
 { tableNum, table: String(tableNum), ts: Date.now(), items, total, status:'pending', createdAt: ts }
 ```
 
-### QR Codes admin — Architecture (ajouté 2026-06-06)
+### QR Codes admin — Architecture (mis à jour 2026-06-07)
 - Popup ouvert via `openQRModal()` — `history.pushState({qrModal:true},'')` + listener `popstate` → bouton retour Android ferme le popup
 - `_QR` objet : `{ color, bgColor, dotStyle, eyeStyle, centerType, centerText, centerImg, libsReady, _hsv:{h,s,v} }`
 - `_hsv` initialisé à `{h:0, s:1, v:1}` → couleur #ff0000 (rouge vif) — saturation et valeur à 100% par défaut
 - Fonctions HSV : `_hsvToHex(h,s,v)`, `_hexToHsv(hex)`, `_qrUpdateHsvUI()`, `_qrInitHsvEvents()`
 - 5 styles modules dans `_QR_STYLES` : square, rounded, dots, extra-rounded, classy
 - Grille styles : `grid-template-columns:repeat(3,1fr)` → 2 lignes de boutons compacts
-- PDF : jsPDF 2 colonnes haute résolution, librairies chargées à la demande
+- PDF : jsPDF 2 colonnes haute résolution, librairies chargées à la demande. Fond blanc (255,255,255). ID retiré du contenu (RNAME = nom ou '' jamais _RID) et du nom de fichier.
+- Scroll lock : `_qrScrollY = window.scrollY` + `document.body.style.overflow='hidden'` à l'ouverture. Restauré dans `closeQRModal()` ET listener `popstate`.
 
 ---
 
@@ -161,9 +162,9 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## 🔒 État fonctionnel — 2026-06-06
+## 🔒 État fonctionnel — 2026-06-07
 
-**Commit de référence : `5d3ccc9`** (après audit QR + corrections graphiques)
+**Commit de référence : `4384bc6`** (scroll QR lock + PDF blanc + ID retiré)
 
 - FCM sonnette, commandes, messages admin ✅
 - Control-app : labels Nom/ID, boutons Mettre à jour, escapeHtml, erreur modal ✅
@@ -175,6 +176,8 @@ demoPage/                           → lecture + écriture publique
 - Bottom nav unified, swipe, desktop responsive ✅
 - Firebase rules v3 + analytics ✅
 - QR codes : popup complet, picker HSV, 5 styles, PDF, bouton retour Android ✅
+- QR popup : scroll admin bloqué (position restaurée à la fermeture) ✅
+- PDF QR : fond blanc, ID absent du contenu et du nom de fichier ✅
 - DIAG_SECRET retiré de MEMORY.md ✅
 
 **Note build APK** : copie manuelle `index.html` obligatoire avant chaque build.
