@@ -1917,7 +1917,7 @@
       <div class="tables-count-row">
         <input type="number" id="tables-count-input" class="tables-count-input" min="1" max="99" value="1" inputmode="numeric">
         <button class="tables-count-btn" id="tables-count-save">Générer</button>
-        <span style="font-size:0.78rem;color:var(--muted)">tables</span>
+        <span id="tables-count-unit" style="font-size:0.78rem;color:var(--muted)">tables</span>
         <button id="qr-pdf-btn" class="qr-pdf-btn" onclick="openQRModal()">🖨 PDF QR</button>
       </div>
       <div class="tables-url-list" id="tables-url-list"></div>
@@ -3853,6 +3853,7 @@ function applyAdminUI(l) {
   Object.entries(_cmap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
   ['chart-orders-badge','chart-calls-badge','chart-products-badge'].forEach(id => { const el=$(id); if(el && t.chartTopN) el.textContent=t.chartTopN; });
   const _tcsave = $('tables-count-save'); if (_tcsave && t.btnGenerate) _tcsave.textContent = t.btnGenerate;
+  const _tcunit = $('tables-count-unit'); if (_tcunit && t.tblUnit) _tcunit.textContent = t.tblUnit;
   const _ordList = $('orders-admin-list'); if (_ordList && !_lastAdminOrders?.length) _ordList.innerHTML = '<div class="orders-empty">' + (t.ordEmpty || 'Aucune commande pour le moment') + '</div>';
 
   // Theme section title + badge
@@ -3954,6 +3955,7 @@ function setGlobalLang(l) {
   renderEventsChips();
   if (_lastAdminOrders.length) renderOrdersAdmin(_lastAdminOrders);
   if (_adminCurrentTab === 'orders') updateAnalytics();
+  if (_tableCount) renderTableURLs(_tableCount);
 }
 
 function switchInfoLang(l) {

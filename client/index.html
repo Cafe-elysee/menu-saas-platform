@@ -7036,7 +7036,7 @@ async function confirmOrder() {
       <div class="cart-success">
         <div class="cart-success-ico">✓</div>
         <div>${t.cartSent || 'Commande envoyée !'}</div>
-        <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">${isTakeaway ? (t.histTakeaway || 'À emporter') : 'Table ' + tableNum}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">${isTakeaway ? (t.histTakeaway || 'À emporter') : (t.histTable || 'Table') + ' ' + tableNum}</div>
       </div>`;
     cartItems = [];
     saveCart();
@@ -7854,6 +7854,11 @@ function applyTranslations() {
   targets.forEach(el => {
     if (el) { el.classList.remove('lt'); void el.offsetWidth; el.classList.add('lt'); }
   });
+  // Badge table QR code
+  if (_TID) {
+    const _tblLbl = document.getElementById('table-chip-label');
+    if (_tblLbl) _tblLbl.textContent = (t.histTable || 'Table') + ' ' + _TID;
+  }
   _updateCCHeader();
 }
 
