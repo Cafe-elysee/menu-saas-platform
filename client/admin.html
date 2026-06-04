@@ -1434,7 +1434,9 @@
   }
   /* ── STATS OUTER SECTION ── */
   .stats-outer-section > .sec-body { overflow: visible; }
-  .stats-outer-section .adm-section:hover { transform: none; }
+  .chart-block { padding-top: 1rem; margin-top: 0.25rem; border-top: 1px solid var(--border); }
+  .chart-block:first-child { padding-top: 0; margin-top: 0; border-top: none; }
+  .chart-block-hd { display:flex; align-items:center; gap:0.5rem; font-size:0.8rem; font-weight:600; color:var(--text); margin-bottom:0.75rem; }
 
   /* ── ANALYTICS FILTER ── */
   .analytics-filter-bar {
@@ -1754,18 +1756,18 @@
       </div>
     </div>
     <!-- Graphique commandes -->
-    <div class="adm-section" id="chart-orders-section">
-      <div class="sec-hd"><span style="margin-right:6px">🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
+    <div class="chart-block" id="chart-orders-section">
+      <div class="chart-block-hd"><span>🧾</span><span id="chart-orders-title">Commandes par table</span><span class="sec-badge" id="chart-orders-badge">top 10</span></div>
       <div class="chart-svg-wrap" id="chart-orders-wrap" style="min-height:50px"></div>
     </div>
     <!-- Graphique appels -->
-    <div class="adm-section" id="chart-calls-section">
-      <div class="sec-hd"><span style="margin-right:6px">🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
+    <div class="chart-block" id="chart-calls-section">
+      <div class="chart-block-hd"><span>🔔</span><span id="chart-calls-title">Appels par table</span><span class="sec-badge" id="chart-calls-badge">top 10</span></div>
       <div class="chart-svg-wrap" id="chart-calls-wrap" style="min-height:50px"></div>
     </div>
     <!-- Graphique produits -->
-    <div class="adm-section" id="chart-products-section">
-      <div class="sec-hd"><span style="margin-right:6px">📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
+    <div class="chart-block" id="chart-products-section">
+      <div class="chart-block-hd"><span>📦</span><span id="chart-products-title">Produits les plus vendus</span><span class="sec-badge" id="chart-products-badge">top 10</span></div>
       <div id="chart-products-wrap"></div>
     </div>
   </div>
