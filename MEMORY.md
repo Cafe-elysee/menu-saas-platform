@@ -132,7 +132,10 @@ Barres SVG utilisent `@keyframes chartBarGrow` + CSS custom property `--bar-i`. 
 - 5 styles modules dans `_QR_STYLES` : square, rounded, dots, extra-rounded, classy
 - Grille styles : `grid-template-columns:repeat(3,1fr)` → 2 lignes de boutons compacts
 - PDF : jsPDF 2 colonnes haute résolution, librairies chargées à la demande. Fond blanc (255,255,255). ID retiré du contenu (RNAME = nom ou '' jamais _RID) et du nom de fichier.
-- Scroll lock : `_qrScrollY = window.scrollY` + `document.body.style.overflow='hidden'` à l'ouverture. Restauré dans `closeQRModal()` ET listener `popstate`.
+- Scroll lock : `_qrLockScroll()` bloque `html` ET `body` overflow. `_qrUnlockScroll()` restaure + scrollTo.
+- Swipe guard : touchstart/touchend vérifient `qr-modal.classList.contains('open')` → retour immédiat si popup actif.
+- Tab guard : `_qrSavedTab = _adminCurrentTab` à l'ouverture → `switchAdminTab(_qrSavedTab)` à la fermeture si l'onglet a changé.
+- stats-card (mode clair) : `html.light .stats-card` doit avoir `border-left-color:rgba(168,104,64,0.45)` + `border-right-color` pour les bordures dorées visibles.
 
 ---
 
@@ -164,7 +167,7 @@ demoPage/                           → lecture + écriture publique
 
 ## 🔒 État fonctionnel — 2026-06-07
 
-**Commit de référence : `4384bc6`** (scroll QR lock + PDF blanc + ID retiré)
+**Commit de référence : `2eacd3a`** (bordures stats-card + scroll QR + PDF blanc)
 
 - FCM sonnette, commandes, messages admin ✅
 - Control-app : labels Nom/ID, boutons Mettre à jour, escapeHtml, erreur modal ✅
@@ -172,11 +175,12 @@ demoPage/                           → lecture + écriture publique
 - Admin : section Statistiques réductible, graphiques fonctionnels pleine largeur ✅
 - Admin : traductions 5 langues complètes ✅
 - Admin : FAB onglet 2 correct au refresh ✅
+- Admin : stats-card bordures identiques à adm-section (dark + light mode) ✅
 - Analytics : backfill robuste, période 30j défaut ✅
 - Bottom nav unified, swipe, desktop responsive ✅
 - Firebase rules v3 + analytics ✅
 - QR codes : popup complet, picker HSV, 5 styles, PDF, bouton retour Android ✅
-- QR popup : scroll admin bloqué (position restaurée à la fermeture) ✅
+- QR popup : swipe admin bloqué + onglet restauré à la fermeture ✅
 - PDF QR : fond blanc, ID absent du contenu et du nom de fichier ✅
 - DIAG_SECRET retiré de MEMORY.md ✅
 

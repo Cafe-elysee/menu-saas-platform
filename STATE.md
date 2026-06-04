@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `4384bc6` (2026-06-07)
+**Commit** : `2eacd3a` (2026-06-07)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
@@ -71,7 +71,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - 2 onglets, section Statistiques carte unique réductible ✅
 - Graphiques analytics pleine largeur au refresh ✅
 - Ordre périodes correct + localStorage ✅
-- Design stats-card identique aux autres cartes ✅
+- Design stats-card identique aux autres cartes (dark + light mode) ✅
 - Badges "top 10" traduits en 5 langues ✅
 - Section Tables traduite ✅
 - Message "Aucune commande" traduit au changement de langue ✅
@@ -89,10 +89,11 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
   - Centre transparent (sans fond blanc) ✅
   - Aperçu SVG vectoriel temps réel ✅
   - Bouton retour Android ferme le popup ✅
-  - **Scroll admin bloqué pendant que le popup est ouvert** ✅
+  - Swipe admin désactivé quand popup ouvert (plus de changement d'onglet) ✅
+  - Onglet actif sauvegardé et restauré à la fermeture ✅
 - PDF 2 colonnes haute résolution téléchargeable ✅
-  - **Fond blanc (plus de noir)** ✅
-  - **ID retiré du contenu et du nom de fichier** ✅
+  - Fond blanc (plus de noir) ✅
+  - ID retiré du contenu et du nom de fichier ✅
 - Aperçu QR adapté à la taille du conteneur (SVG 100%) ✅
 
 ---
@@ -108,12 +109,18 @@ Utilise `.stats-card` (jamais `adm-section`). Collapse via `toggleStatsCard()` C
 ### Modals control-app hors tabs-track
 `#del-modal` et `#nc-modal` après fermeture `#app`. Position:fixed dans parent transformé → zone tactile décalée sur Android.
 
-### QR Popup — bouton retour Android + scroll lock
-`history.pushState({qrModal:true},'')` à l'ouverture + listener `popstate` pour fermer → bouton retour natif Android fonctionne.
-`document.body.style.overflow='hidden'` + sauvegarde `_qrScrollY` à l'ouverture → scroll admin bloqué, position restaurée à la fermeture.
+### QR Popup — scroll lock + tab guard + retour Android
+- `history.pushState({qrModal:true},'')` à l'ouverture + listener `popstate` → bouton retour natif Android fonctionne
+- `_qrLockScroll()` : `overflow:hidden` sur `html` ET `body` + sauvegarde `_qrScrollY`
+- `_qrUnlockScroll()` : restaure overflow + `scrollTo(0, _qrScrollY)`
+- Swipe handler : vérifie `qr-modal.classList.contains('open')` → annule si popup actif
+- `_qrSavedTab` : sauvegarde l'onglet actif à l'ouverture, le restaure à la fermeture
 
 ### QR Picker HSV
 `_QR._hsv = {h:0,s:1,v:1}` initialisé dans `_QR`. Fonctions `_hsvToHex`, `_hexToHsv`, `_qrUpdateHsvUI`, `_qrInitHsvEvents`. Drag sur carré SV + slider teinte, touch + mouse.
+
+### stats-card — mode clair
+`html.light .stats-card` doit avoir `border-left-color:rgba(168,104,64,0.45)` et `border-right-color:rgba(168,104,64,0.45)` — sans ça les bordures dorées gauche/droite n'apparaissent pas en mode clair.
 
 ---
 
@@ -131,12 +138,12 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## Audit complet — 2026-06-04 ✅ + QR 2026-06-06 ✅ + PDF/Scroll 2026-06-07 ✅
+## Audit complet — 2026-06-07 ✅
 
 | Point | Statut |
 |-------|--------|
-| escapeHtml sur toutes données Firebase (server-app + control-app) | ✅ |
-| Traductions 5 langues complètes admin | ✅ |
+| escapeHtml sur toutes données Firebase (server-app + control-app + admin) | ✅ |
+| Traductions 5 langues complètes admin + server-app | ✅ |
 | FAB onglet 2 correct au refresh | ✅ |
 | Section Statistiques réductible, graphiques fonctionnels | ✅ |
 | Graphiques pleine largeur au refresh + ordre périodes | ✅ |
@@ -145,7 +152,9 @@ demoPage/                           → lecture + écriture publique
 | Firebase rules v3 appliquées | ✅ |
 | QR codes — popup complet avec picker HSV, styles, PDF | ✅ |
 | PDF QR fond blanc, ID retiré du contenu et du nom de fichier | ✅ |
-| Scroll admin bloqué quand popup QR ouvert (position restaurée à la fermeture) | ✅ |
+| Swipe admin bloqué quand popup QR ouvert | ✅ |
+| Onglet actif restauré à la fermeture du popup QR | ✅ |
+| stats-card bordures dorées identiques à adm-section (dark + light) | ✅ |
 | DIAG_SECRET retiré de MEMORY.md | ✅ |
 
 ---
