@@ -5774,7 +5774,6 @@ function syncStyleAdminUI(mode) {
   // Tables section : visible si tableSystem activé (dans le panel 2)
   const tablesSection = document.getElementById('tables-admin-section');
   if (tablesSection) tablesSection.style.display = _featOk('tableSystem') ? '' : 'none';
-  _updateScFabVisibility();
 
   // Toggles : toujours affichés (sous réserve de la licence)
   const callBtn   = document.getElementById('toggle-call-btn');
@@ -5818,6 +5817,10 @@ function syncStyleAdminUI(mode) {
 
   // Refresh theme selector (paper mode hides similar-looking themes)
   renderThemeSelector();
+
+  // Toujours en dernier : visibilité FAB selon onglet actif
+  // (doit être après scNoteBtn et toutes les overrides ci-dessus)
+  _updateScFabVisibility();
 }
 
 
