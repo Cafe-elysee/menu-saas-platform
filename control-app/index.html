@@ -612,18 +612,29 @@
     }
     .variant-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-    .forfait-row { display:flex; gap:8px; padding:10px 0 4px; }
-    .forfait-btn {
-      flex:1; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600;
-      border:1.5px solid var(--border); color:var(--muted); background:none;
-      cursor:pointer; transition:border-color 0.2s, color 0.2s, background 0.2s;
-      font-family:inherit; line-height:1.3; text-align:center;
+    .forfait-seg {
+      display:flex; padding:10px 0 6px;
     }
-    .forfait-btn:hover { border-color:rgba(200,164,78,0.5); color:var(--text); }
-    .forfait-btn.active {
-      border-color:var(--gold); color:var(--gold);
-      background:rgba(200,164,78,0.08);
+    .forfait-seg-wrap {
+      display:flex; width:100%;
+      background:rgba(255,255,255,0.04); border:1.5px solid var(--border);
+      border-radius:12px; overflow:hidden; position:relative;
     }
+    .forfait-seg-btn {
+      flex:1; padding:11px 8px; font-size:0.8rem; font-weight:600;
+      border:none; background:none; color:var(--muted);
+      cursor:pointer; font-family:inherit; line-height:1.3; text-align:center;
+      transition:color 0.22s; position:relative; z-index:1;
+    }
+    .forfait-seg-btn.active { color:#0c0a08; }
+    .forfait-seg-btn:not(.active):hover { color:var(--text); }
+    .forfait-seg-slider {
+      position:absolute; top:3px; bottom:3px; width:calc(50% - 3px);
+      background:var(--gold); border-radius:9px;
+      transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      left:3px;
+    }
+    .forfait-seg-wrap.right .forfait-seg-slider { transform:translateX(calc(100% + 0px)); left:3px; }
 
     .dp-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
@@ -1971,9 +1982,12 @@ function buildClientCard(client) {
 
       '<hr class="divider">' +
       '<div class="section-label">Forfait Client</div>' +
-      '<div class="forfait-row">' +
-        '<button class="forfait-btn" id="forfait-menu-qr-'+id+'" onclick="writeForfait(\''+s+'\',\'menu-qr\')">📋 Forfait Menu QR</button>' +
-        '<button class="forfait-btn" id="forfait-services-'+id+'" onclick="writeForfait(\''+s+'\',\'services\')">🛎 Commandes & Services</button>' +
+      '<div class="forfait-seg">' +
+        '<div class="forfait-seg-wrap" id="forfait-wrap-'+id+'">' +
+          '<div class="forfait-seg-slider"></div>' +
+          '<button class="forfait-seg-btn" id="forfait-menu-qr-'+id+'" onclick="writeForfait(\''+s+'\',\'menu-qr\')">📋 Menu QR</button>' +
+          '<button class="forfait-seg-btn" id="forfait-services-'+id+'" onclick="writeForfait(\''+s+'\',\'services\')">🛎 Commandes & Services</button>' +
+        '</div>' +
       '</div>' +
 
       '<div class="section-label">🌐 Langues disponibles</div>' +
@@ -2120,10 +2134,12 @@ function loadClientData(client) {
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
     // Forfait actif : Menu QR si callBtn=false, sinon Commandes & Services
     var isMenuQR = feat.callBtn === false;
-    var btnQR  = document.getElementById('forfait-menu-qr-'+id);
-    var btnSrv = document.getElementById('forfait-services-'+id);
+    var btnQR   = document.getElementById('forfait-menu-qr-'+id);
+    var btnSrv  = document.getElementById('forfait-services-'+id);
+    var wrap    = document.getElementById('forfait-wrap-'+id);
     if (btnQR)  btnQR.classList.toggle('active',  isMenuQR);
     if (btnSrv) btnSrv.classList.toggle('active', !isMenuQR);
+    if (wrap)   wrap.classList.toggle('right', !isMenuQR);
     if (!_clientVariants[s]) _clientVariants[s] = {};
 
     const enabledLangs = cfg.enabledLangs || {};
@@ -2184,11 +2200,19 @@ function writeQRSystem(slug, val) {
 function writeForfait(slug, forfait) {
   const id = slug.replace(/-/g,'_');
   const btnId = forfait === 'menu-qr' ? 'forfait-menu-qr-'+id : 'forfait-services-'+id;
-  // Ne rien faire si ce forfait est déjà actif
   const btn = document.getElementById(btnId);
   if (btn && btn.classList.contains('active')) return;
 
   const isServices = forfait === 'services';
+  const isMenuQR   = !isServices;
+  // Mise à jour visuelle immédiate
+  const btnQR  = document.getElementById('forfait-menu-qr-'+id);
+  const btnSrv = document.getElementById('forfait-services-'+id);
+  const wrap   = document.getElementById('forfait-wrap-'+id);
+  if (btnQR)  btnQR.classList.toggle('active',  isMenuQR);
+  if (btnSrv) btnSrv.classList.toggle('active', isServices);
+  if (wrap)   wrap.classList.toggle('right', isServices);
+  // Écriture Firebase
   const db = getClientDb(slug);
   db.ref('/config/features/callBtn').set(isServices);
   db.ref('/config/features/orderUI').set(isServices);
