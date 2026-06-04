@@ -6962,7 +6962,7 @@ async function qrDownloadPDF() {
 
   const base = location.href.replace(/admin\.html.*$/, 'index.html');
   const { jsPDF } = window.jspdf;
-  const RNAME = adminData?.info?.name || _RID;
+  const RNAME = adminData?.info?.name || '';
   const PNG_SIZE = 600;
 
   // Générer PNG haute résolution pour chaque table
@@ -6980,17 +6980,19 @@ async function qrDownloadPDF() {
   let col=0, row=0, pageN=1, total=Math.ceil(_tableCount/(COL*ROWS_PP));
 
   const addHdr = () => {
-    doc.setFillColor(10,8,6);
+    // Fond blanc
+    doc.setFillColor(255,255,255);
     doc.rect(0,0,210,297,'F');
-    // Gold accent bar
-    doc.setFillColor(180,140,60);
-    doc.rect(0,0,210,2,'F');
-    doc.setTextColor(200,164,78);
+    // Barre dorée en haut
+    doc.setFillColor(200,164,78);
+    doc.rect(0,0,210,2.5,'F');
+    // Nom du restaurant
+    doc.setTextColor(30,22,10);
     doc.setFontSize(18); doc.setFont('helvetica','bold');
-    doc.text(RNAME, 105, MARGIN+2, {align:'center'});
-    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(110,95,72);
-    doc.text('QR CODES · SCANNEZ POUR COMMANDER', 105, MARGIN+8, {align:'center'});
-    if (total > 1) { doc.setFontSize(6.5); doc.setTextColor(80,70,55); doc.text('Page '+pageN+' / '+total, 105, 291, {align:'center'}); }
+    if (RNAME) doc.text(RNAME, 105, MARGIN+2, {align:'center'});
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(110,90,55);
+    doc.text('QR CODES · SCANNEZ POUR COMMANDER', 105, RNAME ? MARGIN+8 : MARGIN+4, {align:'center'});
+    if (total > 1) { doc.setFontSize(6.5); doc.setTextColor(160,145,120); doc.text('Page '+pageN+' / '+total, 105, 291, {align:'center'}); }
   };
   addHdr();
 
@@ -6998,22 +7000,24 @@ async function qrDownloadPDF() {
     if (!imgs[i]) continue;
     const x = MARGIN + col*CELL_W + (CELL_W-QR_MM)/2;
     const y = TOP + row*ROW_H;
-    // Card background
-    doc.setFillColor(22,18,12);
-    doc.roundedRect(x-4, y-4, QR_MM+8, QR_MM+16, 4, 4, 'F');
-    // White QR background
+    // Card crème avec bordure dorée
+    doc.setFillColor(248,243,234);
+    doc.setDrawColor(210,185,140);
+    doc.roundedRect(x-4, y-4, QR_MM+8, QR_MM+16, 4, 4, 'FD');
+    // Fond blanc sous le QR
     doc.setFillColor(255,255,255);
     doc.roundedRect(x-1, y-1, QR_MM+2, QR_MM+2, 2, 2, 'F');
     doc.addImage(imgs[i],'PNG',x,y,QR_MM,QR_MM);
     // Label
-    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(200,164,78);
+    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(150,112,40);
     doc.text('TABLE '+(i+1), x+QR_MM/2, y+QR_MM+9, {align:'center'});
     col++;
     if (col >= COL) { col=0; row++; }
     if (row >= ROWS_PP && i < imgs.length-1) { row=0; col=0; pageN++; doc.addPage(); addHdr(); }
   }
 
-  doc.save('QR-Tables-'+_RID+'.pdf');
+  const _fname = (adminData?.info?.name || 'QR').replace(/[^a-zA-Z0-9À-ɏ _-]/g,'').trim() || 'QR';
+  doc.save(_fname + '-Tables.pdf');
   btns.forEach(b => { b.disabled=false; b.innerHTML='📥 Télécharger PDF'; });
   sts.forEach(s => { s.textContent='✅ PDF téléchargé !'; s.className='qr-dl-st ok'; });
   setTimeout(() => sts.forEach(s => { s.textContent=''; s.className='qr-dl-st'; }), 4000);
