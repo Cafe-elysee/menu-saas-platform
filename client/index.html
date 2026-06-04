@@ -5724,9 +5724,7 @@ function loadAdminData() {
   // Feature flag : qrOrdering (commande sans prompt table quand _TID présent)
   _rref('/config/features/qrOrdering').on('value', snap => {
     _qrOrderingEnabled = snap.val() !== false;
-    // Si désactivé, cacher le chip table
-    const chip = document.getElementById('table-chip');
-    if (chip) chip.style.display = (_TID && _qrOrderingEnabled) ? '' : 'none';
+    // Chip table masqué au client — numéro de table jamais affiché dans le menu
   });
 
   // Licence overlay fêtes (depuis Control)
@@ -7041,7 +7039,7 @@ async function confirmOrder() {
       <div class="cart-success">
         <div class="cart-success-ico">✓</div>
         <div>${t.cartSent || 'Commande envoyée !'}</div>
-        <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">${isTakeaway ? (t.histTakeaway || 'À emporter') : (t.histTable || 'Table') + ' ' + tableNum}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">${isTakeaway ? (t.histTakeaway || 'À emporter') : (t.destTable || '🪑 À table')}</div>
       </div>`;
     cartItems = [];
     saveCart();
@@ -7161,10 +7159,10 @@ function renderHistModal(orders) {
     const timeStr = o.createdAt ? new Date(o.createdAt).toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit' }) : '';
     const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString(locale, { day:'2-digit', month:'2-digit' }) : '';
 
-    // Numéro de table traduit : chiffre = table, sinon = à emporter
+    // Numéro de table masqué au client — chiffre = "À table" générique, sinon = à emporter
     const isNum = o.tableNum && /^\d+$/.test(String(o.tableNum));
     const tableLabel = isNum
-      ? `${t.histTable || 'Table'} ${o.tableNum}`
+      ? (t.destTable || '🪑 À table')
       : (t.histTakeaway || 'À emporter');
 
     // Noms des produits dans la langue courante (via ITEMS si disponible)
@@ -7408,12 +7406,7 @@ window.addEventListener('popstate', () => {
 ================================================ */
 function init() {
   if (isDemo) document.body.classList.add('demo-mode');
-  // Chip table QR code
-  if (_TID) {
-    const chip = document.getElementById('table-chip');
-    const lbl  = document.getElementById('table-chip-label');
-    if (chip && lbl) { lbl.textContent = 'Table ' + _TID; chip.classList.add('show'); }
-  }
+  // Chip table QR code — intentionnellement masqué au client (numéro de table interne)
   // Initialiser l'UI de base immédiatement
   buildLangBtns();
   setupPreloader();
@@ -7866,11 +7859,7 @@ function applyTranslations() {
   targets.forEach(el => {
     if (el) { el.classList.remove('lt'); void el.offsetWidth; el.classList.add('lt'); }
   });
-  // Badge table QR code
-  if (_TID) {
-    const _tblLbl = document.getElementById('table-chip-label');
-    if (_tblLbl) _tblLbl.textContent = (t.histTable || 'Table') + ' ' + _TID;
-  }
+  // Badge table intentionnellement masqué au client
   _updateCCHeader();
 }
 
