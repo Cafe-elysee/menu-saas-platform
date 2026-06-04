@@ -1536,9 +1536,13 @@
   html.light .stats-card {
     background:linear-gradient(160deg,#ffffff 0%,#faf7f2 100%);
     border-color:rgba(168,104,64,0.15);
-    box-shadow:0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+    border-left-color:rgba(168,104,64,0.45);
+    border-right-color:rgba(168,104,64,0.45);
+    box-shadow:0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
   }
   html.light .stats-card:hover {
+    border-left-color:var(--gold);
+    border-right-color:var(--gold);
     box-shadow:0 10px 36px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.1);
     transform:translateY(-2px);
   }
