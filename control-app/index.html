@@ -2182,6 +2182,12 @@ function writeQRSystem(slug, val) {
   db.ref('/config/features/qrOrdering').set(val);
 }
 function writeForfait(slug, forfait) {
+  const id = slug.replace(/-/g,'_');
+  const btnId = forfait === 'menu-qr' ? 'forfait-menu-qr-'+id : 'forfait-services-'+id;
+  // Ne rien faire si ce forfait est déjà actif
+  const btn = document.getElementById(btnId);
+  if (btn && btn.classList.contains('active')) return;
+
   const isServices = forfait === 'services';
   const db = getClientDb(slug);
   db.ref('/config/features/callBtn').set(isServices);
