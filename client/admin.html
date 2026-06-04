@@ -1741,9 +1741,9 @@
     <div id="analytics-section" class="analytics-filter-bar">
       <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
       <div class="filter-pills-row">
-        <button class="filter-pill active" id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
+        <button class="filter-pill"        id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
         <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
-        <button class="filter-pill"        id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
+        <button class="filter-pill active"  id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
         <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
         <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
       </div>
@@ -5994,7 +5994,7 @@ function closeIconModal() {
    ═══════════════════════════════════════════════════════ */
 
 let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
-let _adminCurrentPeriod = 'week';
+let _adminCurrentPeriod = 'month';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
 let _adminAllOrders        = {};
@@ -6242,11 +6242,11 @@ function _cleanupOldAnalytics() {
 }
 
 function _backfillAnalyticsFromOrders(existing) {
-  // Pour chaque commande brute qui n'a pas encore d'agrégat, créer l'agrégat
   const pending = {};
   Object.values(_adminAllOrders).forEach(o => {
-    if (!o.createdAt) return;
-    const d = new Date(o.createdAt);
+    const stamp = o.createdAt || o.ts;
+    if (!stamp) return;
+    const d = new Date(stamp);
     const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     if (existing[key]) return; // déjà agrégé
     if (!pending[key]) pending[key] = { createdAt: new Date(key + 'T00:00:00').getTime(), orders: {}, products: {} };
