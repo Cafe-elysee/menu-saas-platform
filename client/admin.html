@@ -1440,29 +1440,52 @@
     border-radius:18px;
     overflow:hidden;
     box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition:border-left-color 0.3s, border-right-color 0.3s, box-shadow 0.35s, transform 0.25s;
+  }
+  .stats-card:hover {
+    border-left-color:var(--gold);
+    border-right-color:var(--gold);
+    box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(200,164,78,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+    transform:translateY(-2px);
   }
   html.light .stats-card {
     background:linear-gradient(160deg,#ffffff 0%,#faf7f2 100%);
     border-color:rgba(168,104,64,0.15);
     box-shadow:0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
   }
+  html.light .stats-card:hover {
+    box-shadow:0 10px 36px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.1);
+    transform:translateY(-2px);
+  }
   @media(min-width:900px) {
     .stats-card { box-shadow:0 2px 18px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.1); border-radius:18px; }
     html.light .stats-card { box-shadow:0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04); }
   }
   .stats-card-hd {
-    padding:16px 18px 14px;
-    font-size:0.88rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
-    color:var(--text); border-bottom:1px solid var(--border);
-    display:flex; align-items:center; gap:10px;
+    font-family:'Crimson Pro',serif; font-size:1.25rem; font-weight:600;
+    color:var(--cream); padding:16px 18px;
+    background:linear-gradient(90deg, rgba(200,164,78,0.12) 0%, rgba(200,164,78,0.04) 40%, transparent 80%);
+    border-bottom:1px solid rgba(200,164,78,0.12);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     cursor:pointer; user-select:none;
+    transition:color 0.22s, background 0.25s;
   }
-  .stats-card-hd:hover { color:var(--gold); }
+  .stats-card-hd:hover {
+    color:var(--gold);
+    background:linear-gradient(90deg, rgba(200,164,78,0.18) 0%, rgba(200,164,78,0.07) 45%, transparent 80%);
+  }
+  html.light .stats-card-hd {
+    background:linear-gradient(90deg, rgba(168,104,64,0.09) 0%, rgba(168,104,64,0.03) 40%, transparent 80%);
+    border-bottom-color:rgba(168,104,64,0.12);
+  }
+  html.light .stats-card-hd:hover {
+    background:linear-gradient(90deg, rgba(168,104,64,0.15) 0%, rgba(168,104,64,0.06) 45%, transparent 80%);
+  }
   .stats-card-chevron { margin-left:auto; transition:transform 0.3s; }
   .stats-card.collapsed .stats-card-chevron { transform:rotate(-90deg); }
+  .stats-card.collapsed .stats-card-hd { border-bottom-color:transparent; background:linear-gradient(90deg, rgba(200,164,78,0.06) 0%, transparent 60%); }
   .stats-card-body { padding:16px 16px 18px; overflow:hidden; max-height:2000px; transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.25s; }
   .stats-card.collapsed .stats-card-body { max-height:0; padding-top:0; padding-bottom:0; }
-  .stats-card.collapsed .stats-card-hd { border-bottom-color:transparent; }
   .chart-block { padding-top: 1rem; margin-top: 0.25rem; border-top: 1px solid var(--border); }
   .chart-block:first-of-type { padding-top: 0; margin-top: 0; border-top: none; }
   .chart-block-hd { display:flex; align-items:center; gap:0.5rem; font-size:0.8rem; font-weight:600; color:var(--text); margin-bottom:0.75rem; }
@@ -1772,9 +1795,9 @@
       <div id="analytics-section" class="analytics-filter-bar">
         <div class="analytics-filter-label" id="analytics-filter-label">Période d'analyse</div>
         <div class="filter-pills-row">
+          <button class="filter-pill active" id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
           <button class="filter-pill"        id="filter-pill-7d"     data-period="week"   onclick="setAnalyticsPeriod('week')">7 jours</button>
-          <button class="filter-pill"        id="filter-pill-today"  data-period="today"  onclick="setAnalyticsPeriod('today')">Aujourd'hui</button>
-          <button class="filter-pill active" id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
+          <button class="filter-pill"        id="filter-pill-30d"    data-period="month"  onclick="setAnalyticsPeriod('month')">30 jours</button>
           <button class="filter-pill"        id="filter-pill-12m"    data-period="year"   onclick="setAnalyticsPeriod('year')">12 mois</button>
           <button class="filter-pill"        id="filter-pill-custom" data-period="custom" onclick="setAnalyticsPeriod('custom')">Personnalisé</button>
         </div>
@@ -6073,7 +6096,7 @@ function closeIconModal() {
    ═══════════════════════════════════════════════════════ */
 
 let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
-let _adminCurrentPeriod = 'month';
+let _adminCurrentPeriod = localStorage.getItem(_PFX + 'analytics_period') || 'today';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
 let _adminAllOrders        = {};
@@ -6131,6 +6154,7 @@ function _updateScFabVisibility() {
 /* ── Filtre de période ── */
 function setAnalyticsPeriod(period) {
   _adminCurrentPeriod = period;
+  localStorage.setItem(_PFX + 'analytics_period', period);
   document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.period === period));
   const cr = document.getElementById('analytics-custom-range');
   if (cr) cr.classList.toggle('show', period === 'custom');
@@ -6212,7 +6236,9 @@ function buildBarChart(containerId, data, opts) {
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   if (!data.length) { container.innerHTML = '<div class="chart-empty">' + (t.chartEmpty || 'Aucune donnée') + '</div>'; return; }
 
-  const W   = Math.max(container.clientWidth || 0, 280);
+  const cw  = container.clientWidth || 0;
+  if (!cw && _adminCurrentTab === 'orders') { setTimeout(() => updateAnalytics(), 150); return; }
+  const W   = Math.max(cw, 280);
   const H   = 175;
   const PL  = 32, PR = 8, PT = 24, PB = 30;
   const IW  = W - PL - PR, IH = H - PT - PB;
@@ -6357,13 +6383,18 @@ window.addEventListener('resize', () => {
   }, 200);
 });
 
-/* ── Restaurer l'onglet actif au chargement ── */
+/* ── Restaurer l'onglet actif + période analytics au chargement ── */
 document.addEventListener('DOMContentLoaded', () => {
+  // Synchroniser le pill de période (valeur lue depuis localStorage)
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.period === _adminCurrentPeriod));
+  const cr = document.getElementById('analytics-custom-range');
+  if (cr) cr.classList.toggle('show', _adminCurrentPeriod === 'custom');
+
   if (_adminCurrentTab === 'orders') {
     const p1 = document.getElementById('admin-panel-display');
     const p2 = document.getElementById('admin-panel-orders');
     if (p1) p1.style.display = 'none';
-    if (p2) p2.style.display = '';
+    if (p2) { p2.style.display = ''; void p2.offsetWidth; }
     document.getElementById('admin-tab-display')?.classList.remove('on');
     document.getElementById('admin-tab-orders')?.classList.add('on');
     if (!ordersListener) startOrdersListener();
