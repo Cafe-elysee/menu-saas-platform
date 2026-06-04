@@ -6140,7 +6140,12 @@ function computeAnalytics() {
     });
   });
 
-  const top10 = arr => arr.sort((a,b) => b.value - a.value).slice(0,10);
+  const top10 = arr => arr.sort((a,b) => {
+    if (b.value !== a.value) return b.value - a.value;
+    const na = parseInt(a.label), nb = parseInt(b.label);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return String(a.label).localeCompare(String(b.label));
+  }).slice(0,10);
   return {
     ordersByTable: top10(Object.entries(ordersByTable).map(([l,v]) => ({label:l, value:v}))),
     callsByTable:  top10(Object.entries(callsByTable).map(([l,v])  => ({label:l, value:v}))),
@@ -6184,7 +6189,7 @@ function buildBarChart(containerId, data, opts) {
     const y = (PT + IH - (v / yMax) * IH).toFixed(1);
     const dash = i > 0 ? ' stroke-dasharray="3,4"' : '';
     svg += '<line x1="' + PL + '" y1="' + y + '" x2="' + (W - PR) + '" y2="' + y + '" stroke="rgba(200,164,78,0.09)" stroke-width="1"' + dash + '/>';
-    svg += '<text x="' + (PL - 4) + '" y="' + (parseFloat(y) + 3.5).toFixed(1) + '" text-anchor="end" font-size="8.5" fill="rgba(200,164,78,0.35)" font-family="Outfit,sans-serif">' + v + '</text>';
+    svg += '<text x="' + (PL - 4) + '" y="' + (parseFloat(y) + 3.5).toFixed(1) + '" text-anchor="end" font-size="10" fill="rgba(200,164,78,0.75)" font-family="Outfit,sans-serif">' + v + '</text>';
   });
 
   // Bars
@@ -6202,7 +6207,7 @@ function buildBarChart(containerId, data, opts) {
     const vlbl = isTop ? color : 'rgba(200,164,78,0.55)';
     svg += '<text class="chart-val-lbl" style="--lbl-i:' + (320 + delay) + 'ms" x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (parseFloat(by) - 5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="' + vlbl + '">' + d.value + '</text>';
     const lbl = String(d.label).length > 7 ? String(d.label).substring(0,6) + '…' : String(d.label);
-    svg += '<text x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="8.5" fill="rgba(200,164,78,0.42)" font-family="Outfit,sans-serif">' + lbl + '</text>';
+    svg += '<text x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(200,164,78,0.85)" font-family="Outfit,sans-serif">' + lbl + '</text>';
   });
   svg += '</svg>';
   container.innerHTML = svg;
