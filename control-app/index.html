@@ -571,9 +571,9 @@
     .pw-feedback { font-size: 0.72rem; margin-top: 0.3rem; min-height: 1em; }
     .pw-feedback.ok  { color: var(--green); }
     .pw-feedback.err { color: var(--red); }
-    .info-edit-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; }
-    .info-edit-lbl { font-size:0.72rem; color:var(--muted); width:28px; flex-shrink:0; }
-    .info-edit-wrap { display:flex; gap:0.4rem; flex:1; }
+    .info-edit-row { display:flex; flex-direction:column; gap:0.3rem; margin-bottom:0.75rem; }
+    .info-edit-lbl { font-size:0.72rem; color:var(--muted); font-weight:600; }
+    .info-edit-wrap { display:flex; gap:0.4rem; width:100%; }
     .info-edit-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.84rem; color:var(--text); font-family:inherit; outline:none; min-width:0; transition:border-color 0.2s; }
     .info-edit-input:focus { border-color:var(--gold); }
     .info-edit-btn { background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08; border:none; border-radius:8px; padding:0.5rem 0.85rem; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:opacity 0.2s; }

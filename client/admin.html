@@ -1473,16 +1473,14 @@
   .filter-date-sep { color:var(--muted); font-size:0.82rem; font-weight:600; }
   /* ── CHARTS ── */
   .chart-svg-wrap svg { display:block; overflow:visible; }
+  @keyframes chartBarGrow { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+  @keyframes chartLblIn   { from { opacity:0; }           to { opacity:1; }           }
   .chart-bar {
     transform-origin:center bottom; transform-box:fill-box;
-    transform:scaleY(0);
+    animation:chartBarGrow 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    animation-delay:var(--bar-i,0ms);
   }
-  .chart-bar.anim {
-    transition:transform 0.5s cubic-bezier(0.22,1,0.36,1);
-    transform:scaleY(1);
-  }
-  .chart-val-lbl { opacity:0; }
-  .chart-val-lbl.anim { opacity:1; transition:opacity 0.25s; }
+  .chart-val-lbl { animation:chartLblIn 0.25s ease both; animation-delay:var(--lbl-i,320ms); }
   .chart-empty {
     text-align:center; color:var(--muted); font-size:0.82rem;
     padding:28px 0 10px; font-style:italic;
@@ -6170,32 +6168,15 @@ function buildBarChart(containerId, data, opts) {
     const r     = Math.min(3, BW / 2);
     const fill  = isTop ? color : ('url(#' + cid + ')');
 
-    svg += '<rect class="chart-bar" x="' + bx + '" y="' + baseY + '" width="' + BW.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="' + r + '" fill="' + fill + '" data-by="' + by + '"/>';
-    // Value label (shown after animation)
+    const delay = i * 38;
+    svg += '<rect class="chart-bar" style="--bar-i:' + delay + 'ms" x="' + bx + '" y="' + by + '" width="' + BW.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="' + r + '" fill="' + fill + '"/>';
     const vlbl = isTop ? color : 'rgba(200,164,78,0.55)';
-    svg += '<text class="chart-val-lbl" x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (parseFloat(by) - 5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="' + vlbl + '">' + d.value + '</text>';
-    // X label
+    svg += '<text class="chart-val-lbl" style="--lbl-i:' + (320 + delay) + 'ms" x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (parseFloat(by) - 5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="' + vlbl + '">' + d.value + '</text>';
     const lbl = String(d.label).length > 7 ? String(d.label).substring(0,6) + '…' : String(d.label);
     svg += '<text x="' + (parseFloat(bx) + BW/2).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="8.5" fill="rgba(200,164,78,0.42)" font-family="Outfit,sans-serif">' + lbl + '</text>';
   });
   svg += '</svg>';
   container.innerHTML = svg;
-
-  // Animate
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    container.querySelectorAll('.chart-bar').forEach((bar, i) => {
-      const targetY = bar.dataset.by;
-      setTimeout(() => {
-        bar.style.transition = 'none';
-        bar.setAttribute('y', targetY);
-        requestAnimationFrame(() => {
-          bar.classList.add('anim');
-          const vl = container.querySelectorAll('.chart-val-lbl')[i];
-          if (vl) setTimeout(() => vl.classList.add('anim'), 320);
-        });
-      }, i * 38);
-    });
-  }));
 }
 
 /* ── Rendu produits ── */
