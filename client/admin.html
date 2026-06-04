@@ -6649,12 +6649,24 @@ function _qrInitUI() {
   if (sub) sub.textContent = _tableCount + ' table' + (_tableCount > 1 ? 's' : '') + ' · Menu Pro';
 }
 
+let _qrHistoryPushed = false;
 function openQRModal() {
   if (!_tableCount) return;
   document.getElementById('qr-modal').classList.add('open');
+  history.pushState({ qrModal: true }, '');
+  _qrHistoryPushed = true;
   _qrLoadLibs().then(() => { _qrInitUI(); qrUpdatePreview(); });
 }
-function closeQRModal() { document.getElementById('qr-modal').classList.remove('open'); }
+function closeQRModal() {
+  document.getElementById('qr-modal').classList.remove('open');
+  if (_qrHistoryPushed) { _qrHistoryPushed = false; history.back(); }
+}
+window.addEventListener('popstate', () => {
+  if (document.getElementById('qr-modal').classList.contains('open')) {
+    _qrHistoryPushed = false;
+    document.getElementById('qr-modal').classList.remove('open');
+  }
+});
 
 function qrSetColor(v) {
   _QR.color = v;
