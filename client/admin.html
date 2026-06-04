@@ -20,7 +20,6 @@
       --muted:  rgba(244,234,210,0.52);
       --border: rgba(200,164,78,0.18);
       --bord2:  rgba(200,164,78,0.36);
-      --border2: rgba(200,164,78,0.36);
       --green:  #7ebd6a;
       --red:    #e05252;
       --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
@@ -38,7 +37,6 @@
       --muted:  rgba(28,23,16,0.52);
       --border: rgba(168,104,64,0.22);
       --bord2:  rgba(168,104,64,0.42);
-      --border2: rgba(168,104,64,0.42);
     }
     html.light body { background:var(--bg); color:var(--cream); }
     html.light .adm-header { background:rgba(245,240,232,0.98) !important; }
@@ -1220,7 +1218,7 @@
       display:flex; align-items:center; gap:7px;
       padding:7px 13px 7px 10px;
       border-radius:10px;
-      border:1px solid var(--border2);
+      border:1px solid var(--bord2);
       background:var(--bg-card);
       cursor:pointer; transition:border-color 0.18s, background 0.18s;
       font-size:0.82rem; color:var(--cream);
@@ -2064,6 +2062,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
     chartProductsTitle:'Κορυφαία προϊόντα', chartEmpty:'Δεν υπάρχουν δεδομένα', chartTopN:'top 10',
     scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
+    btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια',
     btnDelLogo:    'Διαγραφή λογοτύπου',
   },
   fr: {
@@ -2178,6 +2177,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
     chartProductsTitle:'Produits les plus vendus', chartEmpty:'Aucune donnée sur cette période', chartTopN:'top 10',
     scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
+    btnGenerate:'Générer', tblLabel:'Table', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables',
     btnDelLogo:    'Supprimer le logo',
   },
   en: {
@@ -2292,6 +2292,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
     chartProductsTitle:'Top products', chartEmpty:'No data for this period', chartTopN:'top 10',
     scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
+    btnGenerate:'Generate', tblLabel:'Table', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables',
     btnDelLogo:    'Delete logo',
   },
   de: {
@@ -2406,6 +2407,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
     chartProductsTitle:'Top-Produkte', chartEmpty:'Keine Daten für diesen Zeitraum', chartTopN:'top 10',
     scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
+    btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische',
     btnDelLogo:    'Logo löschen',
   },
   ar: {
@@ -2520,6 +2522,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
     chartProductsTitle:'أفضل المنتجات', chartEmpty:'لا توجد بيانات لهذه الفترة', chartTopN:'top 10',
     scAnalytics:'📊 إحصائيات', statsSectionTitle:'إحصائيات',
+    btnGenerate:'إنشاء', tblLabel:'طاولة', tblCopy:'نسخ', tblCopied:'تم النسخ!', tblUnit:'طاولات',
     btnDelLogo:    'حذف الشعار',
   },
 };
@@ -3639,6 +3642,9 @@ function applyAdminUI(l) {
   Object.entries(_pillMap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
   const _cmap = { 'chart-orders-title':'chartOrdersTitle','chart-calls-title':'chartCallsTitle','chart-products-title':'chartProductsTitle' };
   Object.entries(_cmap).forEach(([id,k]) => { const el=$(id); if(el && t[k]) el.textContent=t[k]; });
+  ['chart-orders-badge','chart-calls-badge','chart-products-badge'].forEach(id => { const el=$(id); if(el && t.chartTopN) el.textContent=t.chartTopN; });
+  const _tcsave = $('tables-count-save'); if (_tcsave && t.btnGenerate) _tcsave.textContent = t.btnGenerate;
+  const _ordList = $('orders-admin-list'); if (_ordList && !_lastAdminOrders?.length) _ordList.innerHTML = '<div class="orders-empty">' + (t.ordEmpty || 'Aucune commande pour le moment') + '</div>';
 
   // Theme section title + badge
   const themeHd = $('sec-hd-theme');
@@ -5961,28 +5967,29 @@ function renderTableURLs(n) {
   const list = document.getElementById('tables-url-list');
   if (!list) return;
   if (n === 0) { list.innerHTML = ''; return; }
-
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const base = location.href.replace(/admin\.html.*$/, 'index.html');
   const rows = [];
   for (let i = 1; i <= n; i++) {
     const url = base + '?rid=' + _RID + '&table=' + i;
-    rows.push(`
-      <div class="table-url-row">
-        <div class="table-url-num">Table ${i}</div>
-        <div class="table-url-link" title="${url}">${url}</div>
-        <button class="table-url-copy" onclick="copyTableURL(this,'${url}')">Copier</button>
-      </div>`);
+    rows.push(
+      '<div class="table-url-row">' +
+        '<div class="table-url-num">' + (t.tblLabel || 'Table') + ' ' + i + '</div>' +
+        '<div class="table-url-link" title="' + url + '">' + url + '</div>' +
+        '<button class="table-url-copy" onclick="copyTableURL(this,\'' + url + '\')">' + (t.tblCopy || 'Copier') + '</button>' +
+      '</div>');
   }
   list.innerHTML = rows.join('');
 }
 
 function copyTableURL(btn, url) {
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   navigator.clipboard.writeText(url).then(() => {
-    btn.textContent = 'Copié !';
+    btn.textContent = t.tblCopied || 'Copié !';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => { btn.textContent = t.tblCopy || 'Copier'; btn.classList.remove('copied'); }, 2000);
   }).catch(() => {
-    btn.textContent = url; // fallback visible
+    btn.textContent = url;
   });
 }
 

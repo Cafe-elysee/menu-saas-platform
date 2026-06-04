@@ -1160,6 +1160,7 @@
     <div class="del-icon">🗑️</div>
     <div class="del-title">Supprimer le client</div>
     <div class="del-warn"><span class="del-name" id="del-client-name"></span><br>Toutes les données (menu, commandes, config) seront supprimées définitivement.</div>
+    <div id="del-error" style="display:none;font-size:0.75rem;color:#e05252;margin:6px 0;text-align:center"></div>
     <div class="del-actions">
       <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
       <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
@@ -1313,6 +1314,7 @@ const SAAS_FB_CONFIG = {
 // CLIENTS — configs Firebase par client
 // ════════════════════════════════════════════════════
 const CLIENTS = []; // Chargé dynamiquement depuis Firebase SaaS
+function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', ar:'العربية' };
 const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
@@ -1924,7 +1926,7 @@ function buildClientCard(client) {
   div.id = 'card-' + id;
   div.innerHTML =
     '<div class="card-top" onclick="toggleCard(\''+id+'\')">' +
-      '<span class="card-name">'+client.name+'</span>' +
+      '<span class="card-name">'+escapeHtml(client.name)+'</span>' +
       '<div class="card-top-right">' +
         '<span class="client-status-badge active" id="active-badge-'+id+'">Actif</span>' +
         '<div class="status-dot' + (_deviceStatus[s] ? ' online' : '') + '" id="status-'+id+'"></div>' +
@@ -2039,6 +2041,8 @@ function closeDelModal() {
   document.getElementById('del-modal').classList.remove('show');
   const btn = document.getElementById('del-confirm-btn');
   btn.textContent = 'Supprimer'; btn.disabled = false;
+  const errEl = document.getElementById('del-error');
+  if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
 }
 async function confirmDeleteClient() {
   if (!_deleteSlug) return;
@@ -2053,7 +2057,8 @@ async function confirmDeleteClient() {
     if (cardEl) cardEl.remove();
   } catch(e) {
     btn.textContent = 'Supprimer'; btn.disabled = false;
-    alert('Erreur : ' + e.message);
+    const errEl = document.getElementById('del-error');
+    if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
   }
 }
 
