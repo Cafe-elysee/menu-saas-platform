@@ -6755,7 +6755,7 @@ function _qrBuildSVG(url, size) {
     center = `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/>${mods}${eyes}${center}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${size} ${size}" width="100%" height="100%" style="display:block" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/>${mods}${eyes}${center}</svg>`;
 }
 
 function _qrInjectSVG(containerId, url, size) {
