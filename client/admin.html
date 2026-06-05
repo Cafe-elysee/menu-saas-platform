@@ -1675,6 +1675,28 @@
     transition:transform 0.22s; box-shadow:0 1px 3px rgba(0,0,0,0.3);
   }
   .settings-toggle:checked + .settings-toggle-track::after { transform:translateX(18px); }
+
+  /* ── Réglages — sections plates (sans carte) ── */
+  .settings-section {
+    padding:0 0 8px;
+    border-bottom:1px solid rgba(200,164,78,0.12);
+    margin-bottom:8px;
+  }
+  .settings-section:last-child { border-bottom:none; margin-bottom:0; }
+  html.light .settings-section { border-bottom-color:rgba(168,104,64,0.12); }
+  .settings-sec-hd {
+    font-family:'Crimson Pro',serif; font-size:1.15rem; font-weight:600;
+    color:var(--cream); padding:16px 18px 10px;
+  }
+  html.light .settings-sec-hd { color:var(--cream); }
+  /* Bouton gold fixe dark+light (couleurs hardcodées dark mode) */
+  .btn-settings-gold {
+    padding:10px 16px;
+    background:linear-gradient(135deg,#e2c278,#c8a44e,#9a7a35);
+    border-radius:10px; color:#0c0a08; font-size:0.84rem; font-weight:600;
+    white-space:nowrap; transition:all 0.25s;
+  }
+  .btn-settings-gold:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.35); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
@@ -1963,23 +1985,32 @@
   <!-- ── PANEL 3 : Réglages ── -->
   <div id="admin-panel-settings" class="admin-panel" style="display:none">
 
-    <div class="adm-section" id="sec-settings-name">
-      <div class="sec-hd">Nom du restaurant</div>
-      <div style="padding:16px 18px;display:flex;gap:10px;align-items:center">
-        <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom du restaurant" style="flex:1">
-        <button class="btn-save-prod settings-save-btn" style="flex:0 0 auto;white-space:nowrap" onclick="saveRestaurantName()">Mettre à jour</button>
+    <div class="settings-section" id="sec-settings-name">
+      <div class="settings-sec-hd">Nom</div>
+      <div style="padding:0 18px 16px;display:flex;gap:10px;align-items:center">
+        <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom" style="flex:1">
+        <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveRestaurantName()">Mettre à jour</button>
       </div>
-      <div id="settings-name-fb" style="padding:0 18px 14px;font-size:0.76rem;min-height:1.2em"></div>
+      <div id="settings-name-fb" style="padding:0 18px 10px;font-size:0.76rem;min-height:1.2em"></div>
     </div>
 
-    <div class="adm-section" id="sec-settings-langs">
-      <div class="sec-hd">🌐 Langues disponibles</div>
-      <div id="settings-langs-list" style="padding:10px 18px 14px;display:flex;flex-direction:column;gap:6px"></div>
+    <div class="settings-section" id="sec-settings-pwd">
+      <div class="settings-sec-hd">Mot de passe admin</div>
+      <div style="padding:0 18px 16px;display:flex;gap:10px;align-items:center">
+        <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
+        <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveAdminPassword()">Mettre à jour</button>
+      </div>
+      <div id="settings-pwd-fb" style="padding:0 18px 10px;font-size:0.76rem;min-height:1.2em"></div>
     </div>
 
-    <div class="adm-section" id="sec-settings-lang-params">
-      <div class="sec-hd">🌐 Langues — Paramètres</div>
-      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:12px">
+    <div class="settings-section" id="sec-settings-langs">
+      <div class="settings-sec-hd">Langues disponibles</div>
+      <div id="settings-langs-list" style="padding:0 18px 16px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div class="settings-section" id="sec-settings-lang-params">
+      <div class="settings-sec-hd">Langues — Paramètres</div>
+      <div style="padding:0 18px 16px;display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
           <span id="settings-default-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue affichée (1ère visite)</span>
           <select id="settings-default-lang" class="settings-sel" onchange="adminSetDefaultLang(this.value)"></select>
@@ -1989,15 +2020,6 @@
           <select id="settings-primary-lang" class="settings-sel" onchange="adminSetPrimaryLang(this.value)"></select>
         </div>
       </div>
-    </div>
-
-    <div class="adm-section" id="sec-settings-pwd">
-      <div class="sec-hd">Mot de passe admin</div>
-      <div style="padding:16px 18px;display:flex;gap:10px;align-items:center">
-        <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
-        <button class="btn-save-prod settings-save-btn" style="flex:0 0 auto;white-space:nowrap" onclick="saveAdminPassword()">Mettre à jour</button>
-      </div>
-      <div id="settings-pwd-fb" style="padding:0 18px 14px;font-size:0.76rem;min-height:1.2em"></div>
     </div>
 
   </div><!-- /admin-panel-settings -->
@@ -2344,7 +2366,7 @@ const ADMIN_UI = {
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
     tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις', tabSettings:'⚙️ Ρυθμίσεις',
-    settingsName:'Όνομα εστιατορίου', settingsLangs:'🌐 Διαθέσιμες γλώσσες', settingsLangParams:'🌐 Γλώσσες — Ρυθμίσεις',
+    settingsName:'Όνομα', settingsLangs:'Διαθέσιμες γλώσσες', settingsLangParams:'Γλώσσες — Ρυθμίσεις',
     settingsPwd:'Κωδικός διαχειριστή', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
     settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
     analyticsTitle:'Περίοδος ανάλυσης',
@@ -2462,7 +2484,7 @@ const ADMIN_UI = {
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
     tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels', tabSettings:'⚙️ Réglages',
-    settingsName:'Nom du restaurant', settingsLangs:'🌐 Langues disponibles', settingsLangParams:'🌐 Langues — Paramètres',
+    settingsName:'Nom', settingsLangs:'Langues disponibles', settingsLangParams:'Langues — Paramètres',
     settingsPwd:'Mot de passe admin', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
     analyticsTitle:'Période d\'analyse',
@@ -2580,7 +2602,7 @@ const ADMIN_UI = {
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
     tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls', tabSettings:'⚙️ Settings',
-    settingsName:'Restaurant name', settingsLangs:'🌐 Available languages', settingsLangParams:'🌐 Languages — Settings',
+    settingsName:'Name', settingsLangs:'Available languages', settingsLangParams:'Languages — Settings',
     settingsPwd:'Admin password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
     settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
     analyticsTitle:'Analysis period',
@@ -2698,7 +2720,7 @@ const ADMIN_UI = {
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
     tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe', tabSettings:'⚙️ Einstellungen',
-    settingsName:'Restaurantname', settingsLangs:'🌐 Verfügbare Sprachen', settingsLangParams:'🌐 Sprachen — Einstellungen',
+    settingsName:'Name', settingsLangs:'Verfügbare Sprachen', settingsLangParams:'Sprachen — Einstellungen',
     settingsPwd:'Admin-Passwort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
     settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
     analyticsTitle:'Analysezeitraum',
@@ -2816,7 +2838,7 @@ const ADMIN_UI = {
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
     tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات', tabSettings:'⚙️ الإعدادات',
-    settingsName:'اسم المطعم', settingsLangs:'🌐 اللغات المتاحة', settingsLangParams:'🌐 اللغات — الإعدادات',
+    settingsName:'الاسم', settingsLangs:'اللغات المتاحة', settingsLangParams:'اللغات — الإعدادات',
     settingsPwd:'كلمة مرور الإدارة', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
     settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
     analyticsTitle:'فترة التحليل',
@@ -3945,7 +3967,7 @@ function applyAdminUI(l) {
     ['sec-settings-lang-params','settingsLangParams'],['sec-settings-pwd','settingsPwd']
   ];
   _setLabels.forEach(([secId, key]) => {
-    const hd = document.querySelector('#'+secId+' .sec-hd');
+    const hd = document.querySelector('#'+secId+' .settings-sec-hd');
     if (hd && t[key]) hd.textContent = t[key];
   });
   const _setEl = (id, key) => { const el=$(id); if(el&&t[key]) el.textContent=t[key]; };
