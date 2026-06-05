@@ -1168,6 +1168,7 @@ function applyLang() {
   document.getElementById('settings-notif-desc').textContent    = t.settingsNotifDesc;
   document.getElementById('settings-fcm-title').textContent     = t.settingsFcmTitle;
   document.getElementById('settings-fcm-retry-btn').textContent = t.settingsFcmRetry;
+  _updateFcmStatus();
   var notifTxt = document.getElementById('notif-perm-txt');
   var notifBtn = document.querySelector('#notif-perm-banner button');
   if (notifTxt) notifTxt.textContent = t.notifBannerTxt;
