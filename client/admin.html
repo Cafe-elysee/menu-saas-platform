@@ -6535,8 +6535,8 @@ function switchAdminTab(tab) {
   const nextPanel = document.getElementById('admin-panel-' + tab);
 
   if (prevPanel) {
-    prevPanel.classList.add(goRight ? 'tab-out-left' : 'tab-out-right');
-    setTimeout(() => { prevPanel.style.display = 'none'; prevPanel.classList.remove('tab-out-left','tab-out-right'); }, 180);
+    prevPanel.style.display = 'none';
+    prevPanel.classList.remove('tab-out-left','tab-out-right');
   }
   if (nextPanel) {
     nextPanel.style.display = '';
