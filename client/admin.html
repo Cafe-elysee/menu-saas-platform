@@ -3087,8 +3087,18 @@ function applyMenuSnapshot(data) {
   const _wrap = document.getElementById('adm-wrap');
   if (_wrap && _wrap.style.display === 'none') {
     _wrap.style.display = '';
-    const _fab = document.getElementById('fab-save');
-    if (_fab) _fab.style.display = '';
+    // Sync panels DOM avec l'onglet mémorisé (évite le stacking au rechargement)
+    ['display','orders','settings'].forEach(t => {
+      const p = document.getElementById('admin-panel-' + t);
+      if (p) p.style.display = (t === _adminCurrentTab) ? '' : 'none';
+      document.getElementById('admin-tab-' + t)?.classList.toggle('on', t === _adminCurrentTab);
+    });
+    _updateScFabVisibility();
+    if (_adminCurrentTab === 'orders') {
+      if (!ordersListener) startOrdersListener();
+      startAnalyticsListener();
+      requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
+    }
   }
 }
 
@@ -6238,10 +6248,6 @@ function syncStyleAdminUI(mode) {
   if (callBtn   && !_featOk('callBtn')) callBtn.style.display   = 'none';
   if (orderBtn  && !_featOk('orderUI')) orderBtn.style.display  = 'none';
 
-  // FAB notification visible uniquement si sonnette OU commande est licenciée depuis Control
-  const fabNotif = document.getElementById('fab-notif');
-  if (fabNotif) fabNotif.style.display = (_featOk('callBtn') || _featOk('orderUI')) ? '' : 'none';
-
   // En style papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
   document.body.setAttribute('data-style', mode);
   // En style papier, la section info n'affiche que le WiFi (pas les horaires ni l'adresse)
@@ -6560,8 +6566,15 @@ function switchAdminTab(tab) {
 function _updateScFabVisibility() {
   const isOrders   = _adminCurrentTab === 'orders';
   const isDisplay  = _adminCurrentTab === 'display';
+  const isSettings = _adminCurrentTab === 'settings';
   const showOrder  = adminData?.info?.showOrderUI !== false;
   const hasTables  = _featOk('tableSystem');
+
+  // sc-fab raccourcis : masqué sur onglet Réglages
+  const scFab = document.getElementById('sc-fab');
+  if (scFab) scFab.style.display = isSettings ? 'none' : '';
+
+  // Raccourcis popup
   const tab1Ids = ['sc-design-btn','sc-hero-btn','sc-infos-btn','sc-note-btn','sc-cats-btn','sc-prods-btn'];
   tab1Ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = isDisplay ? '' : 'none'; });
   const scOrders = document.getElementById('sc-orders-btn');
@@ -6570,6 +6583,16 @@ function _updateScFabVisibility() {
   if (scTables) scTables.style.display = (isOrders && hasTables) ? '' : 'none';
   const scAnalytics = document.getElementById('sc-analytics-btn');
   if (scAnalytics) scAnalytics.style.display = isOrders ? '' : 'none';
+
+  // FAB Enregistrer tout : onglet 1 uniquement
+  const fabSave = document.getElementById('fab-save');
+  if (fabSave) fabSave.style.display = isDisplay ? '' : 'none';
+
+  // FAB Message serveur : onglet 2 uniquement + feat activé + onglet 2 accessible
+  const tab2Btn = document.getElementById('admin-tab-orders');
+  const tab2Ok  = tab2Btn && tab2Btn.style.display !== 'none';
+  const fabNotif = document.getElementById('fab-notif');
+  if (fabNotif) fabNotif.style.display = (isOrders && tab2Ok && (_featOk('callBtn') || _featOk('orderUI'))) ? '' : 'none';
 }
 
 /* ── Filtre de période ── */
