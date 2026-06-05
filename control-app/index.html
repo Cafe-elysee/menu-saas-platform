@@ -2010,22 +2010,6 @@ function buildClientCard(client) {
         '</div>' +
       '</div>' +
 
-      '<div class="section-label">🌐 Langues disponibles</div>' +
-      '<div class="feat-list">' +
-        langs.map(l =>
-          '<div class="lang-toggle-row"><span class="lang-toggle-label">'+(LANG_LABELS[l]||l)+'</span>' +
-          '<label class="toggle"><input type="checkbox" id="lang-en-'+l+'-'+id+'" checked ' +
-          'onchange="onLangToggle(\''+s+'\',\''+l+'\',this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>'
-        ).join('') +
-      '</div>' +
-
-      '<div class="section-label">🌐 Langues — Paramètres</div>' +
-      '<div class="lang-section">' +
-        '<div class="lang-row"><span class="lang-label">Langue affichée (1ère visite)</span>' +
-        '<select id="default-lang-'+id+'" class="lang-sel" onchange="writeDefaultLang(\''+s+'\',this.value)">'+langOpts+'</select></div>' +
-        '<div class="lang-row"><span class="lang-label">Langue admin (saisie)</span>' +
-        '<select id="primary-lang-'+id+'" class="lang-sel" onchange="writePrimaryLang(\''+s+'\',this.value)">'+langOpts+'</select></div>' +
-      '</div>' +
 
       '<hr class="divider">' +
       '<div class="section-label">Mot de passe admin</div>' +

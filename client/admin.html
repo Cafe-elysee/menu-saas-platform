@@ -1651,6 +1651,30 @@
   html[lang="el"] .sec-hd            { font-size: 1.1rem; }
   html[lang="el"] .cat-products-name { font-size: 0.93rem; }
   html[lang="el"] .order-adm-table   { font-size: 0.93rem; }
+
+  /* ── Réglages tab ── */
+  .settings-sel {
+    background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:8px;
+    color:var(--cream); font-size:0.82rem; padding:6px 10px; outline:none;
+    transition:border-color 0.2s; cursor:pointer; font-family:inherit;
+  }
+  .settings-sel:focus { border-color:var(--gold); }
+  .settings-sel option { background:#181612; }
+  html.light .settings-sel { background:rgba(255,255,255,0.7); color:var(--dark); }
+  html.light .settings-sel option { background:#fff; }
+  .settings-toggle { display:none; }
+  .settings-toggle-track {
+    width:42px; height:24px; border-radius:12px; background:rgba(255,255,255,0.12);
+    border:1px solid var(--bord2); position:relative; cursor:pointer;
+    transition:background 0.22s, border-color 0.22s; flex-shrink:0;
+  }
+  .settings-toggle:checked + .settings-toggle-track { background:var(--gold); border-color:var(--gold); }
+  .settings-toggle-track::after {
+    content:''; position:absolute; top:3px; left:3px;
+    width:16px; height:16px; border-radius:50%; background:#fff;
+    transition:transform 0.22s; box-shadow:0 1px 3px rgba(0,0,0,0.3);
+  }
+  .settings-toggle:checked + .settings-toggle-track::after { transform:translateX(18px); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
@@ -1936,6 +1960,48 @@
 
   </div><!-- /admin-panel-orders -->
 
+  <!-- ── PANEL 3 : Réglages ── -->
+  <div id="admin-panel-settings" class="admin-panel" style="display:none">
+
+    <div class="adm-section" id="sec-settings-name">
+      <div class="sec-hd">Nom du restaurant</div>
+      <div style="padding:16px 18px;display:flex;gap:10px;align-items:center">
+        <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom du restaurant" style="flex:1">
+        <button class="btn-save-prod settings-save-btn" style="flex:0 0 auto;white-space:nowrap" onclick="saveRestaurantName()">Mettre à jour</button>
+      </div>
+      <div id="settings-name-fb" style="padding:0 18px 14px;font-size:0.76rem;min-height:1.2em"></div>
+    </div>
+
+    <div class="adm-section" id="sec-settings-langs">
+      <div class="sec-hd">🌐 Langues disponibles</div>
+      <div id="settings-langs-list" style="padding:10px 18px 14px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div class="adm-section" id="sec-settings-lang-params">
+      <div class="sec-hd">🌐 Langues — Paramètres</div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span id="settings-default-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue affichée (1ère visite)</span>
+          <select id="settings-default-lang" class="settings-sel" onchange="adminSetDefaultLang(this.value)"></select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span id="settings-primary-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue admin (saisie)</span>
+          <select id="settings-primary-lang" class="settings-sel" onchange="adminSetPrimaryLang(this.value)"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-section" id="sec-settings-pwd">
+      <div class="sec-hd">Mot de passe admin</div>
+      <div style="padding:16px 18px;display:flex;gap:10px;align-items:center">
+        <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
+        <button class="btn-save-prod settings-save-btn" style="flex:0 0 auto;white-space:nowrap" onclick="saveAdminPassword()">Mettre à jour</button>
+      </div>
+      <div id="settings-pwd-fb" style="padding:0 18px 14px;font-size:0.76rem;min-height:1.2em"></div>
+    </div>
+
+  </div><!-- /admin-panel-settings -->
+
 </div><!-- /adm-wrap -->
 
 <!-- ── QR CODES MODAL ── -->
@@ -2082,6 +2148,14 @@
       </svg>
     </div>
     <span class="admin-nav-label tab-label">Commandes &amp; Appels</span>
+  </button>
+  <button class="admin-nav-btn" id="admin-tab-settings" onclick="switchAdminTab('settings')">
+    <div class="admin-nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <span class="admin-nav-label">Réglages</span>
   </button>
 </nav>
 
@@ -2269,7 +2343,10 @@ const ADMIN_UI = {
     noneIco:       '— Καμία —',
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
-    tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις',
+    tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις', tabSettings:'⚙️ Ρυθμίσεις',
+    settingsName:'Όνομα εστιατορίου', settingsLangs:'🌐 Διαθέσιμες γλώσσες', settingsLangParams:'🌐 Γλώσσες — Ρυθμίσεις',
+    settingsPwd:'Κωδικός διαχειριστή', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
+    settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
     analyticsTitle:'Περίοδος ανάλυσης',
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
@@ -2384,7 +2461,10 @@ const ADMIN_UI = {
     noneIco:       '— Aucune —',
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
-    tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels',
+    tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels', tabSettings:'⚙️ Réglages',
+    settingsName:'Nom du restaurant', settingsLangs:'🌐 Langues disponibles', settingsLangParams:'🌐 Langues — Paramètres',
+    settingsPwd:'Mot de passe admin', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
+    settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
     analyticsTitle:'Période d\'analyse',
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
@@ -2499,7 +2579,10 @@ const ADMIN_UI = {
     noneIco:       '— None —',
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
-    tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls',
+    tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls', tabSettings:'⚙️ Settings',
+    settingsName:'Restaurant name', settingsLangs:'🌐 Available languages', settingsLangParams:'🌐 Languages — Settings',
+    settingsPwd:'Admin password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
+    settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
     analyticsTitle:'Analysis period',
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
@@ -2614,7 +2697,10 @@ const ADMIN_UI = {
     noneIco:       '— Keines —',
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
-    tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe',
+    tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe', tabSettings:'⚙️ Einstellungen',
+    settingsName:'Restaurantname', settingsLangs:'🌐 Verfügbare Sprachen', settingsLangParams:'🌐 Sprachen — Einstellungen',
+    settingsPwd:'Admin-Passwort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
+    settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
     analyticsTitle:'Analysezeitraum',
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
@@ -2729,7 +2815,10 @@ const ADMIN_UI = {
     noneIco:       '— لا شيء —',
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
-    tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات',
+    tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات', tabSettings:'⚙️ الإعدادات',
+    settingsName:'اسم المطعم', settingsLangs:'🌐 اللغات المتاحة', settingsLangParams:'🌐 اللغات — الإعدادات',
+    settingsPwd:'كلمة مرور الإدارة', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
+    settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
     analyticsTitle:'فترة التحليل',
     filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
     chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
@@ -2934,6 +3023,7 @@ function showAdmin() {
   loadPrimaryLang();
   loadEnabledLangs();
   loadTableSystem();
+  setupSettingsTab();
   setupNotifFab();
 }
 
@@ -3845,9 +3935,23 @@ function applyAdminUI(l) {
   const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders','sc-tables-btn':'scTables','sc-analytics-btn':'scAnalytics' };
   Object.entries(scMap).forEach(([id, key]) => { const el = $(id); if (el) el.textContent = t[key] || el.textContent; });
   // Onglets
-  const _tabD = $('admin-tab-display'), _tabO = $('admin-tab-orders');
+  const _tabD = $('admin-tab-display'), _tabO = $('admin-tab-orders'), _tabS = $('admin-tab-settings');
   if (_tabD) { const _s = _tabD.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
   if (_tabO) { const _s = _tabO.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
+  if (_tabS) { const _s = _tabS.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabSettings || _s.textContent; }
+  // Réglages panel labels
+  const _setLabels = [
+    ['sec-settings-name','settingsName'],['sec-settings-langs','settingsLangs'],
+    ['sec-settings-lang-params','settingsLangParams'],['sec-settings-pwd','settingsPwd']
+  ];
+  _setLabels.forEach(([secId, key]) => {
+    const hd = document.querySelector('#'+secId+' .sec-hd');
+    if (hd && t[key]) hd.textContent = t[key];
+  });
+  const _setEl = (id, key) => { const el=$(id); if(el&&t[key]) el.textContent=t[key]; };
+  _setEl('settings-default-lang-lbl','settingsDefaultLang');
+  _setEl('settings-primary-lang-lbl','settingsPrimaryLang');
+  document.querySelectorAll('.settings-save-btn').forEach(b => { if(t.settingsSave) b.textContent=t.settingsSave; });
   // Analytics texts
   const _ssl = $('stats-section-title'); if (_ssl) _ssl.textContent = t.statsSectionTitle || _ssl.textContent;
   const _afl = $('analytics-filter-label'); if (_afl) _afl.textContent = t.analyticsTitle || _afl.textContent;
@@ -5955,7 +6059,134 @@ function loadEnabledLangs() {
   _rref('/config/enabledLangs').on('value', snap => {
     adminEnabledLangs = snap.val() || {};
     filterAdminLangBtns();
+    _settingsRenderLangToggles();
   });
+}
+
+/* ═══════════════════════════════════════════
+   RÉGLAGES — Onglet 3
+═══════════════════════════════════════════ */
+let _settingsLangData = { enabled:{}, default:'fr', primary:'fr' };
+
+function setupSettingsTab() {
+  // Nom du restaurant
+  _rref('profile/name').on('value', snap => {
+    const inp = document.getElementById('settings-name-input');
+    if (inp && snap.val()) inp.value = snap.val();
+  });
+  // Langues activées
+  _rref('/config/enabledLangs').on('value', snap => {
+    _settingsLangData.enabled = snap.val() || {};
+    _settingsRenderLangToggles();
+  });
+  // Langue par défaut
+  _rref('/config/defaultLang').on('value', snap => {
+    _settingsLangData.default = snap.val() || 'fr';
+    _settingsUpdateLangSelects();
+  });
+  // Langue admin
+  _rref('/config/primaryLang').on('value', snap => {
+    _settingsLangData.primary = snap.val() || 'fr';
+    _settingsUpdateLangSelects();
+  });
+  // Remplir les selects
+  _settingsBuildLangSelects();
+}
+
+function _settingsBuildLangSelects() {
+  ['settings-default-lang','settings-primary-lang'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel || sel.options.length) return;
+    LANGS.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l; opt.textContent = LANG_LABELS[l] || l;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function _settingsUpdateLangSelects() {
+  const selDef = document.getElementById('settings-default-lang');
+  const selPri = document.getElementById('settings-primary-lang');
+  if (selDef) selDef.value = _settingsLangData.default;
+  if (selPri) selPri.value = _settingsLangData.primary;
+}
+
+function _settingsRenderLangToggles() {
+  const container = document.getElementById('settings-langs-list');
+  if (!container) return;
+  container.innerHTML = '';
+  LANGS.forEach((l, i) => {
+    const enabled = _settingsLangData.enabled[l] !== false;
+    const isLast  = i === LANGS.length - 1;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 0' + (isLast ? '' : ';border-bottom:1px solid var(--border)');
+    const uid = 'stl-' + l;
+    row.innerHTML =
+      '<label for="'+uid+'" style="font-size:0.85rem;color:var(--cream);cursor:pointer">' + (LANG_LABELS[l]||l) + '</label>' +
+      '<label style="position:relative;cursor:pointer">' +
+        '<input id="'+uid+'" type="checkbox" class="settings-toggle"' + (enabled?' checked':'') +
+        ' onchange="adminToggleLang(\''+l+'\',this.checked)">' +
+        '<div class="settings-toggle-track"></div>' +
+      '</label>';
+    container.appendChild(row);
+  });
+}
+
+async function saveRestaurantName() {
+  const inp = document.getElementById('settings-name-input');
+  const fb  = document.getElementById('settings-name-fb');
+  const val = inp?.value.trim();
+  if (!val) return;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  try {
+    await _rref('profile/name').set(val);
+    if (adminData?.info) adminData.info.name = val;
+    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.settingsSaved || '✅ Enregistré'; setTimeout(()=>{fb.textContent='';},3000); }
+  } catch(e) {
+    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
+  }
+}
+
+async function adminToggleLang(lang, enabled) {
+  const remaining = LANGS.filter(l => l !== lang && _settingsLangData.enabled[l] !== false);
+  if (!enabled && remaining.length === 0) { _settingsRenderLangToggles(); return; }
+  await _rref('/config/enabledLangs/' + lang).set(enabled);
+  if (!enabled && _settingsLangData.default === lang) {
+    const rep = remaining[0] || 'fr';
+    await _rref('/config/defaultLang').set(rep);
+  }
+  if (!enabled && _settingsLangData.primary === lang) {
+    const rep = remaining[0] || 'fr';
+    await _rref('/config/primaryLang').set(rep);
+  }
+}
+
+function adminSetDefaultLang(lang) {
+  _rref('/config/defaultLang').set(lang);
+}
+
+function adminSetPrimaryLang(lang) {
+  _rref('/config/primaryLang').set(lang);
+}
+
+async function saveAdminPassword() {
+  const inp = document.getElementById('settings-pwd-input');
+  const fb  = document.getElementById('settings-pwd-fb');
+  const val = inp?.value.trim();
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  if (!val || val.length < 4) {
+    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
+    return;
+  }
+  try {
+    const hash = await _hashPwd(val);
+    await _rref('/config/adminHash').set(hash);
+    inp.value = '';
+    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.settingsSaved || '✅ Enregistré'; setTimeout(()=>{fb.textContent='';},3000); }
+  } catch(e) {
+    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
+  }
 }
 
 function syncStyleAdminUI(mode) {
@@ -6272,31 +6503,32 @@ let _analyticsBackfillDone = false;
 
 function switchAdminTab(tab) {
   if (tab === _adminCurrentTab) return;
-  const wasOrders = _adminCurrentTab === 'orders';
+  const _TAB_ORDER = { display:0, orders:1, settings:2 };
+  const fromIdx = _TAB_ORDER[_adminCurrentTab] ?? 0;
+  const toIdx   = _TAB_ORDER[tab] ?? 0;
+  const goRight = toIdx > fromIdx;
+
+  const prevPanel = document.getElementById('admin-panel-' + _adminCurrentTab);
   _adminCurrentTab = tab;
-  const isOrders = tab === 'orders';
-  const p1 = document.getElementById('admin-panel-display');
-  const p2 = document.getElementById('admin-panel-orders');
-  const outCls = isOrders ? 'tab-out-left' : 'tab-out-right';
-  const inCls  = isOrders ? 'tab-in-right' : 'tab-in-left';
-  const hiding = isOrders ? p1 : p2;
-  const showing = isOrders ? p2 : p1;
-  if (hiding) {
-    hiding.classList.add(outCls);
-    setTimeout(() => { hiding.style.display = 'none'; hiding.classList.remove(outCls); }, 180);
+  const nextPanel = document.getElementById('admin-panel-' + tab);
+
+  if (prevPanel) {
+    prevPanel.classList.add(goRight ? 'tab-out-left' : 'tab-out-right');
+    setTimeout(() => { prevPanel.style.display = 'none'; prevPanel.classList.remove('tab-out-left','tab-out-right'); }, 180);
   }
-  if (showing) {
-    showing.style.display = '';
-    showing.classList.remove('tab-out-left','tab-out-right','tab-in-left','tab-in-right');
-    void showing.offsetWidth;
-    showing.classList.add(inCls);
-    setTimeout(() => showing.classList.remove(inCls), 220);
+  if (nextPanel) {
+    nextPanel.style.display = '';
+    nextPanel.classList.remove('tab-out-left','tab-out-right','tab-in-left','tab-in-right');
+    void nextPanel.offsetWidth;
+    nextPanel.classList.add(goRight ? 'tab-in-right' : 'tab-in-left');
+    setTimeout(() => nextPanel.classList.remove('tab-in-left','tab-in-right'), 220);
   }
-  document.getElementById('admin-tab-display')?.classList.toggle('on', !isOrders);
-  document.getElementById('admin-tab-orders')?.classList.toggle('on', isOrders);
+  ['display','orders','settings'].forEach(t => {
+    document.getElementById('admin-tab-'+t)?.classList.toggle('on', t === tab);
+  });
   localStorage.setItem(_PFX + 'adm_tab', tab);
   _updateScFabVisibility();
-  if (isOrders) {
+  if (tab === 'orders') {
     if (!ordersListener) startOrdersListener();
     startAnalyticsListener();
     requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
@@ -6304,11 +6536,12 @@ function switchAdminTab(tab) {
 }
 
 function _updateScFabVisibility() {
-  const isOrders = _adminCurrentTab === 'orders';
-  const showOrder = adminData?.info?.showOrderUI !== false;
-  const hasTables = _featOk('tableSystem');
+  const isOrders   = _adminCurrentTab === 'orders';
+  const isDisplay  = _adminCurrentTab === 'display';
+  const showOrder  = adminData?.info?.showOrderUI !== false;
+  const hasTables  = _featOk('tableSystem');
   const tab1Ids = ['sc-design-btn','sc-hero-btn','sc-infos-btn','sc-note-btn','sc-cats-btn','sc-prods-btn'];
-  tab1Ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = isOrders ? 'none' : ''; });
+  tab1Ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = isDisplay ? '' : 'none'; });
   const scOrders = document.getElementById('sc-orders-btn');
   if (scOrders) scOrders.style.display = (isOrders && showOrder) ? '' : 'none';
   const scTables = document.getElementById('sc-tables-btn');
@@ -6587,9 +6820,19 @@ document.addEventListener('DOMContentLoaded', () => {
     _ax = _ay = null;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
     var tab2Btn = document.getElementById('admin-tab-orders');
-    var tab2Ok = tab2Btn && tab2Btn.style.display !== 'none';
-    if (dx < 0 && _adminCurrentTab === 'display' && tab2Ok) switchAdminTab('orders');
-    else if (dx > 0 && _adminCurrentTab === 'orders') switchAdminTab('display');
+    var tab2Ok  = tab2Btn && tab2Btn.style.display !== 'none';
+    // Séquence selon disponibilité de l'onglet Commandes
+    // orders visible  : display ↔ orders ↔ settings
+    // orders masqué   : display ↔ settings
+    if (dx < 0) { // swipe gauche → onglet suivant
+      if      (_adminCurrentTab === 'display' && tab2Ok)   switchAdminTab('orders');
+      else if (_adminCurrentTab === 'display' && !tab2Ok)  switchAdminTab('settings');
+      else if (_adminCurrentTab === 'orders')               switchAdminTab('settings');
+    } else { // swipe droite → onglet précédent
+      if      (_adminCurrentTab === 'settings' && tab2Ok)  switchAdminTab('orders');
+      else if (_adminCurrentTab === 'settings' && !tab2Ok) switchAdminTab('display');
+      else if (_adminCurrentTab === 'orders')               switchAdminTab('display');
+    }
   }, { passive:true });
 })();
 
