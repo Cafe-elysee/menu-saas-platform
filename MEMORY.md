@@ -1,5 +1,5 @@
 # MEMORY — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-07
+## Dernière mise à jour : 2026-06-05
 
 ---
 
@@ -165,27 +165,28 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## 🔒 État fonctionnel — 2026-06-07
+## 🔒 État fonctionnel — 2026-06-05
 
-**Commit de référence : `2eacd3a`** (bordures stats-card + scroll QR + PDF blanc)
+**Commit de référence : `3081034`** (onglet Réglages admin + Forfait Client + QR system)
 
 - FCM sonnette, commandes, messages admin ✅
-- Control-app : labels Nom/ID, boutons Mettre à jour, escapeHtml, erreur modal ✅
-- Server-app : onglet initial, messages, scroll, 5 langues ✅
-- Admin : section Statistiques réductible, graphiques fonctionnels pleine largeur ✅
-- Admin : traductions 5 langues complètes ✅
+- Control-app : boutons 3D gold (#c8a44e, identique dark+light) ✅
+- Control-app : Forfait Client segmented control (Menu QR / Commandes & Services) ✅
+- Control-app : nouveau client = Forfait Menu QR par défaut ✅
+- Control-app : photos/fêtes/thèmes toujours actifs, langues retirées ✅
+- Server-app : écran Forfait Menu QR (dark/light, 5 langues) ✅
+- Menu client : numéro table masqué, appel serveur sans saisie si QR ✅
+- Admin : 3 onglets (Affichage / Commandes / Réglages), swipe intelligent ✅
+- Admin : onglet Réglages (Nom, Langues, MDP), sync Firebase temps réel ✅
+- Admin : stats-card bordures identiques adm-section (dark + light) ✅
 - Admin : FAB onglet 2 correct au refresh ✅
-- Admin : stats-card bordures identiques à adm-section (dark + light mode) ✅
 - Analytics : backfill robuste, période 30j défaut ✅
-- Bottom nav unified, swipe, desktop responsive ✅
 - Firebase rules v3 + analytics ✅
-- QR codes : popup complet, picker HSV, 5 styles, PDF, bouton retour Android ✅
-- QR popup : swipe admin bloqué + onglet restauré à la fermeture ✅
-- PDF QR : fond blanc, ID absent du contenu et du nom de fichier ✅
+- QR codes : popup complet, picker HSV, PDF blanc, scroll lock, tab guard ✅
 - DIAG_SECRET retiré de MEMORY.md ✅
 
 **Note build APK** : copie manuelle `index.html` obligatoire avant chaque build.
-APKs actuels (2026-06-04) restent valides — aucun fichier APK touché depuis.
+APKs actuels (2026-06-05) : control-app 4.3 MB, server-app 6.6 MB.
 
 ---
 
