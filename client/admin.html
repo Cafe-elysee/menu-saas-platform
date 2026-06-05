@@ -1669,6 +1669,8 @@
     transition:background 0.22s, border-color 0.22s; flex-shrink:0;
   }
   .settings-toggle:checked + .settings-toggle-track { background:var(--gold); border-color:var(--gold); }
+  html.light .settings-toggle-track { background:rgba(168,104,64,0.10); border-color:rgba(168,104,64,0.35); }
+  html.light .settings-toggle:checked + .settings-toggle-track { background:#c8a44e; border-color:#c8a44e; }
   .settings-toggle-track::after {
     content:''; position:absolute; top:3px; left:3px;
     width:16px; height:16px; border-radius:50%; background:#fff;
