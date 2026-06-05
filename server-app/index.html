@@ -670,7 +670,7 @@
 
     <div style="margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
       <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Token FCM</div>
-      <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px;font-family:monospace">—</div>
+      <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px">—</div>
       <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(200,164,78,0.3);background:transparent;color:var(--gold);font-family:inherit;font-size:0.8rem;cursor:pointer">🔄 Re-enregistrer FCM</button>
     </div>
   </section>
@@ -727,7 +727,7 @@ const T = {
     settingsBtnChange:'🔄 Αλλαγή εστιατορίου', settingsChangeDesc:'Διαγράφει την τρέχουσα σύνδεση και ζητά νέο αναγνωριστικό εστιατορίου.',
     settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
     settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → Menu Pro → Μπαταρία → Χωρίς περιορισμούς',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Επαναεγγραφή FCM', settingsFcmNoToken:'❌ Κανένα token FCM',
+    settingsFcmTitle:'Σύνδεση εφαρμογής', settingsFcmRetry:'🔄 Επανασύνδεση', settingsFcmNoToken:'❌ Εφαρμογή μη συνδεδεμένη', settingsFcmConnected:'✅ Εφαρμογή συνδεδεμένη', settingsFcmWaiting:'⏳ Σύνδεση…', settingsFcmError:'❌ Σφάλμα σύνδεσης',
     notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.',
   },
   fr: {
@@ -745,7 +745,7 @@ const T = {
     settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.',
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
     settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-enregistrer FCM', settingsFcmNoToken:'❌ Pas de token FCM',
+    settingsFcmTitle:'Connexion application', settingsFcmRetry:'🔄 Reconnecter', settingsFcmNoToken:'❌ Application non connectée', settingsFcmConnected:'✅ Application connectée', settingsFcmWaiting:'⏳ Connexion en cours…', settingsFcmError:'❌ Erreur de connexion',
     notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer',
   },
   en: {
@@ -763,7 +763,7 @@ const T = {
     settingsBtnChange:'🔄 Change restaurant', settingsChangeDesc:'Removes the current connection and asks for a new restaurant ID.',
     settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
     settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → Menu Pro Server → Battery → No restrictions',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 Re-register FCM', settingsFcmNoToken:'❌ No FCM token',
+    settingsFcmTitle:'App connection', settingsFcmRetry:'🔄 Reconnect', settingsFcmNoToken:'❌ Application not connected', settingsFcmConnected:'✅ Application connected', settingsFcmWaiting:'⏳ Connecting…', settingsFcmError:'❌ Connection error',
     notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable',
   },
   de: {
@@ -781,7 +781,7 @@ const T = {
     settingsBtnChange:'🔄 Restaurant wechseln', settingsChangeDesc:'Löscht die aktuelle Verbindung und fordert eine neue Restaurant-ID an.',
     settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
     settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → Menu Pro Server → Akku → Keine Einschränkungen',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 FCM neu registrieren', settingsFcmNoToken:'❌ Kein FCM-Token',
+    settingsFcmTitle:'App-Verbindung', settingsFcmRetry:'🔄 Neu verbinden', settingsFcmNoToken:'❌ App nicht verbunden', settingsFcmConnected:'✅ App verbunden', settingsFcmWaiting:'⏳ Verbindung…', settingsFcmError:'❌ Verbindungsfehler',
     notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren',
   },
   ar: {
@@ -799,7 +799,7 @@ const T = {
     settingsBtnChange:'🔄 تغيير المطعم', settingsChangeDesc:'يحذف الاتصال الحالي ويطلب معرّفاً جديداً للمطعم.',
     settingsChangeConfirm:'تغيير المطعم؟\nسيتم حذف الاتصال الحالي.',
     settingsNotifTitle:'الإشعارات في الخلفية', settingsNotifDesc:'لاستقبال الإشعارات عند إغلاق التطبيق:\nالإعدادات ← التطبيقات ← Menu Pro ← البطارية ← بلا قيود',
-    settingsFcmTitle:'Token FCM', settingsFcmRetry:'🔄 إعادة تسجيل FCM', settingsFcmNoToken:'❌ لا يوجد رمز FCM',
+    settingsFcmTitle:'اتصال التطبيق', settingsFcmRetry:'🔄 إعادة الاتصال', settingsFcmNoToken:'❌ التطبيق غير متصل', settingsFcmConnected:'✅ التطبيق متصل', settingsFcmWaiting:'⏳ جارٍ الاتصال…', settingsFcmError:'❌ خطأ في الاتصال',
     notifBannerTxt:'الإشعارات معطّلة — اضغط للتفعيل', notifBannerBtn:'تفعيل',
   }
 };
@@ -1312,23 +1312,23 @@ function _updateFcmStatus(msg, color) {
     return;
   }
   var tok = localStorage.getItem(_PFX + 'fcm_token');
-  var lastReg = parseInt(localStorage.getItem(_PFX + 'fcm_last_reg') || '0');
+  var t = T[lang] || T.fr;
   if (tok) {
-    var ago = lastReg ? Math.round((Date.now() - lastReg) / 60000) + ' min' : '?';
-    el.textContent = '✅ ' + tok.substring(0, 14) + '… (' + ago + ')';
+    el.textContent = t.settingsFcmConnected;
     el.style.color = '#4caf50';
   } else {
-    el.textContent = (T[lang] || T.fr).settingsFcmNoToken;
+    el.textContent = t.settingsFcmNoToken;
     el.style.color = '#e74c3c';
   }
 }
 
 function _retryFcmRegister() {
+  var t = T[lang] || T.fr;
   var Push = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
-  if (!Push) { _updateFcmStatus('❌ Push plugin absent', '#e74c3c'); return; }
-  _updateFcmStatus('⏳ En attente du token…', 'var(--cream)');
-  Push.register().catch(function(err) {
-    _updateFcmStatus('❌ ' + JSON.stringify(err), '#e74c3c');
+  if (!Push) { _updateFcmStatus(t.settingsFcmError, '#e74c3c'); return; }
+  _updateFcmStatus(t.settingsFcmWaiting, 'var(--cream)');
+  Push.register().catch(function() {
+    _updateFcmStatus(t.settingsFcmError, '#e74c3c');
   });
 }
 
@@ -1346,7 +1346,7 @@ function setupNativePush() {
     setTimeout(_updateFcmStatus, 1500);
   });
   Push.addListener('registrationError', function(err) {
-    _updateFcmStatus('❌ registrationError: ' + JSON.stringify(err), '#e74c3c');
+    _updateFcmStatus((T[lang] || T.fr).settingsFcmError, '#e74c3c');
     setTimeout(function() { Push.register(); }, 15000);
   });
 
