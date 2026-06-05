@@ -869,11 +869,15 @@
        NOUVEAU CLIENT
     ═══════════════════════════════ */
     .btn-nouveau-client {
-      padding:7px 14px; border-radius:10px; border:1px solid var(--gold);
-      background:var(--gold-dim); color:var(--gold);
-      font-size:0.78rem; font-weight:600; font-family:inherit;
-      display:flex; align-items:center; gap:5px;
+      padding:7px 14px; border-radius:10px; border:none;
+      background:linear-gradient(135deg,#e2c278,#c8a44e,#9a7a35); color:#0c0a08;
+      font-size:0.78rem; font-weight:700; font-family:inherit;
+      display:flex; align-items:center; gap:5px; cursor:pointer;
+      box-shadow:0 3px 10px rgba(200,164,78,0.32), inset 0 1px 0 rgba(255,255,255,0.2);
+      transition:transform 0.2s, box-shadow 0.2s;
     }
+    .btn-nouveau-client:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(200,164,78,0.42), inset 0 1px 0 rgba(255,255,255,0.2); }
+    .btn-nouveau-client:active { transform:translateY(1px); box-shadow:0 1px 4px rgba(200,164,78,0.18); }
     #nc-modal {
       display:none; position:fixed; inset:0; z-index:500;
       background:rgba(0,0,0,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
@@ -2691,7 +2695,9 @@ function setTheme(mode) {
   updateThemeOpts();
 }
 function loadTheme() {
-  if (localStorage.getItem('ctrl_theme') === 'light') document.documentElement.classList.add('light');
+  const saved = localStorage.getItem('ctrl_theme');
+  const mode = saved !== null ? saved : 'light';
+  document.documentElement.classList.toggle('light', mode === 'light');
   updateThemeOpts();
 }
 function updateThemeOpts() {
@@ -2879,6 +2885,7 @@ document.addEventListener('deviceready', () => {
 // INIT
 // ════════════════════════════════════════════════════
 initLogin();
+loadTheme();
 </script>
 </body>
 </html>
