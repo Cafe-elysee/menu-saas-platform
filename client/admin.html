@@ -271,20 +271,20 @@
 
     /* ── FAB NAVIGATION (raccourcis) ── */
     #sc-fab {
-      position:fixed; top:50%; right:16px; transform:translateY(-50%);
+      position:fixed; bottom:calc(var(--admin-nav-h) + 94px); right:20px;
       width:46px; height:46px; border-radius:50%;
       background:var(--bg3); border:1.5px solid var(--bord2);
-      color:var(--gold); display:none; align-items:center; justify-content:center;
+      color:var(--gold); display:flex; align-items:center; justify-content:center;
       z-index:300; cursor:pointer;
       box-shadow:0 4px 18px rgba(0,0,0,0.32);
-      transition:border-color 0.2s, box-shadow 0.2s, color 0.2s;
+      opacity:0; pointer-events:none;
+      transition:border-color 0.2s, box-shadow 0.2s, color 0.2s, opacity 0.18s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
     }
-    #sc-fab.show { display:flex; }
     #sc-fab:hover, #sc-fab.open { border-color:var(--gold); box-shadow:0 6px 22px rgba(200,164,78,0.35); }
     #sc-fab svg { width:20px; height:20px; pointer-events:none; }
     .sc-popup {
-      position:fixed; top:50%; right:70px;
-      transform:translateY(-50%) translateX(6px);
+      position:fixed; bottom:calc(var(--admin-nav-h) + 90px); right:70px;
+      transform:translateX(8px);
       background:var(--bg3); border:1px solid var(--bord2); border-radius:14px;
       padding:6px; z-index:299; min-width:170px;
       display:flex; flex-direction:column; gap:2px;
@@ -294,7 +294,7 @@
     }
     .sc-popup.open {
       opacity:1; pointer-events:all;
-      transform:translateY(-50%) translateX(0);
+      transform:translateX(0);
     }
     .sc-popup button {
       padding:9px 14px; border-radius:10px; border:none;
@@ -304,9 +304,9 @@
       transition:background 0.15s, color 0.15s;
     }
     .sc-popup button:hover { background:rgba(200,164,78,0.12); color:var(--gold); }
-    html[dir="rtl"] #sc-fab { right:auto; left:16px; }
-    html[dir="rtl"] .sc-popup { right:auto; left:70px; transform:translateY(-50%) translateX(-6px); }
-    html[dir="rtl"] .sc-popup.open { transform:translateY(-50%) translateX(0); }
+    html[dir="rtl"] #sc-fab { right:auto; left:20px; }
+    html[dir="rtl"] .sc-popup { right:auto; left:70px; transform:translateX(-8px); }
+    html[dir="rtl"] .sc-popup.open { transform:translateX(0); }
     html[dir="rtl"] .sc-popup button { text-align:right; }
 
     /* ── MAIN LAYOUT ── */
@@ -449,13 +449,14 @@
 
     /* ── FAB NOTIFICATION ── */
     #fab-notif {
-      position:fixed; bottom:calc(var(--admin-nav-h) + 92px); right:20px;
+      position:fixed; bottom:calc(var(--admin-nav-h) + 20px); right:20px;
       width:52px; height:52px; border-radius:50%;
       background:linear-gradient(135deg,#5a9e4a,#7ebd6a);
       color:#fff; display:flex; align-items:center; justify-content:center;
       box-shadow:0 4px 18px rgba(126,189,106,0.5), 0 2px 8px rgba(0,0,0,0.3);
       z-index:200; cursor:pointer;
-      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+      opacity:0; pointer-events:none;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s, opacity 0.18s ease;
     }
     #fab-notif:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 8px 28px rgba(126,189,106,0.65); }
     #fab-notif:active { transform:scale(0.93); }
@@ -1034,7 +1035,8 @@
       display:flex; align-items:center; justify-content:center;
       box-shadow:0 6px 24px rgba(200,164,78,0.45), 0 2px 8px rgba(0,0,0,0.4);
       z-index:200; border:none; cursor:pointer;
-      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+      opacity:0; pointer-events:none;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s, opacity 0.18s ease;
     }
     #fab-save:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 12px 32px rgba(200,164,78,0.55); }
     #fab-save:active { transform:scale(0.93); opacity:0.88; }
@@ -1054,6 +1056,10 @@
       opacity:0; pointer-events:none; transition:opacity 0.2s;
     }
     #fab-save:hover::before { opacity:1; }
+    /* État visible des FABs (avec animation d'entrée via JS transform inline) */
+    #fab-save.fab-visible, #fab-notif.fab-visible, #sc-fab.fab-visible {
+      opacity:1; pointer-events:all;
+    }
 
     /* ── BOUTON SAUVEGARDE CATÉGORIES ── */
     .btn-save-cats {
@@ -1243,7 +1249,8 @@
 
       /* FABs décalés pour ne pas couvrir le contenu */
       #fab-save  { bottom:36px; right:36px; width:64px; height:64px; }
-      #fab-notif { bottom:116px; right:36px; }
+      #fab-notif { bottom:36px; right:36px; }
+      #sc-fab    { bottom:114px; right:36px; }
 
       /* Form grid : 3 colonnes sur desktop large */
       .form-grid-2 { grid-template-columns:1fr 1fr; }
@@ -2135,7 +2142,7 @@
 </div>
 
 <!-- FAB Enregistrer tout -->
-<button id="fab-save" style="display:none" title="Enregistrer tout">
+<button id="fab-save" title="Enregistrer tout">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
@@ -2145,7 +2152,7 @@
 </button>
 
 <!-- FAB Notification serveurs -->
-<button id="fab-notif" style="display:none" title="Envoyer une notification" data-tooltip="Envoyer une notification">
+<button id="fab-notif" title="Envoyer une notification" data-tooltip="Envoyer une notification">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
     <path d="M13.73 21a2 2 0 01-3.46 0"/>
@@ -3024,7 +3031,6 @@ async function doLogin() {
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
   // adm-wrap et adm-header restent cachés jusqu'au premier rendu Firebase (cf. applyMenuSnapshot)
-  document.getElementById('sc-fab').classList.add('show');
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
@@ -6565,6 +6571,25 @@ function switchAdminTab(tab) {
   }
 }
 
+function _showFab(el) {
+  if (!el || el.classList.contains('fab-visible')) return;
+  clearTimeout(el._fabHideTimer);
+  el.style.transform = 'translateY(10px) scale(0.85)';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.classList.add('fab-visible');
+    el.style.transform = '';
+  }));
+}
+function _hideFab(el) {
+  if (!el) return;
+  clearTimeout(el._fabHideTimer);
+  el.classList.remove('fab-visible');
+  el.style.transform = 'translateY(10px) scale(0.85)';
+  el._fabHideTimer = setTimeout(() => {
+    if (!el.classList.contains('fab-visible')) el.style.transform = '';
+  }, 220);
+}
+
 function _updateScFabVisibility() {
   const isOrders   = _adminCurrentTab === 'orders';
   const isDisplay  = _adminCurrentTab === 'display';
@@ -6574,7 +6599,7 @@ function _updateScFabVisibility() {
 
   // sc-fab raccourcis : masqué sur onglet Réglages
   const scFab = document.getElementById('sc-fab');
-  if (scFab) scFab.style.display = isSettings ? 'none' : '';
+  if (scFab) { isSettings ? _hideFab(scFab) : _showFab(scFab); }
 
   // Raccourcis popup
   const tab1Ids = ['sc-design-btn','sc-hero-btn','sc-infos-btn','sc-note-btn','sc-cats-btn','sc-prods-btn'];
@@ -6588,13 +6613,14 @@ function _updateScFabVisibility() {
 
   // FAB Enregistrer tout : onglet 1 uniquement
   const fabSave = document.getElementById('fab-save');
-  if (fabSave) fabSave.style.display = isDisplay ? '' : 'none';
+  if (fabSave) { isDisplay ? _showFab(fabSave) : _hideFab(fabSave); }
 
   // FAB Message serveur : onglet 2 uniquement + feat activé + onglet 2 accessible
   const tab2Btn = document.getElementById('admin-tab-orders');
   const tab2Ok  = tab2Btn && tab2Btn.style.display !== 'none';
   const fabNotif = document.getElementById('fab-notif');
-  if (fabNotif) fabNotif.style.display = (isOrders && tab2Ok && (_featOk('callBtn') || _featOk('orderUI'))) ? '' : 'none';
+  const showNotif = isOrders && tab2Ok && (_featOk('callBtn') || _featOk('orderUI'));
+  if (fabNotif) { showNotif ? _showFab(fabNotif) : _hideFab(fabNotif); }
 }
 
 /* ── Filtre de période ── */
