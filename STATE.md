@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-05
+## Dernière mise à jour : 2026-06-05 (commit e5c737c)
 
 ---
 
@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `3081034` (2026-06-05)
+**Commit** : `e5c737c` (2026-06-05)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
@@ -34,8 +34,10 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 
 | Fichier | Taille | Rebuild |
 |---------|--------|---------|
-| `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-05 ✅ |
-| `MenuProServeur-SaaS-v1.0.apk` | 6.6 MB | 2026-06-05 ✅ |
+| `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-05 19:30 ✅ |
+| `MenuProServeur-SaaS-v1.0.apk` | 6.6 MB | 2026-06-05 19:12 ✅ |
+
+> Les changements FABs admin / bouton retour modal sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
 
 ---
 
@@ -61,11 +63,16 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
   - Nouveau client créé = Forfait Menu QR par défaut ✅
 - Photos produits, Overlay fêtes, tous thèmes → toujours actifs (plus de contrôle licence) ✅
 - Langues disponibles + Paramètres retirés (gérés depuis l'admin) ✅
+- **Thème light par défaut** au 1er lancement (si aucun thème sauvegardé) ✅
+- **Bouton Nouveau client** : effet 3D gold avancé (card-link style), police Outfit ✅
+- **Textes gold en light mode** → couleur texte normale (`var(--text)`) ✅
 
 ### Server App
 - Onglet initial intelligent, messages persistants, scroll conservé ✅
 - 5 langues, `escapeHtml` sur toutes données Firebase ✅
 - **Écran Forfait Menu QR** : bloque si callBtn=false + orderUI=false (5 langues, respecte dark/light) ✅
+- **Statut FCM simplifié** : "Application connectée / non connectée" (5 langues) ✅
+- `applyLang()` synchronise le statut FCM à chaque changement de langue ✅
 
 ### Menu client (client/index.html)
 - Numéro de table jamais affiché au client (interne uniquement) ✅
@@ -77,16 +84,27 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 ### Admin panel — 3 onglets ✅
 - **Onglet 1 — Affichage Menu** : identique à avant ✅
 - **Onglet 2 — Commandes & Appels** : identique à avant ✅
-- **Onglet 3 — Réglages** (nouveau) :
+- **Onglet 3 — Réglages** :
+  - Sections plates sans cartes (Nom → MDP → Langues → Paramètres langues) ✅
+  - Boutons gold hardcodé `#c8a44e` dark + light ✅
+  - Toggles langues gold hardcodé `#c8a44e` en light mode ✅
   - Nom du restaurant (lecture/écriture `profile/name`, sync temps réel) ✅
-  - 🌐 Langues disponibles (toggles par langue, min 1 obligatoire) ✅
-  - 🌐 Langues — Paramètres (langue défaut + langue admin) ✅
+  - Langues disponibles (toggles, min 1 obligatoire) ✅
+  - Langues — Paramètres (langue défaut + langue admin) ✅
   - Mot de passe admin (hash SHA-256 + écriture `config/adminHash`) ✅
   - Traduit en 5 langues ✅
 - Swipe 3 onglets : display↔orders↔settings ✅
   - Orders masqué → display↔settings direct ✅
 - switchAdminTab() réécrit (3 onglets, direction animée) ✅
+- Fix stacking panels : sync DOM/state dans applyMenuSnapshot + display:none immédiat ✅
 - Synchronisation auto via Firebase (admin ↔ control-app temps réel) ✅
+
+### Admin panel — FABs
+- `#fab-save` (doré) : onglet 1 uniquement, bottom-right ✅
+- `#fab-notif` (vert) : onglet 2 uniquement, **même position** que fab-save ✅
+- `#sc-fab` (raccourcis) : au-dessus du FAB principal (bottom-right), masqué sur Réglages ✅
+- Animation fluide entrée/sortie (`_showFab` / `_hideFab`) : opacity + transform spring ✅
+- **Bouton retour Android** : ferme le modal message serveur (`history.pushState` + `popstate`) ✅
 
 ### Admin panel — Statistiques
 - Section Statistiques carte unique réductible ✅
@@ -117,6 +135,13 @@ Nouveau client : Forfait Menu QR par défaut (`callBtn:false, orderUI:false, tab
 `_settingsLangData` : état local `{ enabled, default, primary }`.
 `adminToggleLang(lang, enabled)` : empêche de désactiver la dernière langue active.
 Sync automatique : même Firebase → control-app et admin se voient mutuellement.
+
+### Admin FABs — Architecture
+`_showFab(el)` : set transform inline (start) → double rAF → add `.fab-visible` + clear transform → transition opacity+transform.
+`_hideFab(el)` : remove `.fab-visible` → set transform inline → setTimeout 220ms clear.
+Tous les FABs en `display:flex` permanent + `opacity:0; pointer-events:none` par défaut CSS.
+`.fab-visible` : `opacity:1; pointer-events:all`.
+Bouton retour Android modal notif : `history.pushState({adminModal:'notif'},'')` à l'ouverture, `popstate` ferme, `closeModal()` appelle `history.back()` si state présent.
 
 ### switchAdminTab — 3 onglets
 `_TAB_ORDER = { display:0, orders:1, settings:2 }` → direction d'animation calculée par index.
@@ -154,7 +179,9 @@ demoPage/                           → lecture + écriture publique
 |-------|--------|
 | escapeHtml sur toutes données Firebase | ✅ |
 | Traductions 5 langues complètes admin + server-app | ✅ |
-| Onglet Réglages admin (Nom, Langues, MDP) | ✅ |
+| Onglet Réglages admin (Nom, Langues, MDP) — sections plates | ✅ |
+| Boutons gold #c8a44e hardcodé dark + light (admin + control-app) | ✅ |
+| Toggles langues gold #c8a44e hardcodé light mode | ✅ |
 | Sync temps réel admin ↔ control-app | ✅ |
 | Forfait Client segmented control (spring animation) | ✅ |
 | Nouveau client = Forfait Menu QR par défaut | ✅ |
@@ -162,7 +189,15 @@ demoPage/                           → lecture + écriture publique
 | Numéro table masqué côté client | ✅ |
 | Appel serveur sans saisie si QR (`?table=X`) | ✅ |
 | Swipe 3 onglets admin (orders masqué → direct display↔settings) | ✅ |
-| Boutons 3D gold unifié (#c8a44e) dark + light | ✅ |
+| Fix stacking panels admin (sync DOM/state) | ✅ |
+| FABs admin bottom-right stackés (sc-fab au-dessus) | ✅ |
+| Animation fluide FABs entrée/sortie (_showFab/_hideFab) | ✅ |
+| Bouton retour Android ferme modal message serveur | ✅ |
+| Control-app thème light par défaut au 1er lancement | ✅ |
+| Control-app bouton Nouveau client 3D gold + Outfit | ✅ |
+| Control-app textes gold → var(--text) en light mode | ✅ |
+| Server-app FCM status simplifié (5 langues) | ✅ |
+| Server-app applyLang() sync FCM status | ✅ |
 | Photos/fêtes/thèmes toujours actifs | ✅ |
 | Langues retirées de control-app | ✅ |
 | stats-card bordures identiques adm-section | ✅ |
