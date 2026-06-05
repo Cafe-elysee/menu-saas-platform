@@ -3717,12 +3717,21 @@ function setupNotifFab() {
   fab.addEventListener('click', () => {
     textarea.value = '';
     modal.classList.add('on');
+    history.pushState({ adminModal: 'notif' }, '');
     setTimeout(() => textarea.focus(), 300);
   });
 
-  function closeModal() { modal.classList.remove('on'); }
+  function closeModal() {
+    if (!modal.classList.contains('on')) return;
+    modal.classList.remove('on');
+    if (history.state?.adminModal === 'notif') history.back();
+  }
   cancelBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  window.addEventListener('popstate', e => {
+    if (modal.classList.contains('on')) { modal.classList.remove('on'); }
+  });
 
   sendBtn.addEventListener('click', async () => {
     const msg = textarea.value.trim();
