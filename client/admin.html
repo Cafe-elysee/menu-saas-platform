@@ -3130,9 +3130,9 @@ async function checkLogin() {
   } catch(e) {}
 
   const saved    = sessionStorage.getItem(_PFX+'admin_auth');
-  const sessionId = sessionStorage.getItem(_PFX+'session_id');
+  const sessionId = sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess');
 
-  if (saved === 'ok' && sessionId) {
+  if ((saved === 'ok' || localStorage.getItem(_PFX+'admin_sess')) && sessionId) {
     // Vérifier que la session Firebase n'a pas été révoquée
     try {
       const snap = await _rref('sessions/' + sessionId).once('value');
@@ -3143,16 +3143,23 @@ async function checkLogin() {
           if (actSnap.val() === false || actSnap.val() === null) {
             sessionStorage.removeItem(_PFX+'admin_auth');
             sessionStorage.removeItem(_PFX+'session_id');
+            localStorage.removeItem(_PFX+'admin_sess');
             return;
           }
         } catch(e) {}
+        // Restaurer sessionStorage si on vient du localStorage
+        sessionStorage.setItem(_PFX+'admin_auth', 'ok');
+        sessionStorage.setItem(_PFX+'session_id', sessionId);
         showAdmin(); return;
       }
       // Session révoquée → déconnexion forcée
       sessionStorage.removeItem(_PFX+'admin_auth');
       sessionStorage.removeItem(_PFX+'session_id');
+      localStorage.removeItem(_PFX+'admin_sess');
     } catch(e) {
       // Erreur réseau → laisser passer (mode offline)
+      sessionStorage.setItem(_PFX+'admin_auth', 'ok');
+      sessionStorage.setItem(_PFX+'session_id', sessionId);
       showAdmin(); return;
     }
   }
@@ -3180,6 +3187,7 @@ async function _openSession() {
   const sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
   sessionStorage.setItem(_PFX+'admin_auth', 'ok');
   sessionStorage.setItem(_PFX+'session_id', sid);
+  localStorage.setItem(_PFX+'admin_sess', sid);
   try {
     await _rref('sessions/' + sid).set({
       ts: Date.now(),
@@ -3190,12 +3198,13 @@ async function _openSession() {
 }
 
 async function _closeSession() {
-  const sid = sessionStorage.getItem(_PFX+'session_id');
+  const sid = sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess');
   if (sid) {
     try { await _rref('sessions/' + sid).remove(); } catch(e) {}
   }
   sessionStorage.removeItem(_PFX+'admin_auth');
   sessionStorage.removeItem(_PFX+'session_id');
+  localStorage.removeItem(_PFX+'admin_sess');
 }
 
 /* ── THÈME ── */
@@ -3866,8 +3875,8 @@ function renderHeroImageSection() {
     [...section.children].forEach(el => { if (el !== hd) inner.appendChild(el); });
     section.appendChild(body);
 
-    // Restaurer l'état sauvegardé (sans animation au chargement)
-    if (id && saved[id]) {
+    // Réduit par défaut — sauf si l'utilisateur a explicitement ouvert cette section
+    if (!id || saved[id] !== false) {
       body.style.transition = 'none';
       section.classList.add('collapsed');
       requestAnimationFrame(() => { body.style.transition = ''; });
@@ -3888,7 +3897,7 @@ function renderHeroImageSection() {
 (function() {
   const KEY = _PFX + 'stats_collapsed';
   const card = document.getElementById('stats-section');
-  if (card && localStorage.getItem(KEY) === '1') card.classList.add('collapsed');
+  if (card && localStorage.getItem(KEY) !== '0') card.classList.add('collapsed');
 })();
 function toggleStatsCard() {
   const card = document.getElementById('stats-section');
@@ -6491,9 +6500,10 @@ async function saveAdminPassword() {
         await _rref('sessions').remove().catch(() => {});
         // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
         _removeSavedId(_RID);
-        // Vider la session locale et recharger
+        // Vider la session locale (session + persistante) et recharger
         sessionStorage.removeItem(_PFX+'admin_auth');
         sessionStorage.removeItem(_PFX+'session_id');
+        localStorage.removeItem(_PFX+'admin_sess');
         inp.value = '';
         if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.pwdChangedLogout || '✅ Mot de passe modifié — reconnectez-vous'; }
         setTimeout(() => location.reload(), 1800);
