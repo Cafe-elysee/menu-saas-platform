@@ -534,17 +534,30 @@
 </div>
 
 <!-- ÉCRAN CONFIGURATION (premier lancement) -->
-<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:#0f0d0a;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:340px;width:100%">
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
     <div style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">Menu Pro Serveur</div>
-    <div style="font-size:0.78rem;color:#7a6a52;margin-bottom:28px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
-    <div style="font-size:0.82rem;color:#a09070;margin-bottom:10px;text-align:left">ID du restaurant</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:28px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">ID du restaurant</div>
     <input type="text" id="setup-rid-input" placeholder="ex: cafe-oran"
-      style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:rgba(255,255,255,0.04);color:#f2ead8;font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
-    <div style="font-size:0.68rem;color:#7a6a52;margin-bottom:20px">Demande l'identifiant à l'administrateur</div>
+      style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
+    <div style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demande l&#39;identifiant à l&#39;administrateur</div>
     <div id="setup-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
     <button onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer">Confirmer</button>
+  </div>
+</div>
+
+
+<!-- Confirmation modal élégant -->
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
+  <div id="confirm-box" style="width:100%;max-width:320px;background:var(--surface);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
+    <div id="confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
+    <div id="confirm-msg" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
+    <div style="display:flex;gap:10px;">
+      <button id="confirm-cancel-btn" onclick="_hideConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bord2);background:transparent;color:var(--cream);font-family:inherit;font-size:0.85rem;cursor:pointer;transition:background 0.18s;"></button>
+      <button id="confirm-ok-btn"     onclick="_doConfirm()"  style="flex:1;padding:11px 6px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;transition:opacity 0.18s;"></button>
+    </div>
   </div>
 </div>
 
@@ -729,7 +742,7 @@ const T = {
     settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
     settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → Menu Pro → Μπαταρία → Χωρίς περιορισμούς',
     settingsFcmTitle:'Σύνδεση εφαρμογής', settingsFcmRetry:'🔄 Επανασύνδεση', settingsFcmNoToken:'❌ Εφαρμογή μη συνδεδεμένη', settingsFcmConnected:'✅ Εφαρμογή συνδεδεμένη', settingsFcmWaiting:'⏳ Σύνδεση…', settingsFcmError:'❌ Σφάλμα σύνδεσης',
-    notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.',
+    notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.', confirmYes:'Επιβεβαίωση', confirmNo:'Ακύρωση',
   },
   fr: {
     hdrSub:'Interface Serveur', connWait:'En attente…', connOn:'Connecté',
@@ -747,7 +760,7 @@ const T = {
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
     settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
     settingsFcmTitle:'Connexion application', settingsFcmRetry:'🔄 Reconnecter', settingsFcmNoToken:'❌ Application non connectée', settingsFcmConnected:'✅ Application connectée', settingsFcmWaiting:'⏳ Connexion en cours…', settingsFcmError:'❌ Erreur de connexion',
-    notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer',
+    notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer', confirmYes:'Confirmer', confirmNo:'Annuler',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -765,7 +778,7 @@ const T = {
     settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
     settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → Menu Pro Server → Battery → No restrictions',
     settingsFcmTitle:'App connection', settingsFcmRetry:'🔄 Reconnect', settingsFcmNoToken:'❌ Application not connected', settingsFcmConnected:'✅ Application connected', settingsFcmWaiting:'⏳ Connecting…', settingsFcmError:'❌ Connection error',
-    notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable',
+    notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable', confirmYes:'Confirm', confirmNo:'Cancel',
   },
   de: {
     hdrSub:'Kellner-Interface', connWait:'Warten…', connOn:'Verbunden',
@@ -783,7 +796,7 @@ const T = {
     settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
     settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → Menu Pro Server → Akku → Keine Einschränkungen',
     settingsFcmTitle:'App-Verbindung', settingsFcmRetry:'🔄 Neu verbinden', settingsFcmNoToken:'❌ App nicht verbunden', settingsFcmConnected:'✅ App verbunden', settingsFcmWaiting:'⏳ Verbindung…', settingsFcmError:'❌ Verbindungsfehler',
-    notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren',
+    notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren', confirmYes:'Bestätigen', confirmNo:'Abbrechen',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -801,7 +814,7 @@ const T = {
     settingsChangeConfirm:'تغيير المطعم؟\nسيتم حذف الاتصال الحالي.',
     settingsNotifTitle:'الإشعارات في الخلفية', settingsNotifDesc:'لاستقبال الإشعارات عند إغلاق التطبيق:\nالإعدادات ← التطبيقات ← Menu Pro ← البطارية ← بلا قيود',
     settingsFcmTitle:'اتصال التطبيق', settingsFcmRetry:'🔄 إعادة الاتصال', settingsFcmNoToken:'❌ التطبيق غير متصل', settingsFcmConnected:'✅ التطبيق متصل', settingsFcmWaiting:'⏳ جارٍ الاتصال…', settingsFcmError:'❌ خطأ في الاتصال',
-    notifBannerTxt:'الإشعارات معطّلة — اضغط للتفعيل', notifBannerBtn:'تفعيل',
+    notifBannerTxt:'الإشعارات معطّلة — اضغط للتفعيل', notifBannerBtn:'تفعيل', confirmYes:'تأكيد', confirmNo:'إلغاء',
   }
 };
 
@@ -1609,13 +1622,36 @@ function renderOrders() {
   if (panel && savedScroll) panel.scrollTop = savedScroll;
 }
 
+/* ── CONFIRMATION MODAL ── */
+var _confirmCb = null;
+function _showConfirm(title, msg, cancelLabel, okLabel, cb) {
+  document.getElementById('confirm-title').textContent      = title;
+  document.getElementById('confirm-msg').textContent        = msg;
+  document.getElementById('confirm-cancel-btn').textContent = cancelLabel;
+  document.getElementById('confirm-ok-btn').textContent     = okLabel;
+  _confirmCb = cb;
+  document.getElementById('confirm-modal').style.display = 'flex';
+}
+function _hideConfirm() {
+  document.getElementById('confirm-modal').style.display = 'none';
+  _confirmCb = null;
+}
+function _doConfirm() {
+  var cb = _confirmCb;
+  _hideConfirm();
+  if (cb) cb();
+}
+
 /* ── CHANGEMENT DE RESTAURANT ── */
 function changeRestaurant() {
-  if (!confirm((T[lang] || T.fr).settingsChangeConfirm)) return;
-  var deviceId = getDeviceId();
-  _rref('devices/' + deviceId).remove().catch(function() {}).finally(function() {
-    localStorage.removeItem('saas_rid');
-    location.reload();
+  var t = T[lang] || T.fr;
+  var parts = t.settingsChangeConfirm.split('\n');
+  _showConfirm(parts[0], parts[1] || '', t.confirmNo, t.confirmYes, function() {
+    var deviceId = getDeviceId();
+    _rref('devices/' + deviceId).remove().catch(function() {}).finally(function() {
+      localStorage.removeItem('saas_rid');
+      location.reload();
+    });
   });
 }
 

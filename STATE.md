@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-06 (gold light mode fix)
+## Dernière mise à jour : 2026-06-06 (confirm modal + setup screen dark/light)
 
 ---
 
@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `e5c737c` (2026-06-05)
+**Commit** : `7f8a768` (2026-06-06)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
@@ -35,9 +35,9 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 | Fichier | Taille | Rebuild |
 |---------|--------|---------|
 | `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-06 ✅ |
-| `MenuProServeur-SaaS-v1.0.apk` | 6.9 MB | 2026-06-06 ✅ |
+| `MenuProServeur-SaaS-v1.0.apk` | 6.9 MB | 2026-06-06 10:23 ✅ |
 
-> Les changements FABs admin / bouton retour modal sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
+> Les changements admin (client/) sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
 
 ---
 
@@ -76,7 +76,15 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - **Écran Forfait Menu QR** : bloque si callBtn=false + orderUI=false (5 langues, respecte dark/light) ✅
 - **Statut FCM simplifié** : "Application connectée / non connectée" (5 langues) ✅
 - `applyLang()` synchronise le statut FCM à chaque changement de langue ✅
-- **Détection suspension/suppression** : listener `config/active` — ⏸ "Service en pause" (active=false) ou 🚫 "Compte introuvable" (supprimé) — 5 langues, flag `_srvActiveKnown` évite faux positif au démarrage ✅
+- **Détection suspension/suppression au démarrage** : `.once('value')` sur `config` dans `init()` avant tout chargement :
+  - `config === null` → 🚫 écran "Compte introuvable" (supprimé) + bouton "Changer d'ID"
+  - `config.active === false` → ⏸ écran "Service en pause" + bouton "Changer d'ID"
+  - Sinon → `_startApp()` normal
+  - `.catch()` → `_startApp()` (réseau → pas de blocage)
+  - Écrans respectent dark/light mode (`var(--bg)`, `var(--muted)`) — 5 langues ✅
+- **Gold light mode** : `--gold #c8a44e` (identique dark), toutes rgba gold uniformes ✅
+- **Bouton "Changer d'ID"** : popup élégant (confirm-modal) à la place du `window.confirm()` natif — dark/light, 5 langues (`confirmYes` / `confirmNo`) ✅
+- **Setup screen (1er lancement)** : respecte dark/light mode — `var(--bg)`, `var(--card)`, `var(--cream)`, `var(--muted)` ✅
 
 ### Menu client (client/index.html)
 - Numéro de table jamais affiché au client (interne uniquement) ✅
@@ -89,13 +97,16 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 ### Admin panel — 3 onglets ✅
 - **Onglet 1 — Affichage Menu** : identique à avant ✅
 - **Onglet 2 — Commandes & Appels** : identique à avant ✅
-- **Onglet 3 — Réglages** :
-  - Sections plates sans cartes (Nom → MDP → Langues → Paramètres langues) ✅
+- **Onglet 3 — Réglages** — 2 sections regroupées :
+  - **Identifiants** : Nom du restaurant + Mot de passe admin ✅
+  - **Paramètres de langue** : Langues disponibles + Langues — Paramètres ✅
+  - En-têtes traduits en 5 langues (`settingsIdentity`, `settingsLangSection`) ✅
+  - Espacement compact mobile (fits sans scroll), confortable desktop ≥700px ✅
   - Boutons gold hardcodé `#c8a44e` dark + light ✅
   - Toggles langues gold hardcodé `#c8a44e` en light mode ✅
   - Nom du restaurant (lecture/écriture `profile/name`, sync temps réel) ✅
   - Langues disponibles (toggles, min 1 obligatoire) ✅
-  - Langues — Paramètres (langue défaut + langue admin) ✅
+  - Langue défaut + langue admin ✅
   - Mot de passe admin (hash SHA-256 + écriture `config/adminHash`) ✅
 - **Détection suspension/suppression** : vérification `config/active` au login + listener temps réel post-login — déconnexion forcée + message sur écran login ✅
   - Traduit en 5 langues ✅
@@ -104,6 +115,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - switchAdminTab() réécrit (3 onglets, direction animée) ✅
 - Fix stacking panels : sync DOM/state dans applyMenuSnapshot + display:none immédiat ✅
 - Synchronisation auto via Firebase (admin ↔ control-app temps réel) ✅
+- **Gold light mode** : `--gold #c8a44e`, textes `ico-modal-title` + `lang-tab.on` → `var(--cream)` ✅
 
 ### Admin panel — FABs
 - `#fab-save` (doré) : onglet 1 uniquement, bottom-right ✅
@@ -116,6 +128,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - Section Statistiques carte unique réductible ✅
 - Graphiques analytics pleine largeur au refresh, ordre périodes ✅
 - Design stats-card identique adm-section (dark + light) ✅
+- Axe Y affiché en entiers (`Math.round`) — plus de flottants `0000001` ✅
 - FAB onglet 2 correct au refresh ✅
 
 ### Admin panel — QR Codes ✅
@@ -141,6 +154,12 @@ Nouveau client : Forfait Menu QR par défaut (`callBtn:false, orderUI:false, tab
 `_settingsLangData` : état local `{ enabled, default, primary }`.
 `adminToggleLang(lang, enabled)` : empêche de désactiver la dernière langue active.
 Sync automatique : même Firebase → control-app et admin se voient mutuellement.
+2 sections HTML `.settings-section` avec en-têtes `.settings-sec-hd` traduits via `_setEl2()`.
+
+### Server-app init — Architecture
+`init()` appelle `.once('value')` sur `config` avant toute initialisation.
+`_startApp()` contient tout l'ancien code init (lang, listeners, loadMessages, etc.).
+Bouton "Changer d'ID" sur les 2 écrans bloquants appelle `changeRestaurant()`.
 
 ### Admin FABs — Architecture
 `_showFab(el)` : set transform inline (start) → double rAF → add `.fab-visible` + clear transform → transition opacity+transform.
@@ -161,7 +180,12 @@ Utilise `.stats-card` (jamais `adm-section`). Collapse via `toggleStatsCard()`. 
 `_qrLockScroll()` : overflow:hidden sur html+body. Swipe guard dans touchstart/touchend. `_qrSavedTab` restauré à la fermeture.
 
 ### stats-card — mode clair
-`html.light .stats-card` : `border-left-color:rgba(168,104,64,0.45)` + `border-right-color` obligatoires.
+`html.light .stats-card` : `border-left-color:rgba(200,164,78,0.45)` + `border-right-color` obligatoires.
+
+### Gold light mode — règle
+`rgba(168,104,64,...)` = ANCIENNE valeur brown, ne jamais utiliser.
+`rgba(200,164,78,...)` = valeur gold correcte — utiliser partout.
+`--gold: #c8a44e` identique dark + light dans les 3 apps.
 
 ---
 
@@ -179,20 +203,29 @@ demoPage/                           → lecture + écriture publique
 
 ---
 
-## Audit complet — 2026-06-05 ✅
+## Audit complet — 2026-06-06 ✅
 
 | Point | Statut |
 |-------|--------|
 | escapeHtml sur toutes données Firebase | ✅ |
 | Traductions 5 langues complètes admin + server-app | ✅ |
-| Onglet Réglages admin (Nom, Langues, MDP) — sections plates | ✅ |
+| Onglet Réglages admin — 2 sections (Identifiants + Paramètres de langue) | ✅ |
+| Réglages admin — espacement compact mobile, confortable desktop ≥700px | ✅ |
 | Boutons gold #c8a44e hardcodé dark + light (admin + control-app) | ✅ |
-| Gold light mode — admin + server-app : --gold #c8a44e (pas #a86840), textes ico-modal-title + lang-tab→var(--cream) | ✅ |
+| Gold light mode — 3 apps : --gold #c8a44e, rgba(200,164,78,...), textes var(--cream) | ✅ |
 | Toggles langues gold #c8a44e hardcodé light mode | ✅ |
 | Sync temps réel admin ↔ control-app | ✅ |
 | Forfait Client segmented control (spring animation) | ✅ |
 | Nouveau client = Forfait Menu QR par défaut | ✅ |
 | Écran forfait server-app (dark/light, 5 langues) | ✅ |
+| Server-app startup check : config null → 🚫 / active=false → ⏸ / catch → _startApp | ✅ |
+| Server-app écrans bloquants — dark/light mode (var(--bg), var(--muted)) | ✅ |
+| Server-app bouton Changer d'ID sur écrans bloquants | ✅ |
+| Server-app confirm popup élégant (dark/light, 5 langues) à la place de window.confirm | ✅ |
+| Server-app setup screen dark/light mode (var(--bg/card/cream/muted)) | ✅ |
+| Control-app carte Informations : Nom → MDP admin → ID | ✅ |
+| Control-app boutons pause/suppr dans Forfait (3D matte jaune/rouge/vert) | ✅ |
+| Control-app rétention défaut nouveau client = 1 mois | ✅ |
 | Numéro table masqué côté client | ✅ |
 | Appel serveur sans saisie si QR (`?table=X`) | ✅ |
 | Swipe 3 onglets admin (orders masqué → direct display↔settings) | ✅ |
@@ -207,7 +240,9 @@ demoPage/                           → lecture + écriture publique
 | Server-app applyLang() sync FCM status | ✅ |
 | Photos/fêtes/thèmes toujours actifs | ✅ |
 | Langues retirées de control-app | ✅ |
+| Stats axe Y entiers (Math.round, plus de 0000001) | ✅ |
 | stats-card bordures identiques adm-section | ✅ |
+| Admin chevrons — setupCollapsible() IIFE + firstChild.textContent dans applyTranslations() | ✅ |
 | QR popup scroll lock + tab guard | ✅ |
 | PDF QR fond blanc, ID retiré | ✅ |
 | Firebase rules v3 | ✅ |
