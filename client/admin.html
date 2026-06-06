@@ -3012,31 +3012,12 @@ async function doLogin() {
   const hash = await _hashPwd(val);
 
   let expectedHash = ADMIN_HASH;
-  let firebaseHashFound = false;
   try {
     const snap = await _rref('/config/adminHash').get();
-    if (snap.exists()) { expectedHash = snap.val(); firebaseHashFound = true; }
+    if (snap.exists()) expectedHash = snap.val();
   } catch {}
 
   if (hash === expectedHash) {
-    // Vérifier le statut du compte avant d'ouvrir la session
-    try {
-      const activeSnap = await _rref('/config/active').get();
-      if (activeSnap.exists() && activeSnap.val() === false) {
-        document.getElementById('login-err').textContent = 'Compte suspendu. Contactez le service client.';
-        document.getElementById('pwd-input').value = '';
-        return;
-      }
-      if (!activeSnap.exists() && !firebaseHashFound) {
-        // config/active absent ET pas de hash Firebase → restaurant introuvable
-        const profileSnap = await _rref('profile/name').get();
-        if (!profileSnap.exists()) {
-          document.getElementById('login-err').textContent = 'Compte introuvable. Contactez le service client.';
-          document.getElementById('pwd-input').value = '';
-          return;
-        }
-      }
-    } catch {}
     await _openSession();
     _logAction('login');
     showAdmin();
@@ -3062,27 +3043,6 @@ function showAdmin() {
       if (titleEl) titleEl.textContent = name;
     }
   }).catch(() => {});
-  // Listener temps réel — détecte suspension ou suppression pendant la session
-  let _admActiveKnown = false;
-  _rref('/config/active').on('value', async snap => {
-    const v = snap.val();
-    if (v !== false && v !== null) { _admActiveKnown = true; return; } // actif → OK
-    if (!sessionStorage.getItem(_PFX + 'admin_auth')) return; // pas loggué → ignorer
-    if (v === false || (v === null && _admActiveKnown)) {
-      await _closeSession();
-      const msg = v === false
-        ? 'Compte suspendu. Contactez le service client.'
-        : 'Compte introuvable. Contactez le service client.';
-      const wrap = document.getElementById('adm-wrap');
-      const hdr  = document.getElementById('adm-header');
-      if (wrap) wrap.style.display = 'none';
-      if (hdr)  hdr.style.display  = 'none';
-      const loginScreen = document.getElementById('login-screen');
-      if (loginScreen) loginScreen.classList.remove('hidden');
-      const errEl = document.getElementById('login-err');
-      if (errEl) errEl.textContent = msg;
-    }
-  });
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
   loadData();
   loadMenuTheme();

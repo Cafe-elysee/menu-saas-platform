@@ -4981,7 +4981,7 @@
 
 <div id="pause-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:340px;width:100%">
-    <div id="pause-icon" style="width:56px;height:56px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 20px">⏸</div>
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 20px">⏸</div>
     <div id="pause-title" style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:var(--gold);letter-spacing:0.04em;margin-bottom:12px">Menu en pause</div>
     <div id="pause-msg" style="font-size:0.88rem;color:var(--muted);line-height:1.8">Votre menu est momentanément en pause.<br>Merci de contacter l'administrateur pour le réactiver.</div>
     <div style="margin-top:32px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.3">
@@ -5680,42 +5680,22 @@ function loadAdminData() {
     }
   }).catch(() => {});
 
-  // Vérifier si le restaurant est actif (config/active — suspension + suppression)
-  let _menuActiveKnown = false; // true dès qu'on a vu active !== null au moins une fois
+  // Vérifier si le restaurant est actif (config/active)
   _rref('/config/active').on('value', snap => {
-    const val = snap.val();
-    if (val !== null) _menuActiveKnown = true;
+    const isActive = snap.val() !== false;
     const screen = document.getElementById('pause-screen');
     if (!screen) return;
-    const ico   = document.getElementById('pause-icon');
-    const titleEl = document.getElementById('pause-title');
-    const msgEl   = document.getElementById('pause-msg');
-    if (val === false) {
+    if (!isActive) {
       const _PAUSE = {
-        fr: { icon:'⏸', title:'Menu en pause',    msg:'Votre menu est momentanément en pause.<br>Merci de contacter l'administrateur pour le réactiver.' },
-        en: { icon:'⏸', title:'Menu paused',      msg:'Your menu is currently paused.<br>Please contact the administrator to reactivate it.' },
-        el: { icon:'⏸', title:'Μενού σε παύση',   msg:'Το μενού σας είναι προσωρινά σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
-        de: { icon:'⏸', title:'Menü pausiert',    msg:'Ihr Menü ist vorübergehend pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
-        ar: { icon:'⏸', title:'القائمة متوقفة',   msg:'قائمتك متوقفة مؤقتاً.<br>يرجى التواصل مع المسؤول لإعادة تفعيلها.' }
+        fr: { title:'Menu en pause',    msg:'Votre menu est momentanément en pause.<br>Merci de contacter l\'administrateur pour le réactiver.' },
+        en: { title:'Menu paused',      msg:'Your menu is currently paused.<br>Please contact the administrator to reactivate it.' },
+        el: { title:'Μενού σε παύση',   msg:'Το μενού σας είναι προσωρινά σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
+        de: { title:'Menü pausiert',    msg:'Ihr Menü ist vorübergehend pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
+        ar: { title:'القائمة متوقفة',   msg:'قائمتك متوقفة مؤقتاً.<br>يرجى التواصل مع المسؤول لإعادة تفعيلها.' }
       };
       const p = _PAUSE[lang] || _PAUSE.fr;
-      if (ico) ico.textContent = p.icon;
-      if (titleEl) titleEl.textContent = p.title;
-      if (msgEl)   msgEl.innerHTML     = p.msg;
-      screen.style.display = 'flex';
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    } else if (val === null && _menuActiveKnown) {
-      const _DELETED = {
-        fr: { icon:'🚫', title:'Menu introuvable',      msg:'Ce restaurant n'existe plus.<br>Veuillez contacter le service client.' },
-        en: { icon:'🚫', title:'Menu not found',        msg:'This restaurant no longer exists.<br>Please contact customer support.' },
-        el: { icon:'🚫', title:'Μενού δεν βρέθηκε',    msg:'Αυτό το εστιατόριο δεν υπάρχει πλέον.<br>Παρακαλώ επικοινωνήστε με την υποστήριξη.' },
-        de: { icon:'🚫', title:'Menü nicht gefunden',   msg:'Dieses Restaurant existiert nicht mehr.<br>Bitte kontaktieren Sie den Kundendienst.' },
-        ar: { icon:'🚫', title:'القائمة غير موجودة',    msg:'هذا المطعم لم يعد موجوداً.<br>يرجى التواصل مع الدعم.' }
-      };
-      const d = _DELETED[lang] || _DELETED.fr;
-      if (ico) ico.textContent = d.icon;
-      if (titleEl) titleEl.textContent = d.title;
-      if (msgEl)   msgEl.innerHTML     = d.msg;
+      document.getElementById('pause-title').textContent = p.title;
+      document.getElementById('pause-msg').innerHTML = p.msg;
       screen.style.display = 'flex';
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     } else {

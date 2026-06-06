@@ -507,7 +507,7 @@
 
 <div id="srv-pause-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:#0f0d0a;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:320px;width:100%">
-    <div id="srv-pause-icon" style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid rgba(200,164,78,0.25);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">⏸</div>
+    <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid rgba(200,164,78,0.25);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">⏸</div>
     <div id="srv-pause-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:12px">Service en pause</div>
     <div id="srv-pause-msg" style="font-size:0.85rem;color:#7a6a52;line-height:1.9">Ce restaurant est momentanément en pause.<br>Merci de contacter l'administrateur.</div>
     <div style="margin-top:36px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
@@ -1649,45 +1649,22 @@ function init() {
     document.title = name + ' — Serveur';
   }).catch(function() {});
 
-  // Vérifier statut actif du restaurant (suspension + suppression)
-  var _srvActiveKnown = false; // true dès qu'on a vu active !== null au moins une fois
+  // Vérifier statut actif du restaurant
   _rref('/config/active').on('value', function(snap) {
-    var val = snap.val();
-    if (val !== null) _srvActiveKnown = true;
+    var isActive = snap.val() !== false;
     var screen = document.getElementById('srv-pause-screen');
     if (!screen) return;
-    var ico = document.getElementById('srv-pause-icon');
-    var titleEl = document.getElementById('srv-pause-title');
-    var msgEl   = document.getElementById('srv-pause-msg');
-    if (val === false) {
-      var _PAUSE = {
-        fr: { icon:'⏸', title:'Service en pause',       msg:'Ce restaurant est momentanément en pause.<br>Merci de contacter l\'administrateur.' },
-        en: { icon:'⏸', title:'Service paused',         msg:'This restaurant is currently paused.<br>Please contact the administrator.' },
-        el: { icon:'⏸', title:'Σε παύση',               msg:'Αυτό το εστιατόριο είναι σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
-        de: { icon:'⏸', title:'Service pausiert',       msg:'Dieses Restaurant ist pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
-        ar: { icon:'⏸', title:'الخدمة متوقفة',          msg:'هذا المطعم متوقف مؤقتاً.<br>يرجى التواصل مع المسؤول.' }
-      };
-      var p = _PAUSE[lang] || _PAUSE.fr;
-      if (ico) ico.textContent = p.icon;
-      if (titleEl) titleEl.textContent = p.title;
-      if (msgEl)   msgEl.innerHTML     = p.msg;
-      screen.style.display = 'flex';
-    } else if (val === null && _srvActiveKnown) {
-      var _DELETED = {
-        fr: { icon:'🚫', title:'Compte introuvable',        msg:'Cet identifiant n\'existe plus.<br>Veuillez contacter le service client.' },
-        en: { icon:'🚫', title:'Account not found',         msg:'This ID no longer exists.<br>Please contact customer support.' },
-        el: { icon:'🚫', title:'Λογαριασμός δεν βρέθηκε',  msg:'Αυτό το αναγνωριστικό δεν υπάρχει πλέον.<br>Παρακαλώ επικοινωνήστε με την υποστήριξη.' },
-        de: { icon:'🚫', title:'Konto nicht gefunden',      msg:'Diese ID existiert nicht mehr.<br>Bitte kontaktieren Sie den Kundendienst.' },
-        ar: { icon:'🚫', title:'الحساب غير موجود',           msg:'هذا المعرّف لم يعد موجوداً.<br>يرجى التواصل مع الدعم.' }
-      };
-      var d = _DELETED[lang] || _DELETED.fr;
-      if (ico) ico.textContent = d.icon;
-      if (titleEl) titleEl.textContent = d.title;
-      if (msgEl)   msgEl.innerHTML     = d.msg;
-      screen.style.display = 'flex';
-    } else {
-      screen.style.display = 'none';
-    }
+    var _PAUSE = {
+      fr: { title:'Service en pause',  msg:'Ce restaurant est momentanément en pause.<br>Merci de contacter l\'administrateur.' },
+      en: { title:'Service paused',    msg:'This restaurant is currently paused.<br>Please contact the administrator.' },
+      el: { title:'Σε παύση',          msg:'Αυτό το εστιατόριο είναι σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
+      de: { title:'Service pausiert',  msg:'Dieses Restaurant ist pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
+      ar: { title:'الخدمة متوقفة',     msg:'هذا المطعم متوقف مؤقتاً.<br>يرجى التواصل مع المسؤول.' }
+    };
+    var p = _PAUSE[lang] || _PAUSE.fr;
+    document.getElementById('srv-pause-title').textContent = p.title;
+    document.getElementById('srv-pause-msg').innerHTML = p.msg;
+    screen.style.display = isActive ? 'none' : 'flex';
   });
 
   _rref('/config/primaryLang').on('value', function(snap) {
