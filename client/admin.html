@@ -3156,7 +3156,8 @@ const HERO_TEXTS = {
   el: { tagline:'', sub:[], explore:'Μενού' },
   fr: { tagline:'Une expérience culinaire raffinée',       sub:["Cafés d'exception",'Plats gourmets','Ambiance élégante'],      explore:'Menu' },
   en: { tagline:'A refined culinary experience',           sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],    explore:'Menu' },
-  ar: { tagline:'',                                           sub:[],                                                               explore:'القائمة' },
+  de: { tagline:'Ein raffiniertes kulinarisches Erlebnis', sub:['Erstklassige Kaffeespezialitäten','Gourmet-Gerichte','Elegante Atmosphäre'], explore:'Menü' },
+  ar: { tagline:'',                                        sub:[],                                                               explore:'القائمة' },
 };
 
 function updateMockupText() {
@@ -7289,6 +7290,7 @@ function applyCustomDateRange() {
   if (!s || !e) return;
   const sd = new Date(s); sd.setHours(0,0,0,0);
   const ed = new Date(e); ed.setHours(23,59,59,999);
+  if (sd > ed) return;
   _adminCustomStart = sd.getTime();
   _adminCustomEnd   = ed.getTime();
   updateAnalytics();
