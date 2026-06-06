@@ -4287,7 +4287,7 @@
     html[data-menu-theme="neon-tokyo"].light #call-fab { box-shadow:0 4px 18px rgba(0,160,138,0.5); }
     html[data-menu-theme="botanical"].light #call-fab { box-shadow:0 4px 18px rgba(58,122,42,0.5); }
     html[data-menu-theme="rose-parisien"].light #call-fab { box-shadow:0 4px 18px rgba(184,80,128,0.5); }
-    html[data-menu-theme="midnight-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,104,64,0.45); }
+    html[data-menu-theme="midnight-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(128,104,0,0.45); }
     html[data-menu-theme="velvet-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,139,26,0.5); }
     html[data-menu-theme="santorin"].light #call-fab { box-shadow:0 4px 20px rgba(21,101,192,0.5); }
 
@@ -4856,7 +4856,7 @@
     /* ── TABLE CHIP (QR code) ── */
     #table-chip { display:none; align-items:center; gap:4px; background:rgba(200,164,78,0.13); border:1px solid rgba(200,164,78,0.32); border-radius:20px; padding:3px 10px 3px 8px; font-size:0.73rem; font-weight:600; color:var(--gold); white-space:nowrap; flex-shrink:0; }
     #table-chip.show { display:flex; }
-    html.light #table-chip { background:rgba(168,104,64,0.1); border-color:rgba(168,104,64,0.3); color:#a86840; }
+    html.light #table-chip { background:color-mix(in srgb, var(--gold) 10%, transparent); border-color:color-mix(in srgb, var(--gold) 30%, transparent); color:var(--gold); }
 
     #cart-modal {
       position:fixed; inset:0; z-index:400;
@@ -6467,6 +6467,15 @@ function _esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+const _ARIA_LABELS = {
+  qty:        { fr:'Quantité',          en:'Quantity',          de:'Menge',              el:'Ποσότητα',              ar:'الكمية'         },
+  add:        { fr:'Ajouter',           en:'Add',               de:'Hinzufügen',         el:'Προσθήκη',              ar:'إضافة'          },
+  remove:     { fr:'Retirer',           en:'Remove',            de:'Entfernen',          el:'Αφαίρεση',              ar:'إزالة'          },
+  addCart:    { fr:'Ajouter au panier', en:'Add to cart',       de:'In den Warenkorb',   el:'Προσθήκη στο καλάθι',   ar:'أضف إلى السلة'  },
+  removeCart: { fr:'Retirer du panier', en:'Remove from cart',  de:'Aus dem Warenkorb',  el:'Αφαίρεση από το καλάθι',ar:'إزالة من السلة' },
+};
+function _aria(key) { const m=_ARIA_LABELS[key]||{}; return m[lang]||m.fr||''; }
+
 function _hsl2hex(h,s,l) {
   h/=360;s/=100;l/=100;
   let r,g,b;
@@ -6608,10 +6617,10 @@ function buildFlipBook() {
       const qtyClass = qty > 0 ? ' has-qty' : '';
       // Bloc qty rendu inconditionnellement ; le CSS le masque si showOrderUI est off.
       const qtyHtml = `
-        <div class="fp-item-qty${qtyClass}" data-fp-qty="${item.id}" aria-label="Quantité">
-          <button class="fp-qty-btn fp-qty-minus" aria-label="Retirer" onclick="event.stopPropagation();window._fpRemove(${item.id})">−</button>
+        <div class="fp-item-qty${qtyClass}" data-fp-qty="${item.id}" aria-label="${_aria('qty')}">
+          <button class="fp-qty-btn fp-qty-minus" aria-label="${_aria('remove')}" onclick="event.stopPropagation();window._fpRemove(${item.id})">−</button>
           <span class="fp-qty-num">${qty}</span>
-          <button class="fp-qty-btn fp-qty-plus" aria-label="Ajouter" onclick="event.stopPropagation();window._fpAdd(${item.id})">+</button>
+          <button class="fp-qty-btn fp-qty-plus" aria-label="${_aria('add')}" onclick="event.stopPropagation();window._fpAdd(${item.id})">+</button>
         </div>`;
       const arrowSvg = `<svg viewBox="0 0 10 6" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,1 5,5 9,1"/></svg>`;
       return `<div class="fp-item${desc ? ' has-desc' : ''}"${desc ? ` onclick="this.classList.toggle('expanded')"` : ''}>
@@ -8776,7 +8785,7 @@ function createCard(item, idx) {
   const minusBtn = document.createElement('button');
   minusBtn.className = 'card-qty-minus';
   minusBtn.textContent = '−';
-  minusBtn.setAttribute('aria-label', 'Retirer du panier');
+  minusBtn.setAttribute('aria-label', _aria('removeCart'));
   minusBtn.addEventListener('click', e => { e.stopPropagation(); removeFromCart(item.id); });
 
   const qtyNum = document.createElement('span');
@@ -8787,7 +8796,7 @@ function createCard(item, idx) {
   const addBtn = document.createElement('button');
   addBtn.className = 'card-add-btn';
   addBtn.textContent = '+';
-  addBtn.setAttribute('aria-label', 'Ajouter au panier');
+  addBtn.setAttribute('aria-label', _aria('addCart'));
   addBtn.addEventListener('click', e => { e.stopPropagation(); addToCart(item); });
 
   qtyCtrl.appendChild(minusBtn);
