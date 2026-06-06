@@ -1773,7 +1773,7 @@ async function createNewClient() {
     });
 
     // Afficher le résultat
-    const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html?rid=' + rid;
+    const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html';
     document.getElementById('nc-admin-url').textContent = adminUrl;
     document.getElementById('nc-rid-val').textContent = rid;
     document.getElementById('nc-rid-inline').textContent = rid;
@@ -2098,7 +2098,7 @@ function toggleCard(id) {
 async function openAdmin(e, slug) {
   e.preventDefault();
   await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
-  window.open('https://menu-saas-platform.vercel.app/admin.html?rid=' + slug + '&ctrl=1', '_system');
+  window.open('https://menu-saas-platform.vercel.app/admin.html?ctrl=1#rid=' + encodeURIComponent(slug), '_system');
 }
 
 async function toggleClientActive(slug) {

@@ -3088,8 +3088,19 @@ function _doAdmConfirm() {
    LOGIN + SESSION FIREBASE
 ═══════════════════════════════════════════ */
 async function checkLogin() {
-  // Phase 1 : pas de ?rid= dans l'URL → sélecteur d'ID
+  // Phase 1 : pas de ?rid= dans l'URL
   if (!new URLSearchParams(location.search).get('rid')) {
+    // Bypass control-app : ?ctrl=1#rid=xxx → écrire ctrlBypass puis rediriger
+    if (new URLSearchParams(location.search).get('ctrl') === '1' && location.hash) {
+      const _hashRid = new URLSearchParams(location.hash.slice(1)).get('rid');
+      if (_hashRid) {
+        try {
+          await firebase.database().ref('restaurants/' + _hashRid + '/config/ctrlBypass').set(Date.now());
+          location.replace(location.pathname + '?rid=' + encodeURIComponent(_hashRid) + '&ctrl=1');
+          return;
+        } catch(e) {}
+      }
+    }
     _showRidSelector();
     return;
   }
