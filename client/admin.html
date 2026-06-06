@@ -6556,7 +6556,7 @@ function closeIconModal() {
    ANALYTICS — Onglets + Graphiques
    ═══════════════════════════════════════════════════════ */
 
-let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
+let _adminCurrentTab    = 'display';
 let _adminCurrentPeriod = localStorage.getItem(_PFX + 'analytics_period') || 'today';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
@@ -6883,25 +6883,11 @@ window.addEventListener('resize', () => {
   }, 200);
 });
 
-/* ── Restaurer l'onglet actif + période analytics au chargement ── */
+/* ── Synchroniser le pill de période analytics au chargement ── */
 document.addEventListener('DOMContentLoaded', () => {
-  // Synchroniser le pill de période (valeur lue depuis localStorage)
   document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.period === _adminCurrentPeriod));
   const cr = document.getElementById('analytics-custom-range');
   if (cr) cr.classList.toggle('show', _adminCurrentPeriod === 'custom');
-
-  if (_adminCurrentTab === 'orders') {
-    const p1 = document.getElementById('admin-panel-display');
-    const p2 = document.getElementById('admin-panel-orders');
-    if (p1) p1.style.display = 'none';
-    if (p2) { p2.style.display = ''; void p2.offsetWidth; }
-    document.getElementById('admin-tab-display')?.classList.remove('on');
-    document.getElementById('admin-tab-orders')?.classList.add('on');
-    if (!ordersListener) startOrdersListener();
-    startAnalyticsListener();
-    requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
-    _updateScFabVisibility();
-  }
 });
 
 

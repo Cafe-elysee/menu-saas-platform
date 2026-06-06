@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-06 (confirm modal + setup screen dark/light)
+## Dernière mise à jour : 2026-06-06 (admin tab + thème défaut + confirm modal + gold)
 
 ---
 
@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `7f8a768` (2026-06-06)
+**Commit** : `5ead5a3` (2026-06-06)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
@@ -69,6 +69,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - **Carte client — ordre Informations** : Nom → Mot de passe admin → ID ✅
 - **Boutons pause/suppr dans Forfait** : 3D matte jaune amber (⏸ Mettre en pause) + rouge crimson (🗑️ Supprimer) → vert (▶ Réactiver) ✅
 - **Rétention défaut nouveau client** : 1 mois (2592000000 ms) pour appels + commandes ✅
+- **Thème défaut nouveau client** : `carte-classique` (Carte Classique) automatiquement appliqué à la création ✅
 
 ### Server App
 - Onglet initial intelligent, messages persistants, scroll conservé ✅
@@ -116,6 +117,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - Fix stacking panels : sync DOM/state dans applyMenuSnapshot + display:none immédiat ✅
 - Synchronisation auto via Firebase (admin ↔ control-app temps réel) ✅
 - **Gold light mode** : `--gold #c8a44e`, textes `ico-modal-title` + `lang-tab.on` → `var(--cream)` ✅
+- **Onglet par défaut** : toujours `display` (Affichage Menu) à l'ouverture/refresh — `_adminCurrentTab` hardcodé à `'display'`, tab localStorage ignoré ✅
 
 ### Admin panel — FABs
 - `#fab-save` (doré) : onglet 1 uniquement, bottom-right ✅
@@ -226,6 +228,8 @@ demoPage/                           → lecture + écriture publique
 | Control-app carte Informations : Nom → MDP admin → ID | ✅ |
 | Control-app boutons pause/suppr dans Forfait (3D matte jaune/rouge/vert) | ✅ |
 | Control-app rétention défaut nouveau client = 1 mois | ✅ |
+| Control-app thème défaut nouveau client = carte-classique | ✅ |
+| Admin onglet par défaut = display (Affichage Menu) à chaque ouverture/refresh | ✅ |
 | Numéro table masqué côté client | ✅ |
 | Appel serveur sans saisie si QR (`?table=X`) | ✅ |
 | Swipe 3 onglets admin (orders masqué → direct display↔settings) | ✅ |
