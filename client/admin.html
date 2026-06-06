@@ -2943,7 +2943,18 @@ async function checkLogin() {
     // Vérifier que la session Firebase n'a pas été révoquée
     try {
       const snap = await _rref('sessions/' + sessionId).once('value');
-      if (snap.exists()) { showAdmin(); return; }
+      if (snap.exists()) {
+        // Vérifier que le compte est toujours actif
+        try {
+          const actSnap = await _rref('/config/active').once('value');
+          if (actSnap.val() === false || actSnap.val() === null) {
+            sessionStorage.removeItem(_PFX+'admin_auth');
+            sessionStorage.removeItem(_PFX+'session_id');
+            return;
+          }
+        } catch(e) {}
+        showAdmin(); return;
+      }
       // Session révoquée → déconnexion forcée
       sessionStorage.removeItem(_PFX+'admin_auth');
       sessionStorage.removeItem(_PFX+'session_id');
@@ -3041,6 +3052,16 @@ async function doLogin() {
   } catch {}
 
   if (hash === expectedHash) {
+    // Vérifier que le compte est actif avant d'ouvrir la session
+    try {
+      const actSnap = await _rref('/config/active').once('value');
+      if (actSnap.val() === false || actSnap.val() === null) {
+        document.getElementById('login-err').textContent = 'Ce compte est suspendu ou introuvable.';
+        document.getElementById('pwd-input').value = '';
+        document.getElementById('pwd-input').focus();
+        return;
+      }
+    } catch(e) {} // Erreur réseau → laisser passer
     await _openSession();
     _logAction('login');
     showAdmin();
@@ -3051,11 +3072,23 @@ async function doLogin() {
   }
 }
 
+let _adminActiveWatching = false;
+
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
   // adm-wrap et adm-header restent cachés jusqu'au premier rendu Firebase (cf. applyMenuSnapshot)
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
+  // Listener temps réel : déconnexion forcée si compte suspendu ou supprimé pendant la session
+  if (!document.body.classList.contains('demo-mode') && !_adminActiveWatching) {
+    _adminActiveWatching = true;
+    _rref('/config/active').on('value', snap => {
+      const v = snap.val();
+      if (v === false || v === null) {
+        _closeSession().then(() => location.reload()).catch(() => location.reload());
+      }
+    });
+  }
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
   _rref('profile/name').once('value').then(snap => {
     const name = snap.val() || '';
