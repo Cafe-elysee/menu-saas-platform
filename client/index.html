@@ -6463,6 +6463,10 @@ function buildSubFromNames(names) {
   return sub;
 }
 
+function _esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function _hsl2hex(h,s,l) {
   h/=360;s/=100;l/=100;
   let r,g,b;
@@ -6597,8 +6601,8 @@ function buildFlipBook() {
     const activePhotos = showPhotos ? (cat.flipPhotos || []).filter(p => p) : [];
 
     const itemsHtml = catItems.map(item => {
-      const name = item.name[lang] || item.name.fr || '';
-      const desc = item.desc[lang] || item.desc.fr || item.full[lang] || item.full.fr || '';
+      const name = _esc(item.name[lang] || item.name.fr || '');
+      const desc = _esc(item.desc[lang] || item.desc.fr || item.full[lang] || item.full.fr || '');
       const c = cartItems.find(ci => ci.id === item.id);
       const qty = c ? c.qty : 0;
       const qtyClass = qty > 0 ? ' has-qty' : '';
@@ -6619,7 +6623,7 @@ function buildFlipBook() {
           ${desc ? `<div class="fp-item-desc">${desc}</div>` : ''}
         </div>
         <div class="fp-item-right">
-          <div class="fp-item-price">${item.price}</div>
+          <div class="fp-item-price">${_esc(item.price)}</div>
           ${qtyHtml}
         </div>
       </div>`;
@@ -7119,7 +7123,7 @@ function renderCartModal() {
   list.innerHTML = cartItems.map(c => {
     const displayName = c.nameObj ? (c.nameObj[lang] || c.nameObj.fr || Object.values(c.nameObj)[0] || '') : (c.name || '');
     return `<div class="cart-item">
-      <span class="cart-item-name">${displayName}</span>
+      <span class="cart-item-name">${_esc(displayName)}</span>
       <div class="cart-item-qty-wrap">
         <button class="cart-qty-btn" onclick="removeFromCart(${c.id})">−</button>
         <span class="cart-qty">${c.qty}</span>
@@ -7420,7 +7424,7 @@ function renderHistModal(orders) {
       const name = liveItem
         ? (liveItem.name[lang] || liveItem.name.fr || Object.values(liveItem.name)[0] || it.name)
         : it.name;
-      return `${it.qty}× ${name}`;
+      return `${it.qty}× ${_esc(name)}`;
     }).join(' · ');
 
     const reorderBtn = o.status === 'done'
@@ -7434,7 +7438,7 @@ function renderHistModal(orders) {
         <span class="hist-status-badge ${stClass}">${stLabel}</span>
       </div>
       <div class="hist-items">${itemsSummary}</div>
-      <div class="hist-total">${o.total}</div>
+      <div class="hist-total">${_esc(o.total||'')}</div>
       ${reorderBtn}
     </div>`;
   }).join('');
@@ -8228,7 +8232,7 @@ const _camSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 function _setupCardEvents(card, item) {
   card.setAttribute('tabindex', '0');
   card.setAttribute('role', 'button');
-  card.setAttribute('aria-label', item.name[lang]||item.name.fr||'');
+  card.setAttribute('aria-label', _esc(item.name[lang]||item.name.fr||''));
   card.addEventListener('click', () => openSheet(item));
   card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(item); }});
   card.addEventListener('mousemove', e => {
@@ -8253,15 +8257,15 @@ function _cardCinema(item) {
       <div class="cinema-overlay"></div>
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
-        <div class="cinema-name">${item.name[lang]||item.name.fr||''}</div>
-        <div class="cinema-price">${item.price}</div>
+        <div class="cinema-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+        <div class="cinema-price">${_esc(item.price)}</div>
       </div>`;
   } else {
     card.innerHTML = `
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
-        <div class="cinema-name">${item.name[lang]||item.name.fr||''}</div>
-        <div class="cinema-price">${item.price}</div>
+        <div class="cinema-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+        <div class="cinema-price">${_esc(item.price)}</div>
       </div>`;
   }
   _setupCardEvents(card, item);
@@ -8286,10 +8290,10 @@ function _cardStrip(item) {
   card.innerHTML = `
     ${imgBlock}
     <div class="strip-body">
-      <div class="strip-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="strip-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       <div class="strip-right">
         ${badges ? `<div class="strip-badges">${badges}</div>` : ''}
-        <div class="strip-price">${item.price}</div>
+        <div class="strip-price">${_esc(item.price)}</div>
         ${chevronSvg}
       </div>
     </div>`;
@@ -8315,8 +8319,8 @@ function _cardForest(item) {
     ${imgBlock}
     <div class="forest-body">
       <div class="forest-leaf">🌿</div>
-      <div class="forest-name">${item.name[lang]||item.name.fr||''}</div>
-      <div class="forest-price">${item.price}</div>
+      <div class="forest-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+      <div class="forest-price">${_esc(item.price)}</div>
       ${badges ? `<div class="forest-badges">${badges}</div>` : ''}
     </div>`;
   _setupCardEvents(card, item);
@@ -8339,8 +8343,8 @@ function _cardRose(item) {
       : '';
   card.innerHTML = `
     ${imgBlock}
-    <div class="por-name">${item.name[lang]||item.name.fr||''}</div>
-    <div class="por-price">${item.price}</div>
+    <div class="por-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+    <div class="por-price">${_esc(item.price)}</div>
     ${badges ? `<div class="por-badges">${badges}</div>` : ''}`;
   _setupCardEvents(card, item);
   return card;
@@ -8352,7 +8356,7 @@ function _cardEnseigne(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-enseigne';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8363,12 +8367,12 @@ function _cardEnseigne(item) {
       : '';
   card.innerHTML = `
     <div class="ens-price-col">
-      <div class="ens-price">${item.price}</div>
+      <div class="ens-price">${_esc(item.price)}</div>
       <div class="ens-diamond"></div>
     </div>
     <div class="ens-body">
       <div class="ens-top">
-        <div class="ens-name">${item.name[lang]||item.name.fr||''}</div>
+        <div class="ens-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
         ${thumbBlock}
       </div>
       ${desc ? `<div class="ens-desc">${desc}</div>` : ''}
@@ -8397,11 +8401,11 @@ function _cardVelvet(item, idx) {
     <div class="vel-num">${num}</div>
     <div class="vel-divider"></div>
     <div class="vel-body">
-      <div class="vel-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="vel-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       ${badges ? `<div class="vel-badges">${badges}</div>` : ''}
     </div>
     <div class="vel-right">
-      <div class="vel-price">${item.price}</div>
+      <div class="vel-price">${_esc(item.price)}</div>
       ${imgBlock}
     </div>`;
   _setupCardEvents(card, item);
@@ -8414,7 +8418,7 @@ function _cardAurora(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-aurora';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8425,10 +8429,10 @@ function _cardAurora(item) {
       : '';
   card.innerHTML = `
     <div class="aurora-body">
-      <div class="aurora-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="aurora-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       ${desc ? `<div class="aurora-desc">${desc}</div>` : ''}
       <div class="aurora-meta">
-        <div class="aurora-price">${item.price}</div>
+        <div class="aurora-price">${_esc(item.price)}</div>
         ${badges ? `<div class="aurora-badges">${badges}</div>` : ''}
       </div>
     </div>
@@ -8443,7 +8447,7 @@ function _cardPrestige(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8456,8 +8460,8 @@ function _cardPrestige(item) {
           : ''}
       <div class="c-info">
         <div class="c-name-row">
-          <div class="c-name">${item.name[lang]||item.name.fr||''}</div>
-          <div class="c-price">${item.price}</div>
+          <div class="c-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+          <div class="c-price">${_esc(item.price)}</div>
         </div>
         ${desc ? `<div class="c-desc">${desc}</div>` : ''}
         ${badges ? `<div class="c-badges">${badges}</div>` : ''}
@@ -8473,7 +8477,7 @@ function _cardSantorin(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-santorin';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8484,12 +8488,12 @@ function _cardSantorin(item) {
       : '';
   card.innerHTML = `
     <div class="san-shutter">
-      <div class="san-price">${item.price}</div>
+      <div class="san-price">${_esc(item.price)}</div>
       <div class="san-stars">✦ ✦ ✦</div>
     </div>
     <div class="san-body">
       <div class="san-top">
-        <div class="san-name">${item.name[lang]||item.name.fr||''}</div>
+        <div class="san-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
         ${thumbBlock}
       </div>
       ${desc ? `<div class="san-desc">${desc}</div>` : ''}
@@ -8503,17 +8507,17 @@ function _cardSantorin(item) {
 function _cardClassique(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-classique';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML = `
     <div class="cls-row">
       <div class="cls-name-cell">
-        <span class="cls-name">${item.name[lang]||item.name.fr||''}</span>
+        <span class="cls-name">${_esc(item.name[lang]||item.name.fr||'')}</span>
         ${badges ? `<span class="cls-badges-inline">${badges}</span>` : ''}
       </div>
-      <div class="cls-price">${item.price}</div>
+      <div class="cls-price">${_esc(item.price)}</div>
     </div>
     ${desc ? `<div class="cls-desc">${desc}</div>` : ''}`;
   _setupCardEvents(card, item);
@@ -8525,13 +8529,13 @@ function _cardClassique(item) {
 function _cardSommelier(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-sommelier';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="som-main">' +
-      '<div class="som-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      '<div class="som-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="som-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="som-badges">' + badges + '</div>' : '') +
     '</div>' +
@@ -8543,12 +8547,12 @@ function _cardSommelier(item) {
 function _cardBento(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-bento';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
-    '<div class="ben-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+    '<div class="ben-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
     (desc ? '<div class="ben-desc">' + desc + '</div>' : '<div class="ben-desc"></div>') +
     '<div class="ben-bottom">' +
       (badges ? '<div class="ben-badges">' + badges + '</div>' : '<div class="ben-badges"></div>') +
@@ -8561,13 +8565,13 @@ function _cardBento(item) {
 function _cardTelegraphe(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-telegraphe';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="tel-row">' +
-      '<span class="tel-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+      '<span class="tel-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
       '<span class="tel-dots"></span>' +
       '<span class="tel-price">' + item.price + '</span>' +
     '</div>' +
@@ -8580,7 +8584,7 @@ function _cardTelegraphe(item) {
 function _cardCouture(item, idx) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   const num = String((idx||0) + 1).padStart(2, '0');
   card.className = 'card card-couture';
   card.dataset.item = item.id;
@@ -8588,7 +8592,7 @@ function _cardCouture(item, idx) {
   card.innerHTML =
     '<div class="cou-header">' +
       '<span class="cou-num">' + num + '</span>' +
-      '<span class="cou-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+      '<span class="cou-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
     '</div>' +
     (desc ? '<div class="cou-desc">' + desc + '</div>' : '') +
     '<div class="cou-footer">' +
@@ -8603,14 +8607,14 @@ function _cardCouture(item, idx) {
 function _cardJournal(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-dva';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="dva-price-block"><div class="dva-price">' + (item.price||'') + '</div></div>' +
     '<div class="dva-body">' +
-      '<div class="dva-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      '<div class="dva-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="dva-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="dva-badges">' + badges + '</div>' : '') +
     '</div>';
@@ -8621,7 +8625,7 @@ function _cardJournal(item) {
 function _cardVoyage(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   const priceParts = item.price.replace(/[€$£]/g,'').trim().split(/[.,]/);
   const priceInt = priceParts[0] || item.price;
   const currency = (item.price.match(/[€$£]/)||['€'])[0];
@@ -8630,7 +8634,7 @@ function _cardVoyage(item) {
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="voy-main">' +
-      '<div class="voy-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      '<div class="voy-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="voy-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="voy-badges">' + badges + '</div>' : '') +
     '</div>' +
@@ -8642,13 +8646,13 @@ function _cardVoyage(item) {
 function _cardArtisan(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-artisan';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="art-top">' +
-      '<span class="art-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+      '<span class="art-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
       (badges ? '<span class="art-badges">' + badges + '</span>' : '') +
     '</div>' +
     (desc ? '<div class="art-desc">' + desc + '</div>' : '') +
@@ -8661,7 +8665,7 @@ function _cardArtisan(item) {
 function _cardArdoise(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-ardoise';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8670,7 +8674,7 @@ function _cardArdoise(item) {
       '<span class="ard-prix-pill">' + (item.price||'') + '</span>' +
       (badges ? '<span class="ard-badges">' + badges + '</span>' : '<span></span>') +
     '</div>' +
-    '<div class="ard-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+    '<div class="ard-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
     (desc ? '<div class="ard-desc">' + desc + '</div>' : '');
   _setupCardEvents(card, item);
   return card;
@@ -8679,14 +8683,14 @@ function _cardArdoise(item) {
 function _cardMaroc(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-maroc';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="marc-row">' +
       '<div class="marc-left">' +
-        '<div class="marc-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+        '<div class="marc-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
         (badges ? '<div class="marc-badges">' + badges + '</div>' : '') +
       '</div>' +
       '<div class="marc-price">' + item.price + '</div>' +
@@ -8702,7 +8706,7 @@ function _cardEditorial(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
-  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-editorial';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -8715,8 +8719,8 @@ function _cardEditorial(item) {
     ${thumbBlock}
     <div class="edt-body">
       <div class="edt-header">
-        <div class="edt-name">${item.name[lang]||item.name.fr||''}</div>
-        <div class="edt-price">${item.price}</div>
+        <div class="edt-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
+        <div class="edt-price">${_esc(item.price)}</div>
       </div>
       ${desc ? `<div class="edt-desc">${desc}</div>` : ''}
       ${badges ? `<div class="edt-badges">${badges}</div>` : ''}
@@ -8871,7 +8875,7 @@ function openSheet(item) {
   shImg.onerror = () => { shImg.style.display = 'none'; };
   shImg.onload  = () => { shImg.style.display = ''; };
   shImg.src = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http')) ? item.photo : `https://images.unsplash.com/${item.photo}?w=800&h=500&fit=crop`;
-  document.getElementById('sh-name').textContent = item.name[lang]||item.name.fr||'';
+  document.getElementById('sh-name').textContent = _esc(item.name[lang]||item.name.fr||'');
   document.getElementById('sh-price').textContent = item.price;
   document.getElementById('sh-desc').textContent = item.full[lang]||item.full.fr||item.desc[lang]||item.desc.fr||'';
   document.getElementById('al-lbl').textContent = t.alLabel;

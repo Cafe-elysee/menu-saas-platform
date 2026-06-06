@@ -6915,7 +6915,7 @@ function renderOrdersAdmin(orders) {
     const itemsHtml = (o.items || []).map(it => {
       const liveItem = adminData?.items?.find(i => i.id === it.id);
       const name = liveItem ? (liveItem.name?.[currentLang] || liveItem.name?.fr || it.name) : it.name;
-      return `${it.qty}× ${name} — ${it.price}`;
+      return `${it.qty}× ${esc(name)} — ${esc(it.price)}`;
     }).join('<br>');
     const _dAdm = o.createdAt ? new Date(o.createdAt) : null;
     const timeStr = _dAdm ? (() => {
