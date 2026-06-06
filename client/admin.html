@@ -7,6 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/gr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
   <style>
     :root {
       --bg:     #0c0a08;
@@ -1639,11 +1645,68 @@
     flex:1; min-width:130px; padding:7px 10px; border-radius:8px;
     border:1px solid var(--border); background:var(--bg2); color:var(--cream);
     font-family:inherit; font-size:0.76rem; cursor:pointer; outline:none;
-    color-scheme:dark;
+    transition:border-color var(--tr), box-shadow var(--tr);
   }
-  html.light .filter-date-input { background:#fff; color-scheme:light; }
-  .filter-date-input:focus { border-color:var(--gold); }
+  html.light .filter-date-input { background:#fff; color:#333; }
+  .filter-date-input:focus { border-color:var(--gold); box-shadow:0 0 0 2px rgba(200,164,78,0.15); }
   .filter-date-sep { color:var(--muted); font-size:0.82rem; font-weight:600; }
+  /* ── Flatpickr theme admin ── */
+  .flatpickr-calendar {
+    background:var(--bg2) !important; color:var(--cream) !important;
+    border:1px solid var(--border) !important; border-radius:14px !important;
+    box-shadow:0 16px 48px rgba(0,0,0,0.5) !important;
+    font-family:inherit !important; overflow:hidden;
+  }
+  .flatpickr-calendar.arrowTop:before { border-bottom-color:var(--border) !important; }
+  .flatpickr-calendar.arrowTop:after  { border-bottom-color:var(--bg2) !important; }
+  .flatpickr-calendar.arrowBottom:before { border-top-color:var(--border) !important; }
+  .flatpickr-calendar.arrowBottom:after  { border-top-color:var(--bg2) !important; }
+  .flatpickr-months { background:rgba(200,164,78,0.06); padding:4px 0; }
+  .flatpickr-month { color:var(--gold) !important; fill:var(--gold) !important; height:40px; }
+  .flatpickr-current-month { font-size:0.9rem; color:var(--gold) !important; padding-top:8px; }
+  .flatpickr-current-month input.cur-year { color:var(--gold) !important; }
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background:var(--bg2) !important; color:var(--gold) !important; border:none;
+  }
+  .flatpickr-prev-month svg, .flatpickr-next-month svg { fill:var(--gold) !important; }
+  .flatpickr-prev-month:hover, .flatpickr-next-month:hover { background:rgba(200,164,78,0.1) !important; }
+  .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill:var(--gold-l) !important; }
+  .flatpickr-weekday { color:var(--muted) !important; font-size:0.67rem; }
+  .flatpickr-days { border-top:1px solid var(--border) !important; }
+  .flatpickr-day {
+    color:var(--cream) !important; border-color:transparent !important;
+    border-radius:8px !important; transition:background 0.15s;
+  }
+  .flatpickr-day:hover:not(.selected):not(.disabled):not(.flatpickr-disabled) {
+    background:rgba(200,164,78,0.14) !important; border-color:transparent !important;
+  }
+  .flatpickr-day.today { border-color:var(--gold) !important; color:var(--gold) !important; font-weight:600; }
+  .flatpickr-day.today:hover { background:rgba(200,164,78,0.14) !important; }
+  .flatpickr-day.selected, .flatpickr-day.selected:hover {
+    background:var(--gold) !important; border-color:var(--gold) !important;
+    color:#0c0a08 !important; font-weight:700;
+  }
+  .flatpickr-day.disabled, .flatpickr-day.flatpickr-disabled,
+  .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+    color:var(--muted) !important; opacity:0.45;
+  }
+  .numInputWrapper span { border-color:var(--border) !important; }
+  .numInputWrapper span:hover { background:rgba(200,164,78,0.1) !important; }
+  /* Light mode */
+  html.light .flatpickr-calendar {
+    background:#fff !important; border-color:rgba(200,164,78,0.35) !important;
+    box-shadow:0 8px 28px rgba(0,0,0,0.13) !important;
+  }
+  html.light .flatpickr-calendar.arrowTop:after { border-bottom-color:#fff !important; }
+  html.light .flatpickr-calendar.arrowBottom:after { border-top-color:#fff !important; }
+  html.light .flatpickr-months { background:rgba(200,164,78,0.06); }
+  html.light .flatpickr-current-month .flatpickr-monthDropdown-months { background:#fff !important; }
+  html.light .flatpickr-day { color:#333 !important; }
+  html.light .flatpickr-day.today { color:var(--gold) !important; }
+  html.light .flatpickr-day.selected { color:#fff !important; }
+  html.light .flatpickr-day:hover:not(.selected):not(.disabled):not(.flatpickr-disabled) {
+    background:rgba(200,164,78,0.12) !important;
+  }
   /* ── CHARTS ── */
   .chart-svg-wrap svg { display:block; overflow:visible; }
   @keyframes chartBarGrow { from { transform:scaleY(0); } to { transform:scaleY(1); } }
@@ -4602,6 +4665,7 @@ function setGlobalLang(l) {
   if (_lastAdminOrders.length) renderOrdersAdmin(_lastAdminOrders);
   if (_adminCurrentTab === 'orders') updateAnalytics();
   if (_tableCount) renderTableURLs(_tableCount);
+  _fpSetLocale(l);
 }
 
 function switchInfoLang(l) {
@@ -7109,6 +7173,7 @@ let _adminCurrentTab    = 'display';
 let _adminCurrentPeriod = localStorage.getItem(_PFX + 'analytics_period') || 'today';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
+let _fpStart = null, _fpEnd = null;
 let _adminAllOrders        = {};
 let _analyticsData         = {};
 let _analyticsListener     = null;
@@ -7227,6 +7292,53 @@ function applyCustomDateRange() {
   _adminCustomStart = sd.getTime();
   _adminCustomEnd   = ed.getTime();
   updateAnalytics();
+}
+
+/* ── Flatpickr — mapping locale ── */
+function _fpLocale(lang) {
+  const map = { fr:'fr', en:'default', de:'de', el:'gr', ar:'ar' };
+  const key = map[lang] || 'default';
+  return (typeof flatpickr !== 'undefined') ? (flatpickr.l10ns[key] || flatpickr.l10ns.default) : null;
+}
+
+function _initDatePickers() {
+  if (typeof flatpickr === 'undefined') return;
+  const locale = _fpLocale(currentLang);
+  const altFmt = 'j F Y';
+  const today  = new Date();
+
+  _fpStart = flatpickr('#analytics-date-start', {
+    dateFormat   : 'Y-m-d',
+    altInput     : true,
+    altFormat    : altFmt,
+    altInputClass: 'filter-date-input',
+    locale,
+    maxDate : today,
+    disableMobile: true,
+    onChange(dates) {
+      if (_fpEnd && dates[0]) _fpEnd.set('minDate', dates[0]);
+      applyCustomDateRange();
+    }
+  });
+
+  _fpEnd = flatpickr('#analytics-date-end', {
+    dateFormat   : 'Y-m-d',
+    altInput     : true,
+    altFormat    : altFmt,
+    altInputClass: 'filter-date-input',
+    locale,
+    maxDate : today,
+    disableMobile: true,
+    onChange() { applyCustomDateRange(); }
+  });
+}
+
+function _fpSetLocale(lang) {
+  if (!_fpStart || !_fpEnd) return;
+  const locale = _fpLocale(lang);
+  if (!locale) return;
+  _fpStart.set('locale', locale);
+  _fpEnd.set('locale', locale);
 }
 
 function _getAnalyticsPeriod() {
@@ -7445,6 +7557,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.period === _adminCurrentPeriod));
   const cr = document.getElementById('analytics-custom-range');
   if (cr) cr.classList.toggle('show', _adminCurrentPeriod === 'custom');
+  _initDatePickers();
 });
 
 
