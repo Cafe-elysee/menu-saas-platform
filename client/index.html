@@ -56,6 +56,9 @@
       --badge-new: #c8a44e;
       --badge-pop: #e8854a;
       --badge-veg: #7ebd6a;
+      --fab-aura-40: rgba(144,112,248,0.40);
+      --fab-aura-50: rgba(144,112,248,0.50);
+      --fab-aura-25: rgba(144,112,248,0.25);
     }
 
     /* ================================================
@@ -730,98 +733,6 @@
       --gold:#3a3a3a; --gold-lt:#565656; --gold-dk:#222222;
       --cream:#0a0a0a; --muted:rgba(10,10,10,0.52); --border:rgba(68,68,68,0.2); --border2:rgba(68,68,68,0.4);
       --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(68,68,68,0.1),0 4px 14px rgba(0,0,0,0.06);
-    }
-
-    /* ══ LAQUE ══ */
-
-    /* ── LAQUE (standard — champagne) ── */
-    html[data-menu-theme="laque"] {
-      --bg:#080504; --bg2:#100c08; --bg-card:rgba(255,248,230,0.042); --bg-nav:rgba(8,5,4,0.97);
-      --gold:#c8b080; --gold-lt:#dcc898; --gold-dk:#9c8850; --cream:#f0e8d4;
-      --muted:rgba(240,232,212,0.45); --border:rgba(200,176,128,0.12); --border2:rgba(200,176,128,0.30);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(200,176,128,0.18),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#c8b080; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque"].light {
-      --bg:#faf8f4; --bg2:#f0ece4; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(250,248,244,0.97);
-      --gold:#7c6828; --gold-lt:#9c8840; --gold-dk:#5c4c14; --cream:#14100a;
-      --muted:rgba(20,16,10,0.52); --border:rgba(124,104,40,0.16); --border2:rgba(124,104,40,0.36);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(124,104,40,0.12),0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    /* ── LAQUE CELADON ── */
-    html[data-menu-theme="laque-celadon"] {
-      --bg:#050c08; --bg2:#0a1410; --bg-card:rgba(230,255,240,0.04); --bg-nav:rgba(5,12,8,0.97);
-      --gold:#80c8a0; --gold-lt:#a0d8b8; --gold-dk:#509870; --cream:#e8f4ec;
-      --muted:rgba(232,244,236,0.45); --border:rgba(128,200,160,0.12); --border2:rgba(128,200,160,0.28);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(128,200,160,0.16),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#80c8a0; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque-celadon"].light {
-      --bg:#f4faf6; --bg2:#e8f2ec; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(244,250,246,0.97);
-      --gold:#286840; --gold-lt:#408858; --gold-dk:#144c28; --cream:#081408;
-      --muted:rgba(8,20,8,0.52); --border:rgba(40,104,64,0.16); --border2:rgba(40,104,64,0.34);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(40,104,64,0.12),0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    /* ── LAQUE PIVOINE ── */
-    html[data-menu-theme="laque-pivoine"] {
-      --bg:#0a0508; --bg2:#140a10; --bg-card:rgba(255,230,240,0.042); --bg-nav:rgba(10,5,8,0.97);
-      --gold:#c87090; --gold-lt:#e090b0; --gold-dk:#9a5070; --cream:#f4e8ee;
-      --muted:rgba(244,232,238,0.45); --border:rgba(200,112,144,0.14); --border2:rgba(200,112,144,0.30);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(200,112,144,0.16),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#c87090; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque-pivoine"].light {
-      --bg:#faf4f6; --bg2:#f0e8ec; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(250,244,246,0.97);
-      --gold:#883050; --gold-lt:#a84868; --gold-dk:#661038; --cream:#180810;
-      --muted:rgba(24,8,16,0.52); --border:rgba(136,48,80,0.16); --border2:rgba(136,48,80,0.34);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(136,48,80,0.12),0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    /* ── LAQUE ENCRE ── */
-    html[data-menu-theme="laque-encre"] {
-      --bg:#060810; --bg2:#0c1020; --bg-card:rgba(220,228,255,0.042); --bg-nav:rgba(6,8,16,0.97);
-      --gold:#7898d8; --gold-lt:#98b8f0; --gold-dk:#5070a8; --cream:#dce8f8;
-      --muted:rgba(220,232,248,0.45); --border:rgba(120,152,216,0.14); --border2:rgba(120,152,216,0.30);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(120,152,216,0.16),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#7898d8; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque-encre"].light {
-      --bg:#f2f4fc; --bg2:#e4e8f4; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(242,244,252,0.97);
-      --gold:#2840a0; --gold-lt:#3858c0; --gold-dk:#142878; --cream:#0c1028;
-      --muted:rgba(12,16,40,0.52); --border:rgba(40,64,160,0.16); --border2:rgba(40,64,160,0.34);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(40,64,160,0.12),0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    /* ── LAQUE BOIS ── */
-    html[data-menu-theme="laque-bois"] {
-      --bg:#090604; --bg2:#120c06; --bg-card:rgba(255,240,210,0.04); --bg-nav:rgba(9,6,4,0.97);
-      --gold:#c0844a; --gold-lt:#d8a070; --gold-dk:#906028; --cream:#f0e0cc;
-      --muted:rgba(240,224,204,0.45); --border:rgba(192,132,74,0.14); --border2:rgba(192,132,74,0.30);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(192,132,74,0.16),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#c0844a; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque-bois"].light {
-      --bg:#faf6f2; --bg2:#f0e8de; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(250,246,242,0.97);
-      --gold:#885020; --gold-lt:#a86830; --gold-dk:#643410; --cream:#180e04;
-      --muted:rgba(24,14,4,0.52); --border:rgba(136,80,32,0.16); --border2:rgba(136,80,32,0.34);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(136,80,32,0.12),0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    /* ── LAQUE IVOIRE ── */
-    html[data-menu-theme="laque-ivoire"] {
-      --bg:#0a0908; --bg2:#141210; --bg-card:rgba(255,252,244,0.05); --bg-nav:rgba(10,9,8,0.97);
-      --gold:#d8ccb0; --gold-lt:#ede4cc; --gold-dk:#a89c80; --cream:#f8f4ec;
-      --muted:rgba(248,244,236,0.44); --border:rgba(216,204,176,0.14); --border2:rgba(216,204,176,0.30);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(216,204,176,0.14),0 4px 22px rgba(0,0,0,0.88);
-      --badge-new:#d8ccb0; --badge-pop:#e0845c; --badge-veg:#7ebd6a;
-    }
-    html[data-menu-theme="laque-ivoire"].light {
-      --bg:#fcfaf6; --bg2:#f4f0e8; --bg-card:rgba(0,0,0,0.025); --bg-nav:rgba(252,250,246,0.97);
-      --gold:#605840; --gold-lt:#807660; --gold-dk:#403c28; --cream:#1c1810;
-      --muted:rgba(28,24,16,0.50); --border:rgba(96,88,64,0.14); --border2:rgba(96,88,64,0.30);
-      --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px rgba(96,88,64,0.10),0 4px 14px rgba(0,0,0,0.06);
     }
 
     /* ══ AURORA — Inspiré Arc Browser · Linear · Framer ══ */
@@ -3428,34 +3339,6 @@
       box-shadow:0 1px 20px rgba(var(--gold-rgb,0,245,212),0.08);
     }
 
-    /* ── LAQUE — effet surface laquée polie ── */
-    html[data-menu-theme^="laque"] .card {
-      background:linear-gradient(160deg,rgba(255,248,230,0.055) 0%,rgba(255,248,230,0.025) 100%);
-      box-shadow:inset 0 1px 0 rgba(255,248,230,0.07), 0 4px 22px rgba(0,0,0,0.72);
-    }
-    html[data-menu-theme^="laque"] .card:hover {
-      box-shadow:inset 0 1px 0 rgba(255,248,230,0.12), 0 8px 32px rgba(var(--gold-rgb-laque,200,176,128),0.18), 0 4px 20px rgba(0,0,0,0.82) !important;
-    }
-    html[data-menu-theme="laque"]          { --gold-rgb-laque:200,176,128; }
-    html[data-menu-theme="laque-celadon"]  { --gold-rgb-laque:128,200,160; }
-    html[data-menu-theme="laque-pivoine"]  { --gold-rgb-laque:200,112,144; }
-    html[data-menu-theme="laque-encre"]    { --gold-rgb-laque:120,152,216; }
-    html[data-menu-theme="laque-bois"]     { --gold-rgb-laque:192,132,74; }
-    html[data-menu-theme="laque-ivoire"]   { --gold-rgb-laque:216,204,176; }
-    html[data-menu-theme^="laque"] .cat-pill.on {
-      box-shadow:0 0 0 1px rgba(var(--gold-rgb-laque,200,176,128),0.48), 0 2px 12px rgba(var(--gold-rgb-laque,200,176,128),0.22);
-    }
-    html[data-menu-theme^="laque"] #nav {
-      border-bottom:1px solid rgba(var(--gold-rgb-laque,200,176,128),0.10);
-      box-shadow:0 1px 18px rgba(0,0,0,0.6);
-    }
-    html[data-menu-theme^="laque"].light .card {
-      background:none;
-      box-shadow:var(--shadow);
-    }
-    html[data-menu-theme^="laque"].light .card:hover {
-      box-shadow:var(--shadow-h) !important;
-    }
 
     html[data-menu-theme^="botanical-"] .cat-pill { border-radius:10px; }
     html[data-menu-theme^="botanical-"] .s-input { border-radius:10px; }
@@ -3898,13 +3781,13 @@
     /* Fond : aurora boréale subtile en arrière-plan */
     html[data-menu-theme^="aurora"] body {
       background:
-        radial-gradient(ellipse 140% 38% at 50% -4%, rgba(var(--aurora-rgb,144,112,248),0.13) 0%, transparent 60%),
-        radial-gradient(ellipse 70% 45% at -5% 65%, rgba(var(--aurora-b,79,120,248),0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 140% 38% at 50% -4%, color-mix(in srgb, var(--gold) 13%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 45% at -5% 65%, color-mix(in srgb, var(--gold-dk) 9%, transparent) 0%, transparent 60%),
         var(--bg);
     }
     html[data-menu-theme^="aurora"].light body {
       background:
-        radial-gradient(ellipse 140% 38% at 50% -4%, rgba(var(--aurora-rgb,144,112,248),0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 140% 38% at 50% -4%, color-mix(in srgb, var(--gold) 7%, transparent) 0%, transparent 60%),
         var(--bg);
     }
 
@@ -3915,18 +3798,19 @@
     .card-aurora {
       display:flex; flex-direction:row; align-items:stretch;
       overflow:hidden; position:relative;
-      border-left:2px solid rgba(var(--aurora-rgb,144,112,248),0.22);
+      border-left:2px solid color-mix(in srgb, var(--gold) 28%, transparent);
       transition:border-left-color 0.22s, box-shadow 0.22s, background 0.22s;
     }
     .card-aurora:active,
     .card-aurora:hover {
-      border-left-color:rgba(var(--aurora-rgb,144,112,248),0.75) !important;
-      background:rgba(var(--aurora-rgb,144,112,248),0.04);
+      border-left-color:color-mix(in srgb, var(--gold) 75%, transparent) !important;
+      background:color-mix(in srgb, var(--gold) 5%, transparent);
+      box-shadow:0 8px 24px color-mix(in srgb, var(--gold) 18%, transparent), 0 4px 12px rgba(0,0,0,0.5);
     }
     /* Accent line animée en haut au tap */
     .card-aurora::before {
       content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(var(--aurora-rgb,144,112,248),0.5) 30%,rgba(var(--aurora-b,79,120,248),0.5) 70%,transparent);
+      background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--gold) 55%, transparent) 35%,color-mix(in srgb, var(--gold-lt) 50%, transparent) 65%,transparent);
       opacity:0; transition:opacity 0.22s;
     }
     .card-aurora:hover::before,
@@ -3967,8 +3851,8 @@
     .card-aurora:hover .aurora-photo-col img { transform:scale(1.06); }
     .aurora-no-photo {
       width:68px; height:68px; border-radius:12px;
-      background:rgba(var(--aurora-rgb,144,112,248),0.06);
-      border:1px dashed rgba(var(--aurora-rgb,144,112,248),0.2);
+      background:color-mix(in srgb, var(--gold) 7%, transparent);
+      border:1px dashed color-mix(in srgb, var(--gold) 25%, transparent);
       display:flex; align-items:center; justify-content:center; color:var(--muted);
     }
     .aurora-no-photo svg { width:24px; height:24px; }
@@ -3976,12 +3860,12 @@
     /* Cat-pills style "tab" */
     html[data-menu-theme^="aurora"] .cat-pill {
       border-radius:8px; font-weight:500; letter-spacing:0.01em;
-      border:1px solid rgba(var(--aurora-rgb,144,112,248),0.18);
+      border:1px solid color-mix(in srgb, var(--gold) 22%, transparent);
     }
     html[data-menu-theme^="aurora"] .cat-pill.on {
-      background:linear-gradient(135deg,rgba(var(--aurora-rgb,144,112,248),0.92),rgba(var(--aurora-b,79,120,248),0.88));
+      background:linear-gradient(135deg, var(--gold), var(--gold-lt));
       border-color:transparent; color:#fff;
-      box-shadow:0 2px 14px rgba(var(--aurora-rgb,144,112,248),0.38);
+      box-shadow:0 2px 14px color-mix(in srgb, var(--gold) 38%, transparent);
     }
 
     /* Nav avec ligne aurora animée */
@@ -3993,8 +3877,8 @@
       content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
       background:linear-gradient(90deg,
         transparent 0%,
-        rgba(var(--aurora-rgb,144,112,248),0.65) 30%,
-        rgba(var(--aurora-b,79,120,248),0.65) 70%,
+        color-mix(in srgb, var(--gold) 65%, transparent) 30%,
+        color-mix(in srgb, var(--gold-lt) 60%, transparent) 70%,
         transparent 100%);
       background-size:200% 1px;
       animation:auroraLine 4s linear infinite;
@@ -4002,9 +3886,9 @@
 
     /* FAB pulsation aurora */
     @keyframes auroraFab {
-      0%   { box-shadow:0 6px 20px rgba(var(--aurora-rgb,144,112,248),0.4), 0 0 0 0   rgba(var(--aurora-rgb,144,112,248),0.25); }
-      60%  { box-shadow:0 6px 26px rgba(var(--aurora-rgb,144,112,248),0.5), 0 0 0 8px rgba(var(--aurora-rgb,144,112,248),0); }
-      100% { box-shadow:0 6px 20px rgba(var(--aurora-rgb,144,112,248),0.4), 0 0 0 0   rgba(var(--aurora-rgb,144,112,248),0); }
+      0%   { box-shadow:0 6px 20px var(--fab-aura-40), 0 0 0 0   var(--fab-aura-25); }
+      60%  { box-shadow:0 6px 26px var(--fab-aura-50), 0 0 0 8px transparent; }
+      100% { box-shadow:0 6px 20px var(--fab-aura-40), 0 0 0 0   transparent; }
     }
     html[data-menu-theme^="aurora"] #call-fab { animation:auroraFab 2.8s ease-in-out infinite; }
 
@@ -6600,17 +6484,24 @@ function applyMenuColor(hex) {
   const root = document.documentElement;
   if (hex) {
     const s=hex.replace('#','');
-    const r=parseInt(s.slice(0,2),16)/255,g=parseInt(s.slice(2,4),16)/255,b=parseInt(s.slice(4,6),16)/255;
+    const r8=parseInt(s.slice(0,2),16),g8=parseInt(s.slice(2,4),16),b8=parseInt(s.slice(4,6),16);
+    const r=r8/255,g=g8/255,b=b8/255;
     const max=Math.max(r,g,b),min=Math.min(r,g,b);
     let h=0,sat=0,l=(max+min)/2;
     if(max!==min){const d=max-min;sat=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}}
     root.style.setProperty('--gold', hex);
     root.style.setProperty('--gold-lt', _hsl2hex(h*360, sat*100, Math.min(l*100+18,90)));
     root.style.setProperty('--gold-dk', _hsl2hex(h*360, sat*100, Math.max(l*100-22,8)));
+    root.style.setProperty('--fab-aura-40', `rgba(${r8},${g8},${b8},0.40)`);
+    root.style.setProperty('--fab-aura-50', `rgba(${r8},${g8},${b8},0.50)`);
+    root.style.setProperty('--fab-aura-25', `rgba(${r8},${g8},${b8},0.25)`);
   } else {
     root.style.removeProperty('--gold');
     root.style.removeProperty('--gold-lt');
     root.style.removeProperty('--gold-dk');
+    root.style.removeProperty('--fab-aura-40');
+    root.style.removeProperty('--fab-aura-50');
+    root.style.removeProperty('--fab-aura-25');
   }
 }
 
@@ -8849,7 +8740,6 @@ const _THEME_FAMILY_MAP = {
   'santorin-sunset':'santorin','santorin-sand':'santorin','santorin-sea':'santorin','santorin-coral':'santorin','santorin-white':'santorin',
   'dyn-bento-gold':'dyn-bento','dyn-bento-neon':'dyn-bento','dyn-bento-blue':'dyn-bento','dyn-bento-green':'dyn-bento','dyn-bento-pink':'dyn-bento',
   'editorial-azure':'editorial','editorial-terracotta':'editorial','editorial-sage':'editorial','editorial-plum':'editorial','editorial-pearl':'editorial',
-  'laque-celadon':'laque','laque-pivoine':'laque','laque-encre':'laque','laque-bois':'laque','laque-ivoire':'laque',
   'aurora-brume':'aurora','aurora-aube':'aurora','aurora-lime':'aurora','aurora-ambre':'aurora','aurora-sel':'aurora',
 };
 function _themeFamily(id) { return _THEME_FAMILY_MAP[id] || id; }
@@ -8864,7 +8754,6 @@ function createCard(item, idx) {
     case 'velvet-luxe':    card = _cardVelvet(item, idx);break;
     case 'prestige':       card = _cardPrestige(item);   break;
     case 'aurora':         card = _cardAurora(item);     break;
-    case 'laque':          card = _cardPrestige(item);   break;
     case 'santorin':        card = _cardSantorin(item);    break;
     case 'carte-classique': card = _cardClassique(item);  break;
     case 'carte-sommelier': card = _cardSommelier(item);  break;

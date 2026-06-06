@@ -4848,7 +4848,7 @@ function renderCatsSection() {
   });
 }
 
-document.getElementById('btn-add-cat').addEventListener('click', () => {
+function addCategory() {
   if (navigator.vibrate) navigator.vibrate(60);
   const names = {};
   LANGS.forEach(l => { names[l] = (ADMIN_UI[l] || ADMIN_UI.fr).newCat; });
@@ -4856,7 +4856,8 @@ document.getElementById('btn-add-cat').addEventListener('click', () => {
   markUnsaved();
   renderCatsSection();
   renderProductsSection();
-});
+}
+document.getElementById('btn-add-cat').addEventListener('click', addCategory);
 
 document.getElementById('btn-save-cats').addEventListener('click', () => {
   saveData();
