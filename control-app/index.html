@@ -659,37 +659,77 @@
     .forfait-seg-wrap.right .forfait-seg-slider { transform:translateX(100%); }
 
     .dp-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem;
       margin-bottom: 0.75rem;
     }
-    .dp-item { display: flex; flex-direction: column; gap: 0.4rem; }
-    .dp-num { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-    .dp-preview {
-      width: 100%; height: 70px;
-      background: var(--bg); border: 1px dashed var(--border);
-      border-radius: 8px; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
+    .dp-item { display: flex; flex-direction: column; gap: 0.45rem; }
+    .dp-num {
+      font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--gold); opacity: 0.75; font-weight: 600;
     }
+    .dp-preview {
+      width: 100%; height: 110px;
+      background: var(--bg); border: 1.5px dashed rgba(200,164,78,0.22);
+      border-radius: 10px; overflow: hidden; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s;
+    }
+    .dp-preview.has-photo { border-style: solid; border-color: rgba(200,164,78,0.4); }
     .dp-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .dp-cam { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); }
-    .dp-cam span { font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; }
-    .dp-btns { display: flex; gap: 0.35rem; }
+    .dp-cam { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--muted); }
+    .dp-cam svg { opacity: 0.28; }
+    .dp-cam span { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .dp-loading {
+      position: absolute; inset: 0; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(10,9,8,0.55); border-radius: 10px;
+    }
+    .dp-loading.active { display: flex; }
+    .dp-spinner {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2.5px solid rgba(200,164,78,0.25);
+      border-top-color: var(--gold);
+      animation: dp-spin 0.7s linear infinite;
+    }
+    @keyframes dp-spin { to { transform: rotate(360deg); } }
+    .dp-btns { display: flex; gap: 0.4rem; }
     .dp-upload-btn {
-      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
-      padding: 0.4rem 0.5rem;
-      background: var(--gold-dim); border: 1px solid rgba(200,164,78,0.28);
-      border-radius: 6px; color: var(--gold);
-      font-size: 0.73rem; font-weight: 500; cursor: pointer;
-      white-space: nowrap;
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 0.52rem 0.5rem;
+      background: linear-gradient(160deg, #e2c278 0%, #c8a44e 50%, #9a7a35 100%);
+      border: none; border-radius: 8px;
+      color: #1a1208; font-size: 0.71rem; font-weight: 700; cursor: pointer;
+      white-space: nowrap; font-family: inherit; letter-spacing: 0.02em;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.28) inset,
+        0 -1px 0 rgba(0,0,0,0.18) inset,
+        0 3px 0 #7a5018,
+        0 4px 10px rgba(0,0,0,0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative; overflow: hidden;
+    }
+    .dp-upload-btn::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+      border-radius: 8px 8px 0 0; pointer-events: none;
+    }
+    .dp-upload-btn:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.28) inset,
+        0 -1px 0 rgba(0,0,0,0.18) inset,
+        0 1px 0 #7a5018,
+        0 2px 5px rgba(0,0,0,0.25);
     }
     .dp-del-btn {
-      padding: 0.4rem 0.55rem;
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 6px; color: var(--muted); font-size: 0.75rem;
-      cursor: pointer; flex-shrink: 0;
-      transition: border-color 0.2s, color 0.2s;
+      padding: 0.52rem 0.6rem;
+      background: rgba(239,83,80,0.07); border: 1px solid rgba(239,83,80,0.22);
+      border-radius: 8px; color: rgba(239,83,80,0.55); font-size: 0.8rem;
+      cursor: pointer; flex-shrink: 0; font-family: inherit;
+      transition: all 0.2s;
     }
-    .dp-del-btn:hover { border-color: var(--red); color: var(--red); }
+    .dp-del-btn:hover { background: rgba(239,83,80,0.15); border-color: var(--red); color: var(--red); }
     .dp-open-demo-btn {
       display: block; width: 100%; margin-bottom: 1.2rem;
       padding: 0.88rem 1.2rem;
@@ -1201,34 +1241,34 @@
       <div class="settings-section">
         <div class="settings-title">📸 Photos — Page Démo</div>
         <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
-        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.85rem; line-height:1.6;">
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:1rem; line-height:1.6;">
           Ces 5 photos apparaissent dans le diaporama de la page de démonstration publique.
         </div>
         <div class="dp-grid">
           <div class="dp-item">
             <div class="dp-num">Photo 1</div>
-            <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',1,'demo')">✕</button></div>
+            <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-1"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',1,'demo')" title="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 2</div>
-            <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',2,'demo')">✕</button></div>
+            <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-2"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',2,'demo')" title="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 3</div>
-            <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',3,'demo')">✕</button></div>
+            <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-3"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',3,'demo')" title="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 4</div>
-            <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',4,'demo')">✕</button></div>
+            <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-4"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',4,'demo')" title="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 5</div>
-            <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.35"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📤 Photo<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('cafe-elysee',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('cafe-elysee',5,'demo')">✕</button></div>
+            <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-5"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer">✕</button></div>
           </div>
         </div>
       </div>
@@ -2687,17 +2727,29 @@ const DP_MAX_W  = 1600;
 function showDemoPhoto(id, n, url) {
   const img  = document.getElementById('dp-img-'+id+'-'+n);
   const prev = document.getElementById('dp-prev-'+id+'-'+n);
+  const load = document.getElementById('dp-load-'+id+'-'+n);
   if (!img || !prev) return;
-  if (!url) { img.src=''; img.style.display='none'; const cam=prev.querySelector('.dp-cam'); if(cam) cam.style.display=''; return; }
+  if (load) load.classList.remove('active');
+  if (!url) {
+    img.src = ''; img.style.display = 'none';
+    prev.classList.remove('has-photo');
+    const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = '';
+    return;
+  }
   img.src = url; img.style.display = 'block';
+  prev.classList.add('has-photo');
   const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = 'none';
 }
 
-function uploadDemoPhoto(slug, n, input) {
+function _dpSetLoading(id, n, on) {
+  const load = document.getElementById('dp-load-'+id+'-'+n);
+  if (load) load.classList.toggle('active', on);
+}
+
+function uploadDemoPhoto(id, n, input) {
   const file = input.files[0];
   input.value = '';
   if (!file) return;
-  const id = slug.replace(/-/g,'_');
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -2709,8 +2761,8 @@ function uploadDemoPhoto(slug, n, input) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-      // Aperçu local immédiat
       showDemoPhoto(id, n, canvas.toDataURL('image/jpeg', 0.82));
+      _dpSetLoading(id, n, true);
       showToast('Upload en cours…');
 
       canvas.toBlob(async blob => {
@@ -2735,9 +2787,9 @@ function uploadDemoPhoto(slug, n, input) {
   reader.readAsDataURL(file);
 }
 
-async function deleteDemoPhoto(slug, n, id) {
+async function deleteDemoPhoto(id, n, domId) {
   await _saasDb.ref('demoPage/heroSlides/' + n).set(null);
-  showDemoPhoto(id, n, '');
+  showDemoPhoto(domId, n, '');
   showToast('Photo supprimée');
 }
 
