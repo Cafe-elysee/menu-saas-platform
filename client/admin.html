@@ -1994,32 +1994,44 @@
   <!-- ── PANEL 3 : Réglages ── -->
   <div id="admin-panel-settings" class="admin-panel" style="display:none">
 
-    <div class="settings-section" id="sec-settings-name">
-      <div class="settings-sec-hd">Nom</div>
-      <div style="padding:0 18px 16px;display:flex;gap:10px;align-items:center">
-        <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom" style="flex:1">
-        <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveRestaurantName()">Mettre à jour</button>
+    <!-- SECTION 1 : Identifiants -->
+    <div class="settings-section">
+      <div id="sec-settings-identity-hd" class="settings-sec-hd">Identifiants</div>
+
+      <div id="sec-settings-name" style="padding:0 18px 4px">
+        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:6px;font-weight:500;letter-spacing:0.04em">Nom</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom" style="flex:1">
+          <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveRestaurantName()">Mettre à jour</button>
+        </div>
+        <div id="settings-name-fb" style="font-size:0.76rem;min-height:1.2em;margin-top:4px"></div>
       </div>
-      <div id="settings-name-fb" style="padding:0 18px 10px;font-size:0.76rem;min-height:1.2em"></div>
-    </div>
 
-    <div class="settings-section" id="sec-settings-pwd">
-      <div class="settings-sec-hd">Mot de passe admin</div>
-      <div style="padding:0 18px 16px;display:flex;gap:10px;align-items:center">
-        <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
-        <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveAdminPassword()">Mettre à jour</button>
+      <div style="margin:4px 18px 8px;height:1px;background:rgba(200,164,78,0.1)"></div>
+
+      <div id="sec-settings-pwd" style="padding:0 18px 16px">
+        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:6px;font-weight:500;letter-spacing:0.04em">Mot de passe admin</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
+          <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveAdminPassword()">Mettre à jour</button>
+        </div>
+        <div id="settings-pwd-fb" style="font-size:0.76rem;min-height:1.2em;margin-top:4px"></div>
       </div>
-      <div id="settings-pwd-fb" style="padding:0 18px 10px;font-size:0.76rem;min-height:1.2em"></div>
     </div>
 
-    <div class="settings-section" id="sec-settings-langs">
-      <div class="settings-sec-hd">Langues disponibles</div>
-      <div id="settings-langs-list" style="padding:0 18px 16px;display:flex;flex-direction:column;gap:6px"></div>
-    </div>
+    <!-- SECTION 2 : Paramètres de langue -->
+    <div class="settings-section">
+      <div id="sec-settings-lang-section-hd" class="settings-sec-hd">Paramètres de langue</div>
 
-    <div class="settings-section" id="sec-settings-lang-params">
-      <div class="settings-sec-hd">Langues — Paramètres</div>
-      <div style="padding:0 18px 16px;display:flex;flex-direction:column;gap:12px">
+      <div id="sec-settings-langs" style="padding:0 18px 8px">
+        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:8px;font-weight:500;letter-spacing:0.04em">Langues disponibles</div>
+        <div id="settings-langs-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <div style="margin:4px 18px 8px;height:1px;background:rgba(200,164,78,0.1)"></div>
+
+      <div id="sec-settings-lang-params" style="padding:0 18px 16px;display:flex;flex-direction:column;gap:12px">
+        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:0;font-weight:500;letter-spacing:0.04em">Langues — Paramètres</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
           <span id="settings-default-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue affichée (1ère visite)</span>
           <select id="settings-default-lang" class="settings-sel" onchange="adminSetDefaultLang(this.value)"></select>
@@ -2375,6 +2387,7 @@ const ADMIN_UI = {
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
     tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις', tabSettings:'⚙️ Ρυθμίσεις',
+    settingsIdentity:'Στοιχεία', settingsLangSection:'Ρυθμίσεις γλώσσας',
     settingsName:'Όνομα', settingsLangs:'Διαθέσιμες γλώσσες', settingsLangParams:'Γλώσσες — Ρυθμίσεις',
     settingsPwd:'Κωδικός διαχειριστή', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
     settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
@@ -2493,6 +2506,7 @@ const ADMIN_UI = {
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
     tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels', tabSettings:'⚙️ Réglages',
+    settingsIdentity:'Identifiants', settingsLangSection:'Paramètres de langue',
     settingsName:'Nom', settingsLangs:'Langues disponibles', settingsLangParams:'Langues — Paramètres',
     settingsPwd:'Mot de passe admin', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
@@ -2611,6 +2625,7 @@ const ADMIN_UI = {
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
     tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls', tabSettings:'⚙️ Settings',
+    settingsIdentity:'Credentials', settingsLangSection:'Language settings',
     settingsName:'Name', settingsLangs:'Available languages', settingsLangParams:'Languages — Settings',
     settingsPwd:'Admin password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
     settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
@@ -2729,6 +2744,7 @@ const ADMIN_UI = {
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
     tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe', tabSettings:'⚙️ Einstellungen',
+    settingsIdentity:'Anmeldedaten', settingsLangSection:'Spracheinstellungen',
     settingsName:'Name', settingsLangs:'Verfügbare Sprachen', settingsLangParams:'Sprachen — Einstellungen',
     settingsPwd:'Admin-Passwort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
     settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
@@ -2847,6 +2863,7 @@ const ADMIN_UI = {
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
     tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات', tabSettings:'⚙️ الإعدادات',
+    settingsIdentity:'بيانات الهوية', settingsLangSection:'إعدادات اللغة',
     settingsName:'الاسم', settingsLangs:'اللغات المتاحة', settingsLangParams:'اللغات — الإعدادات',
     settingsPwd:'كلمة مرور الإدارة', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
     settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
@@ -3988,7 +4005,11 @@ function applyAdminUI(l) {
   if (_tabD) { const _s = _tabD.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabDisplay || _s.textContent; }
   if (_tabO) { const _s = _tabO.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabOrders || _s.textContent; }
   if (_tabS) { const _s = _tabS.querySelector('.admin-nav-label'); if (_s) _s.textContent = t.tabSettings || _s.textContent; }
-  // Réglages panel labels
+  // Réglages panel labels — en-têtes de groupe
+  const _setEl2 = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.textContent = t[key]; };
+  _setEl2('sec-settings-identity-hd', 'settingsIdentity');
+  _setEl2('sec-settings-lang-section-hd', 'settingsLangSection');
+  // Réglages panel labels — sous-étiquettes
   const _setLabels = [
     ['sec-settings-name','settingsName'],['sec-settings-langs','settingsLangs'],
     ['sec-settings-lang-params','settingsLangParams'],['sec-settings-pwd','settingsPwd']
