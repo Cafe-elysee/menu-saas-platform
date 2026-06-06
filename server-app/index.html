@@ -34,13 +34,13 @@
       --bg2:     #ece7de;
       --surface: #ffffff;
       --card:    rgba(255,255,255,0.92);
-      --gold:    #a86840;
-      --gold-l:  #c4855a;
-      --gold-d:  #7d5130;
+      --gold:    #c8a44e;
+      --gold-l:  #e2c47a;
+      --gold-d:  #9a7a35;
       --cream:   #1c1710;
       --muted:   rgba(28,23,16,0.48);
-      --border:  rgba(168,104,64,0.15);
-      --bord2:   rgba(168,104,64,0.38);
+      --border:  rgba(200,164,78,0.15);
+      --bord2:   rgba(200,164,78,0.38);
       --green:   #3d8b30;
       --blue:    #0066bb;
     }
@@ -112,8 +112,8 @@
     }
     html.light .app-header {
       background:rgba(245,240,232,0.97);
-      border-bottom-color:rgba(168,104,64,0.18);
-      box-shadow:0 1px 0 rgba(168,104,64,0.07), 0 4px 20px rgba(0,0,0,0.06);
+      border-bottom-color:rgba(200,164,78,0.18);
+      box-shadow:0 1px 0 rgba(200,164,78,0.07), 0 4px 20px rgba(0,0,0,0.06);
     }
     .header-brand { display:flex; flex-direction:column; gap:2px; }
     .header-logo {
@@ -142,7 +142,7 @@
       font-size:0.66rem; color:var(--muted);
       transition:var(--tr); white-space:nowrap;
     }
-    html.light .conn-badge { background:rgba(0,0,0,0.04); border-color:rgba(168,104,64,0.22); }
+    html.light .conn-badge { background:rgba(0,0,0,0.04); border-color:rgba(200,164,78,0.22); }
     html.light .conn-badge.on { color:#3d7a33; border-color:rgba(61,122,51,0.35); background:rgba(61,122,51,0.05); }
     .conn-dot { width:7px; height:7px; border-radius:50%; background:rgba(244,234,210,0.2); transition:background 0.4s; }
     .conn-badge.on { border-color:rgba(126,189,106,0.35); color:var(--green); background:rgba(126,189,106,0.06); }
@@ -228,7 +228,7 @@
     html[dir="rtl"] .call-item { flex-direction:row-reverse; border-left:1px solid rgba(200,164,78,0.12); border-right:3px solid rgba(200,164,78,0.4); }
     html.light .call-item {
       background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
-      border-color:rgba(168,104,64,0.14); border-left-color:rgba(168,104,64,0.42);
+      border-color:rgba(200,164,78,0.14); border-left-color:rgba(200,164,78,0.42);
       box-shadow:0 4px 18px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
     }
     html.light .call-item.fresh { border-left-color:var(--gold); }
@@ -286,7 +286,7 @@
     .order-card.st-done::before     { background:linear-gradient(90deg, var(--green), rgba(126,189,106,0.25) 70%, transparent); }
     html.light .order-card {
       background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
-      border-color:rgba(168,104,64,0.12);
+      border-color:rgba(200,164,78,0.12);
       box-shadow:0 4px 18px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
     }
     .order-card.st-pending  { border-color:rgba(200,164,78,0.22); }
@@ -338,7 +338,7 @@
       padding:0 16px 16px;
       border-top:1px solid rgba(255,255,255,0.05);
     }
-    html.light .order-body-pad { border-top-color:rgba(168,104,64,0.1); }
+    html.light .order-body-pad { border-top-color:rgba(200,164,78,0.1); }
     .order-items-lbl { font-size:0.74rem; color:var(--muted); margin-bottom:10px; line-height:1.7; padding-top:12px; }
     .order-total-lbl { font-size:0.8rem; color:var(--cream); font-weight:600; margin-bottom:13px; }
     .order-status-btns { display:flex; gap:7px; }
@@ -349,8 +349,8 @@
       cursor:pointer; transition:var(--tr); font-family:inherit; text-align:center;
     }
     html.light .order-st-btn {
-      border-color:rgba(168,104,64,0.2); color:rgba(28,23,16,0.5);
-      background:rgba(168,104,64,0.04);
+      border-color:rgba(200,164,78,0.2); color:rgba(28,23,16,0.5);
+      background:rgba(200,164,78,0.04);
     }
     .order-st-btn:active { transform:scale(0.96); }
     .order-st-btn.active {
@@ -382,8 +382,8 @@
     }
     html[dir="rtl"] .msg-bubble { border-radius:20px 6px 20px 20px; margin-left:auto; }
     html.light .msg-bubble {
-      background:linear-gradient(160deg, rgba(168,104,64,0.07) 0%, rgba(168,104,64,0.02) 100%);
-      border-color:rgba(168,104,64,0.18);
+      background:linear-gradient(160deg, rgba(200,164,78,0.07) 0%, rgba(200,164,78,0.02) 100%);
+      border-color:rgba(200,164,78,0.18);
       box-shadow:0 3px 12px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.85);
     }
     .msg-item.unread .msg-bubble {
@@ -418,7 +418,7 @@
     }
     html.light .bottom-nav {
       background:rgba(245,240,232,0.97);
-      border-top-color:rgba(168,104,64,0.18);
+      border-top-color:rgba(200,164,78,0.18);
       box-shadow:0 -4px 20px rgba(0,0,0,0.06);
     }
     .nav-btn {

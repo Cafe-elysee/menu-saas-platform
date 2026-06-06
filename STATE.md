@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-06 (commit 812f0b4)
+## Dernière mise à jour : 2026-06-06 (gold light mode fix)
 
 ---
 
@@ -35,7 +35,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 | Fichier | Taille | Rebuild |
 |---------|--------|---------|
 | `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-06 ✅ |
-| `MenuProServeur-SaaS-v1.0.apk` | 6.8 MB | 2026-06-06 ✅ |
+| `MenuProServeur-SaaS-v1.0.apk` | 6.9 MB | 2026-06-06 ✅ |
 
 > Les changements FABs admin / bouton retour modal sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
 
@@ -187,6 +187,7 @@ demoPage/                           → lecture + écriture publique
 | Traductions 5 langues complètes admin + server-app | ✅ |
 | Onglet Réglages admin (Nom, Langues, MDP) — sections plates | ✅ |
 | Boutons gold #c8a44e hardcodé dark + light (admin + control-app) | ✅ |
+| Gold light mode — admin + server-app : --gold #c8a44e (pas #a86840), textes ico-modal-title + lang-tab→var(--cream) | ✅ |
 | Toggles langues gold #c8a44e hardcodé light mode | ✅ |
 | Sync temps réel admin ↔ control-app | ✅ |
 | Forfait Client segmented control (spring animation) | ✅ |
