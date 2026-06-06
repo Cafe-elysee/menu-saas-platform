@@ -7170,7 +7170,7 @@ function closeIconModal() {
    ANALYTICS — Onglets + Graphiques
    ═══════════════════════════════════════════════════════ */
 
-let _adminCurrentTab    = 'display';
+let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
 let _adminCurrentPeriod = localStorage.getItem(_PFX + 'analytics_period') || 'today';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
