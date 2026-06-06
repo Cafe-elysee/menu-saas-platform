@@ -7170,7 +7170,7 @@ function closeIconModal() {
    ANALYTICS — Onglets + Graphiques
    ═══════════════════════════════════════════════════════ */
 
-let _adminCurrentTab    = localStorage.getItem(_PFX + 'adm_tab') || 'display';
+let _adminCurrentTab    = 'display';
 let _adminCurrentPeriod = localStorage.getItem(_PFX + 'analytics_period') || 'today';
 let _adminCustomStart   = null;
 let _adminCustomEnd     = null;
@@ -7560,6 +7560,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const cr = document.getElementById('analytics-custom-range');
   if (cr) cr.classList.toggle('show', _adminCurrentPeriod === 'custom');
   _initDatePickers();
+});
+
+/* ── bfcache : évite le flash de l'onglet précédent au retour navigateur ── */
+window.addEventListener('pagehide', () => {
+  const wrap = document.getElementById('adm-wrap');
+  if (wrap) wrap.style.display = 'none';
+});
+window.addEventListener('pageshow', event => {
+  if (!event.persisted) return;
+  // Restauration bfcache — remettre l'onglet par défaut sans flash
+  _adminCurrentTab = 'display';
+  ['display','orders','settings'].forEach(t => {
+    const p = document.getElementById('admin-panel-' + t);
+    if (p) p.style.display = t === 'display' ? '' : 'none';
+    document.getElementById('admin-tab-' + t)?.classList.toggle('on', t === 'display');
+  });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const wrap = document.getElementById('adm-wrap');
+  if (wrap) wrap.style.display = '';
+  _updateScFabVisibility?.();
 });
 
 
