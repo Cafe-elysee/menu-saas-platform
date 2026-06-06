@@ -291,8 +291,8 @@
     }
     .order-card.st-pending  { border-color:rgba(200,164,78,0.22); }
     .order-card.st-progress { border-color:rgba(77,184,255,0.2); }
-    .order-card.st-done     { border-color:rgba(126,189,106,0.15); opacity:0.55; }
-    html.light .order-card.st-done { opacity:0.65; }
+    .order-card.st-done     { border-color:rgba(126,189,106,0.15); opacity:0.70; }
+    html.light .order-card.st-done { opacity:0.75; }
     .order-card-hd {
       display:flex; align-items:center; gap:10px;
       padding:18px 16px 14px;
@@ -474,6 +474,44 @@
 
     /* Réduction taille Greek pour Table / À emporter */
     html[lang="el"] .order-table-lbl { font-size: 1.05rem; }
+
+    /* ── Loading screen élégant ── */
+    @keyframes srvPulse { 0%,100%{opacity:0.6;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
+    @keyframes srvRingRot { to{transform:rotate(360deg)} }
+    @keyframes srvFadeOut { to{opacity:0;pointer-events:none} }
+    #srv-loading-screen {
+      position:fixed; inset:0; z-index:99999;
+      background:var(--bg);
+      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0;
+      transition:opacity 0.45s ease;
+    }
+    #srv-loading-screen.hide { animation:srvFadeOut 0.45s ease forwards; }
+    .srv-loading-logo {
+      width:72px; height:72px; position:relative; margin-bottom:28px;
+    }
+    .srv-loading-logo-inner {
+      width:72px; height:72px; border-radius:22px;
+      background:linear-gradient(135deg,rgba(200,164,78,0.15),rgba(200,164,78,0.05));
+      border:1.5px solid rgba(200,164,78,0.28);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem;
+      animation:srvPulse 1.8s ease-in-out infinite;
+    }
+    .srv-loading-ring {
+      position:absolute; inset:-8px;
+      border-radius:28px;
+      border:1.5px solid transparent;
+      border-top-color:rgba(200,164,78,0.55);
+      border-right-color:rgba(200,164,78,0.18);
+      animation:srvRingRot 1.4s linear infinite;
+    }
+    .srv-loading-title {
+      font-family:'Crimson Pro',Georgia,serif;
+      font-size:1.35rem; color:var(--gold); letter-spacing:0.06em; margin-bottom:6px;
+    }
+    .srv-loading-sub {
+      font-size:0.68rem; color:var(--muted); letter-spacing:0.18em; text-transform:uppercase;
+    }
   </style>
   <script>
     (function() {
@@ -504,6 +542,15 @@
   </script>
 </head>
 <body>
+
+<div id="srv-loading-screen">
+  <div class="srv-loading-logo">
+    <div class="srv-loading-logo-inner">🍽️</div>
+    <div class="srv-loading-ring"></div>
+  </div>
+  <div class="srv-loading-title">Menu Pro</div>
+  <div class="srv-loading-sub">Serveur</div>
+</div>
 
 <div id="srv-pause-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:320px;width:100%">
@@ -1526,6 +1573,7 @@ function _applyInitialTab() {
         document.getElementById('srv-forfait-title').textContent = fp.title;
         document.getElementById('srv-forfait-msg').innerHTML = fp.msg;
         document.getElementById('srv-forfait-change-btn').textContent = fp.changeId;
+        _hideSrvLoading();
         fs.style.display = 'flex';
       }
       return;
@@ -1770,6 +1818,7 @@ function confirmSetupRid() {
 function init() {
   // Premier lancement sans rid → écran de configuration
   if (window._NEEDS_SETUP) {
+    _hideSrvLoading();
     document.getElementById('setup-screen').style.display = 'flex';
     var inp = document.getElementById('setup-rid-input');
     if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmSetupRid(); });
@@ -1798,6 +1847,7 @@ function init() {
       if (icoEl) icoEl.textContent = d.icon;
       if (titEl) titEl.textContent = d.title;
       if (msgEl) msgEl.innerHTML   = d.msg;
+      _hideSrvLoading();
       if (screen) screen.style.display = 'flex';
       return;
     }
@@ -1815,6 +1865,7 @@ function init() {
       if (icoEl) icoEl.textContent = p.icon;
       if (titEl) titEl.textContent = p.title;
       if (msgEl) msgEl.innerHTML   = p.msg;
+      _hideSrvLoading();
       if (screen) screen.style.display = 'flex';
       return;
     }
@@ -1827,7 +1878,15 @@ function init() {
   });
 }
 
+function _hideSrvLoading() {
+  var el = document.getElementById('srv-loading-screen');
+  if (!el) return;
+  el.classList.add('hide');
+  setTimeout(function() { el.style.display = 'none'; }, 500);
+}
+
 function _startApp() {
+  _hideSrvLoading();
   _rref('/config/primaryLang').on('value', function(snap) {
     var val = snap.val();
     if (val) {

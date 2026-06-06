@@ -1734,6 +1734,101 @@
     .settings-sec-hd { font-size:1.15rem; padding:14px 18px 10px; }
     .btn-settings-gold { padding:10px 16px; font-size:0.84rem; }
   }
+
+  /* ── MODAL ENTRANCE / EXIT ANIMATION ── */
+  @keyframes admModalIn {
+    from { opacity:0; transform:scale(0.92) translateY(8px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+  @keyframes admModalOut {
+    from { opacity:1; transform:scale(1) translateY(0); }
+    to   { opacity:0; transform:scale(0.92) translateY(8px); }
+  }
+  .adm-modal-box { animation:admModalIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
+  .adm-modal-box.out { animation:admModalOut 0.18s ease forwards; }
+
+  /* ── STAGGER ENTRANCE — catégories ── */
+  @keyframes rowStagger {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .cat-row { animation:rowStagger 0.32s cubic-bezier(0.4,0,0.2,1) both; }
+  .cat-row:nth-child(1)  { animation-delay:0ms; }
+  .cat-row:nth-child(2)  { animation-delay:40ms; }
+  .cat-row:nth-child(3)  { animation-delay:80ms; }
+  .cat-row:nth-child(4)  { animation-delay:120ms; }
+  .cat-row:nth-child(5)  { animation-delay:160ms; }
+  .cat-row:nth-child(6)  { animation-delay:200ms; }
+  .cat-row:nth-child(7)  { animation-delay:240ms; }
+  .cat-row:nth-child(8)  { animation-delay:270ms; }
+  .cat-row:nth-child(n+9){ animation-delay:290ms; }
+
+  /* ── STAGGER ENTRANCE — produits ── */
+  @keyframes cardStagger {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .prod-card { animation:cardStagger 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+  .prod-card:nth-child(1)  { animation-delay:0ms; }
+  .prod-card:nth-child(2)  { animation-delay:40ms; }
+  .prod-card:nth-child(3)  { animation-delay:80ms; }
+  .prod-card:nth-child(4)  { animation-delay:120ms; }
+  .prod-card:nth-child(5)  { animation-delay:160ms; }
+  .prod-card:nth-child(6)  { animation-delay:200ms; }
+  .prod-card:nth-child(n+7){ animation-delay:230ms; }
+
+  /* ── FAB SUCCESS ANIMATION ── */
+  @keyframes fabSuccess {
+    0%   { transform:scale(1); }
+    40%  { transform:scale(1.18); box-shadow:0 0 0 8px rgba(200,164,78,0.18); }
+    70%  { transform:scale(0.96); }
+    100% { transform:scale(1); box-shadow:0 6px 24px rgba(200,164,78,0.45); }
+  }
+  #fab-save.fab-success { animation:fabSuccess 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+  /* ── FAB IDLE (rien à sauvegarder) ── */
+  #fab-save.fab-visible:not(.unsaved):not(.fab-success) { opacity:0.42; }
+  #fab-save.fab-visible:not(.unsaved):not(.fab-success):hover { opacity:1; }
+
+  /* ── SKELETON LOADER ── */
+  @keyframes skeletonPulse {
+    0%,100% { opacity:0.45; }
+    50%     { opacity:0.18; }
+  }
+  .skeleton-row {
+    height:52px; border-radius:12px; margin-bottom:10px;
+    background:var(--bord2); animation:skeletonPulse 1.4s ease-in-out infinite;
+  }
+  .skeleton-card {
+    height:90px; border-radius:14px; margin-bottom:10px;
+    background:var(--bord2); animation:skeletonPulse 1.4s ease-in-out infinite;
+  }
+  .skeleton-card:nth-child(2) { animation-delay:0.15s; opacity:0.75; }
+  .skeleton-card:nth-child(3) { animation-delay:0.3s; opacity:0.55; }
+
+  /* ── EMPTY STATE MENU ── */
+  .menu-empty-state {
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:48px 24px; text-align:center;
+  }
+  .menu-empty-icon {
+    width:64px; height:64px; border-radius:20px;
+    background:rgba(200,164,78,0.07); border:1px solid rgba(200,164,78,0.18);
+    display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+  }
+  .menu-empty-title {
+    font-family:'Crimson Pro',Georgia,serif; font-size:1.1rem; color:var(--cream);
+    font-weight:600; letter-spacing:0.03em;
+  }
+  .menu-empty-sub { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+  .menu-empty-cta {
+    margin-top:4px; padding:10px 22px;
+    background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+    border:none; border-radius:10px; color:#0c0a08;
+    font-size:0.85rem; font-weight:600; cursor:pointer;
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .menu-empty-cta:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(200,164,78,0.38); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
@@ -2111,7 +2206,7 @@
 
 <!-- ── ADMIN CONFIRM MODAL (changement mot de passe) ── -->
 <div id="adm-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
-  <div style="width:100%;max-width:320px;background:var(--card);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
+  <div class="adm-modal-box" style="width:100%;max-width:320px;background:var(--card);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
     <div id="adm-confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
     <div id="adm-confirm-msg" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
     <div style="display:flex;gap:10px;">
@@ -2469,6 +2564,8 @@ const ADMIN_UI = {
     pwdConfirmTitle:'Αλλαγή κωδικού', pwdConfirmMsg:'Αυτή η αλλαγή θα σας αποσυνδέσει από όλες τις συσκευές. Θα χρειαστεί να συνδεθείτε ξανά με τον νέο κωδικό.', pwdConfirmOk:'Επιβεβαίωση', pwdConfirmCancel:'Ακύρωση', pwdChangedLogout:'✅ Κωδικός άλλαξε — συνδεθείτε ξανά',
     changeIdBtn:'Αλλαγή ID', changeIdConfirmTitle:'Αλλαγή ID', changeIdConfirmMsg:'Θα μεταφερθείτε στην επιλογή ID. Μπορείτε να επιστρέψετε εδώ χωρίς να εισάγετε ξανά τον κωδικό.', changeIdConfirmOk:'Επιβεβαίωση', changeIdConfirmCancel:'Ακύρωση',
     settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
+    emptyMenuTitle:'Το μενού σας είναι άδειο', emptyMenuSub:'Ξεκινήστε δημιουργώντας την πρώτη σας κατηγορία.',
+    phPassword:'Κωδικός πρόσβασης', phPasswordNew:'Νέος κωδικός', phRestaurantName:'Όνομα',
     analyticsTitle:'Περίοδος ανάλυσης',
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
@@ -2592,6 +2689,8 @@ const ADMIN_UI = {
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
     changeIdBtn:'Changer d\'ID', changeIdConfirmTitle:'Changer d\'identifiant', changeIdConfirmMsg:'Vous serez redirigé vers le sélecteur d\'ID. Vous pourrez revenir ici sans saisir à nouveau le mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
     settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
+    emptyMenuTitle:'Votre menu est vide', emptyMenuSub:'Commencez par créer votre première catégorie pour ajouter des produits.',
+    phPassword:'Mot de passe', phPasswordNew:'Nouveau mot de passe', phRestaurantName:'Nom du restaurant',
     analyticsTitle:'Période d\'analyse',
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
@@ -2715,6 +2814,8 @@ const ADMIN_UI = {
     pwdConfirmTitle:'Change password', pwdConfirmMsg:'This change will sign you out of all devices. You will need to sign in again with the new password.', pwdConfirmOk:'Confirm', pwdConfirmCancel:'Cancel', pwdChangedLogout:'✅ Password changed — please sign in again',
     changeIdBtn:'Change ID', changeIdConfirmTitle:'Change ID', changeIdConfirmMsg:'You will be redirected to the ID selector. You can return here without entering your password again.', changeIdConfirmOk:'Confirm', changeIdConfirmCancel:'Cancel',
     settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
+    emptyMenuTitle:'Your menu is empty', emptyMenuSub:'Start by creating your first category to add products.',
+    phPassword:'Password', phPasswordNew:'New password', phRestaurantName:'Restaurant name',
     analyticsTitle:'Analysis period',
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
@@ -2838,6 +2939,8 @@ const ADMIN_UI = {
     pwdConfirmTitle:'Passwort ändern', pwdConfirmMsg:'Diese Änderung meldet Sie auf allen Geräten ab. Sie müssen sich mit dem neuen Passwort erneut anmelden.', pwdConfirmOk:'Bestätigen', pwdConfirmCancel:'Abbrechen', pwdChangedLogout:'✅ Passwort geändert — bitte erneut anmelden',
     changeIdBtn:'ID ändern', changeIdConfirmTitle:'ID ändern', changeIdConfirmMsg:'Sie werden zur ID-Auswahl weitergeleitet. Sie können ohne erneute Passworteingabe zurückkehren.', changeIdConfirmOk:'Bestätigen', changeIdConfirmCancel:'Abbrechen',
     settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
+    emptyMenuTitle:'Ihr Menü ist leer', emptyMenuSub:'Erstellen Sie zunächst Ihre erste Kategorie, um Produkte hinzuzufügen.',
+    phPassword:'Passwort', phPasswordNew:'Neues Passwort', phRestaurantName:'Restaurantname',
     analyticsTitle:'Analysezeitraum',
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
@@ -2961,6 +3064,8 @@ const ADMIN_UI = {
     pwdConfirmTitle:'تغيير كلمة المرور', pwdConfirmMsg:'هذا التغيير سيُسجّل خروجك من جميع الأجهزة. ستحتاج إلى تسجيل الدخول مجدداً بكلمة المرور الجديدة.', pwdConfirmOk:'تأكيد', pwdConfirmCancel:'إلغاء', pwdChangedLogout:'✅ تم تغيير كلمة المرور — سجّل الدخول مجدداً',
     changeIdBtn:'تغيير المعرّف', changeIdConfirmTitle:'تغيير المعرّف', changeIdConfirmMsg:'ستنتقل إلى شاشة اختيار المعرّف. يمكنك العودة هنا دون إدخال كلمة المرور مجدداً.', changeIdConfirmOk:'تأكيد', changeIdConfirmCancel:'إلغاء',
     settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
+    emptyMenuTitle:'قائمتك فارغة', emptyMenuSub:'ابدأ بإنشاء أول فئة لإضافة المنتجات.',
+    phPassword:'كلمة المرور', phPasswordNew:'كلمة مرور جديدة', phRestaurantName:'اسم المطعم',
     analyticsTitle:'فترة التحليل',
     filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
     chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
@@ -3125,11 +3230,24 @@ function _showAdmConfirm(title, msg, okLabel, cancelLabel, cb, isDanger) {
     okBtn.style.color = '#0c0a08';
   }
   _admConfirmCb = cb;
-  document.getElementById('adm-confirm-modal').style.display = 'flex';
+  const modal = document.getElementById('adm-confirm-modal');
+  const box = modal.querySelector('.adm-modal-box');
+  modal.style.display = 'flex';
+  box.classList.remove('out');
+  void box.offsetWidth;
+  box.style.animation = 'none';
+  void box.offsetWidth;
+  box.style.animation = '';
 }
 
 function _hideAdmConfirm() {
-  document.getElementById('adm-confirm-modal').style.display = 'none';
+  const modal = document.getElementById('adm-confirm-modal');
+  const box = modal.querySelector('.adm-modal-box');
+  box.classList.add('out');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    box.classList.remove('out');
+  }, 180);
   _admConfirmCb = null;
 }
 
@@ -3285,13 +3403,39 @@ document.getElementById('adm-theme-btn').addEventListener('click', () => {
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Fermeture des modales avec Echap
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const modal = document.getElementById('adm-confirm-modal');
+  if (modal && modal.style.display === 'flex') { _hideAdmConfirm(); return; }
+  if (typeof closeQRModal === 'function') {
+    const qr = document.getElementById('qr-modal');
+    if (qr && qr.style.display !== 'none') { closeQRModal(); return; }
+  }
+  const notifBox = document.getElementById('notif-box');
+  if (notifBox && notifBox.style.display !== 'none') {
+    if (typeof _hideNotifBox === 'function') _hideNotifBox();
+  }
+});
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   _logAction('logout');
   await _closeSession();
   location.reload();
 });
 
+let _loginAttempts = 0;
+let _loginBlockUntil = 0;
+
 async function doLogin() {
+  const errEl = document.getElementById('login-err');
+  const now = Date.now();
+  // Anti-bruteforce : bloquer si trop de tentatives récentes
+  if (_loginBlockUntil > now) {
+    const secs = Math.ceil((_loginBlockUntil - now) / 1000);
+    errEl.textContent = `Trop de tentatives — réessayez dans ${secs}s`;
+    return;
+  }
   const val = document.getElementById('pwd-input').value;
   const hash = await _hashPwd(val);
 
@@ -3302,21 +3446,28 @@ async function doLogin() {
   } catch {}
 
   if (hash === expectedHash) {
-    // Vérifier que le compte est actif avant d'ouvrir la session
+    _loginAttempts = 0;
     try {
       const actSnap = await _rref('/config/active').once('value');
       if (actSnap.val() === false || actSnap.val() === null) {
-        document.getElementById('login-err').textContent = 'Ce compte est suspendu ou introuvable.';
+        errEl.textContent = 'Ce compte est suspendu ou introuvable.';
         document.getElementById('pwd-input').value = '';
         document.getElementById('pwd-input').focus();
         return;
       }
-    } catch(e) {} // Erreur réseau → laisser passer
+    } catch(e) {}
     await _openSession();
     _logAction('login');
     showAdmin();
   } else {
-    document.getElementById('login-err').textContent = 'Mot de passe incorrect.';
+    _loginAttempts++;
+    if (_loginAttempts >= 5) {
+      _loginBlockUntil = Date.now() + 30000;
+      _loginAttempts = 0;
+      errEl.textContent = 'Trop de tentatives — accès bloqué 30 secondes.';
+    } else {
+      errEl.textContent = `Mot de passe incorrect (${_loginAttempts}/5).`;
+    }
     document.getElementById('pwd-input').value = '';
     document.getElementById('pwd-input').focus();
   }
@@ -3326,6 +3477,11 @@ let _adminActiveWatching = false;
 
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
+  // Skeleton pendant le chargement Firebase initial
+  const _catsList = document.getElementById('cats-list');
+  if (_catsList && !_catsList.innerHTML.trim()) {
+    _catsList.innerHTML = '<div class="skeleton-row"></div>'.repeat(4);
+  }
   // adm-wrap et adm-header restent cachés jusqu'au premier rendu Firebase (cf. applyMenuSnapshot)
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
@@ -3349,6 +3505,7 @@ function showAdmin() {
       const titleEl = document.getElementById('pm-title');
       if (logoEl)  logoEl.textContent  = name;
       if (titleEl) titleEl.textContent = name;
+      document.title = 'Admin — ' + name;
     }
   }).catch(() => {});
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
@@ -3550,29 +3707,38 @@ function sanitizeItems(items) {
 
 function saveData() {
   adminData.items = sanitizeItems(adminData.items);
-  // Toujours synchroniser le thème et le style actifs avant de sauvegarder,
-  // car adminData.menuTheme/menuStyle peut être périmé si le listener Firebase
-  // n'a pas encore mis à jour adminData depuis le dernier saveMenuTheme/saveMenuMode.
   adminData.menuTheme = currentMenuTheme;
   adminData.menuStyle = currentMenuMode;
-  _lastLocalSave = Date.now(); // bloquer le listener pendant 4s pour ne pas reboucler
+  _lastLocalSave = Date.now();
+  const fab = document.getElementById('fab-save');
+  const fabSvg = fab ? fab.querySelector('svg') : null;
+  // Spinner sur le FAB pendant la sauvegarde
+  if (fabSvg) fabSvg.innerHTML = '<circle cx="13" cy="13" r="9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="28 56" stroke-linecap="round" style="transform-origin:center;animation:fabSpin 0.7s linear infinite"/>';
+  if (!document.getElementById('fab-spin-style')) {
+    const s = document.createElement('style'); s.id = 'fab-spin-style';
+    s.textContent = '@keyframes fabSpin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+  function _afterSave(toast) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    localStorage.setItem(_PFX+'tx_hashes', JSON.stringify(adminData._txHashes || {}));
+    localStorage.setItem(_PFX+'tx_lock',   JSON.stringify(adminData._txLock   || {}));
+    unsaved = false;
+    if (fab) {
+      fab.classList.remove('unsaved');
+      fab.classList.add('fab-success');
+      // Icône coche
+      if (fabSvg) fabSvg.innerHTML = '<polyline points="5 13 10 18 21 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      setTimeout(() => {
+        fab.classList.remove('fab-success');
+        if (fabSvg) fabSvg.innerHTML = '<path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>';
+      }, 1400);
+    }
+    showToast(toast);
+  }
   _rref('menu').set(adminData)
-    .then(() => {
-      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-      localStorage.setItem(_PFX+'tx_hashes', JSON.stringify(adminData._txHashes || {}));
-      localStorage.setItem(_PFX+'tx_lock',   JSON.stringify(adminData._txLock   || {}));
-      unsaved = false;
-      document.getElementById('fab-save').classList.remove('unsaved');
-      showToast((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
-    })
-    .catch(() => {
-      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-      localStorage.setItem(_PFX+'tx_hashes', JSON.stringify(adminData._txHashes || {}));
-      localStorage.setItem(_PFX+'tx_lock',   JSON.stringify(adminData._txLock   || {}));
-      unsaved = false;
-      document.getElementById('fab-save').classList.remove('unsaved');
-      showToast('⚠️ Sauvegarde locale uniquement (pas de connexion)');
-    });
+    .then(() => _afterSave((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved))
+    .catch(() => _afterSave('⚠️ Sauvegarde locale uniquement (pas de connexion)'));
 }
 
 function markUnsaved() {
@@ -4398,6 +4564,13 @@ function applyAdminUI(l) {
     const lang = ta.dataset.lang || l;
     ta.placeholder = (t.notePh || '').replace('{L}', lang.toUpperCase());
   });
+  // Placeholders traduits — champs mot de passe
+  const _pwdInput = $('pwd-input');
+  if (_pwdInput) _pwdInput.placeholder = t.phPassword || 'Mot de passe';
+  const _settingsPwd = $('settings-pwd-input');
+  if (_settingsPwd) _settingsPwd.placeholder = t.phPasswordNew || (t.phPassword || 'Nouveau mot de passe');
+  const _settingsName = $('settings-name-input');
+  if (_settingsName) _settingsName.placeholder = t.phRestaurantName || 'Nom';
 }
 
 /* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
@@ -4472,6 +4645,18 @@ function renderCatsSection() {
   const list = document.getElementById('cats-list');
   document.getElementById('cat-count').textContent = adminData.cats.length;
   list.innerHTML = '';
+
+  // État vide élégant
+  if (!adminData.cats || adminData.cats.length === 0) {
+    const _te = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+    list.innerHTML = `<div class="menu-empty-state">
+      <div class="menu-empty-icon">🍽️</div>
+      <div class="menu-empty-title">${_te.emptyMenuTitle || 'Votre menu est vide'}</div>
+      <div class="menu-empty-sub">${_te.emptyMenuSub || 'Commencez par créer votre première catégorie pour ajouter des produits.'}</div>
+      <button class="menu-empty-cta" onclick="addCategory()">${_te.btnAddCat || '＋ Ajouter une catégorie'}</button>
+    </div>`;
+    return;
+  }
 
   // Lignes de catégories
   adminData.cats.forEach((cat, ci) => {
@@ -5876,7 +6061,10 @@ const THEMES_DATA = [
   { id:'livre-indigo',     styles:['paper'],  names:{el:'Ινδιγό',         fr:'Livre Indigo',       en:'Indigo Book',        de:'Indigobuch',            ar:'الكتاب النيلي'}, dark:'#080818', accent:'#8080e8' },
   { id:'livre-foret',      styles:['paper'],  names:{el:'Δάσος',          fr:'Livre Forêt',        en:'Forest Book',        de:'Waldbuch',              ar:'كتاب الغابة'},   dark:'#060e08', accent:'#c0b060' },
   // 1 thème Simple + Paper
-  { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        ar:'لوحة Bento'},    dark:'#121212', accent:'#ffffff' }
+  { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        ar:'لوحة Bento'},    dark:'#121212', accent:'#ffffff' },
+  // Nouveaux thèmes premium
+  { id:'laque',         styles:['paper','simple'], names:{el:'Λάκα',               fr:'Laque',              en:'Lacquer',            de:'Lackierung',             ar:'الورنيش'},        dark:'#080504', accent:'#c8b080' },
+  { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 ar:'أورورا'},         dark:'#0c0d14', accent:'#9070f8' },
 ];
 
 
@@ -5989,6 +6177,28 @@ const LAYOUTS_DATA = [
       { id: 'dyn-bento-blue',  accent: '#1e90ff' },
       { id: 'dyn-bento-green', accent: '#00fa9a' },
       { id: 'dyn-bento-pink',  accent: '#ff69b4' }
+    ]
+  },
+  {
+    family: 'laque', names: { el: 'Λάκα', fr: 'Laque', en: 'Lacquer', de: 'Lackierung', ar: 'الورنيش' },
+    variants: [
+      { id: 'laque',         accent: '#c8b080' },
+      { id: 'laque-celadon', accent: '#80c8a0' },
+      { id: 'laque-pivoine', accent: '#c87090' },
+      { id: 'laque-encre',   accent: '#7898d8' },
+      { id: 'laque-bois',    accent: '#c0844a' },
+      { id: 'laque-ivoire',  accent: '#d8ccb0' }
+    ]
+  },
+  {
+    family: 'aurora', names: { el: 'Αυρόρα', fr: 'Aurora', en: 'Aurora', de: 'Aurora', ar: 'أورورا' },
+    variants: [
+      { id: 'aurora',        accent: '#9070f8' },
+      { id: 'aurora-brume',  accent: '#40c8e0' },
+      { id: 'aurora-aube',   accent: '#f06858' },
+      { id: 'aurora-lime',   accent: '#4ade80' },
+      { id: 'aurora-ambre',  accent: '#f59e0b' },
+      { id: 'aurora-sel',    accent: '#c8d0e8' }
     ]
   },
 ];
