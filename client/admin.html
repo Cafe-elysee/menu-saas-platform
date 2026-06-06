@@ -2387,6 +2387,7 @@ const ADMIN_UI = {
     errTransFailed:'⚠ Μετάφραση απέτυχε (όριο API;) — τα δεδομένα EL αποθηκεύτηκαν',
     skipTx:        '— Αποθήκευση χωρίς μετάφραση (η αυτόματη μετάφραση λειτουργεί μόνο από τα Ελληνικά)',
     confirmDelete: 'Διαγραφή αυτού του προϊόντος;',
+    deleteTitle:'Διαγραφή προϊόντος', deleteCatTitle:'Διαγραφή κατηγορίας', deleteCatMsg:'Όλα τα προϊόντα της θα διαγραφούν οριστικά.', deleteBtn:'Διαγραφή', cancelBtn:'Ακύρωση',
     newProd:       'Νέο προϊόν',
     secHero:       'Εικόνα',
     badgeHero:     'Hero',
@@ -2509,6 +2510,7 @@ const ADMIN_UI = {
     errTransFailed:'⚠ Traduction échouée (limite API ?) — données EL sauvegardées',
     skipTx:        '— Enregistrement sans traduction (la traduction auto ne fonctionne que depuis le Grec)',
     confirmDelete: 'Supprimer ce produit ?',
+    deleteTitle:'Supprimer le produit', deleteCatTitle:'Supprimer la catégorie', deleteCatMsg:'Tous ses produits seront supprimés définitivement.', deleteBtn:'Supprimer', cancelBtn:'Annuler',
     newProd:       'Nouveau produit',
     secHero:       'Hero',
     badgeHero:     'Hero',
@@ -2631,6 +2633,7 @@ const ADMIN_UI = {
     errTransFailed:'⚠ Translation failed (API limit?) — EL data saved',
     skipTx:        '— Saved without translation (auto-translate only works from Greek)',
     confirmDelete: 'Delete this product?',
+    deleteTitle:'Delete product', deleteCatTitle:'Delete category', deleteCatMsg:'All its products will be permanently deleted.', deleteBtn:'Delete', cancelBtn:'Cancel',
     newProd:       'New product',
     secHero:       'Hero',
     badgeHero:     'Hero',
@@ -2753,6 +2756,7 @@ const ADMIN_UI = {
     errTransFailed:'⚠ Übersetzung fehlgeschlagen — EL-Daten gespeichert',
     skipTx:        '— Ohne Übersetzung gespeichert',
     confirmDelete: 'Dieses Produkt löschen?',
+    deleteTitle:'Produkt löschen', deleteCatTitle:'Kategorie löschen', deleteCatMsg:'Alle Produkte dieser Kategorie werden dauerhaft gelöscht.', deleteBtn:'Löschen', cancelBtn:'Abbrechen',
     newProd:       'Neues Produkt',
     secHero:       'Hero',
     badgeHero:     'Hero',
@@ -2875,6 +2879,7 @@ const ADMIN_UI = {
     errTransFailed:'⚠ فشلت الترجمة (حد API؟) — تم حفظ بيانات EL',
     skipTx:        '— حُفظ بدون ترجمة (الترجمة التلقائية تعمل فقط من اليونانية)',
     confirmDelete: 'حذف هذا المنتج؟',
+    deleteTitle:'حذف المنتج', deleteCatTitle:'حذف الفئة', deleteCatMsg:'ستُحذف جميع منتجاتها نهائياً.', deleteBtn:'حذف', cancelBtn:'إلغاء',
     newProd:       'منتج جديد',
     secHero:       'الصورة',
     badgeHero:     'Hero',
@@ -3082,11 +3087,19 @@ function _ridSelConfirm() {
 ═══════════════════════════════════════════ */
 let _admConfirmCb = null;
 
-function _showAdmConfirm(title, msg, okLabel, cancelLabel, cb) {
+function _showAdmConfirm(title, msg, okLabel, cancelLabel, cb, isDanger) {
   document.getElementById('adm-confirm-title').textContent = title;
   document.getElementById('adm-confirm-msg').innerHTML = msg;
   document.getElementById('adm-confirm-ok-btn').textContent = okLabel;
   document.getElementById('adm-confirm-cancel-btn').textContent = cancelLabel;
+  const okBtn = document.getElementById('adm-confirm-ok-btn');
+  if (isDanger) {
+    okBtn.style.background = 'linear-gradient(135deg,#e87070,#d94040,#b02020)';
+    okBtn.style.color = '#fff';
+  } else {
+    okBtn.style.background = 'linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d))';
+    okBtn.style.color = '#0c0a08';
+  }
   _admConfirmCb = cb;
   document.getElementById('adm-confirm-modal').style.display = 'flex';
 }
@@ -4531,14 +4544,23 @@ function renderCatsSection() {
 
     row.querySelector('.btn-del').addEventListener('click', e => {
       const i = parseInt(e.target.dataset.ci);
-      if (!confirm(`Supprimer la catégorie "${adminData.cats[i].names?.fr || i}" et tous ses produits ?`)) return;
-      if (navigator.vibrate) navigator.vibrate(60);
-      adminData.items = adminData.items.filter(it => it.cat !== i);
-      adminData.items.forEach(it => { if (it.cat > i) it.cat--; });
-      adminData.cats.splice(i, 1);
-      markUnsaved();
-      renderCatsSection();
-      renderProductsSection();
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.el;
+      const rawName = adminData.cats[i]?.names?.[currentLang] || adminData.cats[i]?.names?.fr || adminData.cats[i]?.names?.el || String(i);
+      const safeName = rawName.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      _showAdmConfirm(
+        t.deleteCatTitle,
+        `<span style="color:var(--cream);font-weight:600">${safeName}</span><br><br>${t.deleteCatMsg}`,
+        t.deleteBtn, t.cancelBtn,
+        () => {
+          if (navigator.vibrate) navigator.vibrate(60);
+          adminData.items = adminData.items.filter(it => it.cat !== i);
+          adminData.items.forEach(it => { if (it.cat > i) it.cat--; });
+          adminData.cats.splice(i, 1);
+          markUnsaved();
+          renderCatsSection();
+          renderProductsSection();
+        }, true
+      );
     });
 
     // Photos flipbook — upload (3 slots)
@@ -4880,14 +4902,20 @@ function renderProdCard(container, item, ci) {
   // Delete product
   card.querySelector('.btn-del-prod').addEventListener('click', () => {
     const tDel = ADMIN_UI[currentLang] || ADMIN_UI.el;
-    if (!confirm(tDel.confirmDelete)) return;
-    if (navigator.vibrate) navigator.vibrate(60);
-    const idx = adminData.items.findIndex(it => it.id === item.id);
-    if (idx > -1) adminData.items.splice(idx, 1);
-    card.remove();
-    renderCatsSection();
-    renderProductsSection();
-    markUnsaved();
+    _showAdmConfirm(
+      tDel.deleteTitle,
+      tDel.confirmDelete,
+      tDel.deleteBtn, tDel.cancelBtn,
+      () => {
+        if (navigator.vibrate) navigator.vibrate(60);
+        const idx = adminData.items.findIndex(it => it.id === item.id);
+        if (idx > -1) adminData.items.splice(idx, 1);
+        card.remove();
+        renderCatsSection();
+        renderProductsSection();
+        markUnsaved();
+      }, true
+    );
   });
 }
 
