@@ -1210,34 +1210,6 @@
         </div>
       </div>
 
-      <div class="settings-section" id="notif-status-section">
-        <div class="settings-title">🔔 Notifications</div>
-        <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
-          Chargement…
-        </div>
-        <button class="btn-update" onclick="forceTokenRenewal()">Forcer le renouvellement</button>
-        <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
-        <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15);font-size:0.76rem;color:var(--muted);line-height:1.7">
-          Pour recevoir les notifications quand l'app est fermée :<br>
-          <span style="color:var(--gold)">Paramètres → Applications → Menu Pro Control → Batterie → Aucune restriction</span>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-title">Sécurité — Mot de passe</div>
-        <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
-          Modifier le mot de passe d'accès à l'application.
-        </div>
-        <div class="pw-row" style="margin-bottom:0.5rem;">
-          <input type="password" id="set-pw-new" placeholder="Nouveau mot de passe">
-        </div>
-        <div class="pw-row">
-          <input type="password" id="set-pw-conf" placeholder="Confirmer">
-          <button class="btn-update" onclick="changeAppPassword()">Enregistrer</button>
-        </div>
-        <div class="pw-feedback" id="set-pw-fb"></div>
-      </div>
-
       <div class="settings-section">
         <div class="settings-title">📸 Photos — Page Démo</div>
         <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
@@ -1270,6 +1242,34 @@
             <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-5"><div class="dp-spinner"></div></div></div>
             <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer">✕</button></div>
           </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Sécurité — Mot de passe</div>
+        <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
+          Modifier le mot de passe d'accès à l'application.
+        </div>
+        <div class="pw-row" style="margin-bottom:0.5rem;">
+          <input type="password" id="set-pw-new" placeholder="Nouveau mot de passe">
+        </div>
+        <div class="pw-row">
+          <input type="password" id="set-pw-conf" placeholder="Confirmer">
+          <button class="btn-update" onclick="changeAppPassword()">Enregistrer</button>
+        </div>
+        <div class="pw-feedback" id="set-pw-fb"></div>
+      </div>
+
+      <div class="settings-section" id="notif-status-section">
+        <div class="settings-title">🔔 Notifications</div>
+        <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
+          Chargement…
+        </div>
+        <button class="btn-update" onclick="forceTokenRenewal()">Forcer le renouvellement</button>
+        <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
+        <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15);font-size:0.76rem;color:var(--muted);line-height:1.7">
+          Pour recevoir les notifications quand l'app est fermée :<br>
+          <span style="color:var(--gold)">Paramètres → Applications → Menu Pro Control → Batterie → Aucune restriction</span>
         </div>
       </div>
     </div>
@@ -1727,6 +1727,7 @@ function initFirebase() {
   }
   listenDevis();
   loadClientsFromFirebase();
+  loadDemoPhotos();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
   _checkControlTokenInFirebase();
   setTimeout(refreshNotifStatus, 2000);
@@ -2298,13 +2299,6 @@ function loadClientData(client) {
   });
 
 
-  if (client.demoPage) {
-    db.ref('demoPage/heroSlides').once('value').then(snap => {
-      const photos = snap.val() || {};
-      [1,2,3,4,5].forEach(n => { showDemoPhoto('demo', n, photos[n] || ''); });
-    });
-  }
-
 }
 
 
@@ -2791,6 +2785,14 @@ async function deleteDemoPhoto(id, n, domId) {
   await _saasDb.ref('demoPage/heroSlides/' + n).set(null);
   showDemoPhoto(domId, n, '');
   showToast('Photo supprimée');
+}
+
+function loadDemoPhotos() {
+  if (!_saasDb) return;
+  _saasDb.ref('demoPage/heroSlides').once('value').then(snap => {
+    const photos = snap.val() || {};
+    [1,2,3,4,5].forEach(n => { showDemoPhoto('demo', n, photos[n] || ''); });
+  });
 }
 
 // ════════════════════════════════════════════════════
