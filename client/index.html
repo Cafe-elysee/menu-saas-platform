@@ -6122,6 +6122,9 @@ function applyAdminData(data) {
   if (!data) return;
   try {
 
+    // Taglines toujours vidées — remplacées par la valeur Firebase si présente
+    Object.keys(UI).forEach(l => { UI[l].tagline = ''; });
+
     // Remplacer les catégories — toujours vider, repeupler si présentes
     CATS.length = 0;
     if (Array.isArray(data.cats) && data.cats.length > 0) {
@@ -6210,6 +6213,9 @@ function applyAdminData(data) {
       _adminInfo = data.info;
       updateNoteBar();
     }
+    // Mettre à jour le DOM du tagline avec la valeur courante (vide si non défini)
+    const _hTag = document.getElementById('hero-tag');
+    if (_hTag) _hTag.textContent = UI[lang]?.tagline || '';
   } catch(e) {
     console.warn('Admin data load error:', e);
   }
