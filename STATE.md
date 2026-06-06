@@ -1,5 +1,5 @@
 # STATE — Menu SaaS Platform
-## Dernière mise à jour : 2026-06-05 (commit e5c737c)
+## Dernière mise à jour : 2026-06-06 (commit 812f0b4)
 
 ---
 
@@ -35,7 +35,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 | Fichier | Taille | Rebuild |
 |---------|--------|---------|
 | `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-05 19:30 ✅ |
-| `MenuProServeur-SaaS-v1.0.apk` | 6.6 MB | 2026-06-05 19:12 ✅ |
+| `MenuProServeur-SaaS-v1.0.apk` | 6.8 MB | 2026-06-06 ✅ |
 
 > Les changements FABs admin / bouton retour modal sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
 
