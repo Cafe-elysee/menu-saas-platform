@@ -1108,11 +1108,14 @@
     html.light .adm-sel-popup button { color:var(--cream); }
     html.light .adm-sel-popup button:hover { background:rgba(200,164,78,0.1); }
     /* ── Panneau Commandes (visibility managed by tab panel) ── */
-    /* En mode papier : cacher toute la section photo des produits (upload, preview, label, toggle) */
-    body[data-style="paper"] .photo-form-group { display:none !important; }
-    /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
+    /* En mode papier/carte : cacher toute la section photo des produits (upload, preview, label, toggle) */
+    body[data-style="paper"] .photo-form-group,
+    body[data-style="simple"] .photo-form-group { display:none !important; }
+    /* En mode papier/carte : cacher les miniatures produit dans l'en-tête des cartes */
     body[data-style="paper"] .prod-thumb,
-    body[data-style="paper"] .prod-thumb-empty { display:none !important; }
+    body[data-style="paper"] .prod-thumb-empty,
+    body[data-style="simple"] .prod-thumb,
+    body[data-style="simple"] .prod-thumb-empty { display:none !important; }
     /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
     .cat-photos-row { display:none; }
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
