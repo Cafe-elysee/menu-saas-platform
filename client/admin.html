@@ -1687,25 +1687,31 @@
 
   /* ── Réglages — sections plates (sans carte) ── */
   .settings-section {
-    padding:0 0 8px;
+    padding:0 0 4px;
     border-bottom:1px solid rgba(200,164,78,0.12);
-    margin-bottom:8px;
+    margin-bottom:4px;
   }
   .settings-section:last-child { border-bottom:none; margin-bottom:0; }
   html.light .settings-section { border-bottom-color:rgba(168,104,64,0.12); }
   .settings-sec-hd {
-    font-family:'Crimson Pro',serif; font-size:1.15rem; font-weight:600;
-    color:var(--cream); padding:16px 18px 10px;
+    font-family:'Crimson Pro',serif; font-size:1.1rem; font-weight:600;
+    color:var(--cream); padding:8px 18px 5px;
   }
   html.light .settings-sec-hd { color:var(--cream); }
   /* Bouton gold fixe dark+light (couleurs hardcodées dark mode) */
   .btn-settings-gold {
-    padding:10px 16px;
+    padding:8px 13px;
     background:linear-gradient(135deg,#e2c278,#c8a44e,#9a7a35);
-    border-radius:10px; color:#0c0a08; font-size:0.84rem; font-weight:600;
+    border-radius:10px; color:#0c0a08; font-size:0.82rem; font-weight:600;
     white-space:nowrap; transition:all 0.25s;
   }
   .btn-settings-gold:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.35); }
+  /* Desktop — espacement confortable */
+  @media(min-width:700px) {
+    .settings-section { padding:0 0 10px; margin-bottom:10px; }
+    .settings-sec-hd { font-size:1.15rem; padding:14px 18px 10px; }
+    .btn-settings-gold { padding:10px 16px; font-size:0.84rem; }
+  }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
@@ -1998,24 +2004,24 @@
     <div class="settings-section">
       <div id="sec-settings-identity-hd" class="settings-sec-hd">Identifiants</div>
 
-      <div id="sec-settings-name" style="padding:0 18px 4px">
-        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:6px;font-weight:500;letter-spacing:0.04em">Nom</div>
-        <div style="display:flex;gap:10px;align-items:center">
+      <div id="sec-settings-name" style="padding:0 18px 2px">
+        <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:4px;font-weight:500;letter-spacing:0.04em">Nom</div>
+        <div style="display:flex;gap:8px;align-items:center">
           <input type="text" id="settings-name-input" class="inline-input" placeholder="Nom" style="flex:1">
           <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveRestaurantName()">Mettre à jour</button>
         </div>
-        <div id="settings-name-fb" style="font-size:0.76rem;min-height:1.2em;margin-top:4px"></div>
+        <div id="settings-name-fb" style="font-size:0.74rem;min-height:1em;margin-top:2px"></div>
       </div>
 
-      <div style="margin:4px 18px 8px;height:1px;background:rgba(200,164,78,0.1)"></div>
+      <div style="margin:2px 18px 4px;height:1px;background:rgba(200,164,78,0.1)"></div>
 
-      <div id="sec-settings-pwd" style="padding:0 18px 16px">
-        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:6px;font-weight:500;letter-spacing:0.04em">Mot de passe admin</div>
-        <div style="display:flex;gap:10px;align-items:center">
+      <div id="sec-settings-pwd" style="padding:0 18px 6px">
+        <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:4px;font-weight:500;letter-spacing:0.04em">Mot de passe admin</div>
+        <div style="display:flex;gap:8px;align-items:center">
           <input type="password" id="settings-pwd-input" class="inline-input" placeholder="Nouveau mot de passe" style="flex:1">
           <button class="btn-settings-gold settings-save-btn" style="flex:0 0 auto" onclick="saveAdminPassword()">Mettre à jour</button>
         </div>
-        <div id="settings-pwd-fb" style="font-size:0.76rem;min-height:1.2em;margin-top:4px"></div>
+        <div id="settings-pwd-fb" style="font-size:0.74rem;min-height:1em;margin-top:2px"></div>
       </div>
     </div>
 
@@ -2023,21 +2029,21 @@
     <div class="settings-section">
       <div id="sec-settings-lang-section-hd" class="settings-sec-hd">Paramètres de langue</div>
 
-      <div id="sec-settings-langs" style="padding:0 18px 8px">
-        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:8px;font-weight:500;letter-spacing:0.04em">Langues disponibles</div>
-        <div id="settings-langs-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="sec-settings-langs" style="padding:0 18px 4px">
+        <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:4px;font-weight:500;letter-spacing:0.04em">Langues disponibles</div>
+        <div id="settings-langs-list" style="display:flex;flex-direction:column;gap:4px"></div>
       </div>
 
-      <div style="margin:4px 18px 8px;height:1px;background:rgba(200,164,78,0.1)"></div>
+      <div style="margin:2px 18px 4px;height:1px;background:rgba(200,164,78,0.1)"></div>
 
-      <div id="sec-settings-lang-params" style="padding:0 18px 16px;display:flex;flex-direction:column;gap:12px">
-        <div class="settings-sec-hd" style="font-size:0.7rem;opacity:0.6;padding:0;margin-bottom:0;font-weight:500;letter-spacing:0.04em">Langues — Paramètres</div>
+      <div id="sec-settings-lang-params" style="padding:0 18px 8px;display:flex;flex-direction:column;gap:8px">
+        <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:0;font-weight:500;letter-spacing:0.04em">Langues — Paramètres</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <span id="settings-default-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue affichée (1ère visite)</span>
+          <span id="settings-default-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue affichée (1ère visite)</span>
           <select id="settings-default-lang" class="settings-sel" onchange="adminSetDefaultLang(this.value)"></select>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <span id="settings-primary-lang-lbl" style="font-size:0.84rem;color:var(--muted)">Langue admin (saisie)</span>
+          <span id="settings-primary-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue admin (saisie)</span>
           <select id="settings-primary-lang" class="settings-sel" onchange="adminSetPrimaryLang(this.value)"></select>
         </div>
       </div>
