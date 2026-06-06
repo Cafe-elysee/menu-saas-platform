@@ -7114,12 +7114,17 @@ let _analyticsData         = {};
 let _analyticsListener     = null;
 let _analyticsBackfillDone = false;
 
+const _tabScrollPos = { display:0, orders:0, settings:0 };
+
 function switchAdminTab(tab) {
   if (tab === _adminCurrentTab) return;
   const _TAB_ORDER = { display:0, orders:1, settings:2 };
   const fromIdx = _TAB_ORDER[_adminCurrentTab] ?? 0;
   const toIdx   = _TAB_ORDER[tab] ?? 0;
   const goRight = toIdx > fromIdx;
+
+  // Save scroll position of current tab
+  _tabScrollPos[_adminCurrentTab] = window.scrollY;
 
   const prevPanel = document.getElementById('admin-panel-' + _adminCurrentTab);
   _adminCurrentTab = tab;
@@ -7136,6 +7141,9 @@ function switchAdminTab(tab) {
     nextPanel.classList.add(goRight ? 'tab-in-right' : 'tab-in-left');
     setTimeout(() => nextPanel.classList.remove('tab-in-left','tab-in-right'), 220);
   }
+  // Restore scroll position for the target tab
+  window.scrollTo({ top: _tabScrollPos[tab] ?? 0, behavior: 'instant' });
+
   ['display','orders','settings'].forEach(t => {
     document.getElementById('admin-tab-'+t)?.classList.toggle('on', t === tab);
   });
