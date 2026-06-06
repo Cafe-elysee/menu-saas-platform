@@ -34,7 +34,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 
 | Fichier | Taille | Rebuild |
 |---------|--------|---------|
-| `MenuProControl-SaaS-v1.0.apk` | 4.3 MB | 2026-06-06 ✅ |
+| `MenuProControl-SaaS-v1.0.apk` | 4.5 MB | 2026-06-06 10:29 ✅ |
 | `MenuProServeur-SaaS-v1.0.apk` | 6.9 MB | 2026-06-06 10:23 ✅ |
 
 > Les changements admin (client/) sont **web uniquement** (Vercel) — pas de rebuild APK nécessaire.
