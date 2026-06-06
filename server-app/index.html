@@ -540,12 +540,18 @@
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
     <div style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">Menu Pro Serveur</div>
     <div style="font-size:0.78rem;color:var(--muted);margin-bottom:28px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
-    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">ID du restaurant</div>
+    <!-- IDs mémorisés (peuplé par _renderSetupSavedIds) -->
+    <div id="setup-saved-wrap" style="display:none;text-align:left;margin-bottom:4px;">
+      <div id="setup-saved-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;"></div>
+      <div id="setup-saved-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div style="height:1px;background:rgba(200,164,78,0.12);margin:14px 0;"></div>
+    </div>
+    <div id="setup-rid-label" style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">ID du restaurant</div>
     <input type="text" id="setup-rid-input" placeholder="ex: cafe-oran"
       style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
-    <div style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demande l&#39;identifiant à l&#39;administrateur</div>
+    <div id="setup-rid-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demande l&#39;identifiant à l&#39;administrateur</div>
     <div id="setup-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
-    <button onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer">Confirmer</button>
+    <button id="setup-confirm-btn" onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer">Confirmer</button>
   </div>
 </div>
 
@@ -820,7 +826,7 @@ const T = {
 };
 
 const _cachedAppLang = localStorage.getItem(_PFX+'app_lang_cache');
-let lang = localStorage.getItem(_PFX+'app_lang') || _cachedAppLang || 'fr';
+let lang = localStorage.getItem(_PFX+'app_lang') || _cachedAppLang || localStorage.getItem('saas_ui_lang') || 'fr';
 let calls    = [];
 let messages = [];
 let audioCtx   = null;
@@ -1151,6 +1157,7 @@ function updateMessagesBadge() {
 
 /* ── LANGUAGE ── */
 function applyLang() {
+  localStorage.setItem('saas_ui_lang', lang);
   var t = T[lang];
   var isRTL = LANG_DIRS[lang] === 'rtl';
   document.documentElement.lang = lang;
@@ -1663,13 +1670,98 @@ function changeRestaurant() {
   });
 }
 
+/* ── IDs MÉMORISÉS — HELPERS ── */
+function _getSavedIds() {
+  try { return JSON.parse(localStorage.getItem('saas_saved_ids') || '[]'); } catch(e) { return []; }
+}
+function _addSavedId(rid) {
+  if (!rid) return;
+  var ids = _getSavedIds().filter(function(id) { return id !== rid; });
+  ids.unshift(rid);
+  if (ids.length > 10) ids.length = 10;
+  localStorage.setItem('saas_saved_ids', JSON.stringify(ids));
+}
+function _removeSavedId(rid) {
+  localStorage.setItem('saas_saved_ids', JSON.stringify(_getSavedIds().filter(function(id) { return id !== rid; })));
+}
+
+function _renderSetupSavedIds() {
+  var _SETUP_T = {
+    fr:{ saved:'IDs enregistrés', connect:'Se connecter', newId:'Utiliser un autre ID', placeholder:'ex: cafe-oran', hint:'Demande l\'identifiant à l\'administrateur', confirm:'Confirmer', err:'Identifiant invalide (lettres minuscules, chiffres, tirets).' },
+    en:{ saved:'Saved IDs', connect:'Sign in', newId:'Use another ID', placeholder:'e.g. cafe-oran', hint:'Ask the administrator for the ID', confirm:'Confirm', err:'Invalid ID (lowercase letters, numbers, hyphens).' },
+    el:{ saved:'Αποθηκευμένα IDs', connect:'Σύνδεση', newId:'Χρήση άλλου ID', placeholder:'π.χ. cafe-oran', hint:'Ζητήστε το ID από τον διαχειριστή', confirm:'Επιβεβαίωση', err:'Μη έγκυρο ID (πεζά γράμματα, αριθμοί, παύλες).' },
+    de:{ saved:'Gespeicherte IDs', connect:'Anmelden', newId:'Andere ID verwenden', placeholder:'z.B. cafe-oran', hint:'Fragen Sie den Administrator nach der ID', confirm:'Bestätigen', err:'Ungültige ID (Kleinbuchstaben, Zahlen, Bindestriche).' },
+    ar:{ saved:'المعرّفات المحفوظة', connect:'تسجيل الدخول', newId:'استخدام معرّف آخر', placeholder:'مثال: cafe-oran', hint:'اطلب المعرّف من المسؤول', confirm:'متابعة', err:'معرّف غير صالح (أحرف صغيرة، أرقام، شرطات).' }
+  };
+  var sl = ['fr','en','el','de','ar'].indexOf(lang) >= 0 ? lang : 'fr';
+  var t = _SETUP_T[sl] || _SETUP_T.fr;
+
+  var savedIds = _getSavedIds();
+  var savedWrap = document.getElementById('setup-saved-wrap');
+  var savedList = document.getElementById('setup-saved-list');
+  var ridLabel  = document.getElementById('setup-rid-label');
+  var ridHint   = document.getElementById('setup-rid-hint');
+  var ridInput  = document.getElementById('setup-rid-input');
+  var confirmBtn= document.getElementById('setup-confirm-btn');
+
+  if (ridLabel)   ridLabel.textContent   = savedIds.length > 0 ? t.newId : 'ID du restaurant';
+  if (ridHint)    ridHint.textContent    = t.hint;
+  if (ridInput)   ridInput.placeholder   = t.placeholder;
+  if (confirmBtn) confirmBtn.textContent = t.confirm;
+
+  if (savedList) savedList.innerHTML = '';
+
+  if (savedIds.length > 0 && savedWrap && savedList) {
+    document.getElementById('setup-saved-label').textContent = t.saved;
+    savedIds.forEach(function(id) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--bord2,rgba(200,164,78,0.18));border-radius:12px;';
+
+      var label = document.createElement('span');
+      label.textContent = id;
+      label.style.cssText = 'flex:1;color:var(--cream);font-size:0.9rem;letter-spacing:0.04em;text-align:left;';
+
+      var connectBtn = document.createElement('button');
+      connectBtn.textContent = t.connect;
+      connectBtn.style.cssText = 'flex-shrink:0;padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;';
+      connectBtn.onclick = (function(rid) { return function() { _setupSelConnect(rid); }; })(id);
+
+      var removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.style.cssText = 'flex-shrink:0;width:24px;height:24px;border-radius:6px;border:1px solid var(--bord2,rgba(200,164,78,0.18));background:transparent;color:var(--muted);font-size:1rem;cursor:pointer;';
+      removeBtn.onclick = (function(rid) { return function(e) { e.stopPropagation(); _setupSelRemove(rid); }; })(id);
+
+      row.appendChild(label);
+      row.appendChild(connectBtn);
+      row.appendChild(removeBtn);
+      savedList.appendChild(row);
+    });
+    savedWrap.style.display = '';
+  } else if (savedWrap) {
+    savedWrap.style.display = 'none';
+  }
+}
+
+function _setupSelConnect(rid) {
+  localStorage.setItem('saas_rid', rid);
+  location.reload();
+}
+
+function _setupSelRemove(rid) {
+  _removeSavedId(rid);
+  _renderSetupSavedIds();
+}
+
 /* ── SETUP RID (premier lancement) ── */
 function confirmSetupRid() {
+  var sl = ['fr','en','el','de','ar'].indexOf(lang) >= 0 ? lang : 'fr';
+  var _ERR = { fr:'Identifiant invalide (lettres minuscules, chiffres, tirets).', en:'Invalid ID.', el:'Μη έγκυρο ID.', de:'Ungültige ID.', ar:'معرّف غير صالح.' };
   var val = (document.getElementById('setup-rid-input').value || '').trim().toLowerCase();
   var err = document.getElementById('setup-err');
   if (!val || !/^[a-z0-9][a-z0-9-]{0,28}[a-z0-9]?$/.test(val)) {
-    err.textContent = 'Identifiant invalide (lettres minuscules, chiffres, tirets).'; return;
+    err.textContent = _ERR[sl] || _ERR.fr; return;
   }
+  _addSavedId(val);
   localStorage.setItem('saas_rid', val);
   location.reload();
 }
@@ -1681,6 +1773,7 @@ function init() {
     document.getElementById('setup-screen').style.display = 'flex';
     var inp = document.getElementById('setup-rid-input');
     if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmSetupRid(); });
+    _renderSetupSavedIds();
     return;
   }
 

@@ -1716,6 +1716,25 @@
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
 <!-- ══════════════════════════════════════
+     RID SELECTOR SCREEN (pas de ?rid= dans l'URL)
+══════════════════════════════════════ -->
+<div id="rid-sel-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:10001;align-items:center;justify-content:center;padding:24px;">
+  <div class="login-box">
+    <div class="login-logo">Menu Pro</div>
+    <div class="login-sub" id="rsel-sub">Administration</div>
+    <div id="rsel-saved-wrap" style="display:none">
+      <div id="rsel-saved-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;text-align:left"></div>
+      <div id="rsel-saved-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+      <div style="height:1px;background:rgba(200,164,78,0.12);margin:0 0 16px"></div>
+    </div>
+    <div id="rsel-new-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;text-align:left"></div>
+    <input type="text" class="login-input" id="rsel-rid-input" autocomplete="off" style="text-transform:lowercase;letter-spacing:0.06em">
+    <button class="login-btn" id="rsel-confirm-btn">Continuer</button>
+    <div class="login-err" id="rsel-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      LOGIN SCREEN
 ══════════════════════════════════════ -->
 <div id="login-screen">
@@ -2052,6 +2071,18 @@
   </div><!-- /admin-panel-settings -->
 
 </div><!-- /adm-wrap -->
+
+<!-- ── ADMIN CONFIRM MODAL (changement mot de passe) ── -->
+<div id="adm-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
+  <div style="width:100%;max-width:320px;background:var(--card);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
+    <div id="adm-confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
+    <div id="adm-confirm-msg" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
+    <div style="display:flex;gap:10px;">
+      <button id="adm-confirm-cancel-btn" onclick="_hideAdmConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bord2);background:transparent;color:var(--cream);font-family:inherit;font-size:0.85rem;cursor:pointer;transition:background 0.18s;"></button>
+      <button id="adm-confirm-ok-btn" onclick="_doAdmConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;transition:opacity 0.18s;"></button>
+    </div>
+  </div>
+</div>
 
 <!-- ── QR CODES MODAL ── -->
 <div id="qr-modal" onclick="if(event.target===this)closeQRModal()">
@@ -2396,6 +2427,8 @@ const ADMIN_UI = {
     settingsIdentity:'Στοιχεία', settingsLangSection:'Ρυθμίσεις γλώσσας',
     settingsName:'Όνομα', settingsLangs:'Διαθέσιμες γλώσσες', settingsLangParams:'Γλώσσες — Ρυθμίσεις',
     settingsPwd:'Κωδικός διαχειριστή', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
+    ridSelSaved:'Αποθηκευμένα IDs', ridSelNew:'Χρήση άλλου ID', ridSelPlaceholder:'π.χ. cafe-paris', ridSelConnect:'Σύνδεση', ridSelContinue:'Συνέχεια', ridSelErr:'Μη έγκυρο ID (πεζά γράμματα, αριθμοί, παύλες).',
+    pwdConfirmTitle:'Αλλαγή κωδικού', pwdConfirmMsg:'Αυτή η αλλαγή θα σας αποσυνδέσει από όλες τις συσκευές. Θα χρειαστεί να συνδεθείτε ξανά με τον νέο κωδικό.', pwdConfirmOk:'Επιβεβαίωση', pwdConfirmCancel:'Ακύρωση', pwdChangedLogout:'✅ Κωδικός άλλαξε — συνδεθείτε ξανά',
     settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
     analyticsTitle:'Περίοδος ανάλυσης',
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
@@ -2515,6 +2548,8 @@ const ADMIN_UI = {
     settingsIdentity:'Identifiants', settingsLangSection:'Paramètres de langue',
     settingsName:'Nom', settingsLangs:'Langues disponibles', settingsLangParams:'Langues — Paramètres',
     settingsPwd:'Mot de passe admin', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
+    ridSelSaved:'IDs enregistrés', ridSelNew:'Utiliser un autre ID', ridSelPlaceholder:'ex: cafe-paris', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Identifiant invalide (lettres minuscules, chiffres, tirets).',
+    pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
     settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
     analyticsTitle:'Période d\'analyse',
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
@@ -2634,6 +2669,8 @@ const ADMIN_UI = {
     settingsIdentity:'Credentials', settingsLangSection:'Language settings',
     settingsName:'Name', settingsLangs:'Available languages', settingsLangParams:'Languages — Settings',
     settingsPwd:'Admin password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
+    ridSelSaved:'Saved IDs', ridSelNew:'Use another ID', ridSelPlaceholder:'e.g. cafe-paris', ridSelConnect:'Sign in', ridSelContinue:'Continue', ridSelErr:'Invalid ID (lowercase letters, numbers, hyphens).',
+    pwdConfirmTitle:'Change password', pwdConfirmMsg:'This change will sign you out of all devices. You will need to sign in again with the new password.', pwdConfirmOk:'Confirm', pwdConfirmCancel:'Cancel', pwdChangedLogout:'✅ Password changed — please sign in again',
     settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
     analyticsTitle:'Analysis period',
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
@@ -2753,6 +2790,8 @@ const ADMIN_UI = {
     settingsIdentity:'Anmeldedaten', settingsLangSection:'Spracheinstellungen',
     settingsName:'Name', settingsLangs:'Verfügbare Sprachen', settingsLangParams:'Sprachen — Einstellungen',
     settingsPwd:'Admin-Passwort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
+    ridSelSaved:'Gespeicherte IDs', ridSelNew:'Andere ID verwenden', ridSelPlaceholder:'z.B. cafe-paris', ridSelConnect:'Anmelden', ridSelContinue:'Weiter', ridSelErr:'Ungültige ID (Kleinbuchstaben, Zahlen, Bindestriche).',
+    pwdConfirmTitle:'Passwort ändern', pwdConfirmMsg:'Diese Änderung meldet Sie auf allen Geräten ab. Sie müssen sich mit dem neuen Passwort erneut anmelden.', pwdConfirmOk:'Bestätigen', pwdConfirmCancel:'Abbrechen', pwdChangedLogout:'✅ Passwort geändert — bitte erneut anmelden',
     settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
     analyticsTitle:'Analysezeitraum',
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
@@ -2872,6 +2911,8 @@ const ADMIN_UI = {
     settingsIdentity:'بيانات الهوية', settingsLangSection:'إعدادات اللغة',
     settingsName:'الاسم', settingsLangs:'اللغات المتاحة', settingsLangParams:'اللغات — الإعدادات',
     settingsPwd:'كلمة مرور الإدارة', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
+    ridSelSaved:'المعرّفات المحفوظة', ridSelNew:'استخدام معرّف آخر', ridSelPlaceholder:'مثال: cafe-paris', ridSelConnect:'تسجيل الدخول', ridSelContinue:'متابعة', ridSelErr:'معرّف غير صالح (أحرف صغيرة، أرقام، شرطات).',
+    pwdConfirmTitle:'تغيير كلمة المرور', pwdConfirmMsg:'هذا التغيير سيُسجّل خروجك من جميع الأجهزة. ستحتاج إلى تسجيل الدخول مجدداً بكلمة المرور الجديدة.', pwdConfirmOk:'تأكيد', pwdConfirmCancel:'إلغاء', pwdChangedLogout:'✅ تم تغيير كلمة المرور — سجّل الدخول مجدداً',
     settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
     analyticsTitle:'فترة التحليل',
     filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
@@ -2923,9 +2964,135 @@ let _dragCatIdx  = null;  // index catégorie en cours de drag
 let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase Storage download URL (en attente de sauvegarde)
 
 /* ═══════════════════════════════════════════
+   IDs MÉMORISÉS — HELPERS PARTAGÉS
+═══════════════════════════════════════════ */
+function _getSavedIds() {
+  try { return JSON.parse(localStorage.getItem('saas_saved_ids') || '[]'); } catch(e) { return []; }
+}
+function _addSavedId(rid) {
+  if (!rid || rid === 'demo') return;
+  const ids = _getSavedIds().filter(id => id !== rid);
+  ids.unshift(rid);
+  if (ids.length > 10) ids.length = 10;
+  localStorage.setItem('saas_saved_ids', JSON.stringify(ids));
+}
+function _removeSavedId(rid) {
+  localStorage.setItem('saas_saved_ids', JSON.stringify(_getSavedIds().filter(id => id !== rid)));
+}
+
+/* ═══════════════════════════════════════════
+   SÉLECTEUR D'ID (Phase 1 — pas de ?rid= dans URL)
+═══════════════════════════════════════════ */
+function _showRidSelector() {
+  const _VALID_LANGS = ['fr','en','el','de','ar'];
+  const _l = _VALID_LANGS.includes(localStorage.getItem('saas_ui_lang')) ? localStorage.getItem('saas_ui_lang') : 'fr';
+  const t = (ADMIN_UI[_l] || ADMIN_UI.fr);
+
+  const savedIds = _getSavedIds();
+  const savedWrap = document.getElementById('rsel-saved-wrap');
+  const savedList = document.getElementById('rsel-saved-list');
+
+  // Textes
+  document.getElementById('rsel-saved-label').textContent = t.ridSelSaved || 'IDs enregistrés';
+  document.getElementById('rsel-new-label').textContent = t.ridSelNew || 'Utiliser un autre ID';
+  document.getElementById('rsel-rid-input').placeholder = t.ridSelPlaceholder || 'ex: cafe-paris';
+  document.getElementById('rsel-confirm-btn').textContent = t.ridSelContinue || 'Continuer';
+  document.getElementById('rsel-confirm-btn').onclick = _ridSelConfirm;
+  document.getElementById('rsel-rid-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') _ridSelConfirm();
+  });
+
+  // Section IDs sauvegardés
+  savedList.innerHTML = '';
+  if (savedIds.length > 0) {
+    savedIds.forEach(id => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--bord2);border-radius:12px;';
+
+      const label = document.createElement('span');
+      label.textContent = id;
+      label.style.cssText = 'flex:1;color:var(--cream);font-size:0.9rem;letter-spacing:0.04em;text-align:left;';
+
+      const connectBtn = document.createElement('button');
+      connectBtn.textContent = t.ridSelConnect || 'Se connecter';
+      connectBtn.style.cssText = 'flex-shrink:0;padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;';
+      connectBtn.onclick = () => _ridSelConnect(id);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.style.cssText = 'flex-shrink:0;width:24px;height:24px;border-radius:6px;border:1px solid var(--bord2);background:transparent;color:var(--muted);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+      removeBtn.onclick = (e) => { e.stopPropagation(); _ridSelRemove(id); };
+
+      row.appendChild(label);
+      row.appendChild(connectBtn);
+      row.appendChild(removeBtn);
+      savedList.appendChild(row);
+    });
+    savedWrap.style.display = '';
+  } else {
+    savedWrap.style.display = 'none';
+  }
+
+  document.getElementById('rid-sel-screen').style.display = 'flex';
+}
+
+function _ridSelConnect(rid) {
+  location.href = location.pathname + '?rid=' + encodeURIComponent(rid);
+}
+
+function _ridSelRemove(rid) {
+  _removeSavedId(rid);
+  _showRidSelector(); // re-render
+}
+
+function _ridSelConfirm() {
+  const _VALID_LANGS = ['fr','en','el','de','ar'];
+  const _l = _VALID_LANGS.includes(localStorage.getItem('saas_ui_lang')) ? localStorage.getItem('saas_ui_lang') : 'fr';
+  const t = (ADMIN_UI[_l] || ADMIN_UI.fr);
+  const val = (document.getElementById('rsel-rid-input').value || '').trim().toLowerCase();
+  const errEl = document.getElementById('rsel-err');
+  if (!val || !/^[a-z0-9][a-z0-9-]{0,28}[a-z0-9]?$/.test(val)) {
+    errEl.textContent = t.ridSelErr || 'Identifiant invalide.';
+    return;
+  }
+  errEl.textContent = '';
+  _ridSelConnect(val);
+}
+
+/* ═══════════════════════════════════════════
+   ADMIN CONFIRM MODAL
+═══════════════════════════════════════════ */
+let _admConfirmCb = null;
+
+function _showAdmConfirm(title, msg, okLabel, cancelLabel, cb) {
+  document.getElementById('adm-confirm-title').textContent = title;
+  document.getElementById('adm-confirm-msg').innerHTML = msg;
+  document.getElementById('adm-confirm-ok-btn').textContent = okLabel;
+  document.getElementById('adm-confirm-cancel-btn').textContent = cancelLabel;
+  _admConfirmCb = cb;
+  document.getElementById('adm-confirm-modal').style.display = 'flex';
+}
+
+function _hideAdmConfirm() {
+  document.getElementById('adm-confirm-modal').style.display = 'none';
+  _admConfirmCb = null;
+}
+
+function _doAdmConfirm() {
+  const cb = _admConfirmCb;
+  _hideAdmConfirm();
+  if (cb) cb();
+}
+
+/* ═══════════════════════════════════════════
    LOGIN + SESSION FIREBASE
 ═══════════════════════════════════════════ */
 async function checkLogin() {
+  // Phase 1 : pas de ?rid= dans l'URL → sélecteur d'ID
+  if (!new URLSearchParams(location.search).get('rid')) {
+    _showRidSelector();
+    return;
+  }
   // Charger le nom du restaurant pour la page de login (profile/name créé par Control App)
   try {
     const nameSnap = await _rref('profile/name').once('value');
@@ -3088,6 +3255,8 @@ function showAdmin() {
         _closeSession().then(() => location.reload()).catch(() => location.reload());
       }
     });
+    // Sauvegarder l'ID dans la liste mémorisée après login réussi
+    _addSavedId(_RID);
   }
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
   _rref('profile/name').once('value').then(snap => {
@@ -4152,6 +4321,7 @@ function setGlobalLang(l) {
   currentLang = l;
   document.documentElement.lang = l;
   localStorage.setItem(_PFX+'admin_lang', l);
+  localStorage.setItem('saas_ui_lang', l);
   // Flush DOM edits back to adminData BEFORE re-rendering so manual EN/AR edits are not lost
   if (adminData) collectAllForms();
   // Sync icône langue
@@ -6280,14 +6450,31 @@ async function saveAdminPassword() {
     if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
     return;
   }
-  try {
-    const hash = await _hashPwd(val);
-    await _rref('/config/adminHash').set(hash);
-    inp.value = '';
-    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.settingsSaved || '✅ Enregistré'; setTimeout(()=>{fb.textContent='';},3000); }
-  } catch(e) {
-    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
-  }
+  _showAdmConfirm(
+    t.pwdConfirmTitle || 'Changer de mot de passe',
+    t.pwdConfirmMsg   || 'Ce changement vous déconnectera de tous les appareils.',
+    t.pwdConfirmOk    || 'Confirmer',
+    t.pwdConfirmCancel|| 'Annuler',
+    async () => {
+      if (fb) { fb.style.color = 'var(--muted)'; fb.textContent = '…'; }
+      try {
+        const hash = await _hashPwd(val);
+        await _rref('/config/adminHash').set(hash);
+        // Révoquer toutes les sessions actives
+        await _rref('sessions').remove().catch(() => {});
+        // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
+        _removeSavedId(_RID);
+        // Vider la session locale et recharger
+        sessionStorage.removeItem(_PFX+'admin_auth');
+        sessionStorage.removeItem(_PFX+'session_id');
+        inp.value = '';
+        if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.pwdChangedLogout || '✅ Mot de passe modifié — reconnectez-vous'; }
+        setTimeout(() => location.reload(), 1800);
+      } catch(e) {
+        if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
+      }
+    }
+  );
 }
 
 function syncStyleAdminUI(mode) {
