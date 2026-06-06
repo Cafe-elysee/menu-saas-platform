@@ -479,8 +479,8 @@
     (function() {
       var _r = localStorage.getItem('saas_rid');
       window._NEEDS_SETUP = !_r; // pas de rid → écran de configuration
-      if (_r && localStorage.getItem(_r + '_app_theme') !== 'dark')
-        document.documentElement.classList.add('light');
+      var _saved = _r ? localStorage.getItem(_r + '_app_theme') : localStorage.getItem('saas_last_theme');
+      if (_saved !== 'dark') document.documentElement.classList.add('light');
     })();
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -525,7 +525,8 @@
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid var(--bord2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">📋</div>
     <div id="srv-forfait-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.04em;margin-bottom:12px">Forfait Menu QR</div>
     <div id="srv-forfait-msg" style="font-size:0.85rem;color:var(--cream);opacity:0.65;line-height:1.9">Ce forfait n'inclut pas le service serveur.<br>Contactez l'administrateur pour activer le forfait Commandes & Services.</div>
-    <div style="margin-top:36px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
+    <button id="srv-forfait-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:var(--gold);font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;">Changer d'ID</button>
+    <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
       <div style="height:1px;width:24px;background:var(--gold)"></div>
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase">Menu Pro</div>
       <div style="height:1px;width:24px;background:var(--gold)"></div>
@@ -1188,6 +1189,11 @@ function applyLang() {
   if (notifTxt) notifTxt.textContent = t.notifBannerTxt;
   if (notifBtn) notifBtn.textContent = t.notifBannerBtn;
   var _ls = document.getElementById('lang-select'); if (_ls) _ls.value = lang;
+  var _fBtn = document.getElementById('srv-forfait-change-btn');
+  if (_fBtn && document.getElementById('srv-forfait-screen').style.display !== 'none') {
+    var _fChangeId = { fr:"Changer d'ID", en:'Change ID', el:'Αλλαγή ID', de:'ID ändern', ar:'تغيير المعرّف' };
+    _fBtn.textContent = _fChangeId[lang] || _fChangeId.fr;
+  }
   renderCalls();
   renderOrders();
   renderMessages();
@@ -1428,6 +1434,7 @@ updateThemeIcon();
 document.getElementById('theme-btn').addEventListener('click', function() {
   var isLight = document.documentElement.classList.toggle('light');
   localStorage.setItem(_PFX+'app_theme', isLight ? 'light' : 'dark');
+  localStorage.setItem('saas_last_theme', isLight ? 'light' : 'dark');
   updateThemeIcon();
 });
 setInterval(function() { if (calls.length) renderCalls(); if (messages.length) renderMessages(); }, 30000);
@@ -1500,17 +1507,18 @@ function _applyInitialTab() {
     // Forfait Menu QR : aucun service serveur — afficher écran bloquant
     if (!callEnabled && !orderEnabled) {
       var _FORFAIT = {
-        fr: { title:'Forfait Menu QR', msg:'Ce forfait n\'inclut pas le service serveur.<br>Contactez l\'administrateur pour activer le forfait Commandes & Services.' },
-        en: { title:'QR Menu Plan',    msg:'This plan does not include the server service.<br>Contact the administrator to activate the Orders & Services plan.' },
-        el: { title:'Πακέτο Menu QR',  msg:'Αυτό το πακέτο δεν περιλαμβάνει την υπηρεσία σερβιτόρου.<br>Επικοινωνήστε με τον διαχειριστή.' },
-        de: { title:'QR-Menü-Paket',   msg:'Dieses Paket beinhaltet nicht den Serverdienst.<br>Kontaktieren Sie den Administrator.' },
-        ar: { title:'باقة قائمة QR',   msg:'هذه الباقة لا تتضمن خدمة النادل.<br>تواصل مع المسؤول لتفعيل باقة الطلبات والخدمات.' }
+        fr: { title:'Forfait Menu QR', msg:'Ce forfait n\'inclut pas le service serveur.<br>Contactez l\'administrateur pour activer le forfait Commandes & Services.', changeId:"Changer d'ID" },
+        en: { title:'QR Menu Plan',    msg:'This plan does not include the server service.<br>Contact the administrator to activate the Orders & Services plan.',           changeId:'Change ID' },
+        el: { title:'Πακέτο Menu QR',  msg:'Αυτό το πακέτο δεν περιλαμβάνει την υπηρεσία σερβιτόρου.<br>Επικοινωνήστε με τον διαχειριστή.',                              changeId:'Αλλαγή ID' },
+        de: { title:'QR-Menü-Paket',   msg:'Dieses Paket beinhaltet nicht den Serverdienst.<br>Kontaktieren Sie den Administrator.',                                       changeId:'ID ändern' },
+        ar: { title:'باقة قائمة QR',   msg:'هذه الباقة لا تتضمن خدمة النادل.<br>تواصل مع المسؤول لتفعيل باقة الطلبات والخدمات.',                                       changeId:'تغيير المعرّف' }
       };
       var fp = _FORFAIT[lang] || _FORFAIT.fr;
       var fs = document.getElementById('srv-forfait-screen');
       if (fs) {
         document.getElementById('srv-forfait-title').textContent = fp.title;
         document.getElementById('srv-forfait-msg').innerHTML = fp.msg;
+        document.getElementById('srv-forfait-change-btn').textContent = fp.changeId;
         fs.style.display = 'flex';
       }
       return;
