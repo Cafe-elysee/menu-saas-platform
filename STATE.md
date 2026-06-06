@@ -9,7 +9,7 @@
 
 ## 🔒 ÉTAT FONCTIONNEL (commit de référence)
 
-**Commit** : `5ead5a3` (2026-06-06)
+**Commit** : `eda04b9` (2026-06-06)
 **Branche** : `main`
 
 Cet état est validé et fonctionnel. En cas de problème futur, on peut y revenir.
