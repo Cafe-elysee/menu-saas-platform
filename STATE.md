@@ -76,6 +76,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - **Écran Forfait Menu QR** : bloque si callBtn=false + orderUI=false (5 langues, respecte dark/light) ✅
 - **Statut FCM simplifié** : "Application connectée / non connectée" (5 langues) ✅
 - `applyLang()` synchronise le statut FCM à chaque changement de langue ✅
+- **Détection suspension/suppression** : listener `config/active` — ⏸ "Service en pause" (active=false) ou 🚫 "Compte introuvable" (supprimé) — 5 langues, flag `_srvActiveKnown` évite faux positif au démarrage ✅
 
 ### Menu client (client/index.html)
 - Numéro de table jamais affiché au client (interne uniquement) ✅
@@ -83,6 +84,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - Historique et succès commande : "🪑 À table" sans numéro ✅
 - `#table-chip` jamais affiché ✅
 - Boutons Menu ↗ (admin + control-app) ouvrent avec `?table=1` ✅
+- **Détection suspension/suppression** : ⏸ "Menu en pause" (active=false) ou 🚫 "Menu introuvable" (supprimé) — 5 langues, `_menuActiveKnown` flag ✅
 
 ### Admin panel — 3 onglets ✅
 - **Onglet 1 — Affichage Menu** : identique à avant ✅
@@ -95,6 +97,7 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
   - Langues disponibles (toggles, min 1 obligatoire) ✅
   - Langues — Paramètres (langue défaut + langue admin) ✅
   - Mot de passe admin (hash SHA-256 + écriture `config/adminHash`) ✅
+- **Détection suspension/suppression** : vérification `config/active` au login + listener temps réel post-login — déconnexion forcée + message sur écran login ✅
   - Traduit en 5 langues ✅
 - Swipe 3 onglets : display↔orders↔settings ✅
   - Orders masqué → display↔settings direct ✅
