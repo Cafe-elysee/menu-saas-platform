@@ -66,6 +66,9 @@ Pour mettre à jour l'état fonctionnel : demander à Claude de changer ce commi
 - **Thème light par défaut** au 1er lancement (si aucun thème sauvegardé) ✅
 - **Bouton Nouveau client** : effet 3D gold avancé (card-link style), police Outfit ✅
 - **Textes gold en light mode** → couleur texte normale (`var(--text)`) ✅
+- **Carte client — ordre Informations** : Nom → Mot de passe admin → ID ✅
+- **Boutons pause/suppr dans Forfait** : 3D matte jaune amber (⏸ Mettre en pause) + rouge crimson (🗑️ Supprimer) → vert (▶ Réactiver) ✅
+- **Rétention défaut nouveau client** : 1 mois (2592000000 ms) pour appels + commandes ✅
 
 ### Server App
 - Onglet initial intelligent, messages persistants, scroll conservé ✅
