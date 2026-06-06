@@ -44,6 +44,7 @@
     html.light .inline-input,
     html.light .info-input,
     html.light .login-input { color:var(--cream); background:transparent; }
+    html.light .tagline-input { background:rgba(0,0,0,0.04); border-color:var(--bord2); }
     html.light .inline-input::placeholder,
     html.light .info-input::placeholder { color:rgba(28,23,16,0.40); }
     html.light .ico-pb-label { color:var(--cream) !important; }
@@ -733,6 +734,11 @@
       transition:border-color 0.2s; width:100%; min-height:38px;
     }
     .info-input:focus { border-color:var(--gold); }
+    .tagline-input {
+      background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:10px;
+      padding:12px 14px; min-height:44px;
+    }
+    .tagline-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,164,78,0.12); border-bottom-color:var(--gold); }
     @media(max-width:560px) {
       .info-row { grid-template-columns:1fr; }
       .info-lbl { border-right:none; border-bottom:1px solid var(--border); padding:10px 14px 8px; font-size:0.72rem; }
@@ -889,12 +895,14 @@
     .btn-del:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
     .btn-add {
       width:100%; padding:14px; margin-top:8px;
-      border:1px dashed var(--bord2); border-radius:14px;
-      color:var(--gold); font-size:0.84rem; letter-spacing:0.04em;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border:none; border-radius:14px;
+      color:#0c0a08; font-size:0.84rem; font-weight:600; letter-spacing:0.04em;
       display:flex; align-items:center; justify-content:center; gap:6px;
-      transition:var(--tr); min-height:48px;
+      transition:var(--tr); min-height:48px; cursor:pointer;
     }
-    .btn-add:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+    .btn-add:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.38); }
+    .btn-add:active { transform:scale(0.97); }
 
     /* ── PRODUCTS ── */
     .cat-products { margin-bottom:28px; }
@@ -1030,12 +1038,14 @@
     /* Add product */
     .btn-add-prod {
       width:100%; padding:11px; margin-top:8px;
-      border:1px dashed var(--bord2); border-radius:12px;
-      color:var(--gold); font-size:0.82rem;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border:none; border-radius:12px;
+      color:#0c0a08; font-size:0.82rem; font-weight:600;
       display:flex; align-items:center; justify-content:center; gap:6px;
-      transition:var(--tr);
+      transition:var(--tr); cursor:pointer;
     }
-    .btn-add-prod:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+    .btn-add-prod:hover { transform:translateY(-1px); box-shadow:0 5px 15px rgba(200,164,78,0.35); }
+    .btn-add-prod:active { transform:scale(0.97); }
 
     /* ── SAVE FAB (remplace save-bar) ── */
     .save-bar { display:none; } /* gardé pour compatibilité JS, masqué visuellement */
@@ -4648,6 +4658,8 @@ function renderCatsSection() {
 
   // État vide élégant
   if (!adminData.cats || adminData.cats.length === 0) {
+    const _btnAddCat = document.getElementById('btn-add-cat');
+    if (_btnAddCat) _btnAddCat.style.display = 'none';
     const _te = ADMIN_UI[currentLang] || ADMIN_UI.fr;
     list.innerHTML = `<div class="menu-empty-state">
       <div class="menu-empty-icon">🍽️</div>
@@ -4657,6 +4669,8 @@ function renderCatsSection() {
     </div>`;
     return;
   }
+  const _btnAddCat2 = document.getElementById('btn-add-cat');
+  if (_btnAddCat2) _btnAddCat2.style.display = '';
 
   // Lignes de catégories
   adminData.cats.forEach((cat, ci) => {
@@ -6063,7 +6077,6 @@ const THEMES_DATA = [
   // 1 thème Simple + Paper
   { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        ar:'لوحة Bento'},    dark:'#121212', accent:'#ffffff' },
   // Nouveaux thèmes premium
-  { id:'laque',         styles:['paper','simple'], names:{el:'Λάκα',               fr:'Laque',              en:'Lacquer',            de:'Lackierung',             ar:'الورنيش'},        dark:'#080504', accent:'#c8b080' },
   { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 ar:'أورورا'},         dark:'#0c0d14', accent:'#9070f8' },
 ];
 
@@ -6177,17 +6190,6 @@ const LAYOUTS_DATA = [
       { id: 'dyn-bento-blue',  accent: '#1e90ff' },
       { id: 'dyn-bento-green', accent: '#00fa9a' },
       { id: 'dyn-bento-pink',  accent: '#ff69b4' }
-    ]
-  },
-  {
-    family: 'laque', names: { el: 'Λάκα', fr: 'Laque', en: 'Lacquer', de: 'Lackierung', ar: 'الورنيش' },
-    variants: [
-      { id: 'laque',         accent: '#c8b080' },
-      { id: 'laque-celadon', accent: '#80c8a0' },
-      { id: 'laque-pivoine', accent: '#c87090' },
-      { id: 'laque-encre',   accent: '#7898d8' },
-      { id: 'laque-bois',    accent: '#c0844a' },
-      { id: 'laque-ivoire',  accent: '#d8ccb0' }
     ]
   },
   {
