@@ -6730,11 +6730,11 @@ function buildBarChart(containerId, data, opts) {
   const color = opts.color || 'var(--gold)';
   const cid   = 'cg-' + containerId;
 
-  // Y ticks
+  // Y ticks — step toujours >= 1 (comptes entiers), arrondi pour éviter les flottants
   const rawStep = MAX / 4;
   const mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-  const step = Math.ceil(rawStep / mag) * mag || 1;
-  const yTicks = [0,1,2,3,4].map(i => i * step);
+  const step = Math.max(1, Math.ceil(rawStep / mag) * mag);
+  const yTicks = [0,1,2,3,4].map(i => Math.round(i * step));
   const yMax = yTicks[4];
 
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
