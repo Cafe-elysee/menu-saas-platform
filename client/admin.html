@@ -1706,6 +1706,13 @@
     white-space:nowrap; transition:all 0.25s;
   }
   .btn-settings-gold:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.35); }
+  .btn-settings-red {
+    padding:8px 13px;
+    background:linear-gradient(135deg,#d97070,#c04040,#8c2020);
+    border-radius:10px; color:#fff; font-size:0.82rem; font-weight:600;
+    white-space:nowrap; transition:all 0.25s; text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn-settings-red:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(180,40,40,0.35); }
   /* Desktop — espacement confortable */
   @media(min-width:700px) {
     .settings-section { padding:0 0 10px; margin-bottom:10px; }
@@ -2021,7 +2028,10 @@
 
     <!-- SECTION 1 : Identifiants -->
     <div class="settings-section">
-      <div id="sec-settings-identity-hd" class="settings-sec-hd">Identifiants</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-right:18px">
+        <div id="sec-settings-identity-hd" class="settings-sec-hd">Identifiants</div>
+        <button id="btn-change-id" class="btn-settings-red" onclick="changeRestaurantId()">Changer d'ID</button>
+      </div>
 
       <div id="sec-settings-name" style="padding:0 18px 2px">
         <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:4px;font-weight:500;letter-spacing:0.04em">Nom</div>
@@ -2429,6 +2439,7 @@ const ADMIN_UI = {
     settingsPwd:'Κωδικός διαχειριστή', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
     ridSelSaved:'Αποθηκευμένα IDs', ridSelNew:'Χρήση άλλου ID', ridSelPlaceholder:'π.χ. cafe-paris', ridSelConnect:'Σύνδεση', ridSelContinue:'Συνέχεια', ridSelErr:'Μη έγκυρο ID (πεζά γράμματα, αριθμοί, παύλες).',
     pwdConfirmTitle:'Αλλαγή κωδικού', pwdConfirmMsg:'Αυτή η αλλαγή θα σας αποσυνδέσει από όλες τις συσκευές. Θα χρειαστεί να συνδεθείτε ξανά με τον νέο κωδικό.', pwdConfirmOk:'Επιβεβαίωση', pwdConfirmCancel:'Ακύρωση', pwdChangedLogout:'✅ Κωδικός άλλαξε — συνδεθείτε ξανά',
+    changeIdBtn:'Αλλαγή ID', changeIdConfirmTitle:'Αλλαγή ID', changeIdConfirmMsg:'Αυτή η ενέργεια θα σας αποσυνδέσει. Μπορείτε να συνδεθείτε ξανά με το νέο ID σας.', changeIdConfirmOk:'Επιβεβαίωση', changeIdConfirmCancel:'Ακύρωση',
     settingsDefaultLang:'Γλώσσα εμφάνισης (1η επίσκεψη)', settingsPrimaryLang:'Γλώσσα διαχειριστή',
     analyticsTitle:'Περίοδος ανάλυσης',
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
@@ -2550,6 +2561,7 @@ const ADMIN_UI = {
     settingsPwd:'Mot de passe admin', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     ridSelSaved:'IDs enregistrés', ridSelNew:'Utiliser un autre ID', ridSelPlaceholder:'ex: cafe-paris', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Identifiant invalide (lettres minuscules, chiffres, tirets).',
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
+    changeIdBtn:'Changer d\'ID', changeIdConfirmTitle:'Changer d\'identifiant', changeIdConfirmMsg:'Cette action vous déconnectera. Vous pourrez vous reconnecter avec votre nouvel identifiant.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
     settingsDefaultLang:'Langue affichée (1ère visite)', settingsPrimaryLang:'Langue admin (saisie)',
     analyticsTitle:'Période d\'analyse',
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
@@ -2671,6 +2683,7 @@ const ADMIN_UI = {
     settingsPwd:'Admin password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
     ridSelSaved:'Saved IDs', ridSelNew:'Use another ID', ridSelPlaceholder:'e.g. cafe-paris', ridSelConnect:'Sign in', ridSelContinue:'Continue', ridSelErr:'Invalid ID (lowercase letters, numbers, hyphens).',
     pwdConfirmTitle:'Change password', pwdConfirmMsg:'This change will sign you out of all devices. You will need to sign in again with the new password.', pwdConfirmOk:'Confirm', pwdConfirmCancel:'Cancel', pwdChangedLogout:'✅ Password changed — please sign in again',
+    changeIdBtn:'Change ID', changeIdConfirmTitle:'Change ID', changeIdConfirmMsg:'This will sign you out. You can reconnect with your new ID.', changeIdConfirmOk:'Confirm', changeIdConfirmCancel:'Cancel',
     settingsDefaultLang:'Display language (1st visit)', settingsPrimaryLang:'Admin language (input)',
     analyticsTitle:'Analysis period',
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
@@ -2792,6 +2805,7 @@ const ADMIN_UI = {
     settingsPwd:'Admin-Passwort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
     ridSelSaved:'Gespeicherte IDs', ridSelNew:'Andere ID verwenden', ridSelPlaceholder:'z.B. cafe-paris', ridSelConnect:'Anmelden', ridSelContinue:'Weiter', ridSelErr:'Ungültige ID (Kleinbuchstaben, Zahlen, Bindestriche).',
     pwdConfirmTitle:'Passwort ändern', pwdConfirmMsg:'Diese Änderung meldet Sie auf allen Geräten ab. Sie müssen sich mit dem neuen Passwort erneut anmelden.', pwdConfirmOk:'Bestätigen', pwdConfirmCancel:'Abbrechen', pwdChangedLogout:'✅ Passwort geändert — bitte erneut anmelden',
+    changeIdBtn:'ID ändern', changeIdConfirmTitle:'ID ändern', changeIdConfirmMsg:'Diese Aktion meldet Sie ab. Sie können sich mit Ihrer neuen ID erneut anmelden.', changeIdConfirmOk:'Bestätigen', changeIdConfirmCancel:'Abbrechen',
     settingsDefaultLang:'Anzeigesprache (1. Besuch)', settingsPrimaryLang:'Admin-Sprache (Eingabe)',
     analyticsTitle:'Analysezeitraum',
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
@@ -2913,6 +2927,7 @@ const ADMIN_UI = {
     settingsPwd:'كلمة مرور الإدارة', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
     ridSelSaved:'المعرّفات المحفوظة', ridSelNew:'استخدام معرّف آخر', ridSelPlaceholder:'مثال: cafe-paris', ridSelConnect:'تسجيل الدخول', ridSelContinue:'متابعة', ridSelErr:'معرّف غير صالح (أحرف صغيرة، أرقام، شرطات).',
     pwdConfirmTitle:'تغيير كلمة المرور', pwdConfirmMsg:'هذا التغيير سيُسجّل خروجك من جميع الأجهزة. ستحتاج إلى تسجيل الدخول مجدداً بكلمة المرور الجديدة.', pwdConfirmOk:'تأكيد', pwdConfirmCancel:'إلغاء', pwdChangedLogout:'✅ تم تغيير كلمة المرور — سجّل الدخول مجدداً',
+    changeIdBtn:'تغيير المعرّف', changeIdConfirmTitle:'تغيير المعرّف', changeIdConfirmMsg:'سيؤدي هذا إلى تسجيل خروجك. يمكنك إعادة تسجيل الدخول بمعرّفك الجديد.', changeIdConfirmOk:'تأكيد', changeIdConfirmCancel:'إلغاء',
     settingsDefaultLang:'لغة العرض (الزيارة الأولى)', settingsPrimaryLang:'لغة الإدارة (الإدخال)',
     analyticsTitle:'فترة التحليل',
     filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
@@ -4227,6 +4242,7 @@ function applyAdminUI(l) {
   // Réglages panel labels — en-têtes de groupe
   const _setEl2 = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.textContent = t[key]; };
   _setEl2('sec-settings-identity-hd', 'settingsIdentity');
+  const _btnChId = document.getElementById('btn-change-id'); if (_btnChId && t.changeIdBtn) _btnChId.textContent = t.changeIdBtn;
   _setEl2('sec-settings-lang-section-hd', 'settingsLangSection');
   // Réglages panel labels — sous-étiquettes
   const _setLabels = [
@@ -6484,6 +6500,20 @@ async function saveAdminPassword() {
       } catch(e) {
         if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
       }
+    }
+  );
+}
+
+function changeRestaurantId() {
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  _showAdmConfirm(
+    t.changeIdConfirmTitle || 'Changer d\'identifiant',
+    t.changeIdConfirmMsg   || 'Cette action vous déconnectera. Vous pourrez vous reconnecter avec votre nouvel identifiant.',
+    t.changeIdConfirmOk    || 'Confirmer',
+    t.changeIdConfirmCancel|| 'Annuler',
+    async () => {
+      await _closeSession().catch(() => {});
+      location.href = location.pathname;
     }
   );
 }

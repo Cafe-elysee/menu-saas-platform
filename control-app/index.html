@@ -866,8 +866,36 @@
     .quick-nav-fab:active { transform: scale(0.91); box-shadow: 0 2px 10px rgba(200,164,78,0.3); }
 
     /* ═══════════════════════════════
-       NOUVEAU CLIENT
+       LIEN ADMIN + NOUVEAU CLIENT
     ═══════════════════════════════ */
+    .btn-lien-admin {
+      padding:7px 14px; border-radius:10px; border:none;
+      background:linear-gradient(160deg, #e8c060 0%, #c8a44e 45%, #9e7428 100%);
+      color:#1a1208; font-size:0.78rem; font-weight:700; font-family:'Outfit',sans-serif;
+      letter-spacing:0.03em;
+      display:flex; align-items:center; gap:5px; cursor:pointer;
+      white-space:nowrap; position:relative; overflow:hidden;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.30) inset,
+        0 -1px 0 rgba(0,0,0,0.20) inset,
+        0 3px 0 #7a5018,
+        0 4px 10px rgba(0,0,0,0.40);
+      text-shadow:0 1px 1px rgba(0,0,0,0.15);
+      transition:transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-lien-admin::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:linear-gradient(to bottom, rgba(255,255,255,0.20), transparent);
+      border-radius:10px 10px 0 0; pointer-events:none;
+    }
+    .btn-lien-admin:active {
+      transform:translateY(2px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.30) inset,
+        0 -1px 0 rgba(0,0,0,0.20) inset,
+        0 1px 0 #7a5018,
+        0 2px 5px rgba(0,0,0,0.30);
+    }
     .btn-nouveau-client {
       padding:7px 14px; border-radius:10px; border:none;
       background:linear-gradient(160deg, #e8c060 0%, #c8a44e 45%, #9e7428 100%);
@@ -1121,7 +1149,7 @@
     <!-- TAB CLIENTS -->
     <div class="tab-pane" id="pane-clients">
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Clients</span>
+        <button class="btn-lien-admin" onclick="copyAdminLink()">🔗 Lien admin</button>
         <button class="btn-nouveau-client" onclick="showNewClientModal()">＋ Nouveau client</button>
       </div>
       <div class="clients-list" id="clients-list"></div>
@@ -2093,6 +2121,20 @@ function buildClientCard(client) {
 function toggleCard(id) {
   const card = document.getElementById('card-' + id);
   if (card) card.classList.toggle('open');
+}
+
+function copyAdminLink() {
+  const url = 'https://menu-saas-platform.vercel.app/admin.html';
+  navigator.clipboard.writeText(url).then(function() {
+    const btn = document.querySelector('.btn-lien-admin');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copié !';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  }).catch(function() {
+    const btn = document.querySelector('.btn-lien-admin');
+    if (btn) { const orig = btn.textContent; btn.textContent = '❌ Erreur'; setTimeout(function() { btn.textContent = orig; }, 2000); }
+  });
 }
 
 async function openAdmin(e, slug) {
