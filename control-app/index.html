@@ -326,7 +326,7 @@
       100% { transform: scale(1); }
     }
 
-    /* Collapsible devis card */
+    /* Collapsible commande card */
     .commande-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -339,7 +339,7 @@
     .commande-card.en_cours { border-left: 3px solid var(--gold); }
     .commande-card.traite   { opacity: 0.58; }
 
-    /* Bouton supprimer devis */
+    /* Bouton supprimer commande */
     .commande-card { position:relative; }
     .commande-card-inner { }
     .btn-del-commande {
@@ -349,7 +349,7 @@
     }
     .btn-del-commande:active { background:rgba(239,83,80,0.22); }
 
-    /* Bouton vider devis */
+    /* Bouton vider commande */
     .btn-vider-commande {
       font-size:0.72rem; color:var(--muted); border:1px solid var(--border);
       border-radius:8px; padding:4px 10px; font-family:inherit;
@@ -2012,7 +2012,7 @@ function getClientDb(slug) {
 }
 
 // ════════════════════════════════════════════════════
-// DEVIS — temps réel
+// COMMANDES — temps réel
 // ════════════════════════════════════════════════════
 let _commandesCache = {};
 let _initialTabDecided = false;
@@ -2146,23 +2146,23 @@ function toggleCommandeCard(key) {
 }
 
 function deleteCommande(key) {
-  if (!confirm('Supprimer ce devis définitivement ?')) return;
-  _controlDb.ref('/devis/' + key).remove();
+  if (!confirm('Supprimer cette commande définitivement ?')) return;
+  _controlDb.ref('/commandes/' + key).remove();
 }
 
 function viderCommande() {
-  if (!confirm('Supprimer TOUS les devis ? Cette action est irréversible.')) return;
+  if (!confirm('Supprimer TOUTES les commandes ? Cette action est irréversible.')) return;
   _controlDb.ref('/commandes').remove();
 }
 
 
 function markCommandeRead(key) {
-  _controlDb.ref('/devis/' + key + '/lu').set(true);
+  _controlDb.ref('/commandes/' + key + '/lu').set(true);
 }
 
 function setCommandeStatus(key, sel) {
   const status = sel.value;
-  _controlDb.ref('/devis/' + key).update({ statut: status, lu: true });
+  _controlDb.ref('/commandes/' + key).update({ statut: status, lu: true });
   const card = document.querySelector('.commande-card[data-key="' + key + '"]');
   if (!card) return;
 
@@ -3185,7 +3185,7 @@ document.addEventListener('deviceready', () => {
   if (_pushPlugin) {
     const Push = _pushPlugin;
     Push.createChannel({
-      id: 'devis_control', name: 'Demandes de devis',
+      id: 'devis_control', name: 'Commandes',
       importance: 5, visibility: 1,
       sound: 'default',
       vibration: true, lights: true, lightColor: '#c8a44e'
