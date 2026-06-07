@@ -155,6 +155,50 @@
     }
     .adm-load-title { font-family:'Crimson Pro',serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:4px; }
     .adm-load-sub   { font-size:0.72rem;color:var(--muted);letter-spacing:0.22em;text-transform:uppercase; }
+    /* ── First-login popups (defaultLang + primaryLang) ── */
+    .fl-popup-overlay {
+      position:fixed;inset:0;z-index:100000;
+      background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);
+      display:none;align-items:center;justify-content:center;
+      opacity:0;transition:opacity 0.3s ease;
+    }
+    .fl-popup-overlay.show { opacity:1; }
+    html.light .fl-popup-overlay { background:rgba(0,0,0,0.55); }
+    .fl-popup-card {
+      background:var(--card);border:1px solid var(--bord2);
+      border-radius:22px;padding:28px 22px 22px;
+      max-width:370px;width:90%;text-align:center;
+      box-shadow:0 32px 80px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.15);
+      transform:translateY(18px) scale(0.96);
+      transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fl-popup-overlay.show .fl-popup-card { transform:none; }
+    .fl-popup-step {
+      font-size:0.65rem;color:var(--muted);text-transform:uppercase;
+      letter-spacing:0.18em;margin-bottom:12px;
+    }
+    .fl-popup-icon { font-size:2.2rem;margin-bottom:8px; }
+    .fl-popup-title {
+      font-family:'Crimson Pro',serif;font-size:1.35rem;
+      color:var(--gold);letter-spacing:0.06em;margin-bottom:10px;line-height:1.2;
+    }
+    .fl-popup-desc {
+      font-size:0.81rem;color:var(--text);line-height:1.6;margin-bottom:16px;
+    }
+    .fl-popup-flags { display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap; }
+    .fl-popup-hint {
+      font-size:0.71rem;color:var(--muted);line-height:1.55;margin-bottom:20px;
+      padding:9px 12px;background:var(--bg);border-radius:10px;
+      border:1px solid var(--bord);text-align:left;
+    }
+    .fl-popup-btn {
+      width:100%;padding:13px 0;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#c8a44e,#a07828);
+      color:#fff;font-size:0.9rem;font-weight:600;letter-spacing:0.04em;
+      cursor:pointer;transition:opacity 0.2s,transform 0.15s;
+    }
+    .fl-popup-btn:hover { opacity:0.88; }
+    .fl-popup-btn:active { transform:scale(0.97); }
     /* ── Language strip — login screens ── */
     .login-lang-strip { display:flex;justify-content:center;gap:6px;margin:0 0 18px; }
     .llang-btn {
@@ -2334,6 +2378,35 @@
 
 </div><!-- /adm-wrap -->
 
+<!-- ════════════════════════════════════════
+     FIRST-LOGIN POPUPS — defaultLang + primaryLang
+════════════════════════════════════════ -->
+<!-- Popup 1 : Langue par défaut du menu client -->
+<div class="fl-popup-overlay" id="fl-popup-1">
+  <div class="fl-popup-card">
+    <div class="fl-popup-step" id="fl1-step">Étape 1 sur 2</div>
+    <div class="fl-popup-icon">🌍</div>
+    <div class="fl-popup-title" id="fl1-title">Langue du menu client</div>
+    <div class="fl-popup-desc" id="fl1-desc"></div>
+    <div class="fl-popup-flags" id="fl1-flags"></div>
+    <div class="fl-popup-hint" id="fl1-hint"></div>
+    <button class="fl-popup-btn" id="fl1-btn" onclick="_confirmFlDefault()">Valider</button>
+  </div>
+</div>
+
+<!-- Popup 2 : Langue principale (admin + serveurs) -->
+<div class="fl-popup-overlay" id="fl-popup-2">
+  <div class="fl-popup-card">
+    <div class="fl-popup-step" id="fl2-step">Étape 2 sur 2</div>
+    <div class="fl-popup-icon">⚙️</div>
+    <div class="fl-popup-title" id="fl2-title">Langue principale</div>
+    <div class="fl-popup-desc" id="fl2-desc"></div>
+    <div class="fl-popup-flags" id="fl2-flags"></div>
+    <div class="fl-popup-hint" id="fl2-hint"></div>
+    <button class="fl-popup-btn" id="fl2-btn" onclick="_confirmFlPrimary()">Valider</button>
+  </div>
+</div>
+
 <!-- ── ADMIN CONFIRM MODAL (changement mot de passe) ── -->
 <div id="adm-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
   <div class="adm-modal-box" style="width:100%;max-width:320px;background:var(--card);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
@@ -3614,14 +3687,6 @@ async function doLogin() {
     } catch(e) {}
     await _openSession();
     _logAction('login');
-    // Premier login : sauvegarder la langue choisie comme defaultLang + primaryLang
-    try {
-      const dlSnap = await _rref('/config/defaultLang').once('value');
-      if (!dlSnap.val()) {
-        const chosenLang = currentLang || localStorage.getItem('saas_ui_lang') || 'fr';
-        await _rref('/config').update({ defaultLang: chosenLang, primaryLang: chosenLang });
-      }
-    } catch(_e) {}
     showAdmin();
   } else {
     _loginAttempts++;
@@ -3723,20 +3788,19 @@ function applyMenuSnapshot(data) {
   // Révéler l'admin seulement après le premier rendu complet (évite le flash de sections vides)
   const _wrap = document.getElementById('adm-wrap');
   if (_wrap && _wrap.style.display === 'none') {
-    _wrap.style.display = '';
-    _hideAdmLoadingScreen();
-    // Sync panels DOM avec l'onglet mémorisé (évite le stacking au rechargement)
-    ['display','orders','settings'].forEach(t => {
-      const p = document.getElementById('admin-panel-' + t);
-      if (p) p.style.display = (t === _adminCurrentTab) ? '' : 'none';
-      document.getElementById('admin-tab-' + t)?.classList.toggle('on', t === _adminCurrentTab);
+    // Premier rendu : vérifier si c'est le tout premier login (defaultLang pas encore défini)
+    _rref('/config/defaultLang').once('value').then(snap => {
+      _hideAdmLoadingScreen();
+      if (!snap.val()) {
+        // Premier login absolu → popup 1 avant de révéler l'admin
+        _showFirstLoginPopup1();
+      } else {
+        _revealAdmWrap();
+      }
+    }).catch(() => {
+      _hideAdmLoadingScreen();
+      _revealAdmWrap();
     });
-    _updateScFabVisibility();
-    if (_adminCurrentTab === 'orders') {
-      if (!ordersListener) startOrdersListener();
-      startAnalyticsListener();
-      requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
-    }
   }
 }
 
@@ -7222,6 +7286,153 @@ function copyTableURL(btn, url) {
 ═══════════════════════════════════════════ */
 /* ── Login screen — sélecteur de langue ── */
 // _LOGIN_UI already declared before the IIFE above (line ~3567)
+
+/* ── First-login popups — textes 5 langues ── */
+const _FL_T = {
+  fr: {
+    step1:'Étape 1 sur 2', step2:'Étape 2 sur 2',
+    title1:'Langue du menu',
+    desc1:'Choisissez la langue dans laquelle vos clients verront le menu.',
+    hint1:'💡 Modifiable à tout moment dans ⚙️ Réglages → Paramètres de langue.',
+    title2:'Langue du personnel',
+    desc2:'Choisissez la langue de l\'application serveur et de l\'administration pour votre équipe.',
+    hint2:'💡 Modifiable à tout moment dans ⚙️ Réglages → Paramètres de langue.',
+    btn:'Valider'
+  },
+  en: {
+    step1:'Step 1 of 2', step2:'Step 2 of 2',
+    title1:'Menu language',
+    desc1:'Choose the language your customers will see on the menu.',
+    hint1:'💡 You can change it anytime in ⚙️ Settings → Language settings.',
+    title2:'Staff language',
+    desc2:'Choose the language for the server app and administration for your team.',
+    hint2:'💡 You can change it anytime in ⚙️ Settings → Language settings.',
+    btn:'Confirm'
+  },
+  de: {
+    step1:'Schritt 1 von 2', step2:'Schritt 2 von 2',
+    title1:'Menüsprache',
+    desc1:'Wählen Sie die Sprache, in der Ihre Kunden das Menü sehen.',
+    hint1:'💡 Jederzeit änderbar unter ⚙️ Einstellungen → Spracheinstellungen.',
+    title2:'Personalsprache',
+    desc2:'Wählen Sie die Sprache für die Server-App und die Verwaltung für Ihr Team.',
+    hint2:'💡 Jederzeit änderbar unter ⚙️ Einstellungen → Spracheinstellungen.',
+    btn:'Bestätigen'
+  },
+  el: {
+    step1:'Βήμα 1 από 2', step2:'Βήμα 2 από 2',
+    title1:'Γλώσσα μενού',
+    desc1:'Επιλέξτε τη γλώσσα που θα βλέπουν οι πελάτες σας στο μενού.',
+    hint1:'💡 Αλλαγή ανά πάσα στιγμή στις ⚙️ Ρυθμίσεις → Παράμετροι γλώσσας.',
+    title2:'Γλώσσα προσωπικού',
+    desc2:'Επιλέξτε τη γλώσσα της εφαρμογής σερβιτόρων και της διαχείρισης για την ομάδα σας.',
+    hint2:'💡 Αλλαγή ανά πάσα στιγμή στις ⚙️ Ρυθμίσεις → Παράμετροι γλώσσας.',
+    btn:'Επιβεβαίωση'
+  },
+  ar: {
+    step1:'الخطوة 1 من 2', step2:'الخطوة 2 من 2',
+    title1:'لغة القائمة',
+    desc1:'اختر اللغة التي سيرى بها عملاؤك قائمة الطعام.',
+    hint1:'💡 يمكن التغيير في أي وقت من ⚙️ الإعدادات ← إعدادات اللغة.',
+    title2:'لغة الموظفين',
+    desc2:'اختر لغة تطبيق الخدمة والإدارة لفريقك.',
+    hint2:'💡 يمكن التغيير في أي وقت من ⚙️ الإعدادات ← إعدادات اللغة.',
+    btn:'تأكيد'
+  }
+};
+
+let _flDefault = 'fr', _flPrimary = 'fr';
+
+function _buildFlFlags(containerId, selectedLang, pickFnName) {
+  const FLAGS = [
+    { l:'fr',f:'🇫🇷' },{ l:'en',f:'🇬🇧' },{ l:'de',f:'🇩🇪' },
+    { l:'el',f:'🇬🇷' },{ l:'ar',f:'🇸🇦' }
+  ];
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = FLAGS.map(({l,f}) =>
+    `<button class="llang-btn${l===selectedLang?' on':''}" data-lang="${l}" onclick="${pickFnName}('${l}')">${f}</button>`
+  ).join('');
+}
+
+function _syncFlFlags(containerId, selectedLang) {
+  document.querySelectorAll('#'+containerId+' .llang-btn')
+    .forEach(b => b.classList.toggle('on', b.dataset.lang === selectedLang));
+}
+
+function _showFirstLoginPopup1() {
+  const l = currentLang || 'fr';
+  _flDefault = l;
+  _flPrimary = l;
+  const t = _FL_T[l] || _FL_T.fr;
+  document.getElementById('fl1-step').textContent  = t.step1;
+  document.getElementById('fl1-title').textContent = t.title1;
+  document.getElementById('fl1-desc').textContent  = t.desc1;
+  document.getElementById('fl1-hint').textContent  = t.hint1;
+  document.getElementById('fl1-btn').textContent   = t.btn;
+  _buildFlFlags('fl1-flags', _flDefault, '_pickFlDefault');
+  const pop = document.getElementById('fl-popup-1');
+  pop.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => pop.classList.add('show')));
+}
+
+function _pickFlDefault(l) {
+  _flDefault = l;
+  _syncFlFlags('fl1-flags', l);
+}
+
+function _confirmFlDefault() {
+  const pop1 = document.getElementById('fl-popup-1');
+  pop1.classList.remove('show');
+  const l = currentLang || 'fr';
+  const t = _FL_T[l] || _FL_T.fr;
+  setTimeout(() => {
+    pop1.style.display = 'none';
+    document.getElementById('fl2-step').textContent  = t.step2;
+    document.getElementById('fl2-title').textContent = t.title2;
+    document.getElementById('fl2-desc').textContent  = t.desc2;
+    document.getElementById('fl2-hint').textContent  = t.hint2;
+    document.getElementById('fl2-btn').textContent   = t.btn;
+    _buildFlFlags('fl2-flags', _flPrimary, '_pickFlPrimary');
+    const pop2 = document.getElementById('fl-popup-2');
+    pop2.style.display = 'flex';
+    requestAnimationFrame(() => requestAnimationFrame(() => pop2.classList.add('show')));
+  }, 320);
+}
+
+function _pickFlPrimary(l) {
+  _flPrimary = l;
+  _syncFlFlags('fl2-flags', l);
+}
+
+async function _confirmFlPrimary() {
+  const pop2 = document.getElementById('fl-popup-2');
+  pop2.classList.remove('show');
+  try {
+    await _rref('/config').update({ defaultLang: _flDefault, primaryLang: _flPrimary });
+  } catch(_e) {}
+  setTimeout(() => {
+    pop2.style.display = 'none';
+    _revealAdmWrap();
+  }, 320);
+}
+
+function _revealAdmWrap() {
+  const _wrap = document.getElementById('adm-wrap');
+  if (!_wrap || _wrap.style.display !== 'none') return;
+  _wrap.style.display = '';
+  ['display','orders','settings'].forEach(t => {
+    const p = document.getElementById('admin-panel-' + t);
+    if (p) p.style.display = (t === _adminCurrentTab) ? '' : 'none';
+    document.getElementById('admin-tab-' + t)?.classList.toggle('on', t === _adminCurrentTab);
+  });
+  _updateScFabVisibility();
+  if (_adminCurrentTab === 'orders') {
+    if (!ordersListener) startOrdersListener();
+    startAnalyticsListener();
+    requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
+  }
+}
 
 function _syncLoginLangStrip(containerId, activeLang) {
   document.querySelectorAll('#' + containerId + ' .llang-btn').forEach(b => {

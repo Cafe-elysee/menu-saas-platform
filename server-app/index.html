@@ -1920,17 +1920,12 @@ function _hideSrvLoading() {
 }
 
 function _startApp() {
-  // Premier setup : appliquer et sauvegarder la langue choisie sur l'écran de configuration
+  // Premier setup : appliquer la langue choisie localement (defaultLang/primaryLang gérés par l'admin)
   var _fsl = localStorage.getItem('_srv_setup_lang');
   if (_fsl) {
     localStorage.removeItem('_srv_setup_lang');
     lang = _fsl;
     localStorage.setItem('saas_ui_lang', _fsl);
-    _rref('/config/defaultLang').once('value').then(function(dlSnap) {
-      if (!dlSnap.val()) {
-        _rref('/config').update({ defaultLang: _fsl, primaryLang: _fsl }).catch(function() {});
-      }
-    }).catch(function() {});
   }
   _hideSrvLoading();
   _rref('/config/primaryLang').on('value', function(snap) {
