@@ -1,7 +1,11 @@
-﻿# Scripts de migration (usage interne uniquement)
+﻿# Scripts de migration / audit (usage interne uniquement)
 _refactor.js
 _refactor2.js
 _fill_saas_config.js
+_update_*.mjs
+_fix_*.mjs
+_update_*.js
+_fix_*.js
 
 # Dépendances
 node_modules/
