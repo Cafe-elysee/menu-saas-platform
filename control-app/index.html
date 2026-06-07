@@ -1379,11 +1379,19 @@
         <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
           Chargement…
         </div>
-        <button class="btn-update" onclick="forceTokenRenewal()">Forcer le renouvellement</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          <button class="btn-update" onclick="forceTokenRenewal()">Renouveler le token</button>
+          <button class="btn-update" onclick="_openNotifSettings()" style="background:rgba(200,164,78,0.08);">Réglages notifs</button>
+          <button class="btn-update" onclick="_openBatterySettings()" style="background:rgba(200,164,78,0.08);">Batterie</button>
+          <button class="btn-update" onclick="_openAutoStart()" style="background:rgba(200,164,78,0.08);">Démarrage auto</button>
+        </div>
         <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
-        <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15);font-size:0.76rem;color:var(--muted);line-height:1.7">
-          Pour recevoir les notifications quand l'app est fermée :<br>
-          <span style="color:var(--gold)">Paramètres → Applications → Menu Pro Control → Batterie → Aucune restriction</span>
+        <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15);font-size:0.76rem;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--text);display:block;margin-bottom:4px;">Pour recevoir les notifications app fermée :</strong>
+          1. <span style="color:var(--gold)">Réglages notifs</span> → activer toutes les notifications<br>
+          2. <span style="color:var(--gold)">Batterie</span> → choisir "Aucune restriction"<br>
+          3. <span style="color:var(--gold)">Démarrage auto</span> → activer Menu Pro Control<br>
+          <span style="opacity:0.6;font-size:0.72rem;">Sur Xiaomi/Redmi, les 3 étapes sont nécessaires.</span>
         </div>
       </div>
     </div>
@@ -3081,6 +3089,14 @@ function refreshNotifStatus() {
 function _openNotifSettings() {
   const NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
   if (NS) NS.openNotifications();
+}
+function _openBatterySettings() {
+  const NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
+  if (NS) NS.openBattery();
+}
+function _openAutoStart() {
+  const NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
+  if (NS) NS.openAutoStart();
 }
 
 function forceTokenRenewal() {
