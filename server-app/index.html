@@ -475,6 +475,14 @@
     /* Réduction taille Greek pour Table / À emporter */
     html[lang="el"] .order-table-lbl { font-size: 1.05rem; }
 
+    /* ── Setup screen — language strip ── */
+    .setup-lang-strip { display:flex;justify-content:center;gap:6px;margin:0 0 20px; }
+    .slang-btn {
+      background:none;border:1.5px solid rgba(200,164,78,0.25);border-radius:9px;
+      padding:5px 9px;font-size:1.1rem;cursor:pointer;line-height:1;
+      transition:border-color 0.18s,background 0.18s;-webkit-tap-highlight-color:transparent;
+    }
+    .slang-btn.on { border-color:#c8a44e;background:rgba(200,164,78,0.12); }
     /* ── Loading screen élégant ── */
     @keyframes srvPulse { 0%,100%{opacity:0.6;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
     @keyframes srvRingRot { to{transform:rotate(360deg)} }
@@ -586,7 +594,14 @@
   <div style="max-width:340px;width:100%">
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
     <div style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">Menu Pro Serveur</div>
-    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:28px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
+    <div class="setup-lang-strip" id="setup-lang-strip">
+      <button class="slang-btn" data-lang="fr" onclick="_setupPickLang('fr')">🇫🇷</button>
+      <button class="slang-btn" data-lang="en" onclick="_setupPickLang('en')">🇬🇧</button>
+      <button class="slang-btn" data-lang="de" onclick="_setupPickLang('de')">🇩🇪</button>
+      <button class="slang-btn" data-lang="el" onclick="_setupPickLang('el')">🇬🇷</button>
+      <button class="slang-btn" data-lang="ar" onclick="_setupPickLang('ar')">🇸🇦</button>
+    </div>
     <!-- IDs mémorisés (peuplé par _renderSetupSavedIds) -->
     <div id="setup-saved-wrap" style="display:none;text-align:left;margin-bottom:4px;">
       <div id="setup-saved-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;"></div>
@@ -1800,9 +1815,22 @@ function _setupSelRemove(rid) {
   _renderSetupSavedIds();
 }
 
+/* ── Setup screen — sélecteur de langue ── */
+var _setupLang = localStorage.getItem('saas_ui_lang') || 'fr';
+
+function _setupPickLang(l) {
+  _setupLang = l;
+  lang = l;
+  localStorage.setItem('saas_ui_lang', l);
+  document.querySelectorAll('#setup-lang-strip .slang-btn').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.lang === l);
+  });
+  _renderSetupSavedIds();
+}
+
 /* ── SETUP RID (premier lancement) ── */
 function confirmSetupRid() {
-  var sl = ['fr','en','el','de','ar'].indexOf(lang) >= 0 ? lang : 'fr';
+  var sl = ['fr','en','el','de','ar'].indexOf(_setupLang) >= 0 ? _setupLang : 'fr';
   var _ERR = { fr:'Identifiant invalide (lettres minuscules, chiffres, tirets).', en:'Invalid ID.', el:'Μη έγκυρο ID.', de:'Ungültige ID.', ar:'معرّف غير صالح.' };
   var val = (document.getElementById('setup-rid-input').value || '').trim().toLowerCase();
   var err = document.getElementById('setup-err');
@@ -1811,6 +1839,8 @@ function confirmSetupRid() {
   }
   _addSavedId(val);
   localStorage.setItem('saas_rid', val);
+  // Transporter la langue choisie pour la sauvegarder en Firebase après rechargement
+  localStorage.setItem('_srv_setup_lang', _setupLang);
   location.reload();
 }
 
@@ -1822,6 +1852,10 @@ function init() {
     document.getElementById('setup-screen').style.display = 'flex';
     var inp = document.getElementById('setup-rid-input');
     if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmSetupRid(); });
+    // Marquer le bouton de langue actif
+    document.querySelectorAll('#setup-lang-strip .slang-btn').forEach(function(b) {
+      b.classList.toggle('on', b.dataset.lang === _setupLang);
+    });
     _renderSetupSavedIds();
     return;
   }
@@ -1886,6 +1920,18 @@ function _hideSrvLoading() {
 }
 
 function _startApp() {
+  // Premier setup : appliquer et sauvegarder la langue choisie sur l'écran de configuration
+  var _fsl = localStorage.getItem('_srv_setup_lang');
+  if (_fsl) {
+    localStorage.removeItem('_srv_setup_lang');
+    lang = _fsl;
+    localStorage.setItem('saas_ui_lang', _fsl);
+    _rref('/config/defaultLang').once('value').then(function(dlSnap) {
+      if (!dlSnap.val()) {
+        _rref('/config').update({ defaultLang: _fsl, primaryLang: _fsl }).catch(function() {});
+      }
+    }).catch(function() {});
+  }
   _hideSrvLoading();
   _rref('/config/primaryLang').on('value', function(snap) {
     var val = snap.val();

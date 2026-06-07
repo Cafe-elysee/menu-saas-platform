@@ -155,6 +155,14 @@
     }
     .adm-load-title { font-family:'Crimson Pro',serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:4px; }
     .adm-load-sub   { font-size:0.72rem;color:var(--muted);letter-spacing:0.22em;text-transform:uppercase; }
+    /* ── Language strip — login screens ── */
+    .login-lang-strip { display:flex;justify-content:center;gap:6px;margin:0 0 18px; }
+    .llang-btn {
+      background:none;border:1.5px solid var(--bord2);border-radius:9px;
+      padding:5px 9px;font-size:1.1rem;cursor:pointer;line-height:1;
+      transition:border-color 0.18s,background 0.18s;-webkit-tap-highlight-color:transparent;
+    }
+    .llang-btn.on { border-color:#c8a44e;background:rgba(200,164,78,0.12); }
     .login-box {
       width:100%; max-width:360px;
       background:var(--bg3); border:1px solid var(--bord2); border-radius:24px;
@@ -1947,6 +1955,13 @@
   <div class="login-box">
     <div class="login-logo">Menu Pro</div>
     <div class="login-sub" id="rsel-sub">Administration</div>
+    <div class="login-lang-strip" id="rsel-lang-strip">
+      <button class="llang-btn" data-lang="fr" onclick="_ridSelPickLang('fr')">🇫🇷</button>
+      <button class="llang-btn" data-lang="en" onclick="_ridSelPickLang('en')">🇬🇧</button>
+      <button class="llang-btn" data-lang="de" onclick="_ridSelPickLang('de')">🇩🇪</button>
+      <button class="llang-btn" data-lang="el" onclick="_ridSelPickLang('el')">🇬🇷</button>
+      <button class="llang-btn" data-lang="ar" onclick="_ridSelPickLang('ar')">🇸🇦</button>
+    </div>
     <div id="rsel-saved-wrap" style="display:none">
       <div id="rsel-saved-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;text-align:left"></div>
       <div id="rsel-saved-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
@@ -1966,6 +1981,13 @@
   <div class="login-box">
     <div class="login-logo" id="login-logo"></div>
     <div class="login-sub">Administration</div>
+    <div class="login-lang-strip" id="login-lang-strip">
+      <button class="llang-btn" data-lang="fr" onclick="_loginPickLang('fr')">🇫🇷</button>
+      <button class="llang-btn" data-lang="en" onclick="_loginPickLang('en')">🇬🇧</button>
+      <button class="llang-btn" data-lang="de" onclick="_loginPickLang('de')">🇩🇪</button>
+      <button class="llang-btn" data-lang="el" onclick="_loginPickLang('el')">🇬🇷</button>
+      <button class="llang-btn" data-lang="ar" onclick="_loginPickLang('ar')">🇸🇦</button>
+    </div>
     <div class="pw-wrap pw-wrap-block">
       <input type="password" class="login-input" id="pwd-input"
              placeholder="Mot de passe" autocomplete="current-password">
@@ -3296,6 +3318,8 @@ function _showRidSelector() {
   }
 
   document.getElementById('rid-sel-screen').style.display = 'flex';
+  // Sync active flag button
+  _syncLoginLangStrip('rsel-lang-strip', _l);
 }
 
 function _ridSelConnect(rid) {
@@ -3539,6 +3563,26 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
 let _loginAttempts = 0;
 let _loginBlockUntil = 0;
 
+// _LOGIN_UI déclaré ici (avant l'IIFE ci-dessous) car const n'est pas hoisté
+const _LOGIN_UI = {
+  fr: { pwd:'Mot de passe',   btn:'Connexion' },
+  en: { pwd:'Password',       btn:'Sign in' },
+  de: { pwd:'Passwort',       btn:'Anmelden' },
+  el: { pwd:'Κωδικός',        btn:'Σύνδεση' },
+  ar: { pwd:'كلمة المرور',     btn:'دخول' }
+};
+
+// Appliquer la langue mémorisée sur les écrans de login au chargement
+(function() {
+  const _il = localStorage.getItem('saas_ui_lang') || 'fr';
+  const _it = _LOGIN_UI[_il] || _LOGIN_UI.fr;
+  const pwdInput = document.getElementById('pwd-input');
+  if (pwdInput) pwdInput.placeholder = _it.pwd;
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) loginBtn.textContent = _it.btn;
+  _syncLoginLangStrip('login-lang-strip', _il);
+})();
+
 async function doLogin() {
   const errEl = document.getElementById('login-err');
   const now = Date.now();
@@ -3570,6 +3614,14 @@ async function doLogin() {
     } catch(e) {}
     await _openSession();
     _logAction('login');
+    // Premier login : sauvegarder la langue choisie comme defaultLang + primaryLang
+    try {
+      const dlSnap = await _rref('/config/defaultLang').once('value');
+      if (!dlSnap.val()) {
+        const chosenLang = currentLang || localStorage.getItem('saas_ui_lang') || 'fr';
+        await _rref('/config').update({ defaultLang: chosenLang, primaryLang: chosenLang });
+      }
+    } catch(_e) {}
     showAdmin();
   } else {
     _loginAttempts++;
@@ -7168,6 +7220,34 @@ function copyTableURL(btn, url) {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
+/* ── Login screen — sélecteur de langue ── */
+// _LOGIN_UI already declared before the IIFE above (line ~3567)
+
+function _syncLoginLangStrip(containerId, activeLang) {
+  document.querySelectorAll('#' + containerId + ' .llang-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.lang === activeLang);
+  });
+}
+
+function _loginPickLang(l) {
+  localStorage.setItem('saas_ui_lang', l);
+  if (_RID) {
+    currentLang = l;
+    localStorage.setItem(_PFX + 'admin_lang', l);
+  }
+  const t = _LOGIN_UI[l] || _LOGIN_UI.fr;
+  const pwdInput = document.getElementById('pwd-input');
+  if (pwdInput) pwdInput.placeholder = t.pwd;
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) loginBtn.textContent = t.btn;
+  _syncLoginLangStrip('login-lang-strip', l);
+}
+
+function _ridSelPickLang(l) {
+  localStorage.setItem('saas_ui_lang', l);
+  _showRidSelector();
+}
+
 let _admLoadHidden = false;
 function _hideAdmLoadingScreen() {
   if (_admLoadHidden) return;
@@ -7241,8 +7321,9 @@ function switchAdminTab(tab) {
   _tabScrollPos[_adminCurrentTab] = window.scrollY;
   const _targetScroll = _tabScrollPos[tab] ?? 0;
 
-  // Lock overflow during panel swap to prevent scrollbar flash
+  // Lock overflow on html + body during panel swap to prevent scrollbar flash
   document.documentElement.style.overflowY = 'hidden';
+  document.body.style.overflowY = 'hidden';
 
   const prevPanel = document.getElementById('admin-panel-' + _adminCurrentTab);
   _adminCurrentTab = tab;
@@ -7274,6 +7355,7 @@ function switchAdminTab(tab) {
   // Restore overflow after animation + apply correct scroll position
   setTimeout(() => {
     document.documentElement.style.overflowY = '';
+    document.body.style.overflowY = '';
     window.scrollTo({ top: _targetScroll, behavior: 'instant' });
   }, 240);
 }
@@ -7641,22 +7723,46 @@ window.addEventListener('pageshow', event => {
 
 /* ── SWIPE ADMIN (mobile uniquement) ── */
 (function() {
-  var _ax = null, _ay = null;
+  var _ax = null, _ay = null, _swipeDir = null;
+
   document.addEventListener('touchstart', function(e) {
     if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = null; return; }
     _ax = e.touches[0].clientX;
     _ay = e.touches[0].clientY;
+    _swipeDir = null;
   }, { passive:true });
-  document.addEventListener('touchend', function(e) {
+
+  // touchmove NON-passif : preventDefault() si horizontal confirmé
+  // Ceci empêche le browser d'afficher l'indicateur de scroll pendant le swipe latéral
+  document.addEventListener('touchmove', function(e) {
     if (_ax === null) return;
-    if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = null; return; }
+    if (document.getElementById('qr-modal').classList.contains('open')) return;
+    if (_swipeDir === 'vert') return; // scroll vertical : laisser passer
+    var dx = e.touches[0].clientX - _ax;
+    var dy = e.touches[0].clientY - _ay;
+    if (_swipeDir === null) {
+      var adx = Math.abs(dx), ady = Math.abs(dy);
+      if (adx > 10 || ady > 10) {
+        _swipeDir = (adx > ady * 1.2) ? 'horiz' : 'vert';
+      }
+    }
+    if (_swipeDir === 'horiz') {
+      e.preventDefault(); // bloque scroll + indicateur Android pendant swipe latéral
+    }
+  }, { passive:false }); // NON passif obligatoire pour preventDefault()
+
+  document.addEventListener('touchend', function(e) {
+    if (_ax === null) { _swipeDir = null; return; }
+    if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = _swipeDir = null; return; }
     var dx = e.changedTouches[0].clientX - _ax;
     var dy = e.changedTouches[0].clientY - _ay;
-    _ax = _ay = null;
+    var dir = _swipeDir;
+    _ax = _ay = _swipeDir = null;
+    // Ignorer si vertical confirmé ou seuil non atteint
+    if (dir === 'vert') return;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
     var tab2Btn = document.getElementById('admin-tab-orders');
     var tab2Ok  = tab2Btn && tab2Btn.style.display !== 'none';
-    // Séquence selon disponibilité de l'onglet Commandes
     // orders visible  : display ↔ orders ↔ settings
     // orders masqué   : display ↔ settings
     if (dx < 0) { // swipe gauche → onglet suivant
