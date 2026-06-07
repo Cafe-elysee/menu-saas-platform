@@ -132,6 +132,29 @@
       z-index:9999; padding:24px;
     }
     #login-screen.hidden { display:none; }
+    /* ── Admin loading screen ── */
+    @keyframes admLoadPulse { 0%,100%{opacity:0.6;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
+    @keyframes admLoadRot   { to{transform:rotate(360deg)} }
+    @keyframes admLoadFadeOut { to{opacity:0;pointer-events:none} }
+    #adm-loading-screen {
+      position:fixed;inset:0;background:var(--bg);z-index:99999;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+    }
+    #adm-loading-screen.hide { animation:admLoadFadeOut 0.4s ease forwards; }
+    .adm-load-logo { position:relative;width:72px;height:72px;margin-bottom:20px; }
+    .adm-load-logo-inner {
+      width:72px;height:72px;border-radius:20px;
+      background:var(--card);border:1px solid var(--bord2);
+      display:flex;align-items:center;justify-content:center;font-size:2rem;
+      animation:admLoadPulse 1.8s ease-in-out infinite;
+    }
+    .adm-load-ring {
+      position:absolute;inset:-8px;border-radius:28px;
+      border:2px solid transparent;border-top-color:var(--gold);
+      animation:admLoadRot 1.4s linear infinite;
+    }
+    .adm-load-title { font-family:'Crimson Pro',serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:4px; }
+    .adm-load-sub   { font-size:0.72rem;color:var(--muted);letter-spacing:0.22em;text-transform:uppercase; }
     .login-box {
       width:100%; max-width:360px;
       background:var(--bg3); border:1px solid var(--bord2); border-radius:24px;
@@ -1906,6 +1929,18 @@
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
 <!-- ══════════════════════════════════════
+     ADMIN LOADING SCREEN
+══════════════════════════════════════ -->
+<div id="adm-loading-screen">
+  <div class="adm-load-logo">
+    <div class="adm-load-logo-inner">⚙️</div>
+    <div class="adm-load-ring"></div>
+  </div>
+  <div class="adm-load-title">Menu Pro</div>
+  <div class="adm-load-sub">Administration</div>
+</div>
+
+<!-- ══════════════════════════════════════
      RID SELECTOR SCREEN (pas de ?rid= dans l'URL)
 ══════════════════════════════════════ -->
 <div id="rid-sel-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:10001;align-items:center;justify-content:center;padding:24px;">
@@ -3210,6 +3245,7 @@ function _removeSavedId(rid) {
    SÉLECTEUR D'ID (Phase 1 — pas de ?rid= dans URL)
 ═══════════════════════════════════════════ */
 function _showRidSelector() {
+  _hideAdmLoadingScreen();
   const _VALID_LANGS = ['fr','en','el','de','ar'];
   const _l = _VALID_LANGS.includes(localStorage.getItem('saas_ui_lang')) ? localStorage.getItem('saas_ui_lang') : 'fr';
   const t = (ADMIN_UI[_l] || ADMIN_UI.fr);
@@ -3421,6 +3457,8 @@ async function checkLogin() {
       }
     } catch(e) {}
   }
+  // Fallthrough : aucune session valide → écran login visible
+  _hideAdmLoadingScreen();
 }
 
 async function _openSession() {
@@ -3634,6 +3672,7 @@ function applyMenuSnapshot(data) {
   const _wrap = document.getElementById('adm-wrap');
   if (_wrap && _wrap.style.display === 'none') {
     _wrap.style.display = '';
+    _hideAdmLoadingScreen();
     // Sync panels DOM avec l'onglet mémorisé (évite le stacking au rechargement)
     ['display','orders','settings'].forEach(t => {
       const p = document.getElementById('admin-panel-' + t);
@@ -7129,6 +7168,15 @@ function copyTableURL(btn, url) {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
+let _admLoadHidden = false;
+function _hideAdmLoadingScreen() {
+  if (_admLoadHidden) return;
+  _admLoadHidden = true;
+  const el = document.getElementById('adm-loading-screen');
+  if (!el) return;
+  el.classList.add('hide');
+  setTimeout(() => { el.remove(); }, 450);
+}
 checkLogin();
 
 // Fermer les dropdowns si clic en dehors
@@ -7191,6 +7239,10 @@ function switchAdminTab(tab) {
 
   // Save scroll position of current tab
   _tabScrollPos[_adminCurrentTab] = window.scrollY;
+  const _targetScroll = _tabScrollPos[tab] ?? 0;
+
+  // Lock overflow during panel swap to prevent scrollbar flash
+  document.documentElement.style.overflowY = 'hidden';
 
   const prevPanel = document.getElementById('admin-panel-' + _adminCurrentTab);
   _adminCurrentTab = tab;
@@ -7207,8 +7259,6 @@ function switchAdminTab(tab) {
     nextPanel.classList.add(goRight ? 'tab-in-right' : 'tab-in-left');
     setTimeout(() => nextPanel.classList.remove('tab-in-left','tab-in-right'), 220);
   }
-  // Restore scroll position for the target tab
-  window.scrollTo({ top: _tabScrollPos[tab] ?? 0, behavior: 'instant' });
 
   ['display','orders','settings'].forEach(t => {
     document.getElementById('admin-tab-'+t)?.classList.toggle('on', t === tab);
@@ -7220,6 +7270,12 @@ function switchAdminTab(tab) {
     startAnalyticsListener();
     requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
   }
+
+  // Restore overflow after animation + apply correct scroll position
+  setTimeout(() => {
+    document.documentElement.style.overflowY = '';
+    window.scrollTo({ top: _targetScroll, behavior: 'instant' });
+  }, 240);
 }
 
 function _showFab(el) {

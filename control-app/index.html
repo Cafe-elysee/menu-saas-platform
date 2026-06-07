@@ -89,6 +89,29 @@
       z-index: 1000;
     }
     #login-screen.hidden { display: none; }
+    /* ── Control loading screen ── */
+    @keyframes ctrlLoadPulse { 0%,100%{opacity:0.6;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
+    @keyframes ctrlLoadRot   { to{transform:rotate(360deg)} }
+    @keyframes ctrlLoadFadeOut { to{opacity:0;pointer-events:none} }
+    #ctrl-loading-screen {
+      position:fixed;inset:0;background:var(--bg);z-index:9999;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+    }
+    #ctrl-loading-screen.hide { animation:ctrlLoadFadeOut 0.4s ease forwards; }
+    .ctrl-load-logo { position:relative;width:72px;height:72px;margin-bottom:20px; }
+    .ctrl-load-logo-inner {
+      width:72px;height:72px;border-radius:20px;
+      background:var(--card-bg);border:1px solid rgba(200,164,78,0.25);
+      display:flex;align-items:center;justify-content:center;font-size:2rem;
+      animation:ctrlLoadPulse 1.8s ease-in-out infinite;
+    }
+    .ctrl-load-ring {
+      position:absolute;inset:-8px;border-radius:28px;
+      border:2px solid transparent;border-top-color:#c8a44e;
+      animation:ctrlLoadRot 1.4s linear infinite;
+    }
+    .ctrl-load-title { font-size:1.4rem;font-weight:700;color:#c8a44e;letter-spacing:0.08em;margin-bottom:4px; }
+    .ctrl-load-sub   { font-size:0.7rem;color:var(--muted);letter-spacing:0.22em;text-transform:uppercase; }
 
     .login-box {
       background: var(--card-bg);
@@ -1157,6 +1180,16 @@
 </head>
 <body>
 
+<!-- ══════════════ LOADING ══════════════ -->
+<div id="ctrl-loading-screen">
+  <div class="ctrl-load-logo">
+    <div class="ctrl-load-logo-inner">⚙️</div>
+    <div class="ctrl-load-ring"></div>
+  </div>
+  <div class="ctrl-load-title">Menu Pro</div>
+  <div class="ctrl-load-sub">Control</div>
+</div>
+
 <!-- ══════════════ LOGIN ══════════════ -->
 <div id="login-screen">
   <div class="login-box">
@@ -1654,6 +1687,16 @@ async function sha256(str) {
 // ════════════════════════════════════════════════════
 let _isFirstRun = false;
 
+let _ctrlLoadHidden = false;
+function _hideCtrlLoadingScreen() {
+  if (_ctrlLoadHidden) return;
+  _ctrlLoadHidden = true;
+  const el = document.getElementById('ctrl-loading-screen');
+  if (!el) return;
+  el.classList.add('hide');
+  setTimeout(() => { el.remove(); }, 450);
+}
+
 function initLogin() {
   const stored = localStorage.getItem('ctrl_pw_hash');
   if (!stored) {
@@ -1663,6 +1706,7 @@ function initLogin() {
     document.getElementById('login-pw2-wrap').style.display = 'block';
     document.getElementById('login-btn').textContent = 'Créer le mot de passe';
   }
+  _hideCtrlLoadingScreen();
 }
 
 async function tryLogin() {
