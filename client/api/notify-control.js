@@ -84,8 +84,8 @@ module.exports = async (req, res) => {
   try {
     const { title, body: bodyText, type } = req.body || {};
 
-    const notifTitle = title || '📋 Nouveau devis';
-    const notifBody  = bodyText || 'Un client a envoyé une demande de devis.';
+    const notifTitle = title || '🆕 Nouvelle commande';
+    const notifBody  = bodyText || 'Un client a envoyé une commande.';
 
     const sa          = JSON.parse(process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT);
     const accessToken = await getAccessToken(sa);
@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
         message: {
           token: entry.token,
           notification: { title: notifTitle, body: notifBody },
-          data: { type: type || 'devis', ts: String(Date.now()) },
+          data: { type: type || 'commande', ts: String(Date.now()) },
           android: {
             priority: 'high',
             notification: { channel_id: 'devis_control', sound: 'default' }
