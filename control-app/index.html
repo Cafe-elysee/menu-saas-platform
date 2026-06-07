@@ -1177,6 +1177,12 @@
     .quick-nav-name { font-size: 0.9rem; font-weight: 500; }
     .variant-univ-sep { font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(200,164,78,.55); margin:0.6rem 0 0.3rem; padding-top:0.5rem; border-top:1px solid rgba(200,164,78,.15); }
   </style>
+  <script>
+    (function(){
+      var t = localStorage.getItem('ctrl_theme');
+      if (t !== 'dark') document.documentElement.classList.add('light');
+    })();
+  </script>
 </head>
 <body>
 
