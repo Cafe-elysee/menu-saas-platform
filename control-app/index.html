@@ -1211,6 +1211,11 @@
     .quick-nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .quick-nav-name { font-size: 0.9rem; font-weight: 500; }
     .variant-univ-sep { font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(200,164,78,.55); margin:0.6rem 0 0.3rem; padding-top:0.5rem; border-top:1px solid rgba(200,164,78,.15); }
+  @keyframes ctrlConfirmIn  { from { opacity:0; transform:scale(0.88) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes ctrlConfirmOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.9); } }
+  #ctrl-confirm-modal { display:none; position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px; }
+  .ctrl-confirm-box { width:100%; max-width:320px; background:var(--surface); border:1px solid var(--bord2); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
+  .ctrl-confirm-box.out { animation:ctrlConfirmOut 0.18s ease forwards; }
   </style>
   <script>
     (function(){
@@ -1455,6 +1460,17 @@
     <div class="del-actions">
       <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
       <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div id="ctrl-confirm-modal" onclick="if(event.target===this)_hideCtrlConfirm()">
+  <div class="ctrl-confirm-box">
+    <div id="ctrl-confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.2rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
+    <div id="ctrl-confirm-msg"   style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="_hideCtrlConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bord2);background:transparent;color:var(--text);font-family:inherit;font-size:0.85rem;cursor:pointer;">Annuler</button>
+      <button id="ctrl-confirm-ok-btn" onclick="_doCtrlConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:none;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;"></button>
     </div>
   </div>
 </div>
@@ -2153,14 +2169,47 @@ function toggleCommandeCard(key) {
   if (card) card.classList.toggle('open');
 }
 
+let _ctrlConfirmCb = null;
+function _showCtrlConfirm(title, msg, okLabel, cb, isDanger) {
+  document.getElementById('ctrl-confirm-title').textContent = title;
+  document.getElementById('ctrl-confirm-msg').textContent   = msg;
+  const okBtn = document.getElementById('ctrl-confirm-ok-btn');
+  okBtn.textContent = okLabel;
+  okBtn.style.background = isDanger ? 'linear-gradient(135deg,#e87070,#d94040,#b02020)' : 'linear-gradient(135deg,#d4a94e,#c8a44e,#b8922e)';
+  okBtn.style.color = isDanger ? '#fff' : '#0c0a08';
+  _ctrlConfirmCb = cb;
+  const modal = document.getElementById('ctrl-confirm-modal');
+  const box   = modal.querySelector('.ctrl-confirm-box');
+  box.classList.remove('out');
+  modal.style.display = 'flex';
+  void box.offsetWidth;
+  box.style.animation = 'none';
+  void box.offsetWidth;
+  box.style.animation = '';
+}
+function _hideCtrlConfirm() {
+  const modal = document.getElementById('ctrl-confirm-modal');
+  const box   = modal.querySelector('.ctrl-confirm-box');
+  box.classList.add('out');
+  setTimeout(() => { modal.style.display = 'none'; box.classList.remove('out'); }, 180);
+  _ctrlConfirmCb = null;
+}
+function _doCtrlConfirm() {
+  const cb = _ctrlConfirmCb;
+  _hideCtrlConfirm();
+  if (cb) cb();
+}
+
 function deleteCommande(key) {
-  if (!confirm('Supprimer cette commande définitivement ?')) return;
-  _controlDb.ref('/commandes/' + key).remove();
+  _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
+    _controlDb.ref('/commandes/' + key).remove();
+  }, true);
 }
 
 function viderCommande() {
-  if (!confirm('Supprimer TOUTES les commandes ? Cette action est irréversible.')) return;
-  _controlDb.ref('/commandes').remove();
+  _showCtrlConfirm('Supprimer toutes les commandes', 'Toutes les commandes seront supprimées. Cette action est irréversible.', 'Tout supprimer', () => {
+    _controlDb.ref('/commandes').remove();
+  }, true);
 }
 
 

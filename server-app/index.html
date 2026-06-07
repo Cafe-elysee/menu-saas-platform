@@ -1309,6 +1309,8 @@ function setConnected(on) {
 
 /* ── FIREBASE POLLING (appels) ── */
 var _lastCallTs = parseInt(localStorage.getItem(_PFX+'last_call_ts') || '0');
+var _accountValid = false;
+var _pendingNativeToken = null;
 function startPolling() {
   setConnected(false);
   _rref('calls/lastCall').on('value', function(snap) {
@@ -1357,6 +1359,7 @@ function _checkServerTokenInFirebase() {
 
 function saveNativeToken(token) {
   if (!token || !_RID) return;
+  if (!_accountValid) { _pendingNativeToken = token; return; }
   var deviceId = getDeviceId();
   localStorage.setItem(_PFX+'fcm_token', token);
   _rref('devices/' + deviceId).set({ token: token, ts: Date.now(), lang: lang })
@@ -1928,6 +1931,8 @@ function _hideSrvLoading() {
 }
 
 function _startApp() {
+  _accountValid = true;
+  if (_pendingNativeToken) { saveNativeToken(_pendingNativeToken); _pendingNativeToken = null; }
   // Premier setup : appliquer la langue choisie localement (defaultLang/primaryLang gérés par l'admin)
   var _fsl = localStorage.getItem('_srv_setup_lang');
   if (_fsl) {
