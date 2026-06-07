@@ -2893,7 +2893,7 @@ const ADMIN_UI = {
     settingsPwd:'Mot de passe d\'accès', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     ridSelSaved:'IDs enregistrés', ridSelNew:'Entrer un autre ID', ridSelPlaceholder:'ex: cafe-paris', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Code invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, sans espaces.',
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
-    changeIdBtn:'Changer d\'ID', changeIdConfirmTitle:'Changer d\'identifiant', changeIdConfirmMsg:'Vous serez redirigé vers le sélecteur d\'ID. Vous pourrez revenir ici sans saisir à nouveau le mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
+    changeIdBtn:'Changer d\'ID', changeIdConfirmTitle:'Changer de restaurant', changeIdConfirmMsg:'Vous serez redirigé vers la sélection de restaurant. Vous pourrez revenir ici sans entrer à nouveau votre mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
     settingsDefaultLang:'Langue affichée aux clients (par défaut)', settingsPrimaryLang:'Langue du personnel et de l\'administration',
     emptyMenuTitle:'Votre menu est vide', emptyMenuSub:'Commencez par créer votre première catégorie pour ajouter des produits.',
     phPassword:'Mot de passe', phPasswordNew:'Nouveau mot de passe', phRestaurantName:'Nom du restaurant',
@@ -7029,8 +7029,8 @@ async function saveAdminPassword() {
 function changeRestaurantId() {
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   _showAdmConfirm(
-    t.changeIdConfirmTitle || 'Changer d\'identifiant',
-    t.changeIdConfirmMsg   || 'Vous serez redirigé vers le sélecteur d\'ID. Vous pourrez revenir sans saisir à nouveau le mot de passe.',
+    t.changeIdConfirmTitle || 'Changer de restaurant',
+    t.changeIdConfirmMsg   || 'Vous serez redirigé vers la sélection de restaurant. Vous pourrez revenir ici sans entrer à nouveau votre mot de passe.',
     t.changeIdConfirmOk    || 'Confirmer',
     t.changeIdConfirmCancel|| 'Annuler',
     () => {
