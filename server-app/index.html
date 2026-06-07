@@ -594,7 +594,7 @@
   <div style="max-width:340px;width:100%">
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
     <div style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">Menu Pro Serveur</div>
-    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Configuration initiale</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Première connexion</div>
     <div class="setup-lang-strip" id="setup-lang-strip">
       <button class="slang-btn" data-lang="fr" onclick="_setupPickLang('fr')">🇫🇷</button>
       <button class="slang-btn" data-lang="en" onclick="_setupPickLang('en')">🇬🇧</button>
@@ -611,7 +611,7 @@
     <div id="setup-rid-label" style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">ID du restaurant</div>
     <input type="text" id="setup-rid-input" placeholder="ex: cafe-oran"
       style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
-    <div id="setup-rid-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demande l&#39;identifiant à l&#39;administrateur</div>
+    <div id="setup-rid-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demandez votre code d'accès à l'administrateur</div>
     <div id="setup-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
     <button id="setup-confirm-btn" onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer">Confirmer</button>
   </div>
@@ -752,9 +752,9 @@
     </div>
 
     <div style="margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
-      <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Token FCM</div>
+      <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Connexion application</div>
       <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px">—</div>
-      <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(200,164,78,0.3);background:transparent;color:var(--gold);font-family:inherit;font-size:0.8rem;cursor:pointer">🔄 Re-enregistrer FCM</button>
+      <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(200,164,78,0.3);background:transparent;color:var(--gold);font-family:inherit;font-size:0.8rem;cursor:pointer">🔄 Reconnecter</button>
     </div>
   </section>
 
@@ -828,7 +828,7 @@ const T = {
     settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Supprime la connexion actuelle et demande un nouvel identifiant de restaurant.',
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
     settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → Menu Pro Serveur → Batterie → Aucune restriction',
-    settingsFcmTitle:'Connexion application', settingsFcmRetry:'🔄 Reconnecter', settingsFcmNoToken:'❌ Application non connectée', settingsFcmConnected:'✅ Application connectée', settingsFcmWaiting:'⏳ Connexion en cours…', settingsFcmError:'❌ Erreur de connexion',
+    settingsFcmTitle:'Connexion application', settingsFcmRetry:'🔄 Reconnecter', settingsFcmNoToken:'❌ Application non connectée', settingsFcmConnected:'✅ Application connectée', settingsFcmWaiting:'⏳ Connexion en cours…', settingsFcmError:'❌ Connexion échouée — vérifiez internet et réessayez',
     notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer', confirmYes:'Confirmer', confirmNo:'Annuler',
   },
   en: {
@@ -1576,11 +1576,11 @@ function _applyInitialTab() {
     // Forfait Menu QR : aucun service serveur — afficher écran bloquant
     if (!callEnabled && !orderEnabled) {
       var _FORFAIT = {
-        fr: { title:'Forfait Menu QR', msg:'Ce forfait n\'inclut pas le service serveur.<br>Contactez l\'administrateur pour activer le forfait Commandes & Services.', changeId:"Changer d'ID" },
-        en: { title:'QR Menu Plan',    msg:'This plan does not include the server service.<br>Contact the administrator to activate the Orders & Services plan.',           changeId:'Change ID' },
-        el: { title:'Πακέτο Menu QR',  msg:'Αυτό το πακέτο δεν περιλαμβάνει την υπηρεσία σερβιτόρου.<br>Επικοινωνήστε με τον διαχειριστή.',                              changeId:'Αλλαγή ID' },
-        de: { title:'QR-Menü-Paket',   msg:'Dieses Paket beinhaltet nicht den Serverdienst.<br>Kontaktieren Sie den Administrator.',                                       changeId:'ID ändern' },
-        ar: { title:'باقة قائمة QR',   msg:'هذه الباقة لا تتضمن خدمة النادل.<br>تواصل مع المسؤول لتفعيل باقة الطلبات والخدمات.',                                       changeId:'تغيير المعرّف' }
+        fr: { title:'Accès limité', msg:'Cet abonnement inclut uniquement le menu numérique.<br>Contactez l\'administrateur pour activer les appels et les commandes.', changeId:"Changer de restaurant" },
+        en: { title:'Limited access', msg:'This plan includes the digital menu only.<br>Contact the administrator to enable calls and orders.',                         changeId:'Change restaurant' },
+        el: { title:'Περιορισμένη πρόσβαση', msg:'Αυτό το πακέτο περιλαμβάνει μόνο το ψηφιακό μενού.<br>Επικοινωνήστε με τον διαχειριστή για να ενεργοποιήσετε κλήσεις και παραγγελίες.', changeId:'Αλλαγή εστιατορίου' },
+        de: { title:'Eingeschränkter Zugang', msg:'Dieses Paket enthält nur das digitale Menü.<br>Kontaktieren Sie den Administrator, um Anrufe und Bestellungen zu aktivieren.', changeId:'Restaurant ändern' },
+        ar: { title:'وصول محدود', msg:'هذا الاشتراك يشمل القائمة الرقمية فقط.<br>تواصل مع المسؤول لتفعيل النداءات والطلبات.',                                         changeId:'تغيير المطعم' }
       };
       var fp = _FORFAIT[lang] || _FORFAIT.fr;
       var fs = document.getElementById('srv-forfait-screen');
@@ -1750,11 +1750,11 @@ function _removeSavedId(rid) {
 
 function _renderSetupSavedIds() {
   var _SETUP_T = {
-    fr:{ saved:'IDs enregistrés', connect:'Se connecter', newId:'Utiliser un autre ID', placeholder:'ex: cafe-oran', hint:'Demande l\'identifiant à l\'administrateur', confirm:'Confirmer', err:'Identifiant invalide (lettres minuscules, chiffres, tirets).' },
-    en:{ saved:'Saved IDs', connect:'Sign in', newId:'Use another ID', placeholder:'e.g. cafe-oran', hint:'Ask the administrator for the ID', confirm:'Confirm', err:'Invalid ID (lowercase letters, numbers, hyphens).' },
-    el:{ saved:'Αποθηκευμένα IDs', connect:'Σύνδεση', newId:'Χρήση άλλου ID', placeholder:'π.χ. cafe-oran', hint:'Ζητήστε το ID από τον διαχειριστή', confirm:'Επιβεβαίωση', err:'Μη έγκυρο ID (πεζά γράμματα, αριθμοί, παύλες).' },
-    de:{ saved:'Gespeicherte IDs', connect:'Anmelden', newId:'Andere ID verwenden', placeholder:'z.B. cafe-oran', hint:'Fragen Sie den Administrator nach der ID', confirm:'Bestätigen', err:'Ungültige ID (Kleinbuchstaben, Zahlen, Bindestriche).' },
-    ar:{ saved:'المعرّفات المحفوظة', connect:'تسجيل الدخول', newId:'استخدام معرّف آخر', placeholder:'مثال: cafe-oran', hint:'اطلب المعرّف من المسؤول', confirm:'متابعة', err:'معرّف غير صالح (أحرف صغيرة، أرقام، شرطات).' }
+    fr:{ saved:'IDs enregistrés', connect:'Se connecter', newId:'Utiliser un autre ID', placeholder:'ex: cafe-oran', hint:'Demandez votre code d\'accès à l\'administrateur', confirm:'Confirmer', err:'Code invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, sans espaces.' },
+    en:{ saved:'Saved IDs', connect:'Sign in', newId:'Use another ID', placeholder:'e.g. cafe-oran', hint:'Ask your administrator for the access code', confirm:'Confirm', err:'Invalid code: use only lowercase letters, numbers and hyphens, no spaces.' },
+    el:{ saved:'Αποθηκευμένα IDs', connect:'Σύνδεση', newId:'Χρήση άλλου ID', placeholder:'π.χ. cafe-oran', hint:'Ζητήστε τον κωδικό πρόσβασης από τον διαχειριστή', confirm:'Επιβεβαίωση', err:'Μη έγκυρος κωδικός: μόνο πεζά γράμματα, αριθμοί και παύλες, χωρίς κενά.' },
+    de:{ saved:'Gespeicherte IDs', connect:'Anmelden', newId:'Andere ID verwenden', placeholder:'z.B. cafe-oran', hint:'Fragen Sie Ihren Administrator nach dem Zugangscode', confirm:'Bestätigen', err:'Ungültiger Code: nur Kleinbuchstaben, Zahlen und Bindestriche erlaubt, keine Leerzeichen.' },
+    ar:{ saved:'المعرّفات المحفوظة', connect:'تسجيل الدخول', newId:'استخدام معرّف آخر', placeholder:'مثال: cafe-oran', hint:'اطلب رمز الوصول من المسؤول', confirm:'متابعة', err:'رمز غير صالح: استخدم فقط أحرفاً صغيرة وأرقاماً وشرطات، بدون مسافات.' }
   };
   var sl = ['fr','en','el','de','ar'].indexOf(lang) >= 0 ? lang : 'fr';
   var t = _SETUP_T[sl] || _SETUP_T.fr;
