@@ -487,6 +487,50 @@
     }
     html.light .btn-email  { background: rgba(66,133,244,0.1); }
     html.light .btn-viber  { background: rgba(123,65,163,0.1); }
+    .btn-viber-copy {
+      background: rgba(123,65,163,0.13); color: #7b41a3;
+    }
+    html.light .btn-viber-copy { background: rgba(123,65,163,0.1); }
+
+    /* Badge client créé */
+    .commande-client-cree-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 8px;
+      background: rgba(76,175,80,0.13); color: var(--green);
+      font-size: 0.72rem; font-weight: 600;
+      border: 1px solid rgba(76,175,80,0.22);
+    }
+
+    /* Bouton info (i) */
+    .info-btn {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1.5px solid rgba(200,164,78,0.55);
+      background: transparent; color: var(--gold);
+      font-size: 0.6rem; font-weight: 700; line-height: 1;
+      cursor: pointer; display: inline-flex; align-items: center;
+      justify-content: center; flex-shrink: 0; margin-left: 6px;
+      vertical-align: middle; padding: 0; transition: border-color 0.15s, background 0.15s;
+    }
+    .info-btn:active { background: rgba(200,164,78,0.12); border-color: var(--gold); }
+
+    /* Tooltip info */
+    .info-tooltip-overlay { position: fixed; inset: 0; z-index: 9998; }
+    .info-tooltip {
+      position: fixed; z-index: 9999;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 36px 14px 14px;
+      max-width: 280px; width: calc(100vw - 40px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+      font-size: 0.82rem; color: var(--text); line-height: 1.55;
+      animation: tipIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes tipIn { from{opacity:0;transform:scale(0.9) translateY(4px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .info-tooltip strong { color: var(--gold); }
+    .info-tooltip-close {
+      position: absolute; top: 8px; right: 10px;
+      font-size: 1rem; cursor: pointer; color: var(--muted);
+      background: none; border: none; padding: 2px 4px; line-height: 1;
+    }
 
     /* ═══════════════════════════════
        TAB CLIENTS
@@ -2011,6 +2055,18 @@ async function createNewClient() {
     document.getElementById('nc-form').style.display = 'none';
     document.getElementById('nc-result').classList.add('show');
 
+    // Si créé depuis une commande : stocker les infos pour les boutons de livraison
+    if (_pendingCommandeKey) {
+      const cmdData = _commandesCache[_pendingCommandeKey] || {};
+      const fLabel = cmdData.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+      _lastCreatedClients[_pendingCommandeKey] = { rid, pwd, name, forfait: fLabel };
+      const cmdKey = _pendingCommandeKey;
+      _pendingCommandeKey = null;
+      // Re-render la carte commande pour mettre à jour les boutons de contact
+      setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 150);
+    } else {
+      _pendingCommandeKey = null;
+    }
     // Le listener Firebase existant détecte le nouveau client et reconstruit automatiquement
 
   } catch(e) {
@@ -2040,6 +2096,87 @@ function getClientDb(slug) {
 // ════════════════════════════════════════════════════
 let _commandesCache = {};
 let _initialTabDecided = false;
+// Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
+let _lastCreatedClients = {};
+let _pendingCommandeKey = null;
+
+// ── Textes tooltips (i) ───────────────────────────
+const _INFO_TIPS = {
+  forfait: '<strong>📋 Menu QR</strong> — Le client accède au menu digital via son téléphone. Idéal pour consulter la carte, pas de commandes.<br><br><strong>🛎 Commandes & Services</strong> — En plus du menu, les clients peuvent <strong>passer des commandes</strong> et <strong>appeler le serveur</strong> directement depuis leur téléphone.',
+  retention: 'Les appels et commandes sont <strong>automatiquement supprimés</strong> après la durée choisie. Cela garde la base de données légère et rapide.',
+  contact_avant: 'Envoie un message de <strong>confirmation de réception</strong> au client — lui indique que sa demande a bien été reçue et qu\'il sera contacté bientôt.',
+  contact_apres: 'Envoie le <strong>message de livraison</strong> avec le lien d\'accès, l\'identifiant et le mot de passe du client pour qu\'il puisse se connecter immédiatement.'
+};
+
+function showInfoTooltip(btn, tipId) {
+  const existing = document.getElementById('_info-tip-overlay');
+  if (existing) { existing.remove(); return; }
+  const html = _INFO_TIPS[tipId] || '';
+  if (!html) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = '_info-tip-overlay';
+  overlay.className = 'info-tooltip-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  const tip = document.createElement('div');
+  tip.className = 'info-tooltip';
+  tip.innerHTML = html + '<button class="info-tooltip-close" onclick="document.getElementById(\'_info-tip-overlay\').remove()">✕</button>';
+
+  const rect = btn.getBoundingClientRect();
+  let left = rect.left;
+  let top  = rect.bottom + 8;
+  const tipW = Math.min(280, window.innerWidth - 40);
+  if (left + tipW > window.innerWidth - 20) left = window.innerWidth - tipW - 20;
+  if (left < 20) left = 20;
+  if (top + 180 > window.innerHeight) { top = rect.top - 8; tip.style.transform = 'translateY(-100%)'; }
+  tip.style.left = left + 'px';
+  tip.style.top  = top  + 'px';
+
+  overlay.appendChild(tip);
+  document.body.appendChild(overlay);
+}
+
+// ── Messages de livraison (après création client) ─
+function buildDeliverySubject(rest, forfait, lang) {
+  const s = {
+    fr: '🎉 Votre espace Menu Pro est prêt — ' + rest,
+    en: '🎉 Your Menu Pro space is ready — ' + rest,
+    el: '🎉 Ο χώρος Menu Pro σας είναι έτοιμος — ' + rest,
+    ar: '🎉 مساحتكم على Menu Pro جاهزة — ' + rest,
+    de: '🎉 Ihr Menu Pro Bereich ist bereit — ' + rest
+  };
+  return s[lang] || s.fr;
+}
+
+function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
+  const url = 'https://menu-saas-platform.vercel.app/admin.html';
+  const m = {
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace Menu Pro est prêt.\n\n📋 Forfait : ' + forfait + '\n🔗 Lien d\'accès : ' + url + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration Menu Pro.\n\nCordialement,\nL\'équipe Menu Pro',
+    en: 'Hello ' + rest + '! 🎉\n\nYour Menu Pro space is ready.\n\n📋 Plan: ' + forfait + '\n🔗 Access link: ' + url + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link, enter your ID and password to access your Menu Pro admin panel.\n\nBest regards,\nThe Menu Pro team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος Menu Pro σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n🔗 Σύνδεσμος: ' + url + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΜεταβείτε σε αυτόν τον σύνδεσμο και συνδεθείτε με τα παραπάνω στοιχεία.\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
+    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على Menu Pro جاهزة.\n\n📋 الخطة: ' + forfait + '\n🔗 رابط الدخول: ' + url + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا المعرّف ثم كلمة المرور للوصول إلى لوحة الإدارة.\n\nمع التحية،\nفريق Menu Pro',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr Menu Pro Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n🔗 Zugangslink: ' + url + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nGehen Sie zu diesem Link und melden Sie sich mit Ihren Zugangsdaten an.\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
+  };
+  return m[lang] || m.fr;
+}
+
+function _rerenderCommandeCard(key) {
+  const d = _commandesCache[key];
+  if (!d) return;
+  const existing = document.querySelector('.commande-card[data-key="' + key + '"]');
+  if (!existing) return;
+  existing.parentNode.replaceChild(buildCommandeCard(key, d), existing);
+}
+
+function _copyViberMsg(key) {
+  const created = _lastCreatedClients[key];
+  const d = _commandesCache[key];
+  if (!created || !d) return;
+  const fLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+  const msg = buildDeliveryMsg(d.restaurant || '', created.rid, created.pwd, fLabel, d.langue || 'fr');
+  navigator.clipboard.writeText(msg).then(function() { showToast('Message copié ! 📋'); });
+}
 
 function listenCommandes() {
   _controlDb.ref('/commandes').on('value', snap => {
@@ -2100,14 +2237,21 @@ function buildCommandeCard(key, d) {
   const langue       = d.langue || 'fr';
   const restEsc      = escapeHtml(restaurant);
 
+  // État : client déjà créé depuis cette commande ?
+  const created = _lastCreatedClients[key] || null;
+
   // Bouton Email
   let emailBtn = '';
   if (d.email) {
-    const subj = buildContactSubject(restaurant, forfaitLabel, langue);
-    const body = buildContactMsg(restaurant, forfaitLabel, langue);
-    const url  = 'mailto:' + encodeURIComponent(d.email) +
-                 '?subject=' + encodeURIComponent(subj) +
-                 '&body='    + encodeURIComponent(body);
+    const subj = created
+      ? buildDeliverySubject(restaurant, forfaitLabel, langue)
+      : buildContactSubject(restaurant, forfaitLabel, langue);
+    const body = created
+      ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue)
+      : buildContactMsg(restaurant, forfaitLabel, langue);
+    const url = 'mailto:' + encodeURIComponent(d.email) +
+                '?subject=' + encodeURIComponent(subj) +
+                '&body='    + encodeURIComponent(body);
     emailBtn = '<a class="commande-action-btn btn-email" href="' + url + '" target="_system">✉️ Email</a>';
   }
 
@@ -2115,7 +2259,9 @@ function buildCommandeCard(key, d) {
   let waBtn = '';
   if (d.whatsapp && d.whatsapp.numero) {
     const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
-    const msg = buildContactMsg(restaurant, forfaitLabel, langue);
+    const msg = created
+      ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue)
+      : buildContactMsg(restaurant, forfaitLabel, langue);
     const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
     waBtn = '<a class="commande-action-btn btn-wa" href="' + url + '" target="_system">' +
       '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
@@ -2127,7 +2273,15 @@ function buildCommandeCard(key, d) {
   if (d.viber && d.viber.numero) {
     const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
     viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>';
+    if (created) {
+      viberBtn += '<button class="commande-action-btn btn-viber-copy" onclick="_copyViberMsg(\'' + key + '\')">📋 Copier msg</button>';
+    }
   }
+
+  // Bouton "Créer ce client" ou badge si déjà créé
+  const creerBtn = created
+    ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
+    : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
 
   card.innerHTML =
     '<div class="commande-card-inner">' +
@@ -2152,7 +2306,7 @@ function buildCommandeCard(key, d) {
             '<option value="en_cours" ' + (statut==='en_cours' ?'selected':'') + '>⏳ En cours</option>' +
             '<option value="traite"   ' + (statut==='traite'   ?'selected':'') + '>✅ Traité</option>' +
           '</select>' +
-          '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" onclick="showNewClientModalFromCommande(this.dataset.rest)">＋ Créer ce client</button>' +
+          creerBtn +
           emailBtn + waBtn + viberBtn +
           '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')">🗑️</button>' +
         '</div>' +
@@ -2268,7 +2422,8 @@ function buildContactMsg(rest, forfait, lang) {
   return m[lang] || m.fr;
 }
 
-function showNewClientModalFromCommande(restaurantName) {
+function showNewClientModalFromCommande(restaurantName, commandeKey) {
+  _pendingCommandeKey = commandeKey || null;
   showNewClientModal();
   setTimeout(function() {
     const nameEl = document.getElementById('nc-name');
