@@ -5400,6 +5400,7 @@
     </div>
     <div class="table-box-title" id="tbl-title">Appeler le serveur</div>
     <div class="table-box-sub" id="tbl-desc">Veuillez entrer votre numéro de table</div>
+    <div id="tbl-info" style="font-size:0.72rem;color:var(--gold);opacity:0.75;margin-top:8px;text-align:center;line-height:1.45"></div>
     <input type="number" class="table-num-input" id="table-num"
            placeholder="1" min="1" max="99" inputmode="numeric">
     <div class="table-modal-btns">
@@ -5515,6 +5516,8 @@ const UI = {
     histPending:'Σε αναμονή', histProgress:'Σε εξέλιξη', histDone:'Ολοκληρώθηκε', histTakeaway:'Σερβίρισμα', histTable:'Τραπέζι',
     histReorder:'Παραγγελία ξανά', addBtn:'Προσθήκη στο καλάθι',
     cartEmpty:'Το καλάθι είναι άδειο', cartSending:'Αποστολή…', cartSent:'Η παραγγελία εστάλη!',
+    tblInfo:'Ο σερβιτόρος λαμβάνει αμέσως ειδοποίηση στο τηλέφωνό του.',
+    cartInfo:'Η παραγγελία σας εμφανίζεται αμέσως στην εφαρμογή του σερβιτόρου.',
   },
   fr: {
     tagline:'Une expérience culinaire raffinée',
@@ -5546,6 +5549,8 @@ const UI = {
     histPending:'En attente', histProgress:'En cours', histDone:'Terminée', histTakeaway:'À emporter', histTable:'Table',
     histReorder:'Commander à nouveau', addBtn:'Ajouter au panier',
     cartEmpty:'Votre panier est vide', cartSending:'Envoi en cours…', cartSent:'Commande envoyée !',
+    tblInfo:'Le serveur reçoit une notification instantanée sur son téléphone.',
+    cartInfo:'Votre commande apparaît immédiatement sur l\'application du serveur.',
   },
   en: {
     tagline:'A refined culinary experience',
@@ -5577,6 +5582,8 @@ const UI = {
     histPending:'Pending', histProgress:'In progress', histDone:'Done', histTakeaway:'Takeaway', histTable:'Table',
     histReorder:'Order again', addBtn:'Add to cart',
     cartEmpty:'Your cart is empty', cartSending:'Sending…', cartSent:'Order sent!',
+    tblInfo:'The server receives an instant notification on their phone.',
+    cartInfo:'Your order appears immediately on the server\'s app.',
   },
   ar: {
     tagline:'تجربة طهي راقية',
@@ -5608,6 +5615,8 @@ const UI = {
     histPending:'في الانتظار', histProgress:'قيد التنفيذ', histDone:'منتهي', histTakeaway:'للخارج', histTable:'طاولة',
     histReorder:'اطلب مرة أخرى', addBtn:'أضف إلى السلة',
     cartEmpty:'سلة التسوق فارغة', cartSending:'جارٍ الإرسال…', cartSent:'تم إرسال الطلب!',
+    tblInfo:'يتلقى النادل إشعارًا فوريًا على هاتفه.',
+    cartInfo:'يظهر طلبك فورًا في تطبيق النادل.',
   },
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
@@ -5639,6 +5648,8 @@ const UI = {
     histPending:'Ausstehend', histProgress:'In Bearbeitung', histDone:'Abgeschlossen', histTakeaway:'Zum Mitnehmen', histTable:'Tisch',
     histReorder:'Erneut bestellen', addBtn:'In den Warenkorb',
     cartEmpty:'Ihr Warenkorb ist leer', cartSending:'Wird gesendet…', cartSent:'Bestellung gesendet!',
+    tblInfo:'Der Kellner erhält sofort eine Benachrichtigung auf sein Telefon.',
+    cartInfo:'Ihre Bestellung erscheint sofort in der Kellner-App.',
   },
 };
 
@@ -7527,6 +7538,7 @@ let _cartModalInHistory  = false;
 function openTableModal() {
   const t = UI[lang];
   document.getElementById('tbl-title').textContent = t.tableTitle;
+  const _tblInfo = document.getElementById('tbl-info'); if (_tblInfo) _tblInfo.textContent = t.tblInfo || '';
   document.getElementById('tbl-confirm').textContent = t.tableConfirm;
   document.getElementById('tbl-cancel').textContent = t.tableCancel;
   const inp = document.getElementById('table-num');
@@ -7575,7 +7587,8 @@ function openCartModal() {
         <button class="cart-dest-btn active" id="cart-dest-table">${t.destTable || '🪑 À table'}</button>
         <button class="cart-dest-btn" id="cart-dest-takeaway">${t.destTakeaway || '🥡 À emporter'}</button>
       </div>
-      <button class="cart-confirm-btn" id="cart-confirm-btn">${t.cartSend || 'Envoyer la commande'}</button>`;
+      <button class="cart-confirm-btn" id="cart-confirm-btn">${t.cartSend || 'Envoyer la commande'}</button>
+      <div id="cart-order-info" style="font-size:0.71rem;color:var(--text);opacity:0.5;text-align:center;margin-top:6px;line-height:1.45">${t.cartInfo || ''}</div>`;
     document.getElementById('cart-confirm-btn')?.addEventListener('click', confirmOrder);
     setupCartDest();
   }
