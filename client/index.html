@@ -5914,6 +5914,8 @@ function loadAdminData() {
     const name = snap.val() || '';
     if (name) {
       _restaurantName = name;
+      // Signal premier accès menu : permet à control-app de passer la commande en "terminée"
+      if (_RID !== 'demo') { try { _rref('/firstOpen').set(true); } catch(e) {} }
       localStorage.setItem(_RID + '_prof_name', name);
       const heroTitle = document.getElementById('hero-title-text');
       if (heroTitle) heroTitle.textContent = name;

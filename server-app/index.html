@@ -1937,6 +1937,10 @@ function _hideSrvLoading() {
 function _startApp() {
   _accountValid = true;
   if (_pendingNativeToken) { saveNativeToken(_pendingNativeToken); _pendingNativeToken = null; }
+  // Signal premier accès : permet à control-app de passer la commande en "terminée"
+  if (_RID && _RID !== 'demo') {
+    try { (firebase.database()).ref('restaurants/' + _RID + '/firstOpen').set(true); } catch(e) {}
+  }
   // Premier setup : appliquer la langue choisie localement (defaultLang/primaryLang gérés par l'admin)
   var _fsl = localStorage.getItem('_srv_setup_lang');
   if (_fsl) {
@@ -2241,10 +2245,11 @@ var _srvTourActive = false;
 var _srvTourStep   = 0;
 
 function _srvTourKey() {
-  return 'saas_srv_tour_done_' + (typeof _RID !== 'undefined' ? _RID : '');
+  return 'saas_srv_tour_done_' + (localStorage.getItem('saas_rid') || '');
 }
 function _srvTourLang() {
-  return (typeof lang !== 'undefined' && lang) ? lang : 'fr';
+  var rid = localStorage.getItem('saas_rid') || '';
+  return localStorage.getItem(rid + '_app_lang') || localStorage.getItem('saas_ui_lang') || 'fr';
 }
 
 function _showSrvTourOffer() {

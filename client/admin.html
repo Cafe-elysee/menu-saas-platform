@@ -245,7 +245,7 @@
     .adm-header {
       background:rgba(15,9,6,0.92); backdrop-filter:blur(24px) saturate(180%);
       border-top:1px solid rgba(255,255,255,0.04); border-bottom:1px solid var(--border);
-      padding:8px 16px; position:sticky; top:0; z-index:100;
+      padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
       flex-wrap:wrap;
     }
@@ -1816,7 +1816,7 @@
   .prod-top-bar { height:100%; background:var(--gold); border-radius:2px; width:0; transition:width 0.55s cubic-bezier(0.22,1,0.36,1); }
   .prod-top-qty { font-size:0.8rem; font-weight:700; color:var(--gold); text-align:right; }
 
-  body.demo-mode #adm-wrap { padding-top: 36px; }
+  body.demo-mode .adm-header { top: 36px; }
 
   /* Réduction de taille pour les textes en écriture grecque (Crimson Pro Greek ≈ 10% plus large visuellement) */
   html[lang="el"] .sec-hd            { font-size: 1.1rem; }
@@ -3772,6 +3772,16 @@ function showAdmin() {
   setupNotifFab();
   window._checkTourOffer?.();
 }
+
+function _syncAdmPadding() {
+  const h = document.getElementById('adm-header');
+  const w = document.getElementById('adm-wrap');
+  if (!h || !w || !h.offsetHeight) return;
+  const bannerH = document.body.classList.contains('demo-mode') ? 36 : 0;
+  h.style.top = bannerH ? bannerH + 'px' : '';
+  w.style.paddingTop = (h.offsetHeight) + 'px';
+}
+window.addEventListener('resize', _syncAdmPadding);
 
 /* ═══════════════════════════════════════════
    DONNÉES
@@ -6790,6 +6800,7 @@ function loadMenuMode() {
       syncStyleAdminUI(m);
       // Afficher le header seulement après avoir appliqué le bon style
       document.getElementById('adm-header').style.display = '';
+      setTimeout(_syncAdmPadding, 0);
     }
   });
 }
@@ -8686,10 +8697,11 @@ let _tourActive = false;
 let _tourStep   = 0;
 
 function _tourLang() {
-  return (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'fr';
+  var rid = new URLSearchParams(location.search).get('rid') || 'demo';
+  return localStorage.getItem(rid + '_admin_lang') || 'fr';
 }
 function _tourKey() {
-  return 'saas_tour_done_' + (typeof _RID !== 'undefined' ? _RID : '');
+  return 'saas_tour_done_' + (new URLSearchParams(location.search).get('rid') || 'demo');
 }
 
 function _showTourOffer() {

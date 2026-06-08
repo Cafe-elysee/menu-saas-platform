@@ -2031,6 +2031,7 @@ async function createNewClient() {
 
     const hash = await ncHashPwd(pwd);
     const ts   = Date.now();
+    const _isCS = _pendingCommandeKey && (_commandesCache[_pendingCommandeKey]?.forfait === 'commandes-services');
 
     await _saasDb.ref('restaurants/' + rid).set({
       profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
@@ -2039,12 +2040,13 @@ async function createNewClient() {
         tableCount: 0,
         active: true,
         features: {
-          callBtn: false, orderUI: false, photos: true,
-          tableSystem: false, qrOrdering: false, eventOverlay: true
+          callBtn: _isCS, orderUI: _isCS, photos: true,
+          tableSystem: _isCS, qrOrdering: _isCS, eventOverlay: true
         },
         retention: { calls: 2592000000, orders: 2592000000 }
       },
-      menu: { menuTheme: 'carte-classique', menuStyle: 'simple' }
+      menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
+      firstOpen: false
     });
 
     // Afficher le résultat
@@ -2060,8 +2062,13 @@ async function createNewClient() {
       const cmdData = _commandesCache[_pendingCommandeKey] || {};
       const fLabel = cmdData.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
       _lastCreatedClients[_pendingCommandeKey] = { rid, pwd, name, forfait: fLabel };
+      localStorage.setItem('ctrl_cmd_done_' + _pendingCommandeKey, JSON.stringify({ rid, pwd, name, forfait: fLabel }));
       const cmdKey = _pendingCommandeKey;
       _pendingCommandeKey = null;
+      // Passer la commande en "en cours"
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'en_cours', lu: true });
+      // Surveiller le premier accès pour passer en "terminée"
+      _watchFirstOpen(rid, cmdKey);
       // Re-render la carte commande pour mettre à jour les boutons de contact
       setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 150);
     } else {
@@ -2099,6 +2106,21 @@ let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
 let _lastCreatedClients = {};
 let _pendingCommandeKey = null;
+let _firstOpenWatchersSetup = false;
+
+function _watchFirstOpen(rid, cmdKey) {
+  _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
+    if (snap.val() === true && _commandesCache[cmdKey]) {
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true });
+      _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
+      localStorage.removeItem('ctrl_fopen_' + rid);
+      localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
+      delete _lastCreatedClients[cmdKey];
+      setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 100);
+    }
+  });
+  localStorage.setItem('ctrl_fopen_' + rid, cmdKey);
+}
 
 // ── Textes tooltips (i) ───────────────────────────
 const _INFO_TIPS = {
@@ -2152,12 +2174,14 @@ function buildDeliverySubject(rest, forfait, lang) {
 function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html';
   const menuUrl  = 'https://menu-saas-platform.vercel.app/?rid=' + rid + '&table=1';
+  const apkUrl   = 'https://menu-saas-platform.vercel.app/MenuProServeur-SaaS-v1.0.apk';
+  const isCS     = forfait === 'Commandes & Services';
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace Menu Pro est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter et commander directement depuis leur téléphone.\n\nCordialement,\nL\'équipe Menu Pro',
-    en: 'Hello ' + rest + '! 🎉\n\nYour Menu Pro space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse and order directly from their phone.\n\nBest regards,\nThe Menu Pro team',
-    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος Menu Pro σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας.\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
-    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على Menu Pro جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة والطلب مباشرة من هواتفهم.\n\nمع التحية،\nفريق Menu Pro',
-    de: 'Hallo ' + rest + '! 🎉\n\nIhr Menu Pro Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können direkt vom Handy bestellen.\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace Menu Pro est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Téléchargez l\'application serveur sur votre téléphone pour recevoir les commandes et appels en temps réel :\n' + apkUrl : '') + '\n\nCordialement,\nL\'équipe Menu Pro',
+    en: 'Hello ' + rest + '! 🎉\n\nYour Menu Pro space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Download the server app on your phone to receive orders and calls in real time:\n' + apkUrl : '') + '\n\nBest regards,\nThe Menu Pro team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος Menu Pro σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Κατεβάστε την εφαρμογή στο κινητό σας για να λαμβάνετε παραγγελίες σε πραγματικό χρόνο:\n' + apkUrl : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
+    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على Menu Pro جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 حمّلوا تطبيق النادل على هاتفكم لاستقبال الطلبات والنداءات في الوقت الفعلي:\n' + apkUrl : '') + '\n\nمع التحية،\nفريق Menu Pro',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr Menu Pro Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Laden Sie die Kellner-App auf Ihr Handy herunter, um Bestellungen in Echtzeit zu empfangen:\n' + apkUrl : '') + '\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
   };
   return m[lang] || m.fr;
 }
@@ -2182,6 +2206,33 @@ function _copyViberMsg(key) {
 function listenCommandes() {
   _controlDb.ref('/commandes').on('value', snap => {
     _commandesCache = snap.val() || {};
+    // Restaurer _lastCreatedClients depuis localStorage + nettoyer les entrées obsolètes
+    Object.keys(_commandesCache).forEach(function(k) {
+      if (!_lastCreatedClients[k]) {
+        var stored = localStorage.getItem('ctrl_cmd_done_' + k);
+        if (stored) { try { _lastCreatedClients[k] = JSON.parse(stored); } catch(e) {} }
+      }
+    });
+    // Nettoyer les entrées dont la commande n'existe plus
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var lk = localStorage.key(i);
+      if (lk && lk.startsWith('ctrl_cmd_done_')) {
+        var ck = lk.slice(14);
+        if (!_commandesCache[ck]) { localStorage.removeItem(lk); delete _lastCreatedClients[ck]; }
+      }
+    }
+    // Restaurer les watchers firstOpen au démarrage
+    if (!_firstOpenWatchersSetup) {
+      _firstOpenWatchersSetup = true;
+      for (var j = 0; j < localStorage.length; j++) {
+        var fk = localStorage.key(j);
+        if (fk && fk.startsWith('ctrl_fopen_')) {
+          var fRid = fk.slice(11);
+          var fCmd = localStorage.getItem(fk);
+          if (fRid && fCmd && _commandesCache[fCmd]) _watchFirstOpen(fRid, fCmd);
+        }
+      }
+    }
     renderCommandes();
   });
 }
@@ -2358,6 +2409,11 @@ function _doCtrlConfirm() {
 function deleteCommande(key) {
   _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
     _controlDb.ref('/commandes/' + key).remove();
+    localStorage.removeItem('ctrl_cmd_done_' + key);
+    if (_lastCreatedClients[key]) {
+      localStorage.removeItem('ctrl_fopen_' + _lastCreatedClients[key].rid);
+      delete _lastCreatedClients[key];
+    }
   }, true);
 }
 
