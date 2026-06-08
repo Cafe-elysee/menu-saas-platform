@@ -98,7 +98,6 @@ module.exports = async (req, res) => {
     }
 
     let sent = 0;
-    const errors = [];
     for (const entry of entries) {
       const payload = JSON.stringify({
         message: {
@@ -126,24 +125,22 @@ module.exports = async (req, res) => {
           console.log(`FCM attempt ${attempt} status=${r.status} body=${JSON.stringify(r.body)}`);
           if (r.status === 200) { sent++; ok = true; }
           else if ([404, 410].includes(r.status) || r.body?.error?.status === 'UNREGISTERED') {
-            // DEBUG: ne pas supprimer pour voir l'erreur exacte
-            errors.push({ deviceId: entry.deviceId, error: 'UNREGISTERED', status: r.status, fcm_body: r.body });
+            await deleteToken(sa.project_id, accessToken, entry.deviceId);
             ok = true;
           } else if (r.status === 429 || r.status >= 500) {
             if (attempt < 2) await new Promise(res => setTimeout(res, 400 * (attempt + 1)));
           } else {
-            errors.push({ deviceId: entry.deviceId, status: r.status, error: r.body?.error?.status || r.body?.error?.message || JSON.stringify(r.body) });
+            console.error(`FCM unexpected status=${r.status} deviceId=${entry.deviceId}`, r.body);
             ok = true;
           }
         } catch(e) {
           console.error('FCM error attempt', attempt, e.message);
-          errors.push({ attempt, error: e.message });
           if (attempt < 2) await new Promise(res => setTimeout(res, 300 * (attempt + 1)));
         }
       }
     }
 
-    res.status(200).json({ sent, total: entries.length, errors });
+    res.status(200).json({ sent, total: entries.length });
 
   } catch (err) {
     console.error('Error:', err.message);
