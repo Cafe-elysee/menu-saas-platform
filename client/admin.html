@@ -261,9 +261,10 @@
     }
     .adm-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
     .btn-preview {
-      width:34px; height:34px; border:1px solid var(--bord2); border-radius:10px;
+      height:34px; padding:0 12px; border:1px solid var(--bord2); border-radius:10px;
       color:var(--muted); transition:var(--tr);
-      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      display:flex; align-items:center; gap:5px; flex-shrink:0;
+      font-size:0.8rem; font-weight:600; white-space:nowrap;
     }
     .btn-preview:hover { border-color:var(--gold); color:var(--gold); }
     .btn-theme {
@@ -2097,10 +2098,9 @@
         <path id="adm-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
       </svg>
     </button>
-    <button class="btn-preview btn-preview-ico" onclick="window.open('index.html?rid='+_RID+'&table=1','_blank')" title="Voir le menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-      </svg>
+    <button class="btn-preview" id="adm-menu-btn" onclick="window.open('index.html?rid='+_RID+'&table=1','_blank')" title="Voir le menu en ligne">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <span id="adm-menu-btn-txt">Menu</span>
     </button>
   </div>
 </header>
@@ -2655,6 +2655,7 @@ const ADMIN_UI = {
   el: {
     admSub:        'Διαχείριση μενού',
     btnPreview:    '👁 Προβολή μενού',
+    btnViewMenu:   'Μενού',
     btnLogout:     'Αποσύνδεση',
     btnTranslate:  '🌐 Μετάφραση όλων των άλλων γλωσσών',
     secInfo:       'Πληροφορίες',
@@ -2783,6 +2784,7 @@ const ADMIN_UI = {
   fr: {
     admSub:        'Administration du menu',
     btnPreview:    '👁 Voir le menu',
+    btnViewMenu:   'Menu',
     btnLogout:     'Déconnexion',
     secInfo:       'Infos',
     secCats:       'Catégories',
@@ -2908,6 +2910,7 @@ const ADMIN_UI = {
   en: {
     admSub:        'Menu administration',
     btnPreview:    '👁 View menu',
+    btnViewMenu:   'Menu',
     btnLogout:     'Logout',
     secInfo:       'Info',
     secCats:       'Categories',
@@ -3033,6 +3036,7 @@ const ADMIN_UI = {
   de: {
     admSub:        'Menüverwaltung',
     btnPreview:    '👁 Menü anzeigen',
+    btnViewMenu:   'Menü',
     btnLogout:     'Abmelden',
     secInfo:       'Infos',
     secCats:       'Kategorien',
@@ -3158,6 +3162,7 @@ const ADMIN_UI = {
   ar: {
     admSub:        'إدارة القائمة',
     btnPreview:    '👁 عرض القائمة',
+    btnViewMenu:   'القائمة',
     btnLogout:     'تسجيل الخروج',
     secInfo:       'معلومات',
     secCats:       'الفئات',
@@ -3765,6 +3770,7 @@ function showAdmin() {
   loadTableSystem();
   setupSettingsTab();
   setupNotifFab();
+  window._checkTourOffer?.();
 }
 
 /* ═══════════════════════════════════════════
@@ -4816,6 +4822,9 @@ function applyAdminUI(l) {
   if (_settingsPwd) _settingsPwd.placeholder = t.phPasswordNew || (t.phPassword || 'Nouveau mot de passe');
   const _settingsName = $('settings-name-input');
   if (_settingsName) _settingsName.placeholder = t.phRestaurantName || 'Nom';
+  // Bouton Menu header
+  const _menuBtnTxt = $('adm-menu-btn-txt');
+  if (_menuBtnTxt) _menuBtnTxt.textContent = t.btnViewMenu || 'Menu';
 }
 
 /* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
@@ -8464,5 +8473,386 @@ async function qrDownloadPDF() {
     <button class="adm-color-close" onclick="closeAdminColorModal()">Fermer</button>
   </div>
 </div>
+
+<!-- ── TOUR ONBOARDING ── -->
+<div id="tour-offer-overlay" class="hidden" style="display:none">
+  <div id="tour-offer-box">
+    <div id="tour-offer-title"></div>
+    <div id="tour-offer-desc"></div>
+    <div id="tour-offer-btns">
+      <button id="tour-offer-yes" onclick="startTour()"></button>
+      <button id="tour-offer-no" onclick="_tourDismissOffer()"></button>
+    </div>
+  </div>
+</div>
+<div id="tour-highlight-box" style="display:none"></div>
+<div id="tour-tooltip" style="display:none">
+  <div id="tour-tip-counter"></div>
+  <div id="tour-tip-text"></div>
+  <div id="tour-tip-btns">
+    <button class="tour-btn-nav" id="tour-btn-prev" onclick="_tourPrev()">&#8249;</button>
+    <button id="tour-btn-skip" onclick="_tourEnd()"></button>
+    <button class="tour-btn-nav" id="tour-btn-next" onclick="_tourNext()">&#8250;</button>
+  </div>
+</div>
+
+<style>
+/* ═══════════ TOUR ONBOARDING ═══════════ */
+#tour-offer-overlay {
+  position:fixed; inset:0; z-index:98000;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+}
+#tour-offer-overlay.hidden { display:none !important; }
+#tour-offer-box {
+  background:var(--card-bg); border:1px solid rgba(200,164,78,0.3);
+  border-radius:18px; padding:28px 24px; max-width:300px;
+  width:calc(100% - 32px);
+  box-shadow:0 12px 48px rgba(0,0,0,0.35);
+  animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  text-align:center;
+}
+#tour-offer-title {
+  font-size:1.05rem; font-weight:700; color:var(--gold);
+  margin-bottom:10px;
+}
+#tour-offer-desc {
+  font-size:0.85rem; color:var(--muted); line-height:1.55;
+  margin-bottom:20px;
+}
+#tour-offer-btns { display:flex; flex-direction:column; gap:8px; }
+#tour-offer-yes {
+  background:var(--gold); color:#fff; border:none; border-radius:10px;
+  padding:11px 16px; font-size:0.88rem; font-weight:600;
+  cursor:pointer; transition:var(--tr); width:100%;
+}
+#tour-offer-yes:hover { opacity:0.85; }
+#tour-offer-no {
+  background:transparent; border:1px solid var(--bord2);
+  border-radius:10px; padding:9px 16px; font-size:0.82rem;
+  color:var(--muted); cursor:pointer; transition:var(--tr); width:100%;
+}
+#tour-offer-no:hover { color:var(--text); }
+#tour-highlight-box {
+  position:fixed; z-index:98501; pointer-events:none;
+  background:transparent;
+  border:2.5px solid rgba(200,164,78,0.9);
+  border-radius:10px;
+  box-shadow:0 0 0 4000px rgba(0,0,0,0.62),
+             0 0 18px rgba(200,164,78,0.25);
+  transition:top 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             left 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             width 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             height 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             opacity 0.25s;
+}
+#tour-highlight-box.tour-hidden { opacity:0; box-shadow:none; }
+#tour-tooltip {
+  position:fixed; z-index:98502;
+  background:var(--card-bg);
+  border:1px solid rgba(200,164,78,0.35);
+  border-radius:14px; padding:14px 16px; width:240px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  animation:tipIn 0.22s ease;
+}
+#tour-tip-counter {
+  font-size:0.68rem; color:var(--gold); font-weight:600;
+  margin-bottom:5px; letter-spacing:0.06em; opacity:0.8;
+}
+#tour-tip-text {
+  font-size:0.83rem; color:var(--text);
+  line-height:1.5; margin-bottom:12px;
+}
+#tour-tip-btns {
+  display:flex; gap:6px; align-items:center;
+}
+.tour-btn-nav {
+  background:var(--gold); color:#fff; border:none;
+  border-radius:8px; width:32px; height:30px;
+  font-size:1.1rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:var(--tr);
+}
+.tour-btn-nav:hover { opacity:0.82; }
+.tour-btn-nav:disabled { opacity:0.22; cursor:not-allowed; }
+#tour-btn-skip {
+  flex:1; background:transparent; border:1px solid var(--bord2);
+  border-radius:8px; height:30px; font-size:0.77rem;
+  color:var(--muted); cursor:pointer; transition:var(--tr);
+}
+#tour-btn-skip:hover { color:var(--text); }
+/* ════════════════════════════════════════ */
+</style>
+<script>
+/* ═══════════ TOUR ONBOARDING ═══════════════════════════════ */
+const _TOUR_STEPS = [
+  { id:null, tab:null, tip:{
+    el:'Καλώς ήρθατε! 👋 Αυτή η σύντομη ξενάγηση σας εξηγεί τα κύρια εργαλεία σας.',
+    fr:'Bienvenue ! 👋 Cette visite rapide vous présente les principaux outils de votre espace d'administration.',
+    en:'Welcome! 👋 This quick tour shows you the main tools of your admin panel.',
+    de:'Willkommen! 👋 Diese Tour stellt Ihnen die Hauptwerkzeuge Ihres Admin-Bereichs vor.',
+    ar:'مرحبًا! 👋 ستعرف هذه الجولة الأدوات الرئيسية في لوحة الإدارة.'
+  }},
+  { id:'lang-sel-btn', tab:null, tip:{
+    el:'Αλλάξτε τη γλώσσα διεπαφής — επηρεάζει το admin και την εφαρμογή σερβιτόρου.',
+    fr:'Changez la langue de l'interface — admin et application serveur.',
+    en:'Change the interface language — affects admin and server app.',
+    de:'Ändern Sie die Sprache — betrifft Admin und Server-App.',
+    ar:'غيّر لغة الواجهة — يؤثر على الإدارة وتطبيق النادل.'
+  }},
+  { id:'adm-menu-btn', tab:null, tip:{
+    el:'Ανοίγει το μενού σας ακριβώς όπως το βλέπουν οι πελάτες.',
+    fr:'Ouvre votre menu en ligne — tel que vos clients le voient.',
+    en:'Opens your online menu — exactly as your customers see it.',
+    de:'Öffnet Ihr Online-Menü — wie Ihre Kunden es sehen.',
+    ar:'يفتح قائمتك الإلكترونية كما يراها عملاؤك.'
+  }},
+  { id:'toggle-call-btn', tab:null, tip:{
+    el:'Ενεργοποιεί/απενεργοποιεί το κουμπί «Κλήση σερβιτόρου» στο μενού.',
+    fr:'Active ou désactive le bouton "Appeler le serveur" dans le menu client.',
+    en:'Enables/disables the "Call server" button in the customer menu.',
+    de:'Aktiviert/deaktiviert "Kellner rufen" im Kundenmenü.',
+    ar:'تفعيل/تعطيل زر "استدعاء النادل" في قائمة العملاء.'
+  }},
+  { id:'toggle-order-btn', tab:null, tip:{
+    el:'Ενεργοποιεί/απενεργοποιεί τις online παραγγελίες από κινητό.',
+    fr:'Active ou désactive les commandes en ligne depuis le téléphone du client.',
+    en:'Enables/disables online ordering from the customer's phone.',
+    de:'Aktiviert/deaktiviert Online-Bestellungen vom Handy des Kunden.',
+    ar:'تفعيل/تعطيل الطلبات الإلكترونية من هاتف العميل.'
+  }},
+  { id:'admin-tab-display', tab:'display', tip:{
+    el:'Καρτέλα Εμφάνιση — κατηγορίες, άρθρα, σχέδιο, φωτογραφίες και επικεφαλίδα μενού.',
+    fr:'Onglet Affichage — catégories, articles, design, photos et en-tête du menu.',
+    en:'Display tab — categories, items, design, photos, and menu header.',
+    de:'Tab Anzeige — Kategorien, Artikel, Design, Fotos und Menü-Header.',
+    ar:'علامة العرض — الفئات والعناصر والتصميم والصور وترويسة القائمة.'
+  }},
+  { id:'cats-list', tab:'display', scroll:true, tip:{
+    el:'Οι κατηγορίες σας — σύρετε για αναδιάταξη, πατήστε για επεξεργασία ή προσθήκη νέας.',
+    fr:'Vos catégories — glissez pour réorganiser, appuyez pour modifier ou en créer une.',
+    en:'Your categories — drag to reorder, tap to edit or create one.',
+    de:'Ihre Kategorien — ziehen zum Neuordnen, tippen zum Bearbeiten.',
+    ar:'فئاتك — اسحب لإعادة الترتيب، اضغط للتعديل أو الإنشاء.'
+  }},
+  { id:'admin-tab-orders', tab:'orders', tip:{
+    el:'Καρτέλα Παραγγελίες — παραγγελίες και κλήσεις σε πραγματικό χρόνο + στατιστικά.',
+    fr:'Onglet Commandes — commandes et appels en temps réel + statistiques.',
+    en:'Orders tab — real-time orders and calls + analytics.',
+    de:'Tab Bestellungen — Bestellungen in Echtzeit + Statistiken.',
+    ar:'علامة الطلبات — طلبات ومكالمات فورية + إحصائيات.'
+  }},
+  { id:'admin-tab-settings', tab:'settings', tip:{
+    el:'Καρτέλα Ρυθμίσεις — αλλάξτε το όνομα, τον κωδικό πρόσβασης και τις γλώσσες.',
+    fr:'Onglet Réglages — nom du restaurant, mot de passe et paramètres de langue.',
+    en:'Settings tab — restaurant name, password, and language settings.',
+    de:'Tab Einstellungen — Restaurantname, Passwort und Spracheinstellungen.',
+    ar:'علامة الإعدادات — اسم المطعم وكلمة المرور وإعدادات اللغة.'
+  }},
+  { id:'settings-name-input', tab:'settings', scroll:true, tip:{
+    el:'Το όνομα του εστιατορίου — εμφανίζεται στο μενού και στην εφαρμογή σερβιτόρου.',
+    fr:'Le nom du restaurant — visible dans le menu et l'application serveur.',
+    en:'Restaurant name — shown in the menu and server app.',
+    de:'Restaurantname — im Menü und in der Server-App sichtbar.',
+    ar:'اسم المطعم — يظهر في القائمة وتطبيق النادل.'
+  }},
+  { id:'settings-default-lang', tab:'settings', scroll:true, tip:{
+    el:'Γλώσσα μενού πελατών — εμφανίζεται όταν σαρώνουν το QR code σας.',
+    fr:'Langue du menu client — affichée quand vos clients scannent votre QR code.',
+    en:'Customer menu language — shown when clients scan your QR code.',
+    de:'Kundenmenüsprache — beim QR-Scan des Kunden angezeigt.',
+    ar:'لغة قائمة العملاء — تظهر عند مسح رمز QR الخاص بك.'
+  }},
+  { id:'settings-primary-lang', tab:'settings', scroll:true, tip:{
+    el:'Γλώσσα προσωπικού — χρησιμοποιείται στην εφαρμογή σερβιτόρου και σε αυτό εδώ.',
+    fr:'Langue du personnel — utilisée dans l'application serveur et cet espace admin.',
+    en:'Staff language — used in the server app and this admin panel.',
+    de:'Personalsprache — in der Server-App und diesem Admin verwendet.',
+    ar:'لغة الموظفين — تستخدم في تطبيق النادل وهذه الإدارة.'
+  }}
+];
+
+const _TOUR_OFFER_T = {
+  el:{ title:'Ξεκινήστε με μια επίδειξη', desc:'Θέλετε μια σύντομη ξενάγηση για να ανακαλύψετε τα εργαλεία σας;', yes:'Ναι, ξεκινήστε →', no:'Παράλειψη' },
+  fr:{ title:'Découvrez votre espace', desc:'Voulez-vous une visite guidée pour découvrir vos outils ?', yes:'Commencer la visite →', no:'Passer' },
+  en:{ title:'Explore your panel', desc:'Would you like a guided tour to discover your tools?', yes:'Start the tour →', no:'Skip' },
+  de:{ title:'Entdecken Sie Ihren Bereich', desc:'Möchten Sie eine geführte Tour durch Ihre Tools?', yes:'Tour starten →', no:'Überspringen' },
+  ar:{ title:'اكتشف مساحتك', desc:'هل تريد جولة إرشادية لاكتشاف أدواتك؟', yes:'← ابدأ الجولة', no:'تخطي' }
+};
+const _TOUR_END_T   = { el:'Τέλος ✓', fr:'Terminer ✓', en:'Finish ✓', de:'Beenden ✓', ar:'إنهاء ✓' };
+const _TOUR_SKIP_T  = { el:'Παράλειψη', fr:'Passer', en:'Skip', de:'Überspringen', ar:'تخطي' };
+
+let _tourActive = false;
+let _tourStep   = 0;
+
+function _tourLang() {
+  return (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'fr';
+}
+function _tourKey() {
+  return 'saas_tour_done_' + (typeof _RID !== 'undefined' ? _RID : '');
+}
+
+function _showTourOffer() {
+  if (localStorage.getItem(_tourKey())) return;
+  const lang = _tourLang();
+  const t = _TOUR_OFFER_T[lang] || _TOUR_OFFER_T.fr;
+  const overlay = document.getElementById('tour-offer-overlay');
+  if (!overlay) return;
+  document.getElementById('tour-offer-title').textContent = t.title;
+  document.getElementById('tour-offer-desc').textContent  = t.desc;
+  document.getElementById('tour-offer-yes').textContent   = t.yes;
+  document.getElementById('tour-offer-no').textContent    = t.no;
+  overlay.style.display = '';
+  overlay.classList.remove('hidden');
+}
+
+function _tourDismissOffer() {
+  const el = document.getElementById('tour-offer-overlay');
+  if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
+  localStorage.setItem(_tourKey(), '1');
+}
+
+function startTour() {
+  _tourDismissOffer();
+  _tourActive = true;
+  _tourStep   = 0;
+  const hb = document.getElementById('tour-highlight-box');
+  const tt = document.getElementById('tour-tooltip');
+  hb.style.display = '';
+  tt.style.display = '';
+  _tourRender();
+}
+
+function _tourEnd() {
+  _tourActive = false;
+  localStorage.setItem(_tourKey(), '1');
+  const hb = document.getElementById('tour-highlight-box');
+  const tt = document.getElementById('tour-tooltip');
+  if (hb) { hb.style.display = 'none'; hb.classList.add('tour-hidden'); }
+  if (tt) tt.style.display = 'none';
+}
+
+function _tourNext() {
+  if (_tourStep < _TOUR_STEPS.length - 1) { _tourStep++; _tourRender(); }
+  else _tourEnd();
+}
+
+function _tourPrev() {
+  if (_tourStep > 0) { _tourStep--; _tourRender(); }
+}
+
+function _tourRender() {
+  const step  = _TOUR_STEPS[_tourStep];
+  const lang  = _tourLang();
+  const tip   = step.tip[lang] || step.tip.fr;
+  const total = _TOUR_STEPS.length;
+  const isLast = (_tourStep === total - 1);
+
+  // Switch tab if needed
+  if (step.tab && typeof switchAdminTab === 'function') {
+    const curTab = (typeof _adminCurrentTab !== 'undefined') ? _adminCurrentTab : '';
+    if (step.tab !== curTab) switchAdminTab(step.tab);
+  }
+
+  // Counter + text
+  document.getElementById('tour-tip-counter').textContent = (_tourStep + 1) + ' / ' + total;
+  document.getElementById('tour-tip-text').textContent = tip;
+
+  // Buttons
+  const skipBtn = document.getElementById('tour-btn-skip');
+  skipBtn.textContent = isLast
+    ? (_TOUR_END_T[lang] || 'Terminer ✓')
+    : (_TOUR_SKIP_T[lang] || 'Passer');
+  const prevBtn = document.getElementById('tour-btn-prev');
+  const nextBtn = document.getElementById('tour-btn-next');
+  prevBtn.disabled = (_tourStep === 0);
+  prevBtn.textContent = (lang === 'ar') ? '›' : '‹';
+  nextBtn.textContent = isLast ? '✓' : ((lang === 'ar') ? '‹' : '›');
+
+  // Position
+  if (!step.id) {
+    const hb = document.getElementById('tour-highlight-box');
+    hb.classList.add('tour-hidden');
+    hb.style.top = '-9999px'; hb.style.left = '-9999px';
+    hb.style.width = '0'; hb.style.height = '0';
+    _tourPositionTooltip(null);
+  } else {
+    const delay = step.tab ? 320 : 0;
+    setTimeout(function() {
+      const target = document.getElementById(step.id);
+      if (!target) { _tourPositionTooltip(null); return; }
+      if (step.scroll) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function() {
+          _tourPositionHighlight(target);
+          _tourPositionTooltip(target);
+        }, 380);
+      } else {
+        _tourPositionHighlight(target);
+        _tourPositionTooltip(target);
+      }
+    }, delay);
+  }
+}
+
+function _tourPositionHighlight(target) {
+  const hb = document.getElementById('tour-highlight-box');
+  if (!target) { hb.classList.add('tour-hidden'); return; }
+  hb.classList.remove('tour-hidden');
+  const r   = target.getBoundingClientRect();
+  const pad = 6;
+  hb.style.top    = Math.round(r.top    - pad) + 'px';
+  hb.style.left   = Math.round(r.left   - pad) + 'px';
+  hb.style.width  = Math.round(r.width  + pad * 2) + 'px';
+  hb.style.height = Math.round(r.height + pad * 2) + 'px';
+}
+
+function _tourPositionTooltip(target) {
+  const tt  = document.getElementById('tour-tooltip');
+  const vw  = window.innerWidth;
+  const vh  = window.innerHeight;
+  const tw  = 256;
+  const th  = 140;
+  const pad = 12;
+
+  if (!target) {
+    tt.style.left = Math.round((vw - tw) / 2) + 'px';
+    tt.style.top  = Math.round((vh - th) / 2) + 'px';
+    return;
+  }
+
+  const r = target.getBoundingClientRect();
+  let left, top;
+
+  // Prefer right side
+  if (r.right + pad + tw <= vw - pad) {
+    left = r.right + pad;
+    top  = Math.max(pad, Math.min(r.top, vh - th - pad));
+  }
+  // Try left side
+  else if (r.left - pad - tw >= pad) {
+    left = r.left - pad - tw;
+    top  = Math.max(pad, Math.min(r.top, vh - th - pad));
+  }
+  // Below
+  else if (r.bottom + pad + th <= vh - pad) {
+    left = Math.max(pad, Math.min(r.left, vw - tw - pad));
+    top  = r.bottom + pad;
+  }
+  // Above
+  else {
+    left = Math.max(pad, Math.min(r.left, vw - tw - pad));
+    top  = Math.max(pad, r.top - th - pad);
+  }
+
+  tt.style.left = Math.round(left) + 'px';
+  tt.style.top  = Math.round(top)  + 'px';
+}
+
+window._checkTourOffer = function() {
+  setTimeout(_showTourOffer, 1400);
+};
+/* ═══════════════════════════════════════════════════════════ */
+</script>
 </body>
 </html>
