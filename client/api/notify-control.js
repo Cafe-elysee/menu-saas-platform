@@ -126,8 +126,9 @@ module.exports = async (req, res) => {
           console.log(`FCM attempt ${attempt} status=${r.status} body=${JSON.stringify(r.body)}`);
           if (r.status === 200) { sent++; ok = true; }
           else if ([404, 410].includes(r.status) || r.body?.error?.status === 'UNREGISTERED') {
-            await deleteToken(sa.project_id, accessToken, entry.deviceId); ok = true;
-            errors.push({ deviceId: entry.deviceId, error: 'UNREGISTERED', status: r.status });
+            // DEBUG: ne pas supprimer pour voir l'erreur exacte
+            errors.push({ deviceId: entry.deviceId, error: 'UNREGISTERED', status: r.status, fcm_body: r.body });
+            ok = true;
           } else if (r.status === 429 || r.status >= 500) {
             if (attempt < 2) await new Promise(res => setTimeout(res, 400 * (attempt + 1)));
           } else {
