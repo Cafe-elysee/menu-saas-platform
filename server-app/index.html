@@ -1987,6 +1987,7 @@ function _startApp() {
   startPolling();
   startCallsListener();
   startOrdersListener();
+  setTimeout(function(){ window._checkSrvTourOffer?.(); }, 1400);
 
   document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });
   document.addEventListener('click',      unlockAudio, { once:true });
@@ -2046,6 +2047,357 @@ document.addEventListener('deviceready', function() {
   setupNativePush();
   _checkServerTokenInFirebase();
 }, false);
+</script>
+
+<!-- ── TOUR ONBOARDING SERVEUR ── -->
+<div id="srv-tour-offer" class="srv-tour-hidden" style="display:none">
+  <div id="srv-tour-offer-box">
+    <div id="srv-tour-offer-title"></div>
+    <div id="srv-tour-offer-desc"></div>
+    <div id="srv-tour-offer-btns">
+      <button id="srv-tour-offer-yes" onclick="srvStartTour()"></button>
+      <button id="srv-tour-offer-no"  onclick="_srvTourDismissOffer()"></button>
+    </div>
+  </div>
+</div>
+<div id="srv-tour-highlight" style="display:none"></div>
+<div id="srv-tour-tooltip" style="display:none">
+  <div id="srv-tour-counter"></div>
+  <div id="srv-tour-text"></div>
+  <div id="srv-tour-btns">
+    <button class="srv-tour-nav" id="srv-tour-prev" onclick="_srvTourPrev()">&#8249;</button>
+    <button id="srv-tour-skip" onclick="_srvTourEnd()"></button>
+    <button class="srv-tour-nav" id="srv-tour-next" onclick="_srvTourNext()">&#8250;</button>
+  </div>
+</div>
+
+<style>
+/* ═══════════ TOUR SERVEUR ═══════════ */
+#srv-tour-offer {
+  position:fixed; inset:0; z-index:98000;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+}
+#srv-tour-offer.srv-tour-hidden { display:none !important; }
+#srv-tour-offer-box {
+  background:var(--bg); border:1px solid rgba(200,164,78,0.3);
+  border-radius:18px; padding:28px 24px; max-width:300px;
+  width:calc(100% - 32px);
+  box-shadow:0 12px 48px rgba(0,0,0,0.35);
+  animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  text-align:center;
+}
+#srv-tour-offer-title {
+  font-size:1.05rem; font-weight:700; color:var(--gold);
+  margin-bottom:10px; font-family:'Crimson Pro',Georgia,serif;
+}
+#srv-tour-offer-desc {
+  font-size:0.85rem; color:var(--cream); line-height:1.55;
+  margin-bottom:20px;
+}
+#srv-tour-offer-btns { display:flex; flex-direction:column; gap:8px; }
+#srv-tour-offer-yes {
+  background:linear-gradient(135deg,#d4a94e,#b8922e);
+  color:#0c0a08; border:none; border-radius:10px;
+  padding:11px 16px; font-size:0.88rem; font-weight:600;
+  cursor:pointer; width:100%;
+  font-family:'Crimson Pro',Georgia,serif;
+  transition:opacity 0.18s;
+}
+#srv-tour-offer-yes:hover { opacity:0.85; }
+#srv-tour-offer-no {
+  background:transparent; border:1px solid rgba(200,164,78,0.25);
+  border-radius:10px; padding:9px 16px; font-size:0.82rem;
+  color:var(--cream); opacity:0.6; cursor:pointer;
+  font-family:'Crimson Pro',Georgia,serif;
+  transition:opacity 0.18s; width:100%;
+}
+#srv-tour-offer-no:hover { opacity:1; }
+#srv-tour-highlight {
+  position:fixed; z-index:98501; pointer-events:none;
+  background:transparent;
+  border:2.5px solid rgba(200,164,78,0.9);
+  border-radius:10px;
+  box-shadow:0 0 0 4000px rgba(0,0,0,0.62),
+             0 0 18px rgba(200,164,78,0.25);
+  transition:top 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             left 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             width 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             height 0.28s cubic-bezier(0.25,0.46,0.45,0.94),
+             opacity 0.25s;
+}
+#srv-tour-highlight.srv-tour-hidden { opacity:0; box-shadow:none; }
+#srv-tour-tooltip {
+  position:fixed; z-index:98502;
+  background:var(--bg); border:1px solid rgba(200,164,78,0.35);
+  border-radius:14px; padding:14px 16px; width:240px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  font-family:'Crimson Pro',Georgia,serif;
+}
+#srv-tour-counter {
+  font-size:0.68rem; color:var(--gold); font-weight:600;
+  margin-bottom:5px; letter-spacing:0.06em; opacity:0.8;
+}
+#srv-tour-text {
+  font-size:0.85rem; color:var(--cream);
+  line-height:1.5; margin-bottom:12px;
+}
+#srv-tour-btns {
+  display:flex; gap:6px; align-items:center;
+}
+.srv-tour-nav {
+  background:linear-gradient(135deg,#d4a94e,#b8922e);
+  color:#0c0a08; border:none;
+  border-radius:8px; width:32px; height:30px;
+  font-size:1.1rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:opacity 0.18s;
+}
+.srv-tour-nav:hover { opacity:0.82; }
+.srv-tour-nav:disabled { opacity:0.22; cursor:not-allowed; }
+#srv-tour-skip {
+  flex:1; background:transparent;
+  border:1px solid rgba(200,164,78,0.25);
+  border-radius:8px; height:30px; font-size:0.77rem;
+  color:var(--cream); opacity:0.6; cursor:pointer;
+  font-family:'Crimson Pro',Georgia,serif;
+  transition:opacity 0.18s;
+}
+#srv-tour-skip:hover { opacity:1; }
+/* ══════════════════════════════════════ */
+</style>
+<script>
+/* ═══════════ TOUR ONBOARDING SERVEUR ══════════════════════ */
+var _SRV_TOUR_STEPS = [
+  { id:null, tab:null, tip:{
+    fr:'Bienvenue ! 👋 Cette visite rapide vous explique les principales fonctions de l'application serveur.',
+    en:'Welcome! 👋 This quick tour explains the main features of the server app.',
+    el:'Καλώς ήρθατε! 👋 Αυτή η σύντομη ξενάγηση εξηγεί τα κύρια εργαλεία.',
+    de:'Willkommen! 👋 Diese Tour erklärt die wichtigsten Funktionen der Server-App.',
+    ar:'مرحبًا! 👋 ستشرح لك هذه الجولة الميزات الرئيسية لتطبيق النادل.'
+  }},
+  { id:'nav-calls', tab:'calls', tip:{
+    fr:'Onglet Appels — vos clients appuient sur "Appeler le serveur" dans le menu, vous êtes notifié ici.',
+    en:'Calls tab — customers tap "Call server" in the menu, you get notified here.',
+    el:'Καρτέλα Κλήσεις — οι πελάτες πατούν «Κλήση σερβιτόρου» και λαμβάνετε ειδοποίηση.',
+    de:'Tab Anrufe — Kunden tippen "Kellner rufen" und Sie werden hier benachrichtigt.',
+    ar:'علامة المكالمات — يضغط العملاء على "استدعاء النادل" وتتلقى إشعارًا هنا.'
+  }},
+  { id:'calls-list', tab:'calls', scroll:true, tip:{
+    fr:'Chaque appel affiche la table et l'heure. Appuyez pour marquer comme traité.',
+    en:'Each call shows the table and time. Tap to mark as handled.',
+    el:'Κάθε κλήση δείχνει το τραπέζι και την ώρα. Πατήστε για να σημειωθεί ως διεκπεραιωμένη.',
+    de:'Jeder Anruf zeigt Tisch und Uhrzeit. Tippen zum Markieren als erledigt.',
+    ar:'كل مكالمة تُظهر الطاولة والوقت. اضغط لوضع علامة "تمت المعالجة".'
+  }},
+  { id:'nav-orders', tab:'orders', tip:{
+    fr:'Onglet Commandes — les commandes passées depuis le menu en ligne apparaissent ici en temps réel.',
+    en:'Orders tab — orders placed from the online menu appear here in real time.',
+    el:'Καρτέλα Παραγγελίες — οι παραγγελίες από το online μενού εμφανίζονται εδώ σε πραγματικό χρόνο.',
+    de:'Tab Bestellungen — Bestellungen aus dem Online-Menü erscheinen hier in Echtzeit.',
+    ar:'علامة الطلبات — تظهر الطلبات من القائمة الإلكترونية هنا في الوقت الفعلي.'
+  }},
+  { id:'orders-list', tab:'orders', scroll:true, tip:{
+    fr:'Chaque commande affiche le numéro de table, les plats et le total. Changez le statut en appuyant dessus.',
+    en:'Each order shows the table, dishes and total. Change the status by tapping it.',
+    el:'Κάθε παραγγελία δείχνει τραπέζι, πιάτα και σύνολο. Αλλάξτε κατάσταση πατώντας.',
+    de:'Jede Bestellung zeigt Tisch, Gerichte und Summe. Status durch Tippen ändern.',
+    ar:'كل طلب يُظهر الطاولة والأطباق والإجمالي. غيّر الحالة بالضغط عليه.'
+  }},
+  { id:'nav-messages', tab:'messages', tip:{
+    fr:'Messages de l'administrateur — informations importantes ou instructions envoyées depuis l'espace admin.',
+    en:'Admin messages — important info or instructions sent from the admin panel.',
+    el:'Μηνύματα διαχειριστή — σημαντικές πληροφορίες ή οδηγίες από τον admin.',
+    de:'Admin-Nachrichten — wichtige Infos oder Anweisungen vom Admin-Bereich.',
+    ar:'رسائل المدير — معلومات مهمة أو تعليمات مرسلة من لوحة الإدارة.'
+  }},
+  { id:'nav-settings', tab:'settings', tip:{
+    fr:'Réglages — votre restaurant actif, les notifications en arrière-plan et le statut de connexion.',
+    en:'Settings — your active restaurant, background notifications, and connection status.',
+    el:'Ρυθμίσεις — το ενεργό εστιατόριο, οι ειδοποιήσεις και η κατάσταση σύνδεσης.',
+    de:'Einstellungen — Ihr aktives Restaurant, Hintergrundbenachrichtigungen und Verbindungsstatus.',
+    ar:'الإعدادات — مطعمك النشط والإشعارات في الخلفية وحالة الاتصال.'
+  }},
+  { id:'settings-fcm-status', tab:'settings', scroll:true, tip:{
+    fr:'Statut de connexion — doit afficher ✅ pour recevoir les notifications. Si rouge, appuyez sur "Reconnecter".',
+    en:'Connection status — must show ✅ to receive notifications. If red, tap "Reconnect".',
+    el:'Κατάσταση σύνδεσης — πρέπει να εμφανίζει ✅ για να λαμβάνετε ειδοποιήσεις.',
+    de:'Verbindungsstatus — muss ✅ anzeigen, um Benachrichtigungen zu erhalten.',
+    ar:'حالة الاتصال — يجب أن تظهر ✅ لاستقبال الإشعارات. إذا كانت حمراء، اضغط "إعادة الاتصال".'
+  }}
+];
+
+var _SRV_TOUR_OFFER_T = {
+  fr:{ title:'Découvrez l'application', desc:'Voulez-vous une visite guidée pour vous familiariser avec les fonctions ?', yes:'Commencer la visite →', no:'Passer' },
+  en:{ title:'Explore the app', desc:'Would you like a guided tour to get familiar with the features?', yes:'Start the tour →', no:'Skip' },
+  el:{ title:'Ανακαλύψτε την εφαρμογή', desc:'Θέλετε μια ξενάγηση για να εξοικειωθείτε με τις λειτουργίες;', yes:'Ναι, ξεκινήστε →', no:'Παράλειψη' },
+  de:{ title:'Entdecken Sie die App', desc:'Möchten Sie eine Führung durch die Funktionen?', yes:'Tour starten →', no:'Überspringen' },
+  ar:{ title:'اكتشف التطبيق', desc:'هل تريد جولة إرشادية للتعرف على الميزات؟', yes:'← ابدأ الجولة', no:'تخطي' }
+};
+var _SRV_END_T  = { fr:'Terminer ✓', en:'Finish ✓', el:'Τέλος ✓', de:'Beenden ✓', ar:'إنهاء ✓' };
+var _SRV_SKIP_T = { fr:'Passer', en:'Skip', el:'Παράλειψη', de:'Überpringen', ar:'تخطي' };
+
+var _srvTourActive = false;
+var _srvTourStep   = 0;
+
+function _srvTourKey() {
+  return 'saas_srv_tour_done_' + (typeof _RID !== 'undefined' ? _RID : '');
+}
+function _srvTourLang() {
+  return (typeof lang !== 'undefined' && lang) ? lang : 'fr';
+}
+
+function _showSrvTourOffer() {
+  if (localStorage.getItem(_srvTourKey())) return;
+  var l = _srvTourLang();
+  var t = _SRV_TOUR_OFFER_T[l] || _SRV_TOUR_OFFER_T.fr;
+  var overlay = document.getElementById('srv-tour-offer');
+  if (!overlay) return;
+  document.getElementById('srv-tour-offer-title').textContent = t.title;
+  document.getElementById('srv-tour-offer-desc').textContent  = t.desc;
+  document.getElementById('srv-tour-offer-yes').textContent   = t.yes;
+  document.getElementById('srv-tour-offer-no').textContent    = t.no;
+  overlay.style.display = '';
+  overlay.classList.remove('srv-tour-hidden');
+}
+
+function _srvTourDismissOffer() {
+  var el = document.getElementById('srv-tour-offer');
+  if (el) { el.classList.add('srv-tour-hidden'); el.style.display = 'none'; }
+  localStorage.setItem(_srvTourKey(), '1');
+}
+
+function srvStartTour() {
+  _srvTourDismissOffer();
+  _srvTourActive = true;
+  _srvTourStep   = 0;
+  document.getElementById('srv-tour-highlight').style.display = '';
+  document.getElementById('srv-tour-tooltip').style.display   = '';
+  _srvTourRender();
+}
+
+function _srvTourEnd() {
+  _srvTourActive = false;
+  localStorage.setItem(_srvTourKey(), '1');
+  var hb = document.getElementById('srv-tour-highlight');
+  var tt = document.getElementById('srv-tour-tooltip');
+  if (hb) { hb.style.display = 'none'; hb.classList.add('srv-tour-hidden'); }
+  if (tt) tt.style.display = 'none';
+}
+
+function _srvTourNext() {
+  if (_srvTourStep < _SRV_TOUR_STEPS.length - 1) { _srvTourStep++; _srvTourRender(); }
+  else _srvTourEnd();
+}
+
+function _srvTourPrev() {
+  if (_srvTourStep > 0) { _srvTourStep--; _srvTourRender(); }
+}
+
+function _srvTourRender() {
+  var step   = _SRV_TOUR_STEPS[_srvTourStep];
+  var l      = _srvTourLang();
+  var tip    = step.tip[l] || step.tip.fr;
+  var total  = _SRV_TOUR_STEPS.length;
+  var isLast = (_srvTourStep === total - 1);
+
+  // Switch tab if needed
+  if (step.tab && typeof switchTab === 'function') {
+    var curTab = document.querySelector('.nav-btn.on');
+    var curId  = curTab ? curTab.id.replace('nav-', '') : '';
+    if (step.tab !== curId) switchTab(step.tab);
+  }
+
+  // Counter + text
+  document.getElementById('srv-tour-counter').textContent = (_srvTourStep + 1) + ' / ' + total;
+  document.getElementById('srv-tour-text').textContent    = tip;
+
+  // Buttons
+  var skipBtn = document.getElementById('srv-tour-skip');
+  skipBtn.textContent = isLast
+    ? (_SRV_END_T[l] || 'Terminer ✓')
+    : (_SRV_SKIP_T[l] || 'Passer');
+  var prevBtn = document.getElementById('srv-tour-prev');
+  var nextBtn = document.getElementById('srv-tour-next');
+  prevBtn.disabled = (_srvTourStep === 0);
+  prevBtn.textContent = (l === 'ar') ? '›' : '‹';
+  nextBtn.textContent = isLast ? '✓' : ((l === 'ar') ? '‹' : '›');
+
+  // Position
+  if (!step.id) {
+    var hb = document.getElementById('srv-tour-highlight');
+    hb.classList.add('srv-tour-hidden');
+    hb.style.top = '-9999px'; hb.style.left = '-9999px';
+    hb.style.width = '0'; hb.style.height = '0';
+    _srvTourPosTooltip(null);
+  } else {
+    var delay = step.tab ? 320 : 0;
+    setTimeout(function() {
+      var target = document.getElementById(step.id);
+      if (!target) { _srvTourPosTooltip(null); return; }
+      if (step.scroll) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function() {
+          _srvTourPosHighlight(target);
+          _srvTourPosTooltip(target);
+        }, 380);
+      } else {
+        _srvTourPosHighlight(target);
+        _srvTourPosTooltip(target);
+      }
+    }, delay);
+  }
+}
+
+function _srvTourPosHighlight(target) {
+  var hb = document.getElementById('srv-tour-highlight');
+  if (!target) { hb.classList.add('srv-tour-hidden'); return; }
+  hb.classList.remove('srv-tour-hidden');
+  var r = target.getBoundingClientRect();
+  var pad = 6;
+  hb.style.top    = Math.round(r.top    - pad) + 'px';
+  hb.style.left   = Math.round(r.left   - pad) + 'px';
+  hb.style.width  = Math.round(r.width  + pad * 2) + 'px';
+  hb.style.height = Math.round(r.height + pad * 2) + 'px';
+}
+
+function _srvTourPosTooltip(target) {
+  var tt  = document.getElementById('srv-tour-tooltip');
+  var vw  = window.innerWidth;
+  var vh  = window.innerHeight;
+  var tw  = 256;
+  var th  = 140;
+  var pad = 12;
+
+  if (!target) {
+    tt.style.left = Math.round((vw - tw) / 2) + 'px';
+    tt.style.top  = Math.round((vh - th) / 2) + 'px';
+    return;
+  }
+
+  var r = target.getBoundingClientRect();
+  var left, top;
+
+  if (r.right + pad + tw <= vw - pad) {
+    left = r.right + pad;
+    top  = Math.max(pad, Math.min(r.top, vh - th - pad));
+  } else if (r.left - pad - tw >= pad) {
+    left = r.left - pad - tw;
+    top  = Math.max(pad, Math.min(r.top, vh - th - pad));
+  } else if (r.bottom + pad + th <= vh - pad) {
+    left = Math.max(pad, Math.min(r.left, vw - tw - pad));
+    top  = r.bottom + pad;
+  } else {
+    left = Math.max(pad, Math.min(r.left, vw - tw - pad));
+    top  = Math.max(pad, r.top - th - pad);
+  }
+
+  tt.style.left = Math.round(left) + 'px';
+  tt.style.top  = Math.round(top)  + 'px';
+}
+
+window._checkSrvTourOffer = function() { _showSrvTourOffer(); };
+/* ═══════════════════════════════════════════════════════════ */
 </script>
 </body>
 </html>
