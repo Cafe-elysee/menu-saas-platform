@@ -1920,10 +1920,10 @@ function init() {
     }
 
     // Compte actif — démarrage normal
-    _startApp();
+    _startApp(true);
   }).catch(function() {
-    // Erreur réseau → démarrer quand même pour ne pas bloquer
-    _startApp();
+    // Erreur réseau → démarrer quand même pour ne pas bloquer (sans écrire firstOpen)
+    _startApp(false);
   });
 }
 
@@ -1934,11 +1934,11 @@ function _hideSrvLoading() {
   setTimeout(function() { el.style.display = 'none'; }, 500);
 }
 
-function _startApp() {
+function _startApp(confirmed) {
   _accountValid = true;
   if (_pendingNativeToken) { saveNativeToken(_pendingNativeToken); _pendingNativeToken = null; }
-  // Signal premier accès : permet à control-app de passer la commande en "terminée"
-  if (_RID && _RID !== 'demo') {
+  // Signal premier accès : uniquement si compte confirmé valide (pas en mode hors-ligne)
+  if (confirmed && _RID && _RID !== 'demo') {
     try { (firebase.database()).ref('restaurants/' + _RID + '/firstOpen').set(true); } catch(e) {}
   }
   // Premier setup : appliquer la langue choisie localement (defaultLang/primaryLang gérés par l'admin)
