@@ -2302,8 +2302,9 @@ function listenCommandes() {
         var stored = localStorage.getItem('ctrl_cmd_done_' + k);
         if (stored) { try { _lastCreatedClients[k] = JSON.parse(stored); } catch(e) {} }
       }
-      if (!_deletedClients[k] && localStorage.getItem('ctrl_cmd_del_' + k)) {
-        _deletedClients[k] = true;
+      if (!_deletedClients[k]) {
+        var delRid = localStorage.getItem('ctrl_cmd_del_' + k);
+        if (delRid) _deletedClients[k] = delRid;
       }
     });
     // Nettoyer les entrées dont la commande n'existe plus
@@ -2430,7 +2431,7 @@ function buildCommandeCard(key, d) {
 
   // Bouton "Créer ce client" / badge vert créé / badge rouge supprimé
   const creerBtn = _deletedClients[key]
-    ? '<span class="commande-client-supprime-badge">🗑️ Client supprimé</span>'
+    ? '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>'
     : created
       ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
       : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
@@ -2809,8 +2810,8 @@ async function confirmDeleteClient() {
     Object.keys(_commandesCache).forEach(function(cmdKey) {
       const cc = (_commandesCache[cmdKey] && _commandesCache[cmdKey].clientCree) || _lastCreatedClients[cmdKey];
       if (cc && cc.rid === slug) {
-        _deletedClients[cmdKey] = true;
-        localStorage.setItem('ctrl_cmd_del_' + cmdKey, '1');
+        _deletedClients[cmdKey] = cc.rid;
+        localStorage.setItem('ctrl_cmd_del_' + cmdKey, cc.rid);
         _rerenderCommandeCard(cmdKey);
       }
     });
