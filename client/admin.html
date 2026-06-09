@@ -2082,6 +2082,7 @@
         <path d="M16 2l-1.5 2h-5L8 2"/>
       </svg>
     </button>
+    <button id="adm-qr-hdr-btn" class="qr-pdf-btn" onclick="openQRModalMenuQR()" style="display:none;margin-left:0" title="Créer un PDF avec le QR code du menu">🖨 PDF QR</button>
     <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu">
       <span class="vis-dot"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
@@ -7105,6 +7106,9 @@ function syncStyleAdminUI(mode) {
   // Tables section : visible si tableSystem activé (dans le panel 2)
   const tablesSection = document.getElementById('tables-admin-section');
   if (tablesSection) tablesSection.style.display = _featOk('tableSystem') ? '' : 'none';
+  // Bouton PDF QR header : visible uniquement pour Menu QR (pas de tableSystem)
+  const qrHdrBtn = document.getElementById('adm-qr-hdr-btn');
+  if (qrHdrBtn) qrHdrBtn.style.display = _featOk('tableSystem') ? 'none' : '';
 
   // Toggles : toujours affichés (sous réserve de la licence)
   const callBtn   = document.getElementById('toggle-call-btn');
@@ -8337,6 +8341,10 @@ function _qrUnlockScroll() {
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
   window.scrollTo(0, _qrScrollY);
+}
+function openQRModalMenuQR() {
+  if (!_tableCount) _tableCount = 1;
+  openQRModal();
 }
 function openQRModal() {
   if (!_tableCount) return;
