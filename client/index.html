@@ -7154,9 +7154,9 @@ function renderCartModal() {
     return `<div class="cart-item">
       <span class="cart-item-name">${_esc(displayName)}</span>
       <div class="cart-item-qty-wrap">
-        <button class="cart-qty-btn" onclick="removeFromCart(${c.id})">−</button>
+        <button class="cart-qty-btn" aria-label="${_aria('removeCart')}" onclick="removeFromCart(${c.id})">−</button>
         <span class="cart-qty">${c.qty}</span>
-        <button class="cart-qty-btn" onclick="addToCartById(${c.id})">+</button>
+        <button class="cart-qty-btn" aria-label="${_aria('addCart')}" onclick="addToCartById(${c.id})">+</button>
       </div>
       <span class="cart-item-price">${(c.priceNum * c.qty).toFixed(2)} €</span>
     </div>`;
@@ -7597,7 +7597,7 @@ function openCartModal() {
         <button class="cart-dest-btn" id="cart-dest-takeaway">${t.destTakeaway || '🥡 À emporter'}</button>
       </div>
       <button class="cart-confirm-btn" id="cart-confirm-btn">${t.cartSend || 'Envoyer la commande'}</button>
-      <div id="cart-order-info" style="font-size:0.71rem;color:var(--text);opacity:0.5;text-align:center;margin-top:6px;line-height:1.45">${t.cartInfo || ''}</div>`;
+      <div id="cart-order-info" style="font-size:0.71rem;color:var(--cream);opacity:0.5;text-align:center;margin-top:6px;line-height:1.45">${t.cartInfo || ''}</div>`;
     document.getElementById('cart-confirm-btn')?.addEventListener('click', confirmOrder);
     setupCartDest();
   }
@@ -9232,7 +9232,7 @@ function confirmTableCall() {
 
 function showDemoAction() {
   const el = document.createElement('div');
-  el.style.cssText = 'position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%);background:rgba(200,164,78,0.97);color:#0c0a08;padding:0.55rem 1.5rem;border-radius:50px;font-size:0.88rem;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap;font-family:Outfit,sans-serif;';
+  el.style.cssText = 'position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:rgba(200,164,78,0.97);color:#0c0a08;padding:0.55rem 1.5rem;border-radius:50px;font-size:0.88rem;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap;font-family:Outfit,sans-serif;';
   el.textContent = '🔒 Mode démo — action désactivée';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2400);

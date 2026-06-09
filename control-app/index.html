@@ -54,10 +54,6 @@
     html.light body {
       background: linear-gradient(160deg, #ede8df 0%, #e4ddd0 100%);
     }
-    html.light .app-header {
-      background: rgba(237,232,223,0.98);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.04);
-    }
     html.light .bottom-nav {
       background: rgba(237,232,223,0.98) !important;
       box-shadow: 0 -1px 0 rgba(0,0,0,0.08), 0 -4px 16px rgba(0,0,0,0.04);
@@ -1050,7 +1046,7 @@
 
     /* Toast */
     #toast {
-      position: fixed; bottom: calc(var(--nav-h) + 1rem);
+      position: fixed; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
       left: 50%; transform: translateX(-50%) translateY(20px);
       background: rgba(13,11,8,0.95);
       border: 1px solid rgba(200,164,78,0.25);
@@ -1586,7 +1582,7 @@
 
 <div id="ctrl-confirm-modal" onclick="if(event.target===this)_hideCtrlConfirm()">
   <div class="ctrl-confirm-box">
-    <div id="ctrl-confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.2rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
+    <div id="ctrl-confirm-title" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.2rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
     <div id="ctrl-confirm-msg"   style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
     <div style="display:flex;gap:10px;">
       <button onclick="_hideCtrlConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font-family:inherit;font-size:0.85rem;cursor:pointer;">Annuler</button>
@@ -2498,7 +2494,7 @@ function buildCommandeCard(key, d) {
     '</div>' +
     '<div class="commande-body">' +
       '<div class="commande-body-inner">' +
-        '<div class="commande-langue-row">🌐 ' + langLabel + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
+        '<div class="commande-langue-row">🌐 ' + escapeHtml(langLabel) + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
         '<div class="commande-actions">' +
           '<select class="commande-status-sel" onchange="setCommandeStatus(\'' + key + '\',this)">' +
             '<option value="nouveau"  ' + (statut==='nouveau'  ?'selected':'') + '>🆕 Nouveau</option>' +
@@ -2572,7 +2568,9 @@ function deleteCommande(key) {
 
 function viderCommande() {
   _showCtrlConfirm('Supprimer toutes les commandes', 'Toutes les commandes seront supprimées. Cette action est irréversible.', 'Tout supprimer', () => {
-    _controlDb.ref('/commandes').remove();
+    _controlDb.ref('/commandes').remove()
+      .then(() => showToast('Toutes les commandes supprimées'))
+      .catch(e => showToast('Erreur : ' + (e.message || e)));
   }, true);
 }
 
@@ -2730,6 +2728,10 @@ function recreerClientDepuisCommande(btnEl) {
 // ════════════════════════════════════════════════════
 function buildClientsTab() {
   const list = document.getElementById('clients-list');
+  if (CLIENTS.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.88rem">Chargement…</div>';
+    return;
+  }
   list.innerHTML = '';
   CLIENTS.forEach((client, i) => {
     const card = buildClientCard(client);
@@ -3529,7 +3531,7 @@ function openQuickNav() {
                 dot && dot.classList.contains('offline') ? 'var(--red)'   : 'var(--border)';
     return '<div class="quick-nav-item" onclick="quickNavTo(\''+id+'\')">' +
       '<div class="quick-nav-dot" style="background:'+col+'"></div>' +
-      '<span class="quick-nav-name">'+c.name+'</span></div>';
+      '<span class="quick-nav-name">'+escapeHtml(c.name)+'</span></div>';
   }).join('');
   document.getElementById('quick-nav-overlay').classList.add('open');
   document.getElementById('quick-nav-sheet').classList.add('open');
@@ -3608,7 +3610,7 @@ function refreshNotifStatus() {
   const tok = localStorage.getItem('ctrl_fcm_token_v') || '';
   const hasPlugin = !!(_pushPlugin || (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications));
 
-  const line = (icon, txt) => '<div style="margin:3px 0">' + icon + ' ' + txt + '</div>';
+  const line = (icon, txt) => '<div style="margin:3px 0">' + icon + ' ' + escapeHtml(txt) + '</div>';
 
   let html = '';
   html += line(hasPlugin ? '✅' : '❌', 'Plugin notifications : ' + (hasPlugin ? 'chargé' : 'NON CHARGÉ'));
@@ -3750,12 +3752,15 @@ document.addEventListener('deviceready', () => {
     Push.addListener('registrationError', () => setTimeout(() => Push.register(), 15000));
     Push.addListener('pushNotificationReceived', notif => { showToast('🆕 Nouvelle commande !'); switchTab('commandes'); });
     Push.addListener('pushNotificationActionPerformed', action => { switchTab('commandes'); });
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        const last = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
-        if (Date.now() - last > 6 * 3600 * 1000) Push.register().catch(() => {});
-      }
-    });
+    if (!window._ctrlVisibilityListenerAdded) {
+      window._ctrlVisibilityListenerAdded = true;
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          const last = parseInt(localStorage.getItem('ctrl_fcm_last_reg') || '0');
+          if (Date.now() - last > 6 * 3600 * 1000) Push.register().catch(() => {});
+        }
+      });
+    }
 
     // ── Register toujours (token FCM indépendant de la permission d'affichage) ──
     Push.register().catch(() => {});

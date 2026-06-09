@@ -183,13 +183,13 @@
       color:var(--gold);letter-spacing:0.06em;margin-bottom:10px;line-height:1.2;
     }
     .fl-popup-desc {
-      font-size:0.81rem;color:var(--text);line-height:1.6;margin-bottom:16px;
+      font-size:0.81rem;color:var(--cream);line-height:1.6;margin-bottom:16px;
     }
     .fl-popup-flags { display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap; }
     .fl-popup-hint {
       font-size:0.71rem;color:var(--muted);line-height:1.55;margin-bottom:20px;
       padding:9px 12px;background:var(--bg);border-radius:10px;
-      border:1px solid var(--bord);text-align:left;
+      border:1px solid var(--border);text-align:left;
     }
     .fl-popup-btn {
       width:100%;padding:13px 0;border:none;border-radius:12px;
@@ -362,7 +362,7 @@
 
     /* ── SAVED TOAST ── */
     #toast {
-      position:fixed; bottom:calc(var(--admin-nav-h) + 102px); left:50%;
+      position:fixed; bottom:calc(var(--admin-nav-h) + env(safe-area-inset-bottom,0px) + 102px); left:50%;
       transform:translateX(-50%) translateY(0);
       background:var(--bg3); border:1px solid var(--bord2); border-radius:12px;
       padding:12px 22px; font-size:0.84rem; color:var(--green);
@@ -1859,7 +1859,7 @@
   }
   .settings-sel:focus { border-color:var(--gold); }
   .settings-sel option { background:#181612; }
-  html.light .settings-sel { background:rgba(255,255,255,0.7); color:var(--dark); }
+  html.light .settings-sel { background:rgba(255,255,255,0.7); color:var(--cream); }
   html.light .settings-sel option { background:#fff; }
   .settings-toggle { display:none; }
   .settings-toggle-track {
@@ -2674,9 +2674,13 @@ async function _hashPwd(pwd) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-// Error logging global → Firebase logs/errors/
+// Error logging global → Firebase logs/errors/ (max 10/min pour éviter quota Firebase)
+let _errCount = 0, _errReset = 0;
 window.addEventListener('error', ev => {
-  try { _rref('logs/errors/' + Date.now()).set({ msg: String(ev.message).slice(0,200), src: String(ev.filename).slice(0,100), line: ev.lineno, ts: Date.now(), ctx: 'admin' }); } catch(e) {}
+  const now = Date.now();
+  if (now > _errReset) { _errCount = 0; _errReset = now + 60000; }
+  if (_errCount++ > 10) return;
+  try { _rref('logs/errors/' + now).set({ msg: String(ev.message).slice(0,200), src: String(ev.filename).slice(0,100), line: ev.lineno, ts: now, ctx: 'admin' }); } catch(e) {}
 });
 
 /* ═══════════════════════════════════════════
