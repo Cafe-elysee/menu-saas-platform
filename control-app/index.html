@@ -2234,7 +2234,9 @@ function _watchFirstOpen(rid, cmdKey) {
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
+      localStorage.removeItem('ctrl_cmd_pause_' + cmdKey);
       delete _lastCreatedClients[cmdKey];
+      delete _pausedClients[cmdKey];
       setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 100);
     }
   });
@@ -2708,10 +2710,9 @@ function recreerClientDepuisCommande(btnEl) {
         const clientCreeData = { rid: oldRid, pwd, name: restaurantName, forfait: fLabel };
         _lastCreatedClients[commandeKey] = clientCreeData;
         localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
-        _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
+        await _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
         _watchFirstOpen(oldRid, commandeKey);
         showToast('✅ ' + escapeHtml(restaurantName) + ' recréé');
-        setTimeout(function() { _rerenderCommandeCard(commandeKey); }, 150);
       } catch(e) {
         showToast('Erreur : ' + (e.message || e));
         btnEl.disabled = false; btnEl.textContent = '↩ Retour';
@@ -2972,14 +2973,18 @@ function loadClientData(client) {
     // Badge pause dans la commande associée (si client créé depuis une commande)
     const _pcmdKey = _findCmdKeyForRid(s);
     if (_pcmdKey && !_deletedClients[_pcmdKey]) {
-      if (!isActive) {
-        _pausedClients[_pcmdKey] = s;
-        localStorage.setItem('ctrl_cmd_pause_' + _pcmdKey, s);
-      } else {
-        delete _pausedClients[_pcmdKey];
-        localStorage.removeItem('ctrl_cmd_pause_' + _pcmdKey);
+      const _wasPaused = !!_pausedClients[_pcmdKey];
+      const _nowPaused = !isActive;
+      if (_wasPaused !== _nowPaused) {
+        if (_nowPaused) {
+          _pausedClients[_pcmdKey] = s;
+          localStorage.setItem('ctrl_cmd_pause_' + _pcmdKey, s);
+        } else {
+          delete _pausedClients[_pcmdKey];
+          localStorage.removeItem('ctrl_cmd_pause_' + _pcmdKey);
+        }
+        _rerenderCommandeCard(_pcmdKey);
       }
-      _rerenderCommandeCard(_pcmdKey);
     }
 
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
