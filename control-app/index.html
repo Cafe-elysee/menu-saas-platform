@@ -228,6 +228,19 @@
     }
     .btn-logout:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.09); }
     .btn-logout:active { transform: translateY(1px); box-shadow: inset 0 2px 6px rgba(0,0,0,0.2); }
+    .app-header-right { display:flex; align-items:center; gap:8px; }
+    .ctrl-theme-btn {
+      width:34px; height:34px; border-radius:50%; flex-shrink:0;
+      background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted); cursor:pointer;
+      transition:transform 0.15s,box-shadow 0.15s,background 0.15s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1);
+    }
+    html.light .ctrl-theme-btn { background:rgba(0,0,0,0.04); }
+    .ctrl-theme-btn svg { width:15px; height:15px; pointer-events:none; }
+    .ctrl-theme-btn:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1); }
+    .ctrl-theme-btn:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.22); }
 
     /* ── Sliding tabs ── */
     .tab-scroll {
@@ -1385,13 +1398,23 @@
 </div>
 
 <!-- ══════════════ APP ══════════════ -->
+<svg style="display:none">
+  <symbol id="ctrl-i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></symbol>
+  <symbol id="ctrl-i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+</svg>
+
 <div id="app">
   <div class="app-header">
     <div class="app-header-left">
       <div class="app-header-icon">⚙️</div>
       <h2>Menu Pro Control</h2>
     </div>
-    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    <div class="app-header-right">
+      <button class="ctrl-theme-btn" id="ctrl-theme-btn" aria-label="Thème">
+        <svg id="ctrl-theme-ico"><use id="ctrl-theme-ico-use" href="#ctrl-i-moon"/></svg>
+      </button>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
   </div>
 
   <div class="tab-scroll">
@@ -3554,10 +3577,16 @@ function setTheme(mode) {
   localStorage.setItem('ctrl_theme', mode);
   updateThemeOpts();
 }
+function _updateCtrlThemeIcon() {
+  const isLight = document.documentElement.classList.contains('light');
+  const use = document.getElementById('ctrl-theme-ico-use');
+  if (use) use.setAttribute('href', isLight ? '#ctrl-i-moon' : '#ctrl-i-sun');
+}
 function loadTheme() {
   const saved = localStorage.getItem('ctrl_theme');
   const mode = saved !== null ? saved : 'light';
   document.documentElement.classList.toggle('light', mode === 'light');
+  _updateCtrlThemeIcon();
   updateThemeOpts();
 }
 function updateThemeOpts() {
@@ -3565,6 +3594,12 @@ function updateThemeOpts() {
   document.getElementById('opt-dark').className  = 'theme-opt' + (!light ? ' active' : '');
   document.getElementById('opt-light').className = 'theme-opt' + ( light ? ' active' : '');
 }
+document.getElementById('ctrl-theme-btn').addEventListener('click', function() {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('ctrl_theme', isLight ? 'light' : 'dark');
+  _updateCtrlThemeIcon();
+  updateThemeOpts();
+});
 
 // ════════════════════════════════════════════════════
 // RÉGLAGES — MOT DE PASSE APP
