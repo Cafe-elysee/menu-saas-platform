@@ -8342,7 +8342,9 @@ function _qrUnlockScroll() {
   document.body.style.overflow = '';
   window.scrollTo(0, _qrScrollY);
 }
+let _qrMenuQRMode = false;
 function openQRModalMenuQR() {
+  _qrMenuQRMode = true;
   if (!_tableCount) _tableCount = 1;
   openQRModal();
 }
@@ -8358,6 +8360,7 @@ function openQRModal() {
 function closeQRModal() {
   document.getElementById('qr-modal').classList.remove('open');
   _qrUnlockScroll();
+  _qrMenuQRMode = false;
   if (_qrSavedTab && _qrSavedTab !== _adminCurrentTab) switchAdminTab(_qrSavedTab);
   _qrSavedTab = null;
   if (_qrHistoryPushed) { _qrHistoryPushed = false; history.back(); }
@@ -8562,8 +8565,10 @@ async function qrDownloadPDF() {
     doc.roundedRect(x-1, y-1, QR_MM+2, QR_MM+2, 2, 2, 'F');
     doc.addImage(imgs[i],'PNG',x,y,QR_MM,QR_MM);
     // Label
-    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(150,112,40);
-    doc.text('TABLE '+(i+1), x+QR_MM/2, y+QR_MM+9, {align:'center'});
+    if (!_qrMenuQRMode) {
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(150,112,40);
+      doc.text('TABLE '+(i+1), x+QR_MM/2, y+QR_MM+9, {align:'center'});
+    }
     col++;
     if (col >= COL) { col=0; row++; }
     if (row >= ROWS_PP && i < imgs.length-1) { row=0; col=0; pageN++; doc.addPage(); addHdr(); }
