@@ -223,9 +223,11 @@
       padding: 0.4rem 0.9rem;
       background: transparent; border: 1px solid var(--border);
       border-radius: 8px; color: var(--muted);
-      font-size: 0.8rem; transition: all 0.2s;
+      font-size: 0.8rem; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, color 0.15s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.09);
     }
-    .btn-logout:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-logout:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .btn-logout:active { transform: translateY(1px); box-shadow: inset 0 2px 6px rgba(0,0,0,0.2); }
 
     /* ── Sliding tabs ── */
     .tab-scroll {
@@ -346,14 +348,20 @@
       background:rgba(239,83,80,0.12); color:var(--red);
       border:1px solid rgba(239,83,80,0.3); border-radius:8px;
       padding:6px 12px; font-size:0.78rem; font-family:inherit; cursor:pointer;
+      transition:transform 0.15s, box-shadow 0.15s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.1);
     }
-    .btn-del-commande:active { background:rgba(239,83,80,0.22); }
+    .btn-del-commande:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(180,40,40,0.18), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.1); }
+    .btn-del-commande:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
 
     /* Bouton vider commande */
     .btn-vider-commande {
       font-size:0.72rem; color:var(--muted); border:1px solid var(--border);
       border-radius:8px; padding:4px 10px; font-family:inherit;
+      transition:transform 0.15s, box-shadow 0.15s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.08);
     }
+    .btn-vider-commande:active { transform:translateY(1px); box-shadow:inset 0 2px 5px rgba(0,0,0,0.18); }
     .commande-card.status-flash { animation: statusPulse 0.7s ease forwards; }
     .commande-status-pill { transition: background 0.4s ease, color 0.4s ease; }
     .commande-status-pill.pill-pop { animation: pillPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
@@ -475,16 +483,30 @@
     .btn-creer-client {
       background: var(--gold-dim); color: var(--gold);
       border: 1px solid rgba(200,164,78,0.3) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.1);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .btn-creer-client:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(200,164,78,0.2), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.1); }
+    .btn-creer-client:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.18); }
     .btn-email {
       background: rgba(66,133,244,0.13); color: #4285f4;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.1);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .btn-email:active { transform:translateY(1px); box-shadow:inset 0 2px 5px rgba(0,0,0,0.2); }
     .btn-wa {
       background: #25D366; color: #fff;
+      box-shadow: 0 3px 8px rgba(37,211,102,0.3), inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.18);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .btn-wa:hover { transform:translateY(-1px); box-shadow:0 5px 12px rgba(37,211,102,0.4), inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.18); }
+    .btn-wa:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.22); }
     .btn-viber {
       background: rgba(123,65,163,0.15); color: #7b41a3;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.1);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .btn-viber:active { transform:translateY(1px); box-shadow:inset 0 2px 5px rgba(0,0,0,0.2); }
     html.light .btn-email  { background: rgba(66,133,244,0.1); }
     html.light .btn-viber  { background: rgba(123,65,163,0.1); }
     .btn-viber-copy {
@@ -714,10 +736,11 @@
     .info-edit-wrap { display:flex; gap:0.4rem; width:100%; }
     .info-edit-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.84rem; color:var(--text); font-family:inherit; outline:none; min-width:0; transition:border-color 0.2s; }
     .info-edit-input:focus { border-color:var(--gold); }
-    .info-edit-btn { background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08; border:none; border-radius:8px; padding:0.5rem 0.85rem; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:opacity 0.2s; }
-    .info-edit-btn:hover { opacity:0.88; }
-    .info-edit-btn.warn { background:rgba(239,83,80,0.18); color:var(--red); border:1px solid rgba(239,83,80,0.35); opacity:1; }
-    .info-edit-btn.warn:hover { background:rgba(239,83,80,0.28); opacity:1; }
+    .info-edit-btn { background:linear-gradient(135deg,#d4a94e,#b8922e); color:#0c0a08; border:none; border-radius:8px; padding:0.5rem 0.85rem; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 3px 10px rgba(200,164,78,0.28),inset 0 1.5px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.18); }
+    .info-edit-btn:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(200,164,78,0.38),inset 0 1.5px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.18); }
+    .info-edit-btn:active { transform:translateY(1px); box-shadow:inset 0 3px 8px rgba(0,0,0,0.22),inset 0 1px 2px rgba(0,0,0,0.12); }
+    .info-edit-btn.warn { background:rgba(239,83,80,0.18); color:var(--red); border:1px solid rgba(239,83,80,0.35); box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.1); }
+    .info-edit-btn.warn:hover { background:rgba(239,83,80,0.28); transform:translateY(-1px); box-shadow:0 3px 8px rgba(180,40,40,0.18),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.1); }
     .info-edit-warn { font-size:0.7rem; color:var(--red); margin-bottom:0.5rem; min-height:1em; line-height:1.4; }
 
     .lang-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
@@ -1128,7 +1151,11 @@
     .nc-btn-cancel {
       flex:1; padding:12px; border-radius:12px; border:1px solid var(--border);
       background:transparent; color:var(--muted); font-family:inherit; cursor:pointer;
+      transition:transform 0.15s,box-shadow 0.15s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09);
     }
+    .nc-btn-cancel:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .nc-btn-cancel:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
     .nc-result { display:none; }
     .nc-result.show { display:block; }
     .nc-result-title { color:#4caf50; font-weight:700; font-size:1.05rem; margin-bottom:16px; }
@@ -1159,12 +1186,20 @@
     .btn-client-pause  {
       padding:7px 13px; border-radius:9px; font-size:0.75rem; font-weight:600;
       border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit;
+      transition:transform 0.15s,box-shadow 0.15s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09);
     }
+    .btn-client-pause:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .btn-client-pause:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
     .btn-client-pause.is-active   { color:#ff9800; border-color:rgba(255,152,0,0.4); }
     .btn-client-delete {
       padding:7px 13px; border-radius:9px; font-size:0.75rem; font-weight:600;
       border:1px solid rgba(239,83,80,0.3); background:rgba(239,83,80,0.08); color:var(--red); font-family:inherit;
+      transition:transform 0.15s,box-shadow 0.15s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.1);
     }
+    .btn-client-delete:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(180,40,40,0.18),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.1); }
+    .btn-client-delete:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
     .client-danger-zone { display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
 
     /* Boutons action Forfait — 3D matte */
@@ -1213,8 +1248,12 @@
     .del-name { color:var(--gold); font-weight:700; }
     .del-warn { font-size:0.78rem; color:var(--muted); margin:10px 0 20px; line-height:1.6; }
     .del-actions { display:flex; gap:10px; }
-    .del-btn-cancel { flex:1; padding:11px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.88rem; }
-    .del-btn-confirm { flex:1; padding:11px; border-radius:10px; border:none; background:var(--red); color:#fff; font-family:inherit; font-size:0.88rem; font-weight:700; }
+    .del-btn-cancel { flex:1; padding:11px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.88rem; transition:transform 0.15s,box-shadow 0.15s; box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .del-btn-cancel:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .del-btn-cancel:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
+    .del-btn-confirm { flex:1; padding:11px; border-radius:10px; border:none; background:linear-gradient(135deg,#d97070,#c04040,#8c2020); color:#fff; font-family:inherit; font-size:0.88rem; font-weight:700; text-shadow:0 1px 2px rgba(0,0,0,0.3); transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 4px 12px rgba(180,40,40,0.32),inset 0 1.5px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.22); }
+    .del-btn-confirm:hover { transform:translateY(-2px); box-shadow:0 7px 18px rgba(180,40,40,0.44),inset 0 1.5px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.22); }
+    .del-btn-confirm:active { transform:translateY(1px); box-shadow:inset 0 3px 8px rgba(0,0,0,0.28),inset 0 1px 2px rgba(0,0,0,0.15); }
 
     .quick-nav-overlay {
       display: none; position: fixed; inset: 0; z-index: 200;
