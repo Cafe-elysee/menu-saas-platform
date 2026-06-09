@@ -2140,12 +2140,13 @@ async function createNewClient() {
     if (_pendingCommandeKey) {
       const cmdData = _commandesCache[_pendingCommandeKey] || {};
       const fLabel = cmdData.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-      _lastCreatedClients[_pendingCommandeKey] = { rid, pwd, name, forfait: fLabel };
-      localStorage.setItem('ctrl_cmd_done_' + _pendingCommandeKey, JSON.stringify({ rid, pwd, name, forfait: fLabel }));
+      const clientCreeData = { rid, pwd, name, forfait: fLabel };
+      _lastCreatedClients[_pendingCommandeKey] = clientCreeData;
+      localStorage.setItem('ctrl_cmd_done_' + _pendingCommandeKey, JSON.stringify(clientCreeData));
       const cmdKey = _pendingCommandeKey;
       _pendingCommandeKey = null;
-      // Passer la commande en "en cours"
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'en_cours', lu: true });
+      // Passer la commande en "en cours" + persister clientCree dans Firebase
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
       // Surveiller le premier accès pour passer en "terminée"
       _watchFirstOpen(rid, cmdKey);
       // Re-render la carte commande pour mettre à jour les boutons de contact
@@ -2190,7 +2191,7 @@ let _firstOpenWatchersSetup = false;
 function _watchFirstOpen(rid, cmdKey) {
   _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
     if (snap.val() === true && _commandesCache[cmdKey]) {
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true });
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -2274,8 +2275,8 @@ function _rerenderCommandeCard(key) {
 }
 
 function _copyViberMsg(key) {
-  const created = _lastCreatedClients[key];
   const d = _commandesCache[key];
+  const created = (d && d.clientCree) || _lastCreatedClients[key];
   if (!created || !d) return;
   const fLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
   const msg = buildDeliveryMsg(d.restaurant || '', created.rid, created.pwd, fLabel, d.langue || 'fr');
@@ -2369,7 +2370,8 @@ function buildCommandeCard(key, d) {
   const restEsc      = escapeHtml(restaurant);
 
   // État : client déjà créé depuis cette commande ?
-  const created = _lastCreatedClients[key] || null;
+  // d.clientCree vient de Firebase (persiste après redémarrage), fallback sur la mémoire locale
+  const created = d.clientCree || _lastCreatedClients[key] || null;
 
   // Bouton Email
   let emailBtn = '';
@@ -2489,8 +2491,10 @@ function deleteCommande(key) {
   _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
     _controlDb.ref('/commandes/' + key).remove();
     localStorage.removeItem('ctrl_cmd_done_' + key);
-    if (_lastCreatedClients[key]) {
-      localStorage.removeItem('ctrl_fopen_' + _lastCreatedClients[key].rid);
+    const d = _commandesCache[key];
+    const created = (d && d.clientCree) || _lastCreatedClients[key];
+    if (created) {
+      localStorage.removeItem('ctrl_fopen_' + created.rid);
       delete _lastCreatedClients[key];
     }
   }, true);
@@ -2587,9 +2591,10 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     });
 
     const fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
-    _lastCreatedClients[commandeKey] = { rid, pwd, name: restaurantName, forfait: fLabel };
-    localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify({ rid, pwd, name: restaurantName, forfait: fLabel }));
-    _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true });
+    const clientCreeData = { rid, pwd, name: restaurantName, forfait: fLabel };
+    _lastCreatedClients[commandeKey] = clientCreeData;
+    localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
+    _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
     _watchFirstOpen(rid, commandeKey);
     showToast('✅ ' + escapeHtml(restaurantName) + ' créé');
     setTimeout(function() { _rerenderCommandeCard(commandeKey); }, 150);
