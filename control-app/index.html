@@ -522,6 +522,14 @@
       font-size: 0.72rem; font-weight: 600;
       border: 1px solid rgba(76,175,80,0.22);
     }
+    /* Badge client supprimé */
+    .commande-client-supprime-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 8px;
+      background: rgba(231,76,60,0.12); color: #e74c3c;
+      font-size: 0.72rem; font-weight: 600;
+      border: 1px solid rgba(231,76,60,0.25);
+    }
 
     /* Bouton info (i) */
     .info-btn {
@@ -2185,6 +2193,8 @@ let _commandesCache = {};
 let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
 let _lastCreatedClients = {};
+// Commandes dont le client créé a été supprimé : commandeKey → true
+let _deletedClients = {};
 let _pendingCommandeKey = null;
 let _firstOpenWatchersSetup = false;
 
@@ -2286,11 +2296,14 @@ function _copyViberMsg(key) {
 function listenCommandes() {
   _controlDb.ref('/commandes').on('value', snap => {
     _commandesCache = snap.val() || {};
-    // Restaurer _lastCreatedClients depuis localStorage + nettoyer les entrées obsolètes
+    // Restaurer _lastCreatedClients et _deletedClients depuis localStorage + nettoyer les entrées obsolètes
     Object.keys(_commandesCache).forEach(function(k) {
       if (!_lastCreatedClients[k]) {
         var stored = localStorage.getItem('ctrl_cmd_done_' + k);
         if (stored) { try { _lastCreatedClients[k] = JSON.parse(stored); } catch(e) {} }
+      }
+      if (!_deletedClients[k] && localStorage.getItem('ctrl_cmd_del_' + k)) {
+        _deletedClients[k] = true;
       }
     });
     // Nettoyer les entrées dont la commande n'existe plus
@@ -2299,6 +2312,10 @@ function listenCommandes() {
       if (lk && lk.startsWith('ctrl_cmd_done_')) {
         var ck = lk.slice(14);
         if (!_commandesCache[ck]) { localStorage.removeItem(lk); delete _lastCreatedClients[ck]; }
+      }
+      if (lk && lk.startsWith('ctrl_cmd_del_')) {
+        var dk = lk.slice(13);
+        if (!_commandesCache[dk]) { localStorage.removeItem(lk); delete _deletedClients[dk]; }
       }
     }
     // Restaurer les watchers firstOpen au démarrage
@@ -2411,10 +2428,12 @@ function buildCommandeCard(key, d) {
     }
   }
 
-  // Bouton "Créer ce client" ou badge si déjà créé
-  const creerBtn = created
-    ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
-    : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
+  // Bouton "Créer ce client" / badge vert créé / badge rouge supprimé
+  const creerBtn = _deletedClients[key]
+    ? '<span class="commande-client-supprime-badge">🗑️ Client supprimé</span>'
+    : created
+      ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
+      : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
 
   card.innerHTML =
     '<div class="commande-card-inner">' +
@@ -2491,6 +2510,8 @@ function deleteCommande(key) {
   _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
     _controlDb.ref('/commandes/' + key).remove();
     localStorage.removeItem('ctrl_cmd_done_' + key);
+    localStorage.removeItem('ctrl_cmd_del_' + key);
+    delete _deletedClients[key];
     const d = _commandesCache[key];
     const created = (d && d.clientCree) || _lastCreatedClients[key];
     if (created) {
@@ -2784,6 +2805,15 @@ async function confirmDeleteClient() {
     // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
     const cardEl = document.getElementById('card-' + slug.replace(/-/g,'_'));
     if (cardEl) cardEl.remove();
+    // Marquer les commandes dont le client créé vient d'être supprimé
+    Object.keys(_commandesCache).forEach(function(cmdKey) {
+      const cc = (_commandesCache[cmdKey] && _commandesCache[cmdKey].clientCree) || _lastCreatedClients[cmdKey];
+      if (cc && cc.rid === slug) {
+        _deletedClients[cmdKey] = true;
+        localStorage.setItem('ctrl_cmd_del_' + cmdKey, '1');
+        _rerenderCommandeCard(cmdKey);
+      }
+    });
   } catch(e) {
     btn.textContent = 'Supprimer'; btn.disabled = false;
     const errEl = document.getElementById('del-error');
