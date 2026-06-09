@@ -530,6 +530,14 @@
       font-size: 0.72rem; font-weight: 600;
       border: 1px solid rgba(231,76,60,0.25);
     }
+    /* Badge client en pause */
+    .commande-client-pause-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 8px;
+      background: rgba(255,152,0,0.12); color: #ff9800;
+      font-size: 0.72rem; font-weight: 600;
+      border: 1px solid rgba(255,152,0,0.25);
+    }
 
     /* Bouton info (i) */
     .info-btn {
@@ -2193,9 +2201,18 @@ let _commandesCache = {};
 let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
 let _lastCreatedClients = {};
-// Commandes dont le client créé a été supprimé : commandeKey → true
+// Commandes dont le client créé a été supprimé : commandeKey → rid
 let _deletedClients = {};
+// Commandes dont le client créé est en pause : commandeKey → rid
+let _pausedClients = {};
 let _pendingCommandeKey = null;
+
+function _findCmdKeyForRid(rid) {
+  return Object.keys(_commandesCache).find(function(k) {
+    const cc = (_commandesCache[k] && _commandesCache[k].clientCree) || _lastCreatedClients[k];
+    return cc && cc.rid === rid;
+  }) || null;
+}
 let _firstOpenWatchersSetup = false;
 
 function _watchFirstOpen(rid, cmdKey) {
@@ -2306,6 +2323,10 @@ function listenCommandes() {
         var delRid = localStorage.getItem('ctrl_cmd_del_' + k);
         if (delRid) _deletedClients[k] = delRid;
       }
+      if (!_pausedClients[k]) {
+        var pauseRid = localStorage.getItem('ctrl_cmd_pause_' + k);
+        if (pauseRid) _pausedClients[k] = pauseRid;
+      }
     });
     // Nettoyer les entrées dont la commande n'existe plus
     for (var i = localStorage.length - 1; i >= 0; i--) {
@@ -2317,6 +2338,10 @@ function listenCommandes() {
       if (lk && lk.startsWith('ctrl_cmd_del_')) {
         var dk = lk.slice(13);
         if (!_commandesCache[dk]) { localStorage.removeItem(lk); delete _deletedClients[dk]; }
+      }
+      if (lk && lk.startsWith('ctrl_cmd_pause_')) {
+        var pk = lk.slice(15);
+        if (!_commandesCache[pk]) { localStorage.removeItem(lk); delete _pausedClients[pk]; }
       }
     }
     // Restaurer les watchers firstOpen au démarrage
@@ -2432,9 +2457,11 @@ function buildCommandeCard(key, d) {
   // Bouton "Créer ce client" / badge vert créé / badge rouge supprimé
   const creerBtn = _deletedClients[key]
     ? '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>'
-    : created
-      ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
-      : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
+    : _pausedClients[key]
+      ? '<span class="commande-client-pause-badge">⏸ ' + escapeHtml(_pausedClients[key]) + '</span>'
+      : created
+        ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
+        : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
 
   card.innerHTML =
     '<div class="commande-card-inner">' +
@@ -2512,7 +2539,9 @@ function deleteCommande(key) {
     _controlDb.ref('/commandes/' + key).remove();
     localStorage.removeItem('ctrl_cmd_done_' + key);
     localStorage.removeItem('ctrl_cmd_del_' + key);
+    localStorage.removeItem('ctrl_cmd_pause_' + key);
     delete _deletedClients[key];
+    delete _pausedClients[key];
     const d = _commandesCache[key];
     const created = (d && d.clientCree) || _lastCreatedClients[key];
     if (created) {
@@ -2812,6 +2841,9 @@ async function confirmDeleteClient() {
       if (cc && cc.rid === slug) {
         _deletedClients[cmdKey] = cc.rid;
         localStorage.setItem('ctrl_cmd_del_' + cmdKey, cc.rid);
+        // Si le client était en pause, le rouge prend le dessus
+        delete _pausedClients[cmdKey];
+        localStorage.removeItem('ctrl_cmd_pause_' + cmdKey);
         _rerenderCommandeCard(cmdKey);
       }
     });
@@ -2869,6 +2901,19 @@ function loadClientData(client) {
     if (pauseBtn) {
       pauseBtn.textContent = isActive ? '⏸ Mettre en pause' : '▶ Réactiver';
       pauseBtn.className = isActive ? 'btn-action-yellow' : 'btn-action-green';
+    }
+
+    // Badge pause dans la commande associée (si client créé depuis une commande)
+    const _pcmdKey = _findCmdKeyForRid(s);
+    if (_pcmdKey && !_deletedClients[_pcmdKey]) {
+      if (!isActive) {
+        _pausedClients[_pcmdKey] = s;
+        localStorage.setItem('ctrl_cmd_pause_' + _pcmdKey, s);
+      } else {
+        delete _pausedClients[_pcmdKey];
+        localStorage.removeItem('ctrl_cmd_pause_' + _pcmdKey);
+      }
+      _rerenderCommandeCard(_pcmdKey);
     }
 
     const set = (key, val) => { const el = document.getElementById(key+'-'+id); if (el) el.checked = !!val; };
