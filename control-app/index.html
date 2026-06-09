@@ -539,6 +539,18 @@
       border: 1px solid rgba(255,152,0,0.25);
     }
 
+    /* Bouton recréer depuis badge supprimé */
+    .btn-recreer-client {
+      padding: 4px 10px; border-radius: 8px;
+      background: rgba(200,164,78,0.11); color: var(--gold);
+      border: 1px solid rgba(200,164,78,0.28) !important;
+      font-size: 0.68rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+    }
+    .btn-recreer-client:hover { background: rgba(200,164,78,0.22); transform: translateY(-1px); }
+    .btn-recreer-client:active { transform: translateY(1px); }
+    .commande-client-supprime-wrap { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
     /* Bouton info (i) */
     .info-btn {
       width: 16px; height: 16px; border-radius: 50%;
@@ -2456,7 +2468,10 @@ function buildCommandeCard(key, d) {
 
   // Bouton "Créer ce client" / badge vert créé / badge rouge supprimé
   const creerBtn = _deletedClients[key]
-    ? '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>'
+    ? '<div class="commande-client-supprime-wrap">' +
+        '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>' +
+        '<button class="btn-recreer-client" data-key="' + key + '" data-old-rid="' + escapeHtml(_deletedClients[key]) + '" data-rest="' + restEsc + '" onclick="recreerClientDepuisCommande(this)">↩ Retour</button>' +
+      '</div>'
     : _pausedClients[key]
       ? '<span class="commande-client-pause-badge">⏸ ' + escapeHtml(_pausedClients[key]) + '</span>'
       : created
@@ -2653,6 +2668,57 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     showToast('Erreur : ' + (e.message || e));
     if (btnEl) { btnEl.disabled = false; btnEl.textContent = '＋ Créer ce client'; }
   }
+}
+
+function recreerClientDepuisCommande(btnEl) {
+  const commandeKey    = btnEl.dataset.key;
+  const oldRid         = btnEl.dataset.oldRid;
+  const restaurantName = btnEl.dataset.rest;
+  _showCtrlConfirm(
+    'Recréer ce restaurant ?',
+    'Recréer « ' + restaurantName + ' » avec l\'ID ' + oldRid + ' ?',
+    'Recréer',
+    async function() {
+      btnEl.disabled = true; btnEl.textContent = '⏳…';
+      try {
+        const ex = await _saasDb.ref('restaurants/' + oldRid).once('value');
+        if (ex.exists()) {
+          showToast('Cet ID existe déjà — visible dans l\'onglet Clients');
+          btnEl.disabled = false; btnEl.textContent = '↩ Retour';
+          return;
+        }
+        const pwd  = _buildPwdDefault(restaurantName);
+        const hash = await ncHashPwd(pwd);
+        const ts   = Date.now();
+        const cmdData = _commandesCache[commandeKey] || {};
+        const isCS = cmdData.forfait === 'commandes-services';
+        await _saasDb.ref('restaurants/' + oldRid).set({
+          profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+          config: {
+            adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+            features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
+            retention: { calls: 2592000000, orders: 2592000000 }
+          },
+          menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
+          firstOpen: false
+        });
+        delete _deletedClients[commandeKey];
+        localStorage.removeItem('ctrl_cmd_del_' + commandeKey);
+        const fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
+        const clientCreeData = { rid: oldRid, pwd, name: restaurantName, forfait: fLabel };
+        _lastCreatedClients[commandeKey] = clientCreeData;
+        localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
+        _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
+        _watchFirstOpen(oldRid, commandeKey);
+        showToast('✅ ' + escapeHtml(restaurantName) + ' recréé');
+        setTimeout(function() { _rerenderCommandeCard(commandeKey); }, 150);
+      } catch(e) {
+        showToast('Erreur : ' + (e.message || e));
+        btnEl.disabled = false; btnEl.textContent = '↩ Retour';
+      }
+    },
+    false
+  );
 }
 
 
