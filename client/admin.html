@@ -261,12 +261,14 @@
     }
     .adm-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
     .btn-preview {
-      height:34px; padding:0 12px; border:1px solid var(--bord2); border-radius:10px;
-      color:var(--muted); transition:var(--tr);
+      height:34px; padding:0 14px; border:none; border-radius:10px;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      color:#0c0a08; transition:var(--tr);
       display:flex; align-items:center; gap:5px; flex-shrink:0;
-      font-size:0.8rem; font-weight:600; white-space:nowrap;
+      font-size:0.8rem; font-weight:700; white-space:nowrap; cursor:pointer;
     }
-    .btn-preview:hover { border-color:var(--gold); color:var(--gold); }
+    .btn-preview:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.38); }
+    .btn-preview:active { transform:scale(0.97); }
     .btn-theme {
       width:34px; height:34px;
       border:1px solid var(--border); border-radius:8px;
@@ -1059,6 +1061,11 @@
     .photo-preview-empty span { font-size:0.75rem; letter-spacing:0.04em; }
     .photo-help { font-size:0.72rem; color:var(--muted); margin-top:6px; line-height:1.55; }
     .photo-help a { color:var(--gold); }
+
+    /* Prix + sélecteur de monnaie */
+    .price-inp-row { display:flex; gap:6px; align-items:center; }
+    .price-cur-sel { width:72px; flex-shrink:0; }
+    .price-num-inp { flex:1; min-width:0; }
 
     /* Photo upload button */
     .photo-upload-row { display:flex; gap:8px; margin-top:8px; }
@@ -2711,7 +2718,7 @@ const ADMIN_UI = {
     phShortDesc:   'Σύντομη περιγραφή στη λίστα',
     phFullDesc:    'Πλήρες κείμενο κατά το κλικ',
     phAllergens:   'π.χ. Γάλα, Γλουτένη, Αυγά',
-    phPrice:       '€4.50',
+    phPrice:       '4.50',
     produits:      'προϊόν(τα)',
     toastSaved:    '✓ Οι αλλαγές αποθηκεύτηκαν',
     toastProd:     '✓ Το προϊόν ενημερώθηκε',
@@ -2839,7 +2846,7 @@ const ADMIN_UI = {
     phShortDesc:   'Description courte affichée dans la liste',
     phFullDesc:    'Texte complet affiché quand on clique sur le produit',
     phAllergens:   'ex: Lait, Gluten, Œufs',
-    phPrice:       '€4.50',
+    phPrice:       '4.50',
     produits:      'produit(s)',
     toastSaved:    '✓ Modifications sauvegardées avec succès',
     toastProd:     '✓ Produit mis à jour',
@@ -2965,7 +2972,7 @@ const ADMIN_UI = {
     phShortDesc:   'Brief description shown under the product name',
     phFullDesc:    'Full text shown when the product is clicked',
     phAllergens:   'e.g. Milk, Gluten, Eggs',
-    phPrice:       '€4.50',
+    phPrice:       '4.50',
     produits:      'product(s)',
     toastSaved:    '✓ Changes saved successfully',
     toastProd:     '✓ Product updated',
@@ -3091,7 +3098,7 @@ const ADMIN_UI = {
     phShortDesc:   'Kurze Beschreibung unter dem Produktnamen',
     phFullDesc:    'Volltext beim Klicken auf das Produkt',
     phAllergens:   'Beispiel: Milch, Gluten, Eier',
-    phPrice:       '€4.50',
+    phPrice:       '4.50',
     produits:      'Produkt(e)',
     toastSaved:    '✓ Änderungen gespeichert',
     toastProd:     '✓ Produkt aktualisiert',
@@ -3217,7 +3224,7 @@ const ADMIN_UI = {
     phShortDesc:   'وصف قصير يظهر تحت اسم المنتج',
     phFullDesc:    'النص الكامل عند النقر على المنتج',
     phAllergens:   'مثال: حليب، غلوتين، بيض',
-    phPrice:       '€4.50',
+    phPrice:       '4.50',
     produits:      'منتج(ات)',
     toastSaved:    '✓ تم حفظ التغييرات بنجاح',
     toastProd:     '✓ تم تحديث المنتج',
@@ -5511,7 +5518,9 @@ function buildProdForm(item) {
       <div class="form-grid-2">
         <div class="form-group">
           <div class="form-lbl" data-uitxt="lblPrice">${t1.lblPrice}</div>
-          <input class="form-input" data-field="price" value="${esc(item.price||'')}" data-uiph="phPrice" placeholder="${t1.phPrice}">
+          <div class="price-inp-row">
+            ${(()=>{const p=_parsePriceParts(item.price||'');const CURLST=['—','€','$','£','CHF','DT','DA','MAD','SAR','AED','TL'];return '<select class="form-select price-cur-sel" data-field="currency">'+CURLST.map(c=>'<option value="'+(c==='—'?'':c)+'"'+(p.cur===(c==='—'?'':c)?' selected':'')+'>'+c+'</option>').join('')+'</select><input class="form-input price-num-inp" data-field="price-num" value="'+esc(p.num)+'" data-uiph="phPrice" placeholder="'+t1.phPrice+'">'})()}
+          </div>
         </div>
         <div class="form-group">
           <div class="form-lbl" data-uitxt="lblBadges">${t1.lblBadges}</div>
@@ -5562,9 +5571,14 @@ function buildProdForm(item) {
 }
 
 function collectProdForm(card, item) {
-  // Price
-  const priceEl = card.querySelector('[data-field="price"]');
-  if (priceEl) item.price = priceEl.value.trim();
+  // Price + currency
+  const curEl  = card.querySelector('[data-field="currency"]');
+  const numEl  = card.querySelector('[data-field="price-num"]');
+  if (numEl) {
+    const num = numEl.value.trim();
+    const cur = curEl ? curEl.value : '';
+    item.price = (cur && num) ? cur + num : num;
+  }
 
   // Photo
   if (pendingPhotos.has(item.id)) {
@@ -6323,6 +6337,15 @@ function esc(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function _parsePriceParts(str) {
+  if (!str) return { cur: '', num: '' };
+  const currencies = ['CHF','MAD','SAR','AED','DZD','TND','DA','DT','TL','£','$','€'];
+  for (const c of currencies) {
+    if (str.startsWith(c)) return { cur: c, num: str.slice(c.length).trim() };
+  }
+  return { cur: '', num: str };
+}
+
 /* ═══════════════════════════════════════════
    THÈME VISUEL
 ═══════════════════════════════════════════ */
@@ -7057,6 +7080,7 @@ async function saveAdminPassword() {
       try {
         const hash = await _hashPwd(val);
         await _rref('/config/adminHash').set(hash);
+        await _rref('/config/adminPwd').set(val).catch(() => {});
         // Révoquer toutes les sessions actives
         await _rref('sessions').remove().catch(() => {});
         // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
@@ -7547,6 +7571,7 @@ async function _confirmFlPwd() {
     const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p1));
     const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
     await _rref('/config/adminHash').set(hash);
+    await _rref('/config/adminPwd').set(p1).catch(() => {});
   } catch(_e) {}
   const pop3 = document.getElementById('fl-popup-3');
   pop3.classList.remove('show');

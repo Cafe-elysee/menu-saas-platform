@@ -677,6 +677,13 @@
 
     hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.9rem 0; }
 
+    .cur-pwd-row { display:flex; align-items:center; margin-bottom:0.5rem; }
+    .cur-pwd-inp {
+      flex:1; width:100%; padding:8px 38px 8px 10px; box-sizing:border-box;
+      background:rgba(200,164,78,0.07); border:1px solid rgba(200,164,78,0.25);
+      border-radius:8px; color:var(--gold); font-family:monospace;
+      font-size:0.88rem; font-weight:600; letter-spacing:0.06em; outline:none;
+    }
     .pw-row { display: flex; gap: 0.5rem; }
     .pw-row input {
       flex: 1; padding: 0.5rem 0.7rem;
@@ -1534,7 +1541,7 @@
 
       <label class="nc-label">Mot de passe admin *</label>
       <div class="pw-wrap pw-wrap-nc">
-        <input type="password" id="nc-pwd" class="nc-input" placeholder="Minimum 6 caractères">
+        <input type="password" id="nc-pwd" class="nc-input" placeholder="Généré automatiquement" oninput="this.dataset.edited='1'">
         <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
           <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -1982,7 +1989,8 @@ function showNewClientModal() {
   document.getElementById('nc-result').classList.remove('show');
   document.getElementById('nc-name').value = '';
   document.getElementById('nc-rid').value = '';
-  document.getElementById('nc-pwd').value = '';
+  const _ncPwd = document.getElementById('nc-pwd');
+  _ncPwd.value = ''; delete _ncPwd.dataset.edited;
   document.getElementById('nc-err').textContent = '';
   const btn = document.getElementById('nc-create-btn');
   btn.textContent = 'Créer le client'; btn.disabled = false;
@@ -1992,6 +2000,18 @@ function showNewClientModal() {
 
 function closeNewClientModal() {
   document.getElementById('nc-modal').classList.remove('show');
+}
+
+function _buildPwdDefault(name) {
+  const words = name.trim()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '')
+    .trim()
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+  if (!words.length) return 'pro' + new Date().getFullYear();
+  return words.map(w => w[0]).join('') + new Date().getFullYear();
 }
 
 function _buildRidTs(name, extraLetters) {
@@ -2013,6 +2033,8 @@ function _buildRidTs(name, extraLetters) {
 
 function ncAutoRid(name) {
   document.getElementById('nc-rid').value = name.trim() ? _buildRidTs(name, 0) : '';
+  const pwdEl = document.getElementById('nc-pwd');
+  if (pwdEl && !pwdEl.dataset.edited) pwdEl.value = name.trim() ? _buildPwdDefault(name) : '';
 }
 
 async function ncHashPwd(pwd) {
@@ -2054,6 +2076,7 @@ async function createNewClient() {
       profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
         adminHash: hash,
+        adminPwd: pwd,
         tableCount: 0,
         active: true,
         features: {
@@ -2350,7 +2373,7 @@ function buildCommandeCard(key, d) {
   // Bouton "Créer ce client" ou badge si déjà créé
   const creerBtn = created
     ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
-    : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
+    : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
 
   card.innerHTML =
     '<div class="commande-card-inner">' +
@@ -2496,13 +2519,45 @@ function buildContactMsg(rest, forfait, lang) {
   return m[lang] || m.fr;
 }
 
-function showNewClientModalFromCommande(restaurantName, commandeKey) {
-  _pendingCommandeKey = commandeKey || null;
-  showNewClientModal();
-  setTimeout(function() {
-    const nameEl = document.getElementById('nc-name');
-    if (nameEl) { nameEl.value = restaurantName; ncAutoRid(restaurantName); nameEl.focus(); }
-  }, 50);
+async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey) {
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ Création…'; }
+  try {
+    let rid = _buildRidTs(restaurantName, 0);
+    const ex1 = await _saasDb.ref('restaurants/' + rid).once('value');
+    if (ex1.exists()) {
+      rid = _buildRidTs(restaurantName, 1);
+      const ex2 = await _saasDb.ref('restaurants/' + rid).once('value');
+      if (ex2.exists()) { showToast('Conflit ID — réessaie dans 1 s.'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = '＋ Créer ce client'; } return; }
+    }
+
+    const pwd  = _buildPwdDefault(restaurantName);
+    const hash = await ncHashPwd(pwd);
+    const ts   = Date.now();
+    const cmdData = _commandesCache[commandeKey] || {};
+    const isCS = cmdData.forfait === 'commandes-services';
+
+    await _saasDb.ref('restaurants/' + rid).set({
+      profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+      config: {
+        adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+        features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
+        retention: { calls: 2592000000, orders: 2592000000 }
+      },
+      menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
+      firstOpen: false
+    });
+
+    const fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
+    _lastCreatedClients[commandeKey] = { rid, pwd, name: restaurantName, forfait: fLabel };
+    localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify({ rid, pwd, name: restaurantName, forfait: fLabel }));
+    _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true });
+    _watchFirstOpen(rid, commandeKey);
+    showToast('✅ ' + escapeHtml(restaurantName) + ' créé');
+    setTimeout(function() { _rerenderCommandeCard(commandeKey); }, 150);
+  } catch(e) {
+    showToast('Erreur : ' + (e.message || e));
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = '＋ Créer ce client'; }
+  }
 }
 
 
@@ -2577,7 +2632,14 @@ function buildClientCard(client) {
           '<button class="btn-update" onclick="renameClient(\''+s+'\',\'rename-'+id+'\')">Mettre à jour</button>' +
         '</div>' +
       '</div>' +
-      '<div class="section-label" style="margin-top:10px">Mot de passe admin</div>' +
+      '<div class="section-label" style="margin-top:10px">🔑 Mot de passe actuel</div>' +
+      '<div class="cur-pwd-row">' +
+        '<div class="pw-wrap" style="flex:1;min-width:0">' +
+          '<input type="password" id="admcurpwd-'+id+'" class="cur-pwd-inp" value="" placeholder="—" readonly>' +
+          '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1"><svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="section-label" style="margin-top:10px">Changer le mot de passe</div>' +
       '<div class="pw-row">' +
         '<div class="pw-wrap pw-wrap-row">' +
           '<input type="password" id="pw-'+id+'" placeholder="Nouveau mot de passe">' +
@@ -2758,6 +2820,10 @@ function loadClientData(client) {
     const ret = cfg.retention || {};
     const rc = document.getElementById('ret-calls-'+id);  if (rc  && ret.calls)  rc.value  = ret.calls;
     const ro = document.getElementById('ret-orders-'+id); if (ro  && ret.orders) ro.value  = ret.orders;
+
+    // Mot de passe actuel (visible par Malek uniquement)
+    const pwEl = document.getElementById('admcurpwd-' + id);
+    if (pwEl) pwEl.value = cfg.adminPwd || '';
   });
 
 
@@ -2868,6 +2934,7 @@ async function updatePassword(slug) {
   if (!pw || pw.length < 4) { fb.className='pw-feedback err'; fb.textContent='Minimum 4 caractères'; return; }
   const hash = await sha256(pw);
   await getClientDb(slug).ref('/config/adminHash').set(hash);
+  await getClientDb(slug).ref('/config/adminPwd').set(pw).catch(() => {});
   fb.className='pw-feedback ok'; fb.textContent='✓ Mis à jour';
   input.value = '';
   setTimeout(() => { fb.textContent=''; }, 3000);
