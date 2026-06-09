@@ -2367,11 +2367,11 @@
       <div id="sec-settings-lang-params" style="padding:0 18px 8px;display:flex;flex-direction:column;gap:8px">
         <div class="settings-sec-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:0;font-weight:500;letter-spacing:0.04em">Langues — Paramètres</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <div style="display:flex;gap:5px;align-items:center"><span id="settings-default-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue affichée aux clients (par défaut)</span><button class="adm-info-btn" data-tip="defaultLang" onclick="_showAdmInfoTip(this)" aria-label="Info">ⓘ</button></div>
+          <span id="settings-default-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue affichée aux clients (par défaut)</span>
           <select id="settings-default-lang" class="settings-sel" onchange="adminSetDefaultLang(this.value)"></select>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <div style="display:flex;gap:5px;align-items:center"><span id="settings-primary-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue du personnel et de l'administration</span><button class="adm-info-btn" data-tip="primaryLang" onclick="_showAdmInfoTip(this)" aria-label="Info">ⓘ</button></div>
+          <span id="settings-primary-lang-lbl" style="font-size:0.82rem;color:var(--muted)">Langue du personnel et de l'administration</span>
           <select id="settings-primary-lang" class="settings-sel" onchange="adminSetPrimaryLang(this.value)"></select>
         </div>
       </div>
@@ -7602,9 +7602,14 @@ function switchAdminTab(tab) {
 
   // Restore overflow after animation + apply correct scroll position
   setTimeout(() => {
-    document.documentElement.style.overflowY = '';
-    document.body.style.overflowY = '';
-    window.scrollTo({ top: _targetScroll, behavior: 'instant' });
+    if (tab === 'settings') {
+      document.documentElement.style.overflowY = 'hidden';
+      document.body.style.overflowY = 'hidden';
+    } else {
+      document.documentElement.style.overflowY = '';
+      document.body.style.overflowY = '';
+      window.scrollTo({ top: _targetScroll, behavior: 'instant' });
+    }
   }, 240);
 }
 
@@ -8486,102 +8491,5 @@ async function qrDownloadPDF() {
 
 
 
-<style>
-/* ═══════════ BOUTONS (i) ADMIN ═══════════ */
-.adm-info-btn {
-  display:inline-flex; align-items:center; justify-content:center;
-  width:16px; height:16px; border-radius:50%;
-  border:1.5px solid rgba(200,164,78,0.5);
-  background:transparent; color:rgba(200,164,78,0.7);
-  font-size:0.65rem; font-weight:700; cursor:pointer;
-  transition:var(--tr); flex-shrink:0; padding:0;
-  font-style:normal; line-height:1;
-}
-.adm-info-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.08); }
-.adm-info-tooltip {
-  position:fixed; z-index:88000;
-  background:var(--card-bg); border:1px solid rgba(200,164,78,0.3);
-  border-radius:12px; padding:12px 14px; max-width:240px;
-  box-shadow:0 6px 24px rgba(0,0,0,0.25);
-  font-size:0.8rem; color:var(--text); line-height:1.55;
-  animation:tipIn 0.2s ease; pointer-events:none;
-}
-/* ════════════════════════════════════════ */
-</style>
-<script>
-/* ═══════════ INFO TOOLTIPS ADMIN ══════════════════════════ */
-const _ADM_INFO_TIPS = {
-  defaultLang: {
-    el: 'Η γλώσσα που βλέπουν οι πελάτες σας όταν σκανάρουν το QR code. Επιλέξτε τη γλώσσα της κύριας πελατείας σας.',
-    fr: 'La langue affichée dans le menu quand vos clients scannent le QR code. Choisissez la langue de votre clientèle principale.',
-    en: 'The language shown in the menu when customers scan the QR code. Choose your main clientele's language.',
-    de: 'Die Sprache im Menü beim QR-Code-Scan. Wählen Sie die Sprache Ihrer Hauptkundschaft.',
-    ar: 'اللغة المعروضة في القائمة عند مسح رمز QR. اختر لغة عملائك الرئيسيين.'
-  },
-  primaryLang: {
-    el: 'Η γλώσσα της εφαρμογής σερβιτόρου και αυτής της διεπαφής. Επιλέξτε τη γλώσσα του προσωπικού σας.',
-    fr: 'La langue de l'application serveur et de cet espace admin. Choisissez la langue de votre équipe.',
-    en: 'The language of the server app and this admin panel. Choose your team's language.',
-    de: 'Die Sprache der Server-App und dieses Admin-Bereichs. Wählen Sie die Sprache Ihres Teams.',
-    ar: 'لغة تطبيق النادل وهذه الواجهة. اختر لغة فريقك.'
-  }
-};
-
-let _admInfoTipEl = null;
-let _admInfoTipTimer = null;
-
-function _showAdmInfoTip(btn) {
-  const tipId = btn.dataset.tip;
-  const lang  = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'fr';
-  const tips  = _ADM_INFO_TIPS[tipId];
-  if (!tips) return;
-  const text  = tips[lang] || tips.fr;
-
-  // Toggle
-  if (_admInfoTipEl && _admInfoTipEl._srcBtn === btn) {
-    _admInfoTipEl.remove(); _admInfoTipEl = null;
-    clearTimeout(_admInfoTipTimer);
-    return;
-  }
-  if (_admInfoTipEl) { _admInfoTipEl.remove(); _admInfoTipEl = null; }
-
-  const tip = document.createElement('div');
-  tip.className = 'adm-info-tooltip';
-  tip.textContent = text;
-  tip._srcBtn = btn;
-  document.body.appendChild(tip);
-  _admInfoTipEl = tip;
-
-  // Position: prefer below-right of button, stay in viewport
-  const r   = btn.getBoundingClientRect();
-  const vw  = window.innerWidth;
-  const vh  = window.innerHeight;
-  const tw  = 240;
-  const th  = 100; // approx
-  let left = r.right + 6;
-  let top  = r.top;
-  if (left + tw > vw - 8) left = r.left - tw - 6;
-  if (left < 8) left = 8;
-  if (top + th > vh - 8) top = vh - th - 8;
-  if (top < 8) top = 8;
-  tip.style.left = Math.round(left) + 'px';
-  tip.style.top  = Math.round(top)  + 'px';
-
-  // Auto-close after 5s
-  clearTimeout(_admInfoTipTimer);
-  _admInfoTipTimer = setTimeout(function() {
-    if (_admInfoTipEl) { _admInfoTipEl.remove(); _admInfoTipEl = null; }
-  }, 5000);
-}
-
-// Close on outside click
-document.addEventListener('click', function(e) {
-  if (_admInfoTipEl && !e.target.classList.contains('adm-info-btn')) {
-    _admInfoTipEl.remove(); _admInfoTipEl = null;
-    clearTimeout(_admInfoTipTimer);
-  }
-}, true);
-/* ═══════════════════════════════════════════════════════════ */
-</script>
 </body>
 </html>

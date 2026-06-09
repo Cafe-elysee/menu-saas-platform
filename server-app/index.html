@@ -750,12 +750,12 @@
     </div>
 
     <div style="margin-top:28px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div id="settings-notif-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">Notifications en arrière-plan</div><button class="srv-info-btn" data-tip="notifBg" onclick="_showSrvInfoTip(this)" aria-label="Info">ⓘ</button></div>
+      <div id="settings-notif-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Notifications en arrière-plan</div>
       <div id="settings-notif-desc" style="font-size:0.78rem;color:var(--cream);line-height:1.7;white-space:pre-line"></div>
     </div>
 
     <div style="margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">Connexion application</div><button class="srv-info-btn" data-tip="fcmStatus" onclick="_showSrvInfoTip(this)" aria-label="Info">ⓘ</button></div>
+      <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Connexion application</div>
       <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px">—</div>
       <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(200,164,78,0.3);background:transparent;color:var(--gold);font-family:inherit;font-size:0.8rem;cursor:pointer">🔄 Reconnecter</button>
     </div>
@@ -2053,96 +2053,5 @@ document.addEventListener('deviceready', function() {
 </script>
 
 
-<style>
-/* ═══════════ BOUTONS (i) SERVEUR ═══════════ */
-.srv-info-btn {
-  display:inline-flex; align-items:center; justify-content:center;
-  width:16px; height:16px; border-radius:50%;
-  border:1.5px solid rgba(200,164,78,0.5);
-  background:transparent; color:rgba(200,164,78,0.7);
-  font-size:0.65rem; font-weight:700; cursor:pointer;
-  transition:opacity 0.18s; flex-shrink:0; padding:0;
-  font-style:normal; line-height:1;
-}
-.srv-info-btn:hover { border-color:var(--gold); color:var(--gold); }
-.srv-info-tooltip {
-  position:fixed; z-index:88000;
-  background:var(--bg); border:1px solid rgba(200,164,78,0.3);
-  border-radius:12px; padding:12px 14px; max-width:240px;
-  box-shadow:0 6px 24px rgba(0,0,0,0.3);
-  font-size:0.8rem; color:var(--cream); line-height:1.55;
-  font-family:'Crimson Pro',Georgia,serif;
-  pointer-events:none;
-}
-/* ═══════════════════════════════════════════ */
-</style>
-<script>
-/* ═══════════ INFO TOOLTIPS SERVEUR ════════════════════════ */
-var _SRV_INFO_TIPS = {
-  notifBg: {
-    fr: 'Pour recevoir les alertes (commandes, appels) même quand l'application est fermée, activez les notifications en arrière-plan dans les paramètres du téléphone.',
-    en: 'To receive alerts (orders, calls) even when the app is closed, enable background notifications in your phone settings.',
-    el: 'Για ειδοποιήσεις (παραγγελίες, κλήσεις) ακόμα και όταν η εφαρμογή είναι κλειστή, ενεργοποιήστε τις ειδοποιήσεις παρασκηνίου στις ρυθμίσεις.',
-    de: 'Um Benachrichtigungen (Bestellungen, Anrufe) auch bei geschlossener App zu erhalten, aktivieren Sie Hintergrundbenachrichtigungen in den Telefoneinstellungen.',
-    ar: 'لاستقبال التنبيهات (الطلبات، المكالمات) حتى عند إغلاق التطبيق، فعّل الإشعارات في الخلفية في إعدادات الهاتف.'
-  },
-  fcmStatus: {
-    fr: 'Indique si l'application est bien connectée pour recevoir les notifications. ✅ = connecté. En cas de problème, appuyez sur "Reconnecter".',
-    en: 'Shows whether the app is connected to receive notifications. ✅ = connected. If there's an issue, tap "Reconnect".',
-    el: 'Δείχνει αν η εφαρμογή είναι συνδεδεμένη για ειδοποιήσεις. ✅ = συνδεδεμένη. Αν υπάρχει πρόβλημα, πατήστε «Επανασύνδεση».',
-    de: 'Zeigt, ob die App für Benachrichtigungen verbunden ist. ✅ = verbunden. Bei Problemen auf "Wiederverbinden" tippen.',
-    ar: 'يُظهر ما إذا كان التطبيق متصلًا لاستقبال الإشعارات. ✅ = متصل. في حالة وجود مشكلة، اضغط "إعادة الاتصال".'
-  }
-};
-
-var _srvInfoTipEl   = null;
-var _srvInfoTipTimer = null;
-
-function _showSrvInfoTip(btn) {
-  var tipId = btn.dataset.tip;
-  var l     = (typeof lang !== 'undefined' && lang) ? lang : 'fr';
-  var tips  = _SRV_INFO_TIPS[tipId];
-  if (!tips) return;
-  var text  = tips[l] || tips.fr;
-
-  if (_srvInfoTipEl && _srvInfoTipEl._srcBtn === btn) {
-    _srvInfoTipEl.remove(); _srvInfoTipEl = null;
-    clearTimeout(_srvInfoTipTimer); return;
-  }
-  if (_srvInfoTipEl) { _srvInfoTipEl.remove(); _srvInfoTipEl = null; }
-
-  var tip = document.createElement('div');
-  tip.className = 'srv-info-tooltip';
-  tip.textContent = text;
-  tip._srcBtn = btn;
-  document.body.appendChild(tip);
-  _srvInfoTipEl = tip;
-
-  var r = btn.getBoundingClientRect();
-  var vw = window.innerWidth, vh = window.innerHeight;
-  var tw = 240, th = 100, pad = 8;
-  var left = r.right + pad;
-  var top  = r.top;
-  if (left + tw > vw - pad) left = r.left - tw - pad;
-  if (left < pad) left = pad;
-  if (top + th > vh - pad) top = vh - th - pad;
-  if (top < pad) top = pad;
-  tip.style.left = Math.round(left) + 'px';
-  tip.style.top  = Math.round(top)  + 'px';
-
-  clearTimeout(_srvInfoTipTimer);
-  _srvInfoTipTimer = setTimeout(function() {
-    if (_srvInfoTipEl) { _srvInfoTipEl.remove(); _srvInfoTipEl = null; }
-  }, 5000);
-}
-
-document.addEventListener('click', function(e) {
-  if (_srvInfoTipEl && !e.target.classList.contains('srv-info-btn')) {
-    _srvInfoTipEl.remove(); _srvInfoTipEl = null;
-    clearTimeout(_srvInfoTipTimer);
-  }
-}, true);
-/* ═══════════════════════════════════════════════════════════ */
-</script>
 </body>
 </html>

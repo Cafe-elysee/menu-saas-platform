@@ -1954,7 +1954,7 @@ function loadClientsFromFirebase() {
   _saasDb.ref('restaurants').on('value', snap => {
     const data = snap.val() || {};
     const SAAS_URL = 'https://menu-saas-platform.vercel.app';
-    const loaded = Object.entries(data).map(([slug, r]) => ({
+    const loaded = Object.entries(data).filter(([slug]) => slug !== 'demo').map(([slug, r]) => ({
       name:     (r.profile && r.profile.name)     || slug,
       slug,
       url:      SAAS_URL,
