@@ -482,6 +482,66 @@
       border-radius: 99px; padding: 0.1rem 0.5rem;
       margin-top: 0.1rem; align-self: flex-start;
     }
+    /* ── Trial countdown badge ── */
+    .commande-trial-badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em;
+      border-radius: 99px; padding: 0.13rem 0.5rem;
+      border: 1px solid; white-space: nowrap;
+      transition: color 0.3s, border-color 0.3s, background 0.3s;
+    }
+    .commande-trial-badge.urgency-ok {
+      color: var(--gold); border-color: rgba(200,164,78,.3);
+      background: rgba(200,164,78,.1);
+    }
+    .commande-trial-badge.urgency-warning {
+      color: #e8932a; border-color: rgba(232,147,42,.3);
+      background: rgba(232,147,42,.1);
+    }
+    .commande-trial-badge.urgency-expired {
+      color: #e85252; border-color: rgba(232,82,82,.3);
+      background: rgba(232,82,82,.08);
+    }
+    /* ── Suspend / Reactivate button ── */
+    .commande-trial-action {
+      padding: 0.6rem 0.75rem 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .commande-suspend-btn {
+      width: 100%; padding: 0.6rem 1rem; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      border: 1px solid; transition: all 0.25s;
+      font-family: var(--font); letter-spacing: 0.01em;
+    }
+    .commande-suspend-btn.suspend-action {
+      background: rgba(232,82,82,.1); border-color: rgba(232,82,82,.35);
+      color: #e85252;
+    }
+    .commande-suspend-btn.suspend-action:hover {
+      background: rgba(232,82,82,.2); border-color: rgba(232,82,82,.6);
+    }
+    .commande-suspend-btn.reactivate-action {
+      background: rgba(72,185,82,.1); border-color: rgba(72,185,82,.35);
+      color: #48b952;
+    }
+    .commande-suspend-btn.reactivate-action:hover {
+      background: rgba(72,185,82,.2); border-color: rgba(72,185,82,.6);
+    }
+    /* ── Card state overrides ── */
+    .commande-card.trial-expired .commande-card-inner {
+      border-left: 3px solid rgba(232,82,82,.4);
+    }
+    .commande-card.suspended {
+      opacity: 0.72;
+    }
+    .commande-card.suspended .commande-card-inner {
+      border-left: 3px solid rgba(150,155,165,.35);
+      filter: grayscale(0.35) brightness(0.92);
+    }
+    .commande-card.suspended .commande-rest,
+    .commande-card.suspended .commande-forfait {
+      color: var(--muted);
+    }
     .commande-langue-row {
       font-size: 0.8rem; color: var(--muted);
       margin-bottom: 0.85rem;
@@ -2422,6 +2482,26 @@ function _doRenderCommandes() {
   wrap.appendChild(frag);
 }
 
+function _trialInfo(d, key) {
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const ts = Number(d.ts) || parseInt(key) || 0;
+  const remaining = (ts + WEEK) - Date.now();
+  const isExpired = remaining <= 0;
+  const isSuspended = d.suspendu === true;
+  let label = '', urgency = 'ok';
+  if (!isExpired) {
+    const days  = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const mins  = Math.floor((remaining % 3600000) / 60000);
+    if (days > 0)       { label = '⏱ ' + days + 'j ' + hours + 'h'; urgency = days <= 1 ? 'warning' : 'ok'; }
+    else if (hours > 0) { label = '⏱ ' + hours + 'h ' + mins + 'min'; urgency = 'warning'; }
+    else                { label = '⏱ ' + mins + ' min'; urgency = 'warning'; }
+  } else {
+    label = '⌛ Essai expiré'; urgency = 'expired';
+  }
+  return { isExpired, isSuspended, label, urgency, ts };
+}
+
 function buildCommandeCard(key, d) {
   const card   = document.createElement('div');
   const statut = d.statut || 'nouveau';
@@ -2433,6 +2513,7 @@ function buildCommandeCard(key, d) {
   const dateStr = date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) +
                   ' · ' + date.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 
+  const trial = _trialInfo(d, key);
   const statusLabel  = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[statut] || statut;
   const forfaitLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
   const langLabels   = { fr:'Français', en:'English', el:'Ελληνικά', ar:'العربية', de:'Deutsch' };
@@ -2502,6 +2583,7 @@ function buildCommandeCard(key, d) {
         '<span class="commande-rest">' + restEsc + '</span>' +
         '<span class="commande-forfait">' + forfaitLabel + '</span>' +
         (d.paymentMode ? '<span class="commande-paymode">' + (d.paymentMode === 'annual' ? '📅 Annuel' : '📆 Mensuel') + '</span>' : '') +
+        '<span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '">' + trial.label + '</span>' +
         '<span class="commande-date">' + dateStr + '</span>' +
       '</div>' +
       '<div class="commande-summary-right">' +
@@ -2525,8 +2607,17 @@ function buildCommandeCard(key, d) {
         '</div>' +
       '</div>' +
     '</div>' +
+    (trial.isExpired ?
+      '<div class="commande-trial-action">' +
+        '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + key + '\')">' +
+          (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
+        '</button>' +
+      '</div>'
+    : '') +
     '</div>';
 
+  if (trial.isSuspended)       card.classList.add('suspended');
+  else if (trial.isExpired)    card.classList.add('trial-expired');
   if (statut === 'nouveau') card.classList.add('open');
   if (!d.lu) markCommandeRead(key);
   return card;
@@ -2535,6 +2626,40 @@ function toggleCommandeCard(key) {
   const card = document.querySelector('.commande-card[data-key="' + key + '"]');
   if (card) card.classList.toggle('open');
 }
+
+function _toggleSuspend(key) {
+  const d = _commandesCache[key];
+  if (!d) return;
+  const willSuspend = !d.suspendu;
+  const title = willSuspend ? 'Suspendre ce compte ?' : 'Réactiver ce compte ?';
+  const msg   = willSuspend
+    ? 'Le client ne pourra plus accéder à son espace. Vous pourrez le réactiver à tout moment.'
+    : 'Le compte sera réactivé et le client pourra de nouveau accéder à son espace.';
+  const okLbl = willSuspend ? '⏸ Suspendre' : '▶ Réactiver';
+  _showCtrlConfirm(title, msg, okLbl, function() {
+    getControlDb().ref('/commandes/' + key + '/suspendu').set(willSuspend);
+  }, willSuspend);
+}
+
+// Live countdown ticker: update badge text every 60 seconds
+setInterval(function() {
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  document.querySelectorAll('.commande-trial-badge[data-ts]').forEach(function(el) {
+    const ts = Number(el.dataset.ts);
+    if (!ts) return;
+    const remaining = (ts + WEEK) - Date.now();
+    if (remaining <= 0) return; // expired label handled by re-render
+    const days  = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const mins  = Math.floor((remaining % 3600000) / 60000);
+    let label = '', urgency = 'ok';
+    if (days > 0)       { label = '⏱ ' + days + 'j ' + hours + 'h'; urgency = days <= 1 ? 'warning' : 'ok'; }
+    else if (hours > 0) { label = '⏱ ' + hours + 'h ' + mins + 'min'; urgency = 'warning'; }
+    else                { label = '⏱ ' + mins + ' min'; urgency = 'warning'; }
+    el.textContent = label;
+    el.className = 'commande-trial-badge urgency-' + urgency;
+  });
+}, 60000);
 
 let _ctrlConfirmCb = null;
 function _showCtrlConfirm(title, msg, okLabel, cb, isDanger) {
