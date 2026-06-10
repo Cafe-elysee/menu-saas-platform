@@ -2071,8 +2071,9 @@ function _buildPwdDefault(name) {
     .trim()
     .split(/\s+/)
     .filter(w => w.length > 0);
-  if (!words.length) return 'pro' + new Date().getFullYear();
-  return words.map(w => w[0]).join('') + new Date().getFullYear();
+  if (!words.length) return 'pr' + new Date().getFullYear();
+  const initials = words.length === 1 ? words[0].slice(0, 2) : words.map(w => w[0]).join('');
+  return initials + new Date().getFullYear();
 }
 
 function _buildRidTs(name, extraLetters) {
