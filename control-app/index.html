@@ -475,6 +475,13 @@
       font-size: 0.72rem; font-weight: 600;
       color: var(--gold); letter-spacing: 0.03em;
     }
+    .commande-paymode {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.66rem; font-weight: 600; letter-spacing: 0.05em;
+      color: #0e0a04; background: var(--gold);
+      border-radius: 99px; padding: 0.1rem 0.5rem;
+      margin-top: 0.1rem; align-self: flex-start;
+    }
     .commande-langue-row {
       font-size: 0.8rem; color: var(--muted);
       margin-bottom: 0.85rem;
@@ -2481,6 +2488,7 @@ function buildCommandeCard(key, d) {
       '<div class="commande-summary-left">' +
         '<span class="commande-rest">' + restEsc + '</span>' +
         '<span class="commande-forfait">' + forfaitLabel + '</span>' +
+        (d.paymentMode ? '<span class="commande-paymode">' + (d.paymentMode === 'annual' ? '📅 Annuel' : '📆 Mensuel') + '</span>' : '') +
         '<span class="commande-date">' + dateStr + '</span>' +
       '</div>' +
       '<div class="commande-summary-right">' +
