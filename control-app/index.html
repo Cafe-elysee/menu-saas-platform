@@ -2025,10 +2025,14 @@ function loadClientsFromFirebase() {
       noEvents: !!(r.profile && r.profile.noEvents),
       demoPage: !!(r.profile && r.profile.demoPage)
     }));
+    const firstCallback = !_clientsLoaded;
     _clientsLoaded = true;
     // Ne reconstruire les cartes que si la liste des clients change structurellement
     const fp = loaded.map(c => c.slug + '|' + c.name + '|' + (c.langs || []).join('+')).sort().join(',');
-    if (fp === _lastClientsFingerprint) return;
+    if (fp === _lastClientsFingerprint) {
+      if (firstCallback) buildClientsTab(); // 1er retour Firebase à 0 clients : passer de "Chargement…" à "Aucun client"
+      return;
+    }
     _lastClientsFingerprint = fp;
     CLIENTS.forEach(c => _detachClientListeners(c.slug));
     _clientListeners.clear();
