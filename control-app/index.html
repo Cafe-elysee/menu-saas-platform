@@ -2562,7 +2562,11 @@ function _trialInfo(d, key) {
   }
 
   // ── Cycle récurrent (après premier paiement) ──────────────────────────────
-  if (d.paidAt && d.nextReminderAt) {
+  if (d.paidAt) {
+    if (!d.nextReminderAt) {
+      // paidAt présent mais nextReminderAt absent (write partiel) → traiter comme payé, pas de badge
+      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
+    }
     if (now < d.nextReminderAt) {
       // Prochain rappel pas encore arrivé — pas de badge
       return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
