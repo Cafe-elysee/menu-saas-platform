@@ -1743,6 +1743,7 @@ const SAAS_FB_CONFIG = {
 // CLIENTS — configs Firebase par client
 // ════════════════════════════════════════════════════
 const CLIENTS = []; // Chargé dynamiquement depuis Firebase SaaS
+let _clientsLoaded = false; // true après le 1er retour Firebase (même si vide)
 function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', ar:'العربية' };
@@ -2042,6 +2043,7 @@ function loadClientsFromFirebase() {
     _clientListeners.clear();
     CLIENTS.length = 0;
     loaded.forEach(cl => CLIENTS.push(cl));
+    _clientsLoaded = true;
     buildClientsTab();
   });
 }
@@ -2729,7 +2731,11 @@ function recreerClientDepuisCommande(btnEl) {
 function buildClientsTab() {
   const list = document.getElementById('clients-list');
   if (CLIENTS.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.88rem">Chargement…</div>';
+    if (!_clientsLoaded) {
+      list.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.88rem">Chargement…</div>';
+    } else {
+      list.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.88rem;line-height:1.8">Aucun client pour le moment.<br><span style="font-size:0.8rem;opacity:0.6">Cliquez sur <strong>＋ Nouveau client</strong> pour commencer.</span></div>';
+    }
     return;
   }
   list.innerHTML = '';
