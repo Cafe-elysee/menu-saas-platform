@@ -171,7 +171,7 @@
     .tab-panel {
       flex:0 0 100vw; overflow-y:auto; overflow-x:hidden;
       -webkit-overflow-scrolling:touch;
-      padding:0 16px 32px;
+      padding:0 16px calc(32px + env(safe-area-inset-bottom,0px));
     }
     html[dir="rtl"] .tab-panel { direction:rtl; }
 
@@ -573,7 +573,7 @@
     <div id="srv-pause-icon" style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid rgba(200,164,78,0.25);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">⏸</div>
     <div id="srv-pause-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:12px">Service en pause</div>
     <div id="srv-pause-msg" style="font-size:0.85rem;color:var(--muted);line-height:1.9">Ce restaurant est momentanément en pause.<br>Merci de contacter l'administrateur.</div>
-    <button id="srv-pause-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:#c8a44e;font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(200,164,78,0.2),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow='inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1)'">Changer de restaurant</button>
+    <button id="srv-pause-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:#c8a44e;font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);">Changer de restaurant</button>
     <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
       <div style="height:1px;width:24px;background:#c8a44e"></div>
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:#c8a44e;text-transform:uppercase">Menu Pro</div>
@@ -588,7 +588,7 @@
     <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.08);border:1.5px solid var(--bord2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px">📋</div>
     <div id="srv-forfait-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.04em;margin-bottom:12px">Forfait Menu QR</div>
     <div id="srv-forfait-msg" style="font-size:0.85rem;color:var(--cream);opacity:0.65;line-height:1.9">Ce forfait n'inclut pas le service serveur.<br>Contactez l'administrateur pour activer le forfait Commandes & Services.</div>
-    <button id="srv-forfait-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:var(--gold);font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(200,164,78,0.2),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow='inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1)'">Changer d'ID</button>
+    <button id="srv-forfait-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:var(--gold);font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);">Changer d'ID</button>
     <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
       <div style="height:1px;width:24px;background:var(--gold)"></div>
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase">Menu Pro</div>
@@ -621,7 +621,7 @@
       style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.05em;margin-bottom:8px">
     <div id="setup-rid-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demandez votre code d'accès à l'administrateur</div>
     <div id="setup-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
-    <button id="setup-confirm-btn" onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 22px rgba(200,164,78,0.45),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)'">Confirmer</button>
+    <button id="setup-confirm-btn" onclick="confirmSetupRid()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a94e,#b8922e);color:#0c0a08;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)">Confirmer</button>
   </div>
 </div>
 
@@ -695,7 +695,7 @@
 <div id="notif-perm-banner" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(239,83,80,0.12);border-bottom:1px solid rgba(239,83,80,0.3);flex-shrink:0">
   <span style="font-size:1.1rem">🔔</span>
   <span id="notif-perm-txt" style="flex:1;font-size:0.78rem;color:#ef5350;line-height:1.4">Notifications désactivées — touchez pour activer</span>
-  <button onclick="_openNotifSettings()" style="flex-shrink:0;padding:6px 12px;border-radius:8px;border:1px solid rgba(239,83,80,0.5);background:rgba(239,83,80,0.15);color:#ef5350;font-size:0.75rem;font-weight:700;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 3px 8px rgba(180,40,40,0.18),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow='inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1)'">Activer</button>
+  <button onclick="_openNotifSettings()" style="flex-shrink:0;padding:6px 12px;border-radius:8px;border:1px solid rgba(239,83,80,0.5);background:rgba(239,83,80,0.15);color:#ef5350;font-size:0.75rem;font-weight:700;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.1)">Activer</button>
 </div>
 
 <!-- Swipeable content -->
@@ -746,7 +746,7 @@
       <div id="settings-name" style="font-size:0.8rem;color:var(--cream);margin-top:4px"></div>
     </div>
 
-    <button id="settings-change-btn" onclick="changeRestaurant()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:12px;letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 22px rgba(200,164,78,0.45),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)'">
+    <button id="settings-change-btn" onclick="changeRestaurant()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:12px;letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(200,164,78,0.35),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.2)">
       🔄 Changer de restaurant
     </button>
 
@@ -762,7 +762,7 @@
     <div style="margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
       <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Connexion application</div>
       <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px">—</div>
-      <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 12px rgba(200,164,78,0.32),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 7px 18px rgba(200,164,78,0.44),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(200,164,78,0.32),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18)'">🔄 Reconnecter</button>
+      <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 12px rgba(200,164,78,0.32),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18)">🔄 Reconnecter</button>
     </div>
   </section>
 
@@ -1252,6 +1252,10 @@ function applyLang() {
   document.getElementById('nav-lbl-orders').textContent   = t.navOrders;
   document.getElementById('nav-lbl-messages').textContent = t.navMessages;
   document.getElementById('nav-lbl-settings').textContent = t.navSettings;
+  document.getElementById('nav-calls').setAttribute('aria-label', t.navCalls);
+  document.getElementById('nav-orders').setAttribute('aria-label', t.navOrders);
+  document.getElementById('nav-messages').setAttribute('aria-label', t.navMessages);
+  document.getElementById('nav-settings').setAttribute('aria-label', t.navSettings);
   document.getElementById('settings-section-title').textContent = t.settingsTitle;
   document.getElementById('settings-id-label').textContent      = t.settingsIdLabel;
   document.getElementById('settings-change-btn').childNodes[0].textContent = t.settingsBtnChange;
@@ -1597,7 +1601,8 @@ function _applyInitialTab() {
       var fs = document.getElementById('srv-forfait-screen');
       if (fs) {
         document.getElementById('srv-forfait-title').textContent = fp.title;
-        document.getElementById('srv-forfait-msg').innerHTML = fp.msg;
+        document.getElementById('srv-forfait-msg').style.whiteSpace = 'pre-line';
+        document.getElementById('srv-forfait-msg').textContent = fp.msg.replace(/<br\s*\/?>/gi, '\n');
         document.getElementById('srv-forfait-change-btn').textContent = fp.changeId;
         _hideSrvLoading();
         fs.style.display = 'flex';
@@ -1708,7 +1713,7 @@ function renderOrders() {
     list.appendChild(card);
   });
 
-  if (panel && savedScroll) panel.scrollTop = savedScroll;
+  if (panel) panel.scrollTop = savedScroll;
 }
 
 /* ── CONFIRMATION MODAL ── */
