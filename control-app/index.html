@@ -2294,6 +2294,17 @@ function buildDeliverySubject(rest, forfait, lang) {
   return s[lang] || s.fr;
 }
 
+function _paySection(lang) {
+  const s = {
+    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai à compter de la création de votre espace.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements (mensuel ou annuel), la même procédure s\'applique.',
+    en: '\n\n— Trial Period & Payment —\n⏰ You have a 1-week trial period from the creation of your space.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming payments (monthly or annual), the same procedure applies.',
+    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια εβδομάδα δοκιμαστική περίοδο από τη δημιουργία του χώρου σας.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες πληρωμές (μηνιαίες ή ετήσιες), εφαρμόζεται η ίδια διαδικασία.',
+    ar: '\n\n— فترة التجربة والدفع —\n⏰ تتمتعون بأسبوع تجريبي من تاريخ إنشاء مساحتكم.\n\nيجب إتمام الدفع خلال هذه الفترة:\n\n💳 التحويل البنكي: يجب استلام التحويل خلال الأسبوع، أو أرسلوا لنا إثبات التحويل عبر واتساب / فايبر / بريد إلكتروني قبل نهاية الأسبوع.\n\n💵 نقداً: أرسلوا لنا موقعكم الجغرافي ومعرّفكم (أعلاه) عبر واتساب / فايبر / بريد إلكتروني لتحديد موعد خلال الأسبوع.\n\n📅 للدفعات القادمة (الشهرية أو السنوية)، تطبّق نفس الإجراءات.',
+    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine einwöchige Testphase ab Erstellung Ihres Bereichs.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige Zahlungen (monatlich oder jährlich) gilt dasselbe Verfahren.'
+  };
+  return s[lang] || s.fr;
+}
+
 function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html';
   const menuUrl  = 'https://menu-saas-platform.vercel.app/?rid=' + rid + '&table=1';
@@ -2306,7 +2317,9 @@ function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
     ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على Menu Pro جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق Menu Pro',
     de: 'Hallo ' + rest + '! 🎉\n\nIhr Menu Pro Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
   };
-  return m[lang] || m.fr;
+  const _base = m[lang] || m.fr;
+  const _lb = _base.lastIndexOf('\n\n');
+  return _lb === -1 ? _base + _paySection(lang) : _base.slice(0, _lb) + _paySection(lang) + _base.slice(_lb);
 }
 
 function _rerenderCommandeCard(key) {
