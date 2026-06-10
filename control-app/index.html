@@ -2387,7 +2387,10 @@ function _rerenderCommandeCard(key) {
   if (!d) return;
   const existing = document.querySelector('.commande-card[data-key="' + key + '"]');
   if (!existing) return;
-  existing.parentNode.replaceChild(buildCommandeCard(key, d), existing);
+  const wasOpen = existing.classList.contains('open');
+  const newCard = buildCommandeCard(key, d);
+  if (wasOpen) newCard.classList.add('open');
+  existing.parentNode.replaceChild(newCard, existing);
 }
 
 function _copyViberMsg(key) {
@@ -2485,6 +2488,10 @@ function _doRenderCommandes() {
 function _trialInfo(d, key) {
   const WEEK = 7 * 24 * 60 * 60 * 1000;
   const ts = Number(d.ts) || parseInt(key) || 0;
+  // ts < 1_000_000_000_000 (< year 2001 in ms) → legacy/invalid commande, skip trial
+  if (ts < 1000000000000) {
+    return { isExpired: false, isSuspended: d.suspendu === true, label: '', urgency: 'ok', ts: 0, noTrial: true };
+  }
   const remaining = (ts + WEEK) - Date.now();
   const isExpired = remaining <= 0;
   const isSuspended = d.suspendu === true;
@@ -2583,7 +2590,7 @@ function buildCommandeCard(key, d) {
         '<span class="commande-rest">' + restEsc + '</span>' +
         '<span class="commande-forfait">' + forfaitLabel + '</span>' +
         (d.paymentMode ? '<span class="commande-paymode">' + (d.paymentMode === 'annual' ? '📅 Annuel' : '📆 Mensuel') + '</span>' : '') +
-        '<span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '">' + trial.label + '</span>' +
+        (!trial.noTrial ? '<span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '">' + trial.label + '</span>' : '') +
         '<span class="commande-date">' + dateStr + '</span>' +
       '</div>' +
       '<div class="commande-summary-right">' +
@@ -2607,7 +2614,7 @@ function buildCommandeCard(key, d) {
         '</div>' +
       '</div>' +
     '</div>' +
-    (trial.isExpired ?
+    (!trial.noTrial && trial.isExpired ?
       '<div class="commande-trial-action">' +
         '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + key + '\')">' +
           (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
@@ -2616,8 +2623,8 @@ function buildCommandeCard(key, d) {
     : '') +
     '</div>';
 
-  if (trial.isSuspended)       card.classList.add('suspended');
-  else if (trial.isExpired)    card.classList.add('trial-expired');
+  if (!trial.noTrial && trial.isSuspended)    card.classList.add('suspended');
+  else if (!trial.noTrial && trial.isExpired) card.classList.add('trial-expired');
   if (statut === 'nouveau') card.classList.add('open');
   if (!d.lu) markCommandeRead(key);
   return card;
@@ -2637,7 +2644,17 @@ function _toggleSuspend(key) {
     : 'Le compte sera réactivé et le client pourra de nouveau accéder à son espace.';
   const okLbl = willSuspend ? '⏸ Suspendre' : '▶ Réactiver';
   _showCtrlConfirm(title, msg, okLbl, function() {
-    getControlDb().ref('/commandes/' + key + '/suspendu').set(willSuspend);
+    // Mise à jour optimiste immédiate : pas d'attente Firebase, pas de full re-render
+    _commandesCache[key] = Object.assign({}, d, { suspendu: willSuspend });
+    _rerenderCommandeCard(key);
+    // Sync Firebase silencieux en arrière-plan
+    getControlDb().ref('/commandes/' + key + '/suspendu').set(willSuspend)
+      .catch(function() {
+        // Rollback si Firebase échoue (hors-ligne, règles, etc.)
+        _commandesCache[key] = Object.assign({}, _commandesCache[key], { suspendu: !willSuspend });
+        _rerenderCommandeCard(key);
+        showToast('⚠ Erreur de synchronisation — réessayez.');
+      });
   }, willSuspend);
 }
 
