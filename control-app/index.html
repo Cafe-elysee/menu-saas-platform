@@ -621,6 +621,32 @@
       transition: all 0.25s;
     }
     .commande-paid-btn:hover { background: rgba(72,185,100,0.2); border-color: rgba(72,185,100,0.6); }
+    /* ── Bouton Historique paiements ── */
+    .hist-btn {
+      width:100%; margin-top:0.35rem;
+      background:rgba(200,164,78,0.07); color:#c8a44e;
+      border:1px solid rgba(200,164,78,0.25) !important;
+      font-size:0.78rem; font-weight:500;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .hist-btn:hover { background:rgba(200,164,78,0.14); border-color:rgba(200,164,78,0.45) !important; }
+    /* ── Modal historique paiements ── */
+    #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px; }
+    .hist-box { background:var(--bg1); border:1px solid var(--border); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.5); animation:ctrl-in 0.22s ease; }
+    .hist-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:1.15rem; font-weight:600; color:var(--gold); letter-spacing:0.04em; margin-bottom:3px; }
+    .hist-sub { font-size:0.75rem; color:var(--muted); margin-bottom:16px; }
+    .hist-empty { font-size:0.8rem; color:var(--muted); text-align:center; padding:24px 0; }
+    .hist-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+    .hist-item:last-child { border-bottom:none; }
+    .hist-item-badge { font-size:1.05rem; flex-shrink:0; margin-top:1px; }
+    .hist-item-body { flex:1; }
+    .hist-item-date { font-size:0.82rem; color:var(--text); font-weight:600; }
+    .hist-item-detail { font-size:0.71rem; color:var(--muted); margin-top:2px; }
+    .hist-next { margin-top:14px; padding:10px 12px; background:rgba(200,164,78,0.07); border:1px solid rgba(200,164,78,0.2); border-radius:10px; }
+    .hist-next-label { font-size:0.71rem; color:var(--muted); margin-bottom:3px; }
+    .hist-next-val { font-size:0.83rem; color:#c8a44e; font-weight:600; }
+    .hist-close-btn { width:100%; margin-top:16px; padding:10px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.85rem; cursor:pointer; transition:background 0.2s; }
+    .hist-close-btn:hover { background:var(--bg2); }
     .btn-creer-client {
       background: var(--gold-dim); color: var(--gold);
       border: 1px solid rgba(200,164,78,0.3) !important;
@@ -1778,6 +1804,19 @@
   </div>
 </div>
 
+<div id="hist-modal" onclick="if(event.target===this)_hideHistModal()">
+  <div class="hist-box">
+    <div class="hist-title">📋 Historique des paiements</div>
+    <div id="hist-sub" class="hist-sub"></div>
+    <div id="hist-list"></div>
+    <div id="hist-next" class="hist-next" style="display:none">
+      <div class="hist-next-label">📅 Prochain paiement attendu</div>
+      <div id="hist-next-val" class="hist-next-val"></div>
+    </div>
+    <button class="hist-close-btn" onclick="_hideHistModal()">✕ Fermer</button>
+  </div>
+</div>
+
 <div id="ctrl-confirm-modal" onclick="if(event.target===this)_hideCtrlConfirm()">
   <div class="ctrl-confirm-box">
     <div id="ctrl-confirm-title" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.2rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
@@ -2795,6 +2834,7 @@ function _buildClientBillingSectionHTML(cmdKey, d, created) {
               (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
             '</button>'
           : '') +
+        '<button class="commande-action-btn hist-btn" onclick="_showPaymentHistory(\'' + cmdKey + '\')">📋 Historique</button>' +
       '</div>'
     : '';
 
@@ -3130,15 +3170,71 @@ function _markPaid(key) {
       const prev = _commandesCache[key];
       _commandesCache[key] = Object.assign({}, d, update);
       _rerenderCommandeCard(key);
-      _controlDb.ref('/commandes/' + key).update(update).catch(function() {
-        _commandesCache[key] = prev;
-        _rerenderCommandeCard(key);
-        showToast('⚠ Erreur de synchronisation — réessayez.');
-      });
+      const payEntry = { date: now, montant: _getCommandePrice(d), mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr' };
+      _controlDb.ref('/commandes/' + key).update(update)
+        .then(function() {
+          _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
+        })
+        .catch(function() {
+          _commandesCache[key] = prev;
+          _rerenderCommandeCard(key);
+          showToast('⚠ Erreur de synchronisation — réessayez.');
+        });
       showToast('✅ Paiement enregistré');
     },
     false
   );
+}
+
+function _showPaymentHistory(cmdKey) {
+  const d = _commandesCache[cmdKey];
+  if (!d) return;
+  document.getElementById('hist-sub').textContent = d.restaurant || '—';
+
+  const paiementsObj = d.paiements || {};
+  const payments = Object.values(paiementsObj)
+    .filter(function(p) { return p && p.date; })
+    .sort(function(a, b) { return a.date - b.date; });
+
+  const listEl = document.getElementById('hist-list');
+  if (payments.length === 0) {
+    listEl.innerHTML = '<div class="hist-empty">Aucun paiement enregistré</div>';
+  } else {
+    const forfaitLabels = { 'commandes-services': 'Commandes & Services', 'menu-qr': 'Menu QR' };
+    listEl.innerHTML = payments.map(function(p) {
+      const dt = new Date(p.date);
+      const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+      const montant = (p.montant || 0) + ' €/' + (p.mode === 'annual' ? 'an' : 'mois');
+      const mode = p.mode === 'annual' ? 'annuel' : 'mensuel';
+      const forfait = forfaitLabels[p.forfait] || p.forfait || '—';
+      return '<div class="hist-item">' +
+        '<span class="hist-item-badge">✅</span>' +
+        '<div class="hist-item-body">' +
+          '<div class="hist-item-date">' + escapeHtml(dateStr) + '</div>' +
+          '<div class="hist-item-detail">' + escapeHtml(montant) + ' · ' + escapeHtml(mode) + ' · ' + escapeHtml(forfait) + '</div>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  const nextEl  = document.getElementById('hist-next');
+  const nextVal = document.getElementById('hist-next-val');
+  if (d.nextReminderAt) {
+    const nd = new Date(d.nextReminderAt);
+    const ns = nd.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const price = _getCommandePrice(d);
+    const unit  = d.paymentMode === 'annual' ? 'an' : 'mois';
+    nextVal.textContent = ns + ' — ' + price + ' €/' + unit;
+    nextEl.style.display = '';
+  } else {
+    nextEl.style.display = 'none';
+  }
+
+  const modal = document.getElementById('hist-modal');
+  modal.style.display = 'flex';
+}
+
+function _hideHistModal() {
+  document.getElementById('hist-modal').style.display = 'none';
 }
 
 function _checkAutoSuspend() {
