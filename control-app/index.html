@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; overflow: hidden; }
@@ -1442,6 +1445,82 @@
   #ctrl-confirm-modal { display:none; position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px; }
   .ctrl-confirm-box { width:100%; max-width:320px; background:var(--card-bg); border:1px solid var(--border); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .ctrl-confirm-box.out { animation:ctrlConfirmOut 0.18s ease forwards; }
+
+  /* ── Date d'anniversaire ── */
+  .commande-birthdate-row {
+    display: flex; align-items: center; gap: 0.45rem;
+    padding: 0.45rem 0.65rem; margin-bottom: 0.65rem;
+    background: rgba(200,164,78,0.05); border-radius: 8px;
+    border: 1px solid rgba(200,164,78,0.13);
+  }
+  .commande-birthdate-label {
+    font-size: 0.75rem; color: var(--muted); font-weight: 500; flex-shrink: 0;
+  }
+  .birthdate-alt-input {
+    flex: 1; min-width: 0; padding: 0.28rem 0.5rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--gold);
+    font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 600;
+    text-align: center; outline: none; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .birthdate-alt-input:focus { border-color: var(--gold); }
+  html.light .birthdate-alt-input { background: #fff; }
+
+  /* ── Flatpickr thème control-app ── */
+  .flatpickr-calendar {
+    background: var(--card-bg) !important; color: var(--text) !important;
+    border: 1px solid var(--border) !important; border-radius: 14px !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5) !important;
+    font-family: 'Outfit', sans-serif !important; overflow: hidden;
+  }
+  .flatpickr-calendar.arrowTop:before { border-bottom-color: var(--border) !important; }
+  .flatpickr-calendar.arrowTop:after  { border-bottom-color: var(--card-bg) !important; }
+  .flatpickr-calendar.arrowBottom:before { border-top-color: var(--border) !important; }
+  .flatpickr-calendar.arrowBottom:after  { border-top-color: var(--card-bg) !important; }
+  .flatpickr-months { background: rgba(200,164,78,0.06); padding: 4px 0; }
+  .flatpickr-month { color: var(--gold) !important; fill: var(--gold) !important; height: 40px; }
+  .flatpickr-current-month { font-size: 0.9rem; color: var(--gold) !important; padding-top: 8px; }
+  .flatpickr-current-month input.cur-year { color: var(--gold) !important; }
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: var(--card-bg) !important; color: var(--gold) !important; border: none;
+  }
+  .flatpickr-prev-month svg, .flatpickr-next-month svg { fill: var(--gold) !important; }
+  .flatpickr-prev-month:hover, .flatpickr-next-month:hover { background: rgba(200,164,78,0.1) !important; }
+  .flatpickr-weekday { color: var(--muted) !important; font-size: 0.67rem; }
+  .flatpickr-days { border-top: 1px solid var(--border) !important; }
+  .flatpickr-day {
+    color: var(--text) !important; border-color: transparent !important;
+    border-radius: 8px !important;
+  }
+  .flatpickr-day:hover:not(.selected):not(.disabled):not(.flatpickr-disabled) {
+    background: rgba(200,164,78,0.14) !important; border-color: transparent !important;
+  }
+  .flatpickr-day.today { border-color: var(--gold) !important; color: var(--gold) !important; font-weight: 600; }
+  .flatpickr-day.today:hover { background: rgba(200,164,78,0.14) !important; }
+  .flatpickr-day.selected, .flatpickr-day.selected:hover {
+    background: var(--gold) !important; border-color: var(--gold) !important;
+    color: #0c0a08 !important; font-weight: 700;
+  }
+  .flatpickr-day.disabled, .flatpickr-day.flatpickr-disabled,
+  .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+    color: var(--muted) !important; opacity: 0.45;
+  }
+  .numInputWrapper span:hover { background: rgba(200,164,78,0.1) !important; }
+  html.light .flatpickr-calendar {
+    background: #fff !important; border-color: rgba(200,164,78,0.35) !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.13) !important;
+  }
+  html.light .flatpickr-calendar.arrowTop:after { border-bottom-color: #fff !important; }
+  html.light .flatpickr-calendar.arrowBottom:after { border-top-color: #fff !important; }
+  html.light .flatpickr-months { background: rgba(200,164,78,0.06); }
+  html.light .flatpickr-current-month .flatpickr-monthDropdown-months { background: #fff !important; }
+  html.light .flatpickr-day { color: #333 !important; }
+  html.light .flatpickr-day.today { color: var(--gold) !important; }
+  html.light .flatpickr-day.selected { color: #fff !important; }
+  html.light .flatpickr-day:hover:not(.selected):not(.disabled):not(.flatpickr-disabled) {
+    background: rgba(200,164,78,0.12) !important;
+  }
   </style>
   <script>
     (function(){
@@ -2435,6 +2514,7 @@ function _rerenderCommandeCard(key) {
   const newCard = buildCommandeCard(key, d);
   if (wasOpen) newCard.classList.add('open');
   existing.parentNode.replaceChild(newCard, existing);
+  _initBirthdatePicker(key);
 }
 
 function _copyViberMsg(key) {
@@ -2537,6 +2617,7 @@ function _doRenderCommandes() {
   const frag = document.createDocumentFragment();
   keys.forEach(k => frag.appendChild(buildCommandeCard(k, _commandesCache[k])));
   wrap.appendChild(frag);
+  keys.forEach(k => _initBirthdatePicker(k));
 }
 
 function _trialInfo(d, key) {
@@ -2630,6 +2711,15 @@ function buildCommandeCard(key, d) {
       '</div>'
     : '';
 
+  // Champ Date d'anniversaire (firstOpenAt éditable)
+  const birthdateRow = d.paymentMode
+    ? '<div class="commande-birthdate-row">' +
+        '<span class="commande-birthdate-label">📅 Date d\'anniversaire :</span>' +
+        '<input type="text" id="birthdate-inp-' + key + '" class="commande-birthdate-input" readonly' +
+        ' placeholder="Sélectionner…" value="">' +
+      '</div>'
+    : '';
+
   // Message à envoyer selon contexte : rappel si countdown actif, livraison si créé, contact sinon
   const isReminderActive = !trial.noTrial;
 
@@ -2706,6 +2796,7 @@ function buildCommandeCard(key, d) {
       '<div class="commande-body-inner">' +
         '<div class="commande-langue-row">🌐 ' + escapeHtml(langLabel) + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
         priceRow +
+        birthdateRow +
         '<div class="commande-actions">' +
           '<select class="commande-status-sel" onchange="setCommandeStatus(\'' + key + '\',this)">' +
             '<option value="nouveau"  ' + (statut==='nouveau'  ?'selected':'') + '>🆕 Nouveau</option>' +
@@ -2789,6 +2880,53 @@ function _saveCommandePrice(key, rawVal) {
   showToast('💾 Prix mis à jour : ' + price + ' €');
 }
 
+// ── Date d'anniversaire ─────────────────────────────────────────────────────
+const _birthdatePickers = {};
+
+function _initBirthdatePicker(key) {
+  if (typeof flatpickr === 'undefined') return;
+  const d = _commandesCache[key];
+  if (!d || !d.paymentMode) return;
+  const inp = document.getElementById('birthdate-inp-' + key);
+  if (!inp) return;
+  if (_birthdatePickers[key]) {
+    _birthdatePickers[key].destroy();
+    delete _birthdatePickers[key];
+  }
+  const defaultDate = d.firstOpenAt ? new Date(d.firstOpenAt) : null;
+  _birthdatePickers[key] = flatpickr(inp, {
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'j F Y',
+    altInputClass: 'birthdate-alt-input',
+    locale: flatpickr.l10ns.fr || flatpickr.l10ns.default,
+    defaultDate: defaultDate,
+    disableMobile: true,
+    onChange: function(dates) {
+      if (!dates[0]) return;
+      const newTs = dates[0].getTime();
+      if (_birthdatePickers[key]) _birthdatePickers[key].close();
+      _saveFirstOpenAt(key, newTs);
+    }
+  });
+}
+
+function _saveFirstOpenAt(key, newTs) {
+  const d = _commandesCache[key];
+  if (!d) return;
+  if (d.firstOpenAt === newTs) return;
+  const prev = Object.assign({}, d);
+  _commandesCache[key] = Object.assign({}, d, { firstOpenAt: newTs });
+  _rerenderCommandeCard(key);
+  getControlDb().ref('/commandes/' + key + '/firstOpenAt').set(newTs)
+    .catch(function() {
+      _commandesCache[key] = prev;
+      _rerenderCommandeCard(key);
+      showToast('⚠ Erreur de synchronisation — réessayez.');
+    });
+  showToast('📅 Date d\'anniversaire mise à jour');
+}
+
 function _markPaid(key) {
   const d = _commandesCache[key];
   if (!d) return;
@@ -2796,7 +2934,7 @@ function _markPaid(key) {
   const isFirstPayment = !d.paidAt;
   const priceStr = _getCommandePrice(d) + ' €/' + (isMonthly ? 'mois' : 'an');
   const nextInfo = isFirstPayment
-    ? (isMonthly ? 'Prochain rappel dans 2 mois (début du 3ème mois).' : 'Prochain rappel dans 3 mois (début du 4ème mois).')
+    ? (isMonthly ? 'Prochain rappel dans 1 mois (début du 2ème mois).' : 'Prochain rappel dans 12 mois (renouvellement annuel).')
     : (isMonthly ? 'Prochain rappel dans 1 mois.' : 'Prochain rappel dans 12 mois.');
   _showCtrlConfirm(
     'Confirmer le paiement ?',
@@ -2806,7 +2944,7 @@ function _markPaid(key) {
       const now = Date.now();
       let nextReminderAt;
       if (isFirstPayment) {
-        nextReminderAt = isMonthly ? _addMonths(now, 2) : _addMonths(now, 3);
+        nextReminderAt = isMonthly ? _addMonths(now, 1) : _addMonths(now, 12);
       } else {
         const base = d.nextReminderAt || now;
         nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
