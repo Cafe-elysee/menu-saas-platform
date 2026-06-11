@@ -591,6 +591,26 @@
       font-family: 'Outfit', sans-serif;
     }
     .commande-price-save-btn:hover { background: rgba(200,164,78,0.22); }
+    /* ── Mode paiement (edit inline) ── */
+    .commande-paymode-row {
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0.4rem 0.65rem; margin-bottom: 0.5rem;
+      background: rgba(200,164,78,0.04); border-radius: 8px;
+      border: 1px solid rgba(200,164,78,0.1);
+    }
+    .commande-paymode-label {
+      font-size: 0.75rem; color: var(--muted); font-weight: 500; flex-shrink: 0;
+    }
+    .commande-paymode-sel {
+      padding: 0.26rem 0.5rem; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--bg2); color: var(--text);
+      font-size: 0.78rem; font-family: 'Outfit', sans-serif; cursor: pointer; outline: none;
+    }
+    /* ── Section facturation dans carte client ── */
+    .client-billing-section { padding: 0.4rem 0 0.2rem; }
+    .client-billing-section .commande-trial-action {
+      padding: 0.65rem 0 0.4rem; border-top: 1px solid var(--border); margin-top: 0.3rem;
+    }
     /* ── Bouton Payé ── */
     .commande-paid-btn {
       width: 100%; padding: 0.55rem 1rem; border-radius: 8px; margin-bottom: 0.4rem;
@@ -2509,12 +2529,13 @@ function _rerenderCommandeCard(key) {
   const d = _commandesCache[key];
   if (!d) return;
   const existing = document.querySelector('.commande-card[data-key="' + key + '"]');
-  if (!existing) return;
-  const wasOpen = existing.classList.contains('open');
-  const newCard = buildCommandeCard(key, d);
-  if (wasOpen) newCard.classList.add('open');
-  existing.parentNode.replaceChild(newCard, existing);
-  _initBirthdatePicker(key);
+  if (existing) {
+    const wasOpen = existing.classList.contains('open');
+    const newCard = buildCommandeCard(key, d);
+    if (wasOpen) newCard.classList.add('open');
+    existing.parentNode.replaceChild(newCard, existing);
+  }
+  _rerenderClientBillingSection(key);
 }
 
 function _copyViberMsg(key) {
@@ -2583,6 +2604,14 @@ function listenCommandes() {
     }
     renderCommandes();
     setTimeout(_checkAutoSuspend, 200); // vérifier après le rendu initial
+    // Rafraîchir les sections facturation des cartes client déjà affichées
+    setTimeout(function() {
+      Object.keys(_commandesCache).forEach(function(k) {
+        var d = _commandesCache[k];
+        var created = d && (d.clientCree || _lastCreatedClients[k]);
+        if (created) _rerenderClientBillingSection(k);
+      });
+    }, 200);
   });
 }
 
@@ -2617,7 +2646,6 @@ function _doRenderCommandes() {
   const frag = document.createDocumentFragment();
   keys.forEach(k => frag.appendChild(buildCommandeCard(k, _commandesCache[k])));
   wrap.appendChild(frag);
-  keys.forEach(k => _initBirthdatePicker(k));
 }
 
 function _trialInfo(d, key) {
@@ -2673,6 +2701,176 @@ function _trialInfo(d, key) {
   return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
 }
 
+// ── Trouver la commande d'un slug client ────────────────────────────────────
+function _findCommandeForClient(slug) {
+  for (var k in _commandesCache) {
+    var d = _commandesCache[k];
+    var created = d.clientCree || _lastCreatedClients[k];
+    if (created && created.rid === slug) return k;
+  }
+  return null;
+}
+
+// ── Construire le HTML de la section facturation (carte client) ──────────────
+function _buildClientBillingSectionHTML(cmdKey, d, created) {
+  const trial       = _trialInfo(d, cmdKey);
+  const restaurant  = d.restaurant || '—';
+  const langue      = d.langue || 'fr';
+  const forfaitLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+  const price       = _getCommandePrice(d);
+  const priceUnit   = d.paymentMode === 'annual' ? 'an' : 'mois';
+  const isReminderActive = !trial.noTrial;
+
+  const priceRow = d.paymentMode
+    ? '<div class="commande-price-row">' +
+        '<span class="commande-price-label">💶 Prix :</span>' +
+        '<input type="number" class="commande-price-input" id="price-inp-' + cmdKey + '"' +
+        ' value="' + price + '" min="0" step="1"' +
+        ' onkeydown="if(event.key===\'Enter\'){_saveCommandePrice(\'' + cmdKey + '\',this.value);this.blur();}">' +
+        '<span class="commande-price-unit">€/' + priceUnit + '</span>' +
+        '<button class="commande-price-save-btn" onclick="_saveCommandePrice(\'' + cmdKey + '\',document.getElementById(\'price-inp-' + cmdKey + '\').value)">💾</button>' +
+      '</div>'
+    : '';
+
+  const paymodeRow = d.paymentMode
+    ? '<div class="commande-paymode-row">' +
+        '<span class="commande-paymode-label">💳 Mode :</span>' +
+        '<select class="commande-paymode-sel" onchange="_savePaymentMode(\'' + cmdKey + '\',this.value)">' +
+          '<option value="monthly"' + (d.paymentMode === 'monthly' ? ' selected' : '') + '>📆 Mensuel</option>' +
+          '<option value="annual"'  + (d.paymentMode === 'annual'  ? ' selected' : '') + '>📅 Annuel</option>' +
+        '</select>' +
+      '</div>'
+    : '';
+
+  const birthdateRow = d.paymentMode
+    ? '<div class="commande-birthdate-row">' +
+        '<span class="commande-birthdate-label">📅 Date d\'anniversaire :</span>' +
+        '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly' +
+        ' placeholder="Sélectionner…" value="">' +
+      '</div>'
+    : '';
+
+  let emailBtn = '';
+  if (d.email) {
+    const subj = isReminderActive
+      ? _buildReminderSubject(restaurant, langue)
+      : buildDeliverySubject(restaurant, forfaitLabel, langue);
+    const body = isReminderActive
+      ? _buildPaymentReminderMsg(d, restaurant, langue)
+      : buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue);
+    const url = 'mailto:' + encodeURIComponent(d.email) +
+                '?subject=' + encodeURIComponent(subj) +
+                '&body=' + encodeURIComponent(body);
+    emailBtn = '<a class="commande-action-btn btn-email" href="' + url + '" target="_system">✉️ Email</a>';
+  }
+
+  let waBtn = '';
+  if (d.whatsapp && d.whatsapp.numero) {
+    const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
+    const msg = isReminderActive
+      ? _buildPaymentReminderMsg(d, restaurant, langue)
+      : buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue);
+    const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+    waBtn = '<a class="commande-action-btn btn-wa" href="' + url + '" target="_system">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
+      ' WhatsApp</a>';
+  }
+
+  let viberBtn = '';
+  if (d.viber && d.viber.numero) {
+    const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
+    viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>' +
+               '<button class="commande-action-btn btn-viber-copy" onclick="_copyViberMsg(\'' + cmdKey + '\')">📋 Copier msg</button>';
+  }
+
+  const badgeHtml = !trial.noTrial
+    ? '<div style="margin-bottom:0.5rem"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + trial.label + '</span></div>'
+    : '';
+
+  const trialAction = !trial.noTrial
+    ? '<div class="commande-trial-action">' +
+        '<button class="commande-paid-btn" onclick="_markPaid(\'' + cmdKey + '\')">✅ Marquer comme payé</button>' +
+        (trial.isExpired
+          ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + cmdKey + '\')">' +
+              (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
+            '</button>'
+          : '') +
+      '</div>'
+    : '';
+
+  return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
+    '<div class="section-label">💳 Abonnement & Facturation</div>' +
+    badgeHtml +
+    priceRow +
+    paymodeRow +
+    birthdateRow +
+    '<div class="section-label" style="margin-top:8px">📨 Contact client</div>' +
+    '<div class="commande-actions">' + emailBtn + waBtn + viberBtn + '</div>' +
+    trialAction +
+    '</div>';
+}
+
+// ── Sauvegarder le mode paiement (optimistic) ────────────────────────────────
+function _savePaymentMode(cmdKey, mode) {
+  if (mode !== 'monthly' && mode !== 'annual') return;
+  const d = _commandesCache[cmdKey];
+  if (!d || d.paymentMode === mode) return;
+  const prev = Object.assign({}, d);
+  _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode });
+  _rerenderClientBillingSection(cmdKey);
+  _rerenderCommandeCard(cmdKey);
+  _controlDb.ref('/commandes/' + cmdKey + '/paymentMode').set(mode).catch(function() {
+    _commandesCache[cmdKey] = prev;
+    _rerenderClientBillingSection(cmdKey);
+    _rerenderCommandeCard(cmdKey);
+    showToast('⚠ Erreur de synchronisation');
+  });
+  showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
+}
+
+// ── Re-render la section facturation dans la carte client ────────────────────
+function _rerenderClientBillingSection(cmdKey) {
+  const d = _commandesCache[cmdKey];
+  if (!d) return;
+  const created = d.clientCree || _lastCreatedClients[cmdKey];
+  if (!created) return;
+
+  const newHtml = _buildClientBillingSectionHTML(cmdKey, d, created);
+  const temp = document.createElement('div');
+  temp.innerHTML = newHtml;
+  const newSection = temp.firstElementChild;
+
+  // Remplacer une section existante
+  const existing = document.querySelector('.client-billing-section[data-cmdkey="' + cmdKey + '"]');
+  if (existing) {
+    existing.parentNode.replaceChild(newSection, existing);
+    _initBirthdatePicker(cmdKey);
+    return;
+  }
+
+  // Ajouter dans la carte client si elle existe déjà (cas : commandes chargées après les clients)
+  const slugId = created.rid.replace(/-/g, '_');
+  const cardBodyInner = document.querySelector('#card-' + slugId + ' .card-body-inner');
+  if (cardBodyInner) {
+    const hr = document.createElement('hr');
+    hr.className = 'divider';
+    cardBodyInner.appendChild(hr);
+    cardBodyInner.appendChild(newSection);
+    _initBirthdatePicker(cmdKey);
+  }
+}
+
+// ── Copier le message d'attente/contact (commande non encore créée) ──────────
+function _copyContactMsg(key) {
+  const d = _commandesCache[key];
+  if (!d) return;
+  const restaurant  = d.restaurant || '—';
+  const langue      = d.langue || 'fr';
+  const forfaitLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+  const msg = buildContactMsg(restaurant, forfaitLabel, langue);
+  navigator.clipboard.writeText(msg).then(function() { showToast('Message copié ! 📋'); });
+}
+
 function buildCommandeCard(key, d) {
   const card   = document.createElement('div');
   const statut = d.statut || 'nouveau';
@@ -2684,8 +2882,8 @@ function buildCommandeCard(key, d) {
   const dateStr = date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) +
                   ' · ' + date.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 
-  const trial = _trialInfo(d, key);
-  const statusLabel  = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[statut] || statut;
+  const statut_val   = d.statut || 'nouveau';
+  const statusLabel  = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[statut_val] || statut_val;
   const forfaitLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
   const langLabels   = { fr:'Français', en:'English', el:'Ελληνικά', ar:'العربية', de:'Deutsch' };
   const langLabel    = langLabels[d.langue] || d.langue || '—';
@@ -2693,88 +2891,90 @@ function buildCommandeCard(key, d) {
   const langue       = d.langue || 'fr';
   const restEsc      = escapeHtml(restaurant);
 
-  // État : client déjà créé depuis cette commande ?
-  // d.clientCree vient de Firebase (persiste après redémarrage), fallback sur la mémoire locale
   const created = d.clientCree || _lastCreatedClients[key] || null;
 
-  // Prix de l'abonnement pour cette commande
-  const price     = _getCommandePrice(d);
-  const priceUnit = d.paymentMode === 'annual' ? 'an' : 'mois';
-  const priceRow  = d.paymentMode
-    ? '<div class="commande-price-row">' +
-        '<span class="commande-price-label">💶 Prix :</span>' +
-        '<input type="number" class="commande-price-input" id="price-inp-' + key + '"' +
-        ' value="' + price + '" min="0" step="1"' +
-        ' onkeydown="if(event.key===\'Enter\'){_saveCommandePrice(\'' + key + '\',this.value);this.blur();}">' +
-        '<span class="commande-price-unit">€/' + priceUnit + '</span>' +
-        '<button class="commande-price-save-btn" onclick="_saveCommandePrice(\'' + key + '\',document.getElementById(\'price-inp-' + key + '\').value)">💾</button>' +
-      '</div>'
-    : '';
+  const statusSel =
+    '<select class="commande-status-sel" onchange="setCommandeStatus(\'' + key + '\',this)">' +
+      '<option value="nouveau"  ' + (statut==='nouveau'  ?'selected':'') + '>🆕 Nouveau</option>' +
+      '<option value="en_cours" ' + (statut==='en_cours' ?'selected':'') + '>⏳ En cours</option>' +
+      '<option value="traite"   ' + (statut==='traite'   ?'selected':'') + '>✅ Traité</option>' +
+    '</select>';
 
-  // Champ Date d'anniversaire (firstOpenAt éditable)
-  const birthdateRow = d.paymentMode
-    ? '<div class="commande-birthdate-row">' +
-        '<span class="commande-birthdate-label">📅 Date d\'anniversaire :</span>' +
-        '<input type="text" id="birthdate-inp-' + key + '" class="commande-birthdate-input" readonly' +
-        ' placeholder="Sélectionner…" value="">' +
-      '</div>'
-    : '';
+  const chevronSvg =
+    '<svg class="commande-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
-  // Message à envoyer selon contexte : rappel si countdown actif, livraison si créé, contact sinon
-  const isReminderActive = !trial.noTrial;
-
-  // Bouton Email
-  let emailBtn = '';
-  if (d.email) {
-    const subj = isReminderActive
-      ? _buildReminderSubject(restaurant, langue)
-      : created ? buildDeliverySubject(restaurant, forfaitLabel, langue)
-                : buildContactSubject(restaurant, forfaitLabel, langue);
-    const body = isReminderActive
-      ? _buildPaymentReminderMsg(d, restaurant, langue)
-      : created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue)
-                : buildContactMsg(restaurant, forfaitLabel, langue);
-    const url = 'mailto:' + encodeURIComponent(d.email) +
-                '?subject=' + encodeURIComponent(subj) +
-                '&body='    + encodeURIComponent(body);
-    emailBtn = '<a class="commande-action-btn btn-email" href="' + url + '" target="_system">✉️ Email</a>';
-  }
-
-  // Bouton WhatsApp
-  let waBtn = '';
-  if (d.whatsapp && d.whatsapp.numero) {
-    const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
-    const msg = isReminderActive
-      ? _buildPaymentReminderMsg(d, restaurant, langue)
-      : created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue)
-                : buildContactMsg(restaurant, forfaitLabel, langue);
-    const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
-    waBtn = '<a class="commande-action-btn btn-wa" href="' + url + '" target="_system">' +
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
-      ' WhatsApp</a>';
-  }
-
-  // Bouton Viber
-  let viberBtn = '';
-  if (d.viber && d.viber.numero) {
-    const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
-    viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>';
-    if (created || isReminderActive) {
-      viberBtn += '<button class="commande-action-btn btn-viber-copy" onclick="_copyViberMsg(\'' + key + '\')">📋 Copier msg</button>';
+  if (!created) {
+    // ── Mode PENDING (commande reçue, client pas encore créé) ─────────────────
+    let emailBtn = '';
+    if (d.email) {
+      const subj = buildContactSubject(restaurant, forfaitLabel, langue);
+      const body = buildContactMsg(restaurant, forfaitLabel, langue);
+      const url = 'mailto:' + encodeURIComponent(d.email) +
+                  '?subject=' + encodeURIComponent(subj) +
+                  '&body=' + encodeURIComponent(body);
+      emailBtn = '<a class="commande-action-btn btn-email" href="' + url + '" target="_system">✉️ Email</a>';
     }
+
+    let waBtn = '';
+    if (d.whatsapp && d.whatsapp.numero) {
+      const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
+      const msg = buildContactMsg(restaurant, forfaitLabel, langue);
+      const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+      waBtn = '<a class="commande-action-btn btn-wa" href="' + url + '" target="_system">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg>' +
+        ' WhatsApp</a>';
+    }
+
+    let viberBtn = '';
+    if (d.viber && d.viber.numero) {
+      const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
+      viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>' +
+                 '<button class="commande-action-btn btn-viber-copy" onclick="_copyContactMsg(\'' + key + '\')">📋 Copier msg</button>';
+    }
+
+    card.innerHTML =
+      '<div class="commande-card-inner">' +
+      '<div class="commande-summary" onclick="toggleCommandeCard(\'' + key + '\')">' +
+        '<div class="commande-summary-left">' +
+          '<span class="commande-rest">' + restEsc + '</span>' +
+          '<span class="commande-forfait">' + forfaitLabel + '</span>' +
+          (d.paymentMode ? '<span class="commande-paymode">' + (d.paymentMode === 'annual' ? '📅 Annuel' : '📆 Mensuel') + '</span>' : '') +
+          '<span class="commande-date">' + dateStr + '</span>' +
+        '</div>' +
+        '<div class="commande-summary-right">' +
+          '<div class="commande-new-dot"></div>' +
+          '<span class="commande-status-pill">' + statusLabel + '</span>' +
+          chevronSvg +
+        '</div>' +
+      '</div>' +
+      '<div class="commande-body">' +
+        '<div class="commande-body-inner">' +
+          '<div class="commande-langue-row">🌐 ' + escapeHtml(langLabel) + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
+          '<div class="commande-actions">' +
+            statusSel +
+            emailBtn + waBtn + viberBtn +
+            '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>' +
+            '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')">🗑️</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '</div>';
+
+    if (statut === 'nouveau') card.classList.add('open');
+    if (!d.lu) markCommandeRead(key);
+    return card;
   }
 
-  // Bouton "Créer ce client" / badge vert créé / badge rouge supprimé
-  const creerBtn = _deletedClients[key]
-    ? '<div class="commande-client-supprime-wrap">' +
-        '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>' +
-        '<button class="btn-recreer-client" data-key="' + key + '" data-old-rid="' + escapeHtml(_deletedClients[key]) + '" data-rest="' + restEsc + '" onclick="recreerClientDepuisCommande(this)">↩ Retour</button>' +
-      '</div>'
+  // ── Mode CRÉÉ (client déjà créé — carte minimale) ─────────────────────────
+  const badgeHtml = _deletedClients[key]
+    ? '<span class="commande-client-supprime-badge">🗑️ ' + escapeHtml(_deletedClients[key]) + '</span>'
     : _pausedClients[key]
       ? '<span class="commande-client-pause-badge">⏸ ' + escapeHtml(_pausedClients[key]) + '</span>'
-      : created
-        ? '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>'
-        : '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>';
+      : '<span class="commande-client-cree-badge">✅ ' + escapeHtml(created.rid) + '</span>';
+
+  const retourBtn = _deletedClients[key]
+    ? '<button class="btn-recreer-client" data-key="' + key + '" data-old-rid="' + escapeHtml(_deletedClients[key]) + '" data-rest="' + restEsc + '" onclick="recreerClientDepuisCommande(this)">↩ Retour</button>'
+    : '';
 
   card.innerHTML =
     '<div class="commande-card-inner">' +
@@ -2782,48 +2982,25 @@ function buildCommandeCard(key, d) {
       '<div class="commande-summary-left">' +
         '<span class="commande-rest">' + restEsc + '</span>' +
         '<span class="commande-forfait">' + forfaitLabel + '</span>' +
-        (d.paymentMode ? '<span class="commande-paymode">' + (d.paymentMode === 'annual' ? '📅 Annuel' : '📆 Mensuel') + '</span>' : '') +
-        (!trial.noTrial ? '<span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '">' + trial.label + '</span>' : '') +
         '<span class="commande-date">' + dateStr + '</span>' +
       '</div>' +
       '<div class="commande-summary-right">' +
-        '<div class="commande-new-dot"></div>' +
+        badgeHtml +
         '<span class="commande-status-pill">' + statusLabel + '</span>' +
-        '<svg class="commande-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+        chevronSvg +
       '</div>' +
     '</div>' +
     '<div class="commande-body">' +
       '<div class="commande-body-inner">' +
-        '<div class="commande-langue-row">🌐 ' + escapeHtml(langLabel) + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
-        priceRow +
-        birthdateRow +
         '<div class="commande-actions">' +
-          '<select class="commande-status-sel" onchange="setCommandeStatus(\'' + key + '\',this)">' +
-            '<option value="nouveau"  ' + (statut==='nouveau'  ?'selected':'') + '>🆕 Nouveau</option>' +
-            '<option value="en_cours" ' + (statut==='en_cours' ?'selected':'') + '>⏳ En cours</option>' +
-            '<option value="traite"   ' + (statut==='traite'   ?'selected':'') + '>✅ Traité</option>' +
-          '</select>' +
-          creerBtn +
-          emailBtn + waBtn + viberBtn +
+          statusSel +
+          retourBtn +
           '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')">🗑️</button>' +
         '</div>' +
       '</div>' +
     '</div>' +
-    (!trial.noTrial ?
-      '<div class="commande-trial-action">' +
-        '<button class="commande-paid-btn" onclick="_markPaid(\'' + key + '\')">✅ Marquer comme payé</button>' +
-        (trial.isExpired ?
-          '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + key + '\')">' +
-            (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
-          '</button>'
-        : '') +
-      '</div>'
-    : '') +
     '</div>';
 
-  if (!trial.noTrial && trial.isSuspended)    card.classList.add('suspended');
-  else if (!trial.noTrial && trial.isExpired) card.classList.add('trial-expired');
-  if (statut === 'nouveau') card.classList.add('open');
   if (!d.lu) markCommandeRead(key);
   return card;
 }
@@ -2846,7 +3023,7 @@ function _toggleSuspend(key) {
     _commandesCache[key] = Object.assign({}, d, { suspendu: willSuspend });
     _rerenderCommandeCard(key);
     // Sync Firebase silencieux en arrière-plan
-    getControlDb().ref('/commandes/' + key + '/suspendu').set(willSuspend)
+    _controlDb.ref('/commandes/' + key + '/suspendu').set(willSuspend)
       .catch(function() {
         // Rollback si Firebase échoue (hors-ligne, règles, etc.)
         _commandesCache[key] = Object.assign({}, _commandesCache[key], { suspendu: !willSuspend });
@@ -2876,7 +3053,7 @@ function _saveCommandePrice(key, rawVal) {
   if (!d) return;
   if (d.price === price) return;
   _commandesCache[key] = Object.assign({}, d, { price });
-  getControlDb().ref('/commandes/' + key + '/price').set(price);
+  _controlDb.ref('/commandes/' + key + '/price').set(price);
   showToast('💾 Prix mis à jour : ' + price + ' €');
 }
 
@@ -2918,7 +3095,7 @@ function _saveFirstOpenAt(key, newTs) {
   const prev = Object.assign({}, d);
   _commandesCache[key] = Object.assign({}, d, { firstOpenAt: newTs });
   _rerenderCommandeCard(key);
-  getControlDb().ref('/commandes/' + key + '/firstOpenAt').set(newTs)
+  _controlDb.ref('/commandes/' + key + '/firstOpenAt').set(newTs)
     .catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
@@ -2953,7 +3130,7 @@ function _markPaid(key) {
       const prev = _commandesCache[key];
       _commandesCache[key] = Object.assign({}, d, update);
       _rerenderCommandeCard(key);
-      getControlDb().ref('/commandes/' + key).update(update).catch(function() {
+      _controlDb.ref('/commandes/' + key).update(update).catch(function() {
         _commandesCache[key] = prev;
         _rerenderCommandeCard(key);
         showToast('⚠ Erreur de synchronisation — réessayez.');
@@ -2973,7 +3150,7 @@ function _checkAutoSuspend() {
     const prev = _commandesCache[key];
     _commandesCache[key] = Object.assign({}, d, { suspendu: true });
     _rerenderCommandeCard(key);
-    getControlDb().ref('/commandes/' + key + '/suspendu').set(true).catch(function() {
+    _controlDb.ref('/commandes/' + key + '/suspendu').set(true).catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
     });
@@ -3031,7 +3208,12 @@ setInterval(function() {
     if (!ts) return;
     const remaining = (ts + WEEK) - Date.now();
     if (remaining <= 0) {
-      // Expiré → re-render pour afficher bouton Suspendre
+      // Expiré → re-render (commande card ou billing section client)
+      const billingSection = el.closest('.client-billing-section');
+      if (billingSection && billingSection.dataset.cmdkey) {
+        _rerenderClientBillingSection(billingSection.dataset.cmdkey);
+        return;
+      }
       const card = el.closest('.commande-card');
       if (card && card.dataset.key) _rerenderCommandeCard(card.dataset.key);
       return;
@@ -3377,6 +3559,16 @@ function buildClientCard(client) {
       '<select class="retention-sel" id="ret-calls-'+id+'" onchange="writeRetention(\''+s+'\',\'calls\',this)">'+retOpts+'</select></div>' +
       '<div class="retention-row"><span class="retention-label">🛒 Commandes</span>' +
       '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\''+s+'\',\'orders\',this)">'+retOpts+'</select></div>' +
+
+      // Section facturation (si commande associée trouvée)
+      (function() {
+        var cmdKey = _findCommandeForClient(s);
+        if (!cmdKey) return '';
+        var cd = _commandesCache[cmdKey];
+        var cmdCreated = cd && (cd.clientCree || _lastCreatedClients[cmdKey]);
+        if (!cmdCreated) return '';
+        return '<hr class="divider">' + _buildClientBillingSectionHTML(cmdKey, cd, cmdCreated);
+      })() +
 
     '</div></div>';
 
