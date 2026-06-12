@@ -1,5 +1,5 @@
 /* ================================================
-   Service Worker — Menu Pro SaaS
+   Service Worker — GeNext SaaS
    Gère le cache offline + notifications push
 ================================================ */
 
@@ -47,7 +47,7 @@ self.addEventListener('fetch', e => {
 
 /* ── PUSH : notification système même app fermée ── */
 self.addEventListener('push', e => {
-  let title = '🔔 Menu Pro';
+  let title = '🔔 GeNext';
   let body  = 'Appel : Table ?';
   let table = '?';
 

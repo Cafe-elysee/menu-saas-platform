@@ -28,7 +28,7 @@
       } catch(e) {}
     })();
   </script>
-  <title>Menu Pro</title>
+  <title>GeNext</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -5261,7 +5261,7 @@
     <div id="pause-msg" style="font-size:0.88rem;color:var(--muted);line-height:1.8">Votre menu est momentanément en pause.<br>Merci de contacter l'administrateur pour le réactiver.</div>
     <div style="margin-top:32px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.3">
       <div style="height:1px;width:30px;background:var(--gold)"></div>
-      <div style="font-size:0.6rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase">Menu Pro</div>
+      <div style="font-size:0.6rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase">GeNext</div>
       <div style="height:1px;width:30px;background:var(--gold)"></div>
     </div>
   </div>
@@ -5417,7 +5417,7 @@
     <svg class="ft-ico"><use href="#ico-pin"/></svg>
     <div class="ft-txt" id="ft-addr"></div>
   </div>
-  <div class="ft-cr" id="ft-cr">© 2026 Menu Pro</div>
+  <div class="ft-cr" id="ft-cr">© 2026 GeNext</div>
 </footer>
 
 <!-- CALL FAB — Appeler le serveur -->
@@ -5529,7 +5529,7 @@ const UI = {
   el: {
     tagline:'Μια εκλεπτυσμένη γαστρονομική εμπειρία',
     sub:[],
-    preTag:'Menu Pro',
+    preTag:'GeNext',
     explore:'Μενού',
     search:'Αναζήτηση στο μενού…',
     all:'Όλα',
@@ -5562,7 +5562,7 @@ const UI = {
   fr: {
     tagline:'Une expérience culinaire raffinée',
     sub:[],
-    preTag:'Menu Pro',
+    preTag:'GeNext',
     explore:'Menu',
     search:'Rechercher dans le menu…',
     all:'Tout',
@@ -5595,7 +5595,7 @@ const UI = {
   en: {
     tagline:'A refined culinary experience',
     sub:[],
-    preTag:'Menu Pro',
+    preTag:'GeNext',
     explore:'Menu',
     search:'Search the menu…',
     all:'All',
@@ -5628,7 +5628,7 @@ const UI = {
   ar: {
     tagline:'تجربة طهي راقية',
     sub:[],
-    preTag:'Menu Pro',
+    preTag:'GeNext',
     explore:'القائمة',
     search:'ابحث في القائمة…',
     all:'الكل',
@@ -5661,7 +5661,7 @@ const UI = {
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
     sub:[],
-    preTag:'Menu Pro',
+    preTag:'GeNext',
     explore:'Speisekarte',
     search:'Speisekarte durchsuchen…',
     all:'Alle',
@@ -6468,7 +6468,7 @@ function applyAdminData(data) {
     // Mettre à jour le copyright footer avec le nom du restaurant
     if (data.info?.name) {
       const ftCr = document.getElementById('ft-cr');
-      if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + (data.info.name.fr || data.info.name.el || data.info.name.en || 'Menu Pro');
+      if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + (data.info.name.fr || data.info.name.el || data.info.name.en || 'GeNext');
     }
 
     // Mettre à jour les infos du footer + tagline custom

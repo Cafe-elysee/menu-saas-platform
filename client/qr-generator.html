@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Générateur QR Codes — Menu Pro</title>
+<title>Générateur QR Codes — GeNext</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -77,7 +77,7 @@
 <button id="theme-btn" onclick="toggleTheme()">🌙</button>
 
 <h1>Générateur QR Codes</h1>
-<div class="sub">Menu Pro — Système de tables</div>
+<div class="sub">GeNext — Système de tables</div>
 
 <div class="config-card">
   <div class="config-row">
@@ -245,7 +245,7 @@ async function exportPDF() {
   if (selectedTables.size === 0) return;
 
   const { jsPDF } = window.jspdf;
-  const title  = document.getElementById('inp-title').value.trim() || document.getElementById('inp-rid').value.trim() || 'Menu Pro';
+  const title  = document.getElementById('inp-title').value.trim() || document.getElementById('inp-rid').value.trim() || 'GeNext';
   const size   = parseInt(document.getElementById('inp-size').value) || 160;
   const tables = Array.from(selectedTables).sort((a,b) => a - b);
 

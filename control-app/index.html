@@ -1717,7 +1717,7 @@
   <div class="app-header">
     <div class="app-header-left">
       <div class="app-header-icon">⚙️</div>
-      <h2>Menu Pro Control</h2>
+      <h2>GeNext Control</h2>
     </div>
     <div class="app-header-right">
       <button class="ctrl-theme-btn" id="ctrl-theme-btn" aria-label="Thème">
@@ -2604,11 +2604,11 @@ function showInfoTooltip(btn, tipId) {
 // ── Messages de livraison (après création client) ─
 function buildDeliverySubject(rest, forfait, lang) {
   const s = {
-    fr: '🎉 Votre espace Menu Pro est prêt — ' + rest,
-    en: '🎉 Your Menu Pro space is ready — ' + rest,
-    el: '🎉 Ο χώρος Menu Pro σας είναι έτοιμος — ' + rest,
-    ar: '🎉 مساحتكم على Menu Pro جاهزة — ' + rest,
-    de: '🎉 Ihr Menu Pro Bereich ist bereit — ' + rest
+    fr: '🎉 Votre espace GeNext est prêt — ' + rest,
+    en: '🎉 Your GeNext space is ready — ' + rest,
+    el: '🎉 Ο χώρος GeNext σας είναι έτοιμος — ' + rest,
+    ar: '🎉 مساحتكم على GeNext جاهزة — ' + rest,
+    de: '🎉 Ihr GeNext Bereich ist bereit — ' + rest
   };
   return s[lang] || s.fr;
 }
@@ -2630,11 +2630,11 @@ function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const apkUrl   = 'https://menu-saas-platform.vercel.app/MenuProServeur-SaaS-v1.0.apk';
   const isCS     = forfait === 'Commandes & Services';
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace Menu Pro est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe Menu Pro',
-    en: 'Hello ' + rest + '! 🎉\n\nYour Menu Pro space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe Menu Pro team',
-    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος Menu Pro σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
-    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على Menu Pro جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق Menu Pro',
-    de: 'Hallo ' + rest + '! 🎉\n\nIhr Menu Pro Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على GeNext جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق GeNext',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   const _base = m[lang] || m.fr;
   const _lb = _base.lastIndexOf('\n\n');
@@ -3354,11 +3354,11 @@ function _checkAutoSuspend() {
 
 function _buildReminderSubject(rest, lang) {
   const s = {
-    fr: '⚠️ Rappel de paiement Menu Pro — ' + rest,
-    en: '⚠️ Menu Pro payment reminder — ' + rest,
-    el: '⚠️ Υπενθύμιση πληρωμής Menu Pro — ' + rest,
-    ar: '⚠️ تذكير بالدفع Menu Pro — ' + rest,
-    de: '⚠️ Zahlungserinnerung Menu Pro — ' + rest
+    fr: '⚠️ Rappel de paiement GeNext — ' + rest,
+    en: '⚠️ GeNext payment reminder — ' + rest,
+    el: '⚠️ Υπενθύμιση πληρωμής GeNext — ' + rest,
+    ar: '⚠️ تذكير بالدفع GeNext — ' + rest,
+    de: '⚠️ Zahlungserinnerung GeNext — ' + rest
   };
   return s[lang] || s.fr;
 }
@@ -3383,11 +3383,11 @@ function _buildPaymentReminderMsg(d, restaurant, lang) {
   const priceStr = price + ' €/' + (unitLabels[lang] || unitLabels.fr);
   const mode     = modeLabels[lang] || modeLabels.fr;
   const m = {
-    fr: 'Bonjour ' + restaurant + ',\n\nVotre abonnement Menu Pro (' + mode + ' — ' + priceStr + ') arrive à échéance.\n\nMerci de régulariser dans les 7 jours pour maintenir l\'accès à votre service.\n\n💳 Par virement bancaire : effectuez le virement de ' + priceStr + ' et envoyez-nous la preuve par WhatsApp / Viber / email.\n\n💵 En espèces : envoyez votre localisation par WhatsApp / Viber / email pour convenir d\'un rendez-vous dans la semaine.\n\nCordialement,\nL\'équipe Menu Pro',
-    en: 'Hello ' + restaurant + ',\n\nYour Menu Pro subscription (' + mode + ' — ' + priceStr + ') is due for renewal.\n\nPlease settle within 7 days to keep your service running.\n\n💳 Bank transfer: send ' + priceStr + ' and share proof of payment via WhatsApp / Viber / email.\n\n💵 Cash: send your location via WhatsApp / Viber / email to arrange a meeting within the week.\n\nBest regards,\nThe Menu Pro team',
-    el: 'Γεια σας ' + restaurant + ',\n\nΗ συνδρομή σας Menu Pro (' + mode + ' — ' + priceStr + ') λήγει σύντομα.\n\nΠαρακαλούμε τακτοποιήστε εντός 7 ημερών για να διατηρήσετε την πρόσβαση στην υπηρεσία σας.\n\n💳 Τραπεζικό έμβασμα: στείλτε το ποσό ' + priceStr + ' και αποδείξτε την πληρωμή μέσω WhatsApp / Viber / email.\n\n💵 Μετρητά: στείλτε την τοποθεσία σας μέσω WhatsApp / Viber / email για ραντεβού εντός της εβδομάδας.\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
-    ar: 'مرحباً ' + restaurant + ',\n\nاشتراككم في Menu Pro (' + mode + ' — ' + priceStr + ') على وشك الانتهاء.\n\nيرجى التسوية خلال 7 أيام للحفاظ على الوصول إلى خدمتكم.\n\n💳 التحويل البنكي: حوّلوا ' + priceStr + ' وأرسلوا إثبات الدفع عبر واتساب / فايبر / بريد إلكتروني.\n\n💵 نقداً: أرسلوا موقعكم عبر واتساب / فايبر / بريد إلكتروني لتحديد موعد خلال الأسبوع.\n\nمع التحية،\nفريق Menu Pro',
-    de: 'Hallo ' + restaurant + ',\n\nIhr Menu Pro Abonnement (' + mode + ' — ' + priceStr + ') ist zur Verlängerung fällig.\n\nBitte begleichen Sie innerhalb von 7 Tagen, um Ihren Dienst aufrechtzuerhalten.\n\n💳 Banküberweisung: überweisen Sie ' + priceStr + ' und teilen Sie den Zahlungsnachweis per WhatsApp / Viber / E-Mail mit.\n\n💵 Bar: Senden Sie Ihren Standort per WhatsApp / Viber / E-Mail für einen Termin innerhalb der Woche.\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
+    fr: 'Bonjour ' + restaurant + ',\n\nVotre abonnement GeNext (' + mode + ' — ' + priceStr + ') arrive à échéance.\n\nMerci de régulariser dans les 7 jours pour maintenir l\'accès à votre service.\n\n💳 Par virement bancaire : effectuez le virement de ' + priceStr + ' et envoyez-nous la preuve par WhatsApp / Viber / email.\n\n💵 En espèces : envoyez votre localisation par WhatsApp / Viber / email pour convenir d\'un rendez-vous dans la semaine.\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + restaurant + ',\n\nYour GeNext subscription (' + mode + ' — ' + priceStr + ') is due for renewal.\n\nPlease settle within 7 days to keep your service running.\n\n💳 Bank transfer: send ' + priceStr + ' and share proof of payment via WhatsApp / Viber / email.\n\n💵 Cash: send your location via WhatsApp / Viber / email to arrange a meeting within the week.\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + restaurant + ',\n\nΗ συνδρομή σας GeNext (' + mode + ' — ' + priceStr + ') λήγει σύντομα.\n\nΠαρακαλούμε τακτοποιήστε εντός 7 ημερών για να διατηρήσετε την πρόσβαση στην υπηρεσία σας.\n\n💳 Τραπεζικό έμβασμα: στείλτε το ποσό ' + priceStr + ' και αποδείξτε την πληρωμή μέσω WhatsApp / Viber / email.\n\n💵 Μετρητά: στείλτε την τοποθεσία σας μέσω WhatsApp / Viber / email για ραντεβού εντός της εβδομάδας.\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    ar: 'مرحباً ' + restaurant + ',\n\nاشتراككم في GeNext (' + mode + ' — ' + priceStr + ') على وشك الانتهاء.\n\nيرجى التسوية خلال 7 أيام للحفاظ على الوصول إلى خدمتكم.\n\n💳 التحويل البنكي: حوّلوا ' + priceStr + ' وأرسلوا إثبات الدفع عبر واتساب / فايبر / بريد إلكتروني.\n\n💵 نقداً: أرسلوا موقعكم عبر واتساب / فايبر / بريد إلكتروني لتحديد موعد خلال الأسبوع.\n\nمع التحية،\nفريق GeNext',
+    de: 'Hallo ' + restaurant + ',\n\nIhr GeNext Abonnement (' + mode + ' — ' + priceStr + ') ist zur Verlängerung fällig.\n\nBitte begleichen Sie innerhalb von 7 Tagen, um Ihren Dienst aufrechtzuerhalten.\n\n💳 Banküberweisung: überweisen Sie ' + priceStr + ' und teilen Sie den Zahlungsnachweis per WhatsApp / Viber / E-Mail mit.\n\n💵 Bar: Senden Sie Ihren Standort per WhatsApp / Viber / E-Mail für einen Termin innerhalb der Woche.\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   return m[lang] || m.fr;
 }
@@ -3517,22 +3517,22 @@ function setCommandeStatus(key, sel) {
 
 function buildContactSubject(rest, forfait, lang) {
   const s = {
-    fr: 'Votre commande Menu Pro — ' + forfait,
-    en: 'Your Menu Pro order — ' + forfait,
-    el: 'Η παραγγελία σας Menu Pro — ' + forfait,
-    ar: 'طلبكم Menu Pro — ' + forfait,
-    de: 'Ihre Menu Pro Bestellung — ' + forfait
+    fr: 'Votre commande GeNext — ' + forfait,
+    en: 'Your GeNext order — ' + forfait,
+    el: 'Η παραγγελία σας GeNext — ' + forfait,
+    ar: 'طلبكم GeNext — ' + forfait,
+    de: 'Ihre GeNext Bestellung — ' + forfait
   };
   return s[lang] || s.fr;
 }
 
 function buildContactMsg(rest, forfait, lang) {
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 👋\n\nNous avons bien reçu votre commande pour le forfait « ' + forfait + ' ».\n\nNous vous contacterons très prochainement pour démarrer la création de votre espace Menu Pro.\n\nCordialement,\nL\'équipe Menu Pro',
-    en: 'Hello ' + rest + '! 👋\n\nWe have received your order for the « ' + forfait + ' » plan.\n\nWe will contact you very soon to start setting up your Menu Pro space.\n\nBest regards,\nThe Menu Pro team',
-    el: 'Γεια σας ' + rest + '! 👋\n\nΛάβαμε την παραγγελία σας για το πακέτο « ' + forfait + ' ».\n\nΘα επικοινωνήσουμε μαζί σας πολύ σύντομα.\n\nΜε εκτίμηση,\nΗ ομάδα Menu Pro',
-    ar: 'مرحباً ' + rest + '! 👋\n\nلقد استلمنا طلبكم للاشتراك في خطة « ' + forfait + ' ».\n\nسنتواصل معكم قريبًا لبدء إنشاء مساحتكم على Menu Pro.\n\nمع التحية،\nفريق Menu Pro',
-    de: 'Hallo ' + rest + '! 👋\n\nWir haben Ihre Bestellung für das Paket « ' + forfait + ' » erhalten.\n\nWir werden uns sehr bald bei Ihnen melden.\n\nMit freundlichen Grüßen,\nDas Menu Pro Team'
+    fr: 'Bonjour ' + rest + ' ! 👋\n\nNous avons bien reçu votre commande pour le forfait « ' + forfait + ' ».\n\nNous vous contacterons très prochainement pour démarrer la création de votre espace GeNext.\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + rest + '! 👋\n\nWe have received your order for the « ' + forfait + ' » plan.\n\nWe will contact you very soon to start setting up your GeNext space.\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + rest + '! 👋\n\nΛάβαμε την παραγγελία σας για το πακέτο « ' + forfait + ' ».\n\nΘα επικοινωνήσουμε μαζί σας πολύ σύντομα.\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    ar: 'مرحباً ' + rest + '! 👋\n\nلقد استلمنا طلبكم للاشتراك في خطة « ' + forfait + ' ».\n\nسنتواصل معكم قريبًا لبدء إنشاء مساحتكم على GeNext.\n\nمع التحية،\nفريق GeNext',
+    de: 'Hallo ' + rest + '! 👋\n\nWir haben Ihre Bestellung für das Paket « ' + forfait + ' » erhalten.\n\nWir werden uns sehr bald bei Ihnen melden.\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   return m[lang] || m.fr;
 }
