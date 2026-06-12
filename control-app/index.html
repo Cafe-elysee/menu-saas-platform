@@ -2383,6 +2383,11 @@ async function createNewClient() {
     const ts   = Date.now();
     const _isCS = _pendingCommandeKey && (_commandesCache[_pendingCommandeKey]?.forfait === 'commandes-services');
 
+    const _cmdDataForSub = _pendingCommandeKey ? (_commandesCache[_pendingCommandeKey] || {}) : {};
+    const _subForfait  = _cmdDataForSub.forfait || 'menu-qr';
+    const _subPayMode  = _cmdDataForSub.paymentMode || 'monthly';
+    const _subEmail    = _cmdDataForSub.email || null;
+    const _subPrice    = _isCS ? (_subPayMode === 'annual' ? 199 : 19) : (_subPayMode === 'annual' ? 99 : 9);
     await _saasDb.ref('restaurants/' + rid).set({
       profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
@@ -2394,7 +2399,8 @@ async function createNewClient() {
           callBtn: _isCS, orderUI: _isCS, photos: true,
           tableSystem: _isCS, qrOrdering: _isCS, eventOverlay: true
         },
-        retention: { calls: 2592000000, orders: 2592000000 }
+        retention: { calls: 2592000000, orders: 2592000000 },
+        subscription: { forfait: _subForfait, paymentMode: _subPayMode, price: _subPrice, email: _subEmail }
       },
       menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
       firstOpen: false
@@ -3459,12 +3465,16 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const cmdData = _commandesCache[commandeKey] || {};
     const isCS = cmdData.forfait === 'commandes-services';
 
+    const _subPayMode2 = cmdData.paymentMode || 'monthly';
+    const _subEmail2   = cmdData.email || null;
+    const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 199 : 19) : (_subPayMode2 === 'annual' ? 99 : 9);
     await _saasDb.ref('restaurants/' + rid).set({
       profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
-        retention: { calls: 2592000000, orders: 2592000000 }
+        retention: { calls: 2592000000, orders: 2592000000 },
+        subscription: { forfait: cmdData.forfait || 'menu-qr', paymentMode: _subPayMode2, price: _subPrice2, email: _subEmail2 }
       },
       menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
       firstOpen: false
@@ -3510,12 +3520,16 @@ function recreerClientDepuisCommande(btnEl) {
         const ts   = Date.now();
         const cmdData = _commandesCache[commandeKey] || {};
         const isCS = cmdData.forfait === 'commandes-services';
+        const _subPayModeR = cmdData.paymentMode || 'monthly';
+        const _subEmailR   = cmdData.email || null;
+        const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 199 : 19) : (_subPayModeR === 'annual' ? 99 : 9);
         await _saasDb.ref('restaurants/' + oldRid).set({
           profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
           config: {
             adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
             features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
-            retention: { calls: 2592000000, orders: 2592000000 }
+            retention: { calls: 2592000000, orders: 2592000000 },
+            subscription: { forfait: cmdData.forfait || 'menu-qr', paymentMode: _subPayModeR, price: _subPriceR, email: _subEmailR }
           },
           menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
           firstOpen: false
