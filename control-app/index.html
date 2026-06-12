@@ -2458,7 +2458,10 @@ let _firstOpenWatchersSetup = false;
 function _watchFirstOpen(rid, cmdKey) {
   _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
     if (snap.val() === true && _commandesCache[cmdKey]) {
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: Date.now() });
+      const _foTs = Date.now();
+      const _foNext = _foTs + 7 * 24 * 60 * 60 * 1000;
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext });
+      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -3158,9 +3161,27 @@ function _markPaid(key) {
       _controlDb.ref('/commandes/' + key).update(update)
         .then(function() {
           _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
-          // Réactiver aussi dans le Firebase principal (en cas de suspension par le cron)
           const rid = d.clientCree?.rid;
-          if (rid) _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
+          if (rid) {
+            _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
+            _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: nextReminderAt });
+          }
+          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+          if (emailAddr) {
+            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                rid: rid || '',
+                email: emailAddr,
+                name: d.restaurant || '',
+                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                amount: _getCommandePrice(d),
+                paymentMode: d.paymentMode || 'monthly',
+                nextDue: nextReminderAt
+              })
+            }).catch(function() {});
+          }
         })
         .catch(function() {
           _commandesCache[key] = prev;
@@ -3465,7 +3486,6 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     _controlDb.ref('/commandes/' + commandeKey).update({
       statut: 'en_cours', lu: true, clientCree: clientCreeData,
       emailLivraisonProgramme: _nowTs2,
-      nextReminderAt: _nowTs2 + 7 * 24 * 60 * 60 * 1000,
       emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
     });
     _watchFirstOpen(rid, commandeKey);
@@ -3525,7 +3545,6 @@ function recreerClientDepuisCommande(btnEl) {
           statut: 'en_cours', lu: true, clientCree: clientCreeData,
           emailLivraisonProgramme: _nowTs3,
           emailLivraisonSent: null,
-          nextReminderAt: _nowTs3 + 7 * 24 * 60 * 60 * 1000,
           lastReminderSent: null,
           emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'monthly' }
         });
