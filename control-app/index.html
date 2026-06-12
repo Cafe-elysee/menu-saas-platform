@@ -2387,7 +2387,7 @@ async function createNewClient() {
     const _subForfait  = _cmdDataForSub.forfait || 'menu-qr';
     const _subPayMode  = _cmdDataForSub.paymentMode || 'monthly';
     const _subEmail    = _cmdDataForSub.email || null;
-    const _subPrice    = _isCS ? (_subPayMode === 'annual' ? 199 : 19) : (_subPayMode === 'annual' ? 99 : 9);
+    const _subPrice    = _isCS ? (_subPayMode === 'annual' ? 990 : 99) : (_subPayMode === 'annual' ? 490 : 49);
     await _saasDb.ref('restaurants/' + rid).set({
       profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
@@ -3472,7 +3472,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
 
     const _subPayMode2 = cmdData.paymentMode || 'monthly';
     const _subEmail2   = cmdData.email || null;
-    const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 199 : 19) : (_subPayMode2 === 'annual' ? 99 : 9);
+    const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
     await _saasDb.ref('restaurants/' + rid).set({
       profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
       config: {
@@ -3529,7 +3529,7 @@ function recreerClientDepuisCommande(btnEl) {
         const isCS = cmdData.forfait === 'commandes-services';
         const _subPayModeR = cmdData.paymentMode || 'monthly';
         const _subEmailR   = cmdData.email || null;
-        const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 199 : 19) : (_subPayModeR === 'annual' ? 99 : 9);
+        const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
         await _saasDb.ref('restaurants/' + oldRid).set({
           profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
           config: {

@@ -7020,7 +7020,7 @@ async function _loadSubscriptionSection() {
     const forfait  = _subData.forfait || 'menu-qr';
     const isCS     = forfait === 'commandes-services';
     const payMode  = _subData.paymentMode || 'monthly';
-    const price    = _subData.price || (isCS ? (payMode === 'annual' ? 199 : 19) : (payMode === 'annual' ? 99 : 9));
+    const price    = _subData.price || (isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49));
     const forfaitLabel = isCS ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR');
     const modeLabel    = payMode === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
     const canUpgrade   = !isCS;
@@ -7054,7 +7054,7 @@ async function _changeSubscriptionForfait(newForfait) {
     try {
       const isCS      = newForfait === 'commandes-services';
       const payMode   = _subData?.paymentMode || 'monthly';
-      const newPrice  = isCS ? (payMode === 'annual' ? 199 : 19) : (payMode === 'annual' ? 99 : 9);
+      const newPrice  = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
       const newFeats  = {
         callBtn: isCS, orderUI: isCS, photos: true,
         tableSystem: isCS, qrOrdering: isCS, eventOverlay: true
