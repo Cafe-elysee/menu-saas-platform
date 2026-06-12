@@ -46,12 +46,14 @@
     }
     html.light body { background:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background:rgba(248,244,238,0.84) !important;
-      border-bottom-color:rgba(200,164,78,0.20) !important;
-      box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 16px rgba(0,0,0,0.05) !important;
+      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg) !important;
+      background-size: auto, cover !important;
+      background-position: top left, center top !important;
+      border-bottom-color:rgba(200,164,78,0.22) !important;
+      box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05) !important;
     }
     html.light .adm-header::before {
-      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.05) 40%, rgba(200,164,78,0.10) 50%, rgba(200,164,78,0.05) 60%, transparent 100%);
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.05) 40%, rgba(200,164,78,0.11) 50%, rgba(200,164,78,0.05) 60%, transparent 100%);
     }
     /* Textes et inputs */
     html.light .inline-input,
@@ -69,10 +71,11 @@
     html.light .ico-modal-item { color:var(--cream); }
     html.light .ico-modal-close { background:var(--bg3); }
     html.light .login-box {
-      background:rgba(248,244,238,0.84) !important;
-      backdrop-filter:blur(24px) saturate(160%);
-      -webkit-backdrop-filter:blur(24px) saturate(160%);
-      border-color:rgba(200,164,78,0.22) !important;
+      background-image:url(assets/gn-bg-light.jpg) !important;
+      background-size:cover !important; background-position:center !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+      border-color:rgba(200,164,78,0.28) !important;
     }
     /* Admin login screens — bokeh background */
     #login-screen, #rid-sel-screen {
@@ -85,12 +88,13 @@
     /* Admin login logo */
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
     .gna-login-logo {
-      width:80px; height:80px; object-fit:cover; border-radius:50%;
-      mix-blend-mode:screen; display:block;
+      width:140px; height:140px; object-fit:cover; display:block;
+      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
     }
     .gna-login-logo-lt { display:none; }
     html.light .gna-login-logo-dk { display:none !important; }
-    html.light .gna-login-logo-lt { display:block !important; mix-blend-mode:multiply; }
+    html.light .gna-login-logo-lt { display:block !important; }
     .gna-login-subtitle {
       font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:600;
       color:var(--gold); letter-spacing:0.28em; text-transform:uppercase;
@@ -236,10 +240,10 @@
     .llang-btn.on { border-color:#c8a44e;background:rgba(200,164,78,0.12); }
     .login-box {
       width:100%; max-width:360px;
-      background:rgba(13,11,8,0.84); border:1px solid var(--bord2); border-radius:24px;
+      background-image:url(assets/gn-bg-dark.jpg);
+      background-size:cover; background-position:center;
+      border:1px solid rgba(200,164,78,0.28); border-radius:24px;
       padding:36px 28px; text-align:center;
-      backdrop-filter:blur(24px) saturate(160%);
-      -webkit-backdrop-filter:blur(24px) saturate(160%);
     }
     .login-logo { font-family:'Crimson Pro',serif; font-size:1.8rem; color:var(--gold); letter-spacing:0.12em; margin-bottom:4px; }
     .login-sub  { font-size:0.75rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:28px; }
@@ -280,17 +284,18 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      background:rgba(15,9,6,0.82); backdrop-filter:blur(26px) saturate(170%);
-      -webkit-backdrop-filter:blur(26px) saturate(170%);
-      border-top:1px solid rgba(255,255,255,0.03); border-bottom:1px solid rgba(200,164,78,0.16);
-      box-shadow:0 1px 0 rgba(200,164,78,0.08), 0 4px 20px rgba(0,0,0,0.30);
+      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+      background-size: auto, cover;
+      background-position: top left, center top;
+      border-top:1px solid rgba(255,255,255,0.02); border-bottom:1px solid rgba(200,164,78,0.18);
+      box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
       flex-wrap:wrap; overflow:hidden;
     }
     .adm-header::before {
       content:''; position:absolute; inset:0; pointer-events:none;
-      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.08) 40%, rgba(200,164,78,0.14) 50%, rgba(200,164,78,0.08) 60%, transparent 100%);
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.09) 40%, rgba(200,164,78,0.16) 50%, rgba(200,164,78,0.09) 60%, transparent 100%);
       animation:gnBarFlow 8s ease-in-out infinite;
     }
     @media(max-width:767px) {
@@ -1628,27 +1633,29 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background:rgba(10,9,8,0.82);
-    backdrop-filter:blur(28px) saturate(170%);
-    -webkit-backdrop-filter:blur(28px) saturate(170%);
-    border-top:1px solid rgba(200,164,78,0.15);
-    box-shadow:0 -1px 0 rgba(200,164,78,0.08), 0 -6px 28px rgba(0,0,0,0.28);
+    background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+    background-size: auto, cover;
+    background-position: bottom left, center bottom;
+    border-top:1px solid rgba(200,164,78,0.18);
+    box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
     z-index:500; overflow:hidden;
     padding-bottom:env(safe-area-inset-bottom);
   }
   #admin-bottom-nav::before {
     content:''; position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.06) 40%, rgba(200,164,78,0.11) 50%, rgba(200,164,78,0.06) 60%, transparent 100%);
+    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.07) 40%, rgba(200,164,78,0.13) 50%, rgba(200,164,78,0.07) 60%, transparent 100%);
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background:rgba(248,244,238,0.85);
-    border-top-color:rgba(200,164,78,0.20);
-    box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -4px 18px rgba(0,0,0,0.05);
+    background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+    background-size: auto, cover;
+    background-position: bottom left, center bottom;
+    border-top-color:rgba(200,164,78,0.22);
+    box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
   }
   html.light #admin-bottom-nav::before {
-    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.04) 40%, rgba(200,164,78,0.08) 50%, rgba(200,164,78,0.04) 60%, transparent 100%);
+    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.04) 40%, rgba(200,164,78,0.09) 50%, rgba(200,164,78,0.04) 60%, transparent 100%);
   }
   .admin-nav-btn {
     flex:1; display:flex; flex-direction:column;

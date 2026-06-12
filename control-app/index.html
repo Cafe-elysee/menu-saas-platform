@@ -55,9 +55,11 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background: rgba(248,244,238,0.85) !important;
-      border-top-color: rgba(200,164,78,0.20) !important;
-      box-shadow: 0 -1px 0 rgba(200,164,78,0.10), 0 -4px 16px rgba(0,0,0,0.05) !important;
+      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg) !important;
+      background-size: auto, cover !important;
+      background-position: bottom left, center bottom !important;
+      border-top-color: rgba(200,164,78,0.22) !important;
+      box-shadow: 0 -1px 0 rgba(200,164,78,0.12), 0 -4px 16px rgba(0,0,0,0.04) !important;
     }
     .bottom-nav::before {
       content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -112,18 +114,18 @@
     html.light #gn-ctrl-logo-lt { display:block !important; }
 
     .login-box {
-      background: rgba(13,11,8,0.80);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border: 1px solid rgba(200,164,78,0.22);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover; background-position: center;
+      border: 1px solid rgba(200,164,78,0.28);
       border-radius: 24px;
       padding: 2.5rem 2.5rem;
       width: 100%; max-width: 380px;
       text-align: center;
-      box-shadow: 0 0 0 1px rgba(200,164,78,0.06), 0 24px 64px rgba(0,0,0,0.55);
+      box-shadow: 0 0 0 1px rgba(200,164,78,0.10), 0 24px 64px rgba(0,0,0,0.55);
     }
     html.light .login-box {
-      background: rgba(248,244,238,0.82);
+      background-image: url(assets/gn-bg-light.jpg);
+      background-size: cover; background-position: center;
     }
     /* ── Logo login ── */
     .gn-login-logo-wrap {
@@ -131,11 +133,14 @@
       margin-bottom: 1.25rem;
     }
     .gn-login-logo {
-      width: 100px; height: 100px;
-      border-radius: 50%; object-fit: cover;
-      mix-blend-mode: screen;
+      width: 160px; height: 160px; object-fit: cover; display: block;
+      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
     }
-    html.light .gn-login-logo { mix-blend-mode: multiply; }
+    html.light .gn-login-logo {
+      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+    }
     .gn-login-logo-lt { display: none; }
     html.light .gn-login-logo-dk { display: none !important; }
     html.light .gn-login-logo-lt { display: block !important; }
@@ -217,10 +222,11 @@
     }
     .app-header {
       flex-shrink: 0;
-      background: rgba(13,11,8,0.82);
-      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+      background-size: auto, cover;
+      background-position: top left, center top;
       border-bottom: 1px solid rgba(200,164,78,0.18);
-      box-shadow: 0 1px 0 rgba(200,164,78,0.08), 0 4px 20px rgba(0,0,0,0.35);
+      box-shadow: 0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.35);
       padding: 0 1.25rem;
       height: 60px;
       display: flex; align-items: center; justify-content: space-between;
@@ -228,16 +234,18 @@
     }
     .app-header::before {
       content: ''; position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.09) 40%, rgba(200,164,78,0.15) 50%, rgba(200,164,78,0.09) 60%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.09) 40%, rgba(200,164,78,0.16) 50%, rgba(200,164,78,0.09) 60%, transparent 100%);
       animation: gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background: rgba(248,244,238,0.85);
-      border-bottom-color: rgba(200,164,78,0.20);
-      box-shadow: 0 1px 0 rgba(200,164,78,0.10), 0 4px 16px rgba(0,0,0,0.06);
+      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+      background-size: auto, cover;
+      background-position: top left, center top;
+      border-bottom-color: rgba(200,164,78,0.22);
+      box-shadow: 0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05);
     }
     html.light .app-header::before {
-      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.06) 40%, rgba(200,164,78,0.11) 50%, rgba(200,164,78,0.06) 60%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.06) 40%, rgba(200,164,78,0.12) 50%, rgba(200,164,78,0.06) 60%, transparent 100%);
     }
     .app-header-left { display: flex; align-items: center; gap: 10px; }
     .app-header-icon {
@@ -295,10 +303,11 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-      background: rgba(13,11,8,0.82);
-      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+      background-size: auto, cover;
+      background-position: bottom left, center bottom;
       border-top: 1px solid rgba(200,164,78,0.18);
-      box-shadow: 0 -1px 0 rgba(200,164,78,0.08), 0 -4px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 -1px 0 rgba(200,164,78,0.10), 0 -4px 20px rgba(0,0,0,0.3);
       display: flex; align-items: flex-start;
       padding-top: 10px;
       padding-bottom: env(safe-area-inset-bottom);
