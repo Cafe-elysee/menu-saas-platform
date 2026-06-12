@@ -55,8 +55,17 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background: rgba(237,232,223,0.98) !important;
-      box-shadow: 0 -1px 0 rgba(0,0,0,0.08), 0 -4px 16px rgba(0,0,0,0.04);
+      background: rgba(248,244,238,0.85) !important;
+      border-top-color: rgba(200,164,78,0.20) !important;
+      box-shadow: 0 -1px 0 rgba(200,164,78,0.10), 0 -4px 16px rgba(0,0,0,0.05) !important;
+    }
+    .bottom-nav::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.07) 40%, rgba(200,164,78,0.12) 50%, rgba(200,164,78,0.07) 60%, transparent 100%);
+      animation: gnBarFlow 9s ease-in-out infinite reverse;
+    }
+    html.light .bottom-nav::before {
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.05) 40%, rgba(200,164,78,0.09) 50%, rgba(200,164,78,0.05) 60%, transparent 100%);
     }
     /* Texte gold → couleur normale en light mode */
     html.light .section-title,
@@ -81,7 +90,6 @@
       position: fixed; inset: 0;
       display: flex; align-items: center; justify-content: center;
       padding: 1.5rem;
-      background: var(--bg);
       z-index: 1000;
     }
     #login-screen.hidden { display: none; }
@@ -95,29 +103,46 @@
     html.light #ctrl-loading-screen { background-image:url(assets/gn-bg-light.jpg); }
     .gn-ctrl-logo {
       width:72vw;max-width:320px;height:auto;
-      display:block;
+      display:block;border-radius:50%;
       will-change:transform,opacity,filter;
+      mix-blend-mode:screen;
     }
+    html.light .gn-ctrl-logo { mix-blend-mode:multiply; }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
 
     .login-box {
-      background: var(--card-bg);
-      border: 1px solid rgba(200,164,78,0.2);
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
+      background: rgba(13,11,8,0.80);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(200,164,78,0.22);
+      border-radius: 24px;
+      padding: 2.5rem 2.5rem;
       width: 100%; max-width: 380px;
       text-align: center;
-      box-shadow: 0 0 0 1px rgba(200,164,78,0.05), 0 24px 64px rgba(0,0,0,0.6);
+      box-shadow: 0 0 0 1px rgba(200,164,78,0.06), 0 24px 64px rgba(0,0,0,0.55);
     }
-    .login-logo {
-      width: 56px; height: 56px;
-      background: var(--gold-dim);
-      border: 1.5px solid rgba(200,164,78,0.3);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-      margin: 0 auto 1.25rem;
+    html.light .login-box {
+      background: rgba(248,244,238,0.82);
+    }
+    /* ── Logo login ── */
+    .gn-login-logo-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .gn-login-logo {
+      width: 100px; height: 100px;
+      border-radius: 50%; object-fit: cover;
+      mix-blend-mode: screen;
+    }
+    html.light .gn-login-logo { mix-blend-mode: multiply; }
+    .gn-login-logo-lt { display: none; }
+    html.light .gn-login-logo-dk { display: none !important; }
+    html.light .gn-login-logo-lt { display: block !important; }
+    .gn-login-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.65rem; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--gold); opacity: 0.7; margin-top: 6px;
     }
     .login-box h1 {
       font-family: 'Cormorant Garamond', serif;
@@ -184,16 +209,36 @@
     }
     #app.visible { display: flex; }
 
+    @keyframes gnBarFlow {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(200%); opacity: 0; }
+    }
     .app-header {
       flex-shrink: 0;
-      background: rgba(13,11,8,0.97);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(200,164,78,0.15);
+      background: rgba(13,11,8,0.82);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid rgba(200,164,78,0.18);
+      box-shadow: 0 1px 0 rgba(200,164,78,0.08), 0 4px 20px rgba(0,0,0,0.35);
       padding: 0 1.25rem;
       height: 60px;
       display: flex; align-items: center; justify-content: space-between;
+      position: relative; overflow: hidden;
     }
-    html.light .app-header { background: rgba(240,235,224,0.97); }
+    .app-header::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.09) 40%, rgba(200,164,78,0.15) 50%, rgba(200,164,78,0.09) 60%, transparent 100%);
+      animation: gnBarFlow 7s ease-in-out infinite;
+    }
+    html.light .app-header {
+      background: rgba(248,244,238,0.85);
+      border-bottom-color: rgba(200,164,78,0.20);
+      box-shadow: 0 1px 0 rgba(200,164,78,0.10), 0 4px 16px rgba(0,0,0,0.06);
+    }
+    html.light .app-header::before {
+      background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.06) 40%, rgba(200,164,78,0.11) 50%, rgba(200,164,78,0.06) 60%, transparent 100%);
+    }
     .app-header-left { display: flex; align-items: center; gap: 10px; }
     .app-header-icon {
       width: 34px; height: 34px;
@@ -250,13 +295,15 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-      background: rgba(13,11,8,0.97);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(13,11,8,0.82);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
       border-top: 1px solid rgba(200,164,78,0.18);
+      box-shadow: 0 -1px 0 rgba(200,164,78,0.08), 0 -4px 20px rgba(0,0,0,0.3);
       display: flex; align-items: flex-start;
       padding-top: 10px;
       padding-bottom: env(safe-area-inset-bottom);
       z-index: 100;
+      overflow: hidden; position: fixed;
     }
     .nav-btn {
       flex:1; display:flex; flex-direction:column;
@@ -1123,18 +1170,22 @@
     ═══════════════════════════════ */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.78);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.60);
+      backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
       z-index: 500; align-items: center; justify-content: center;
       padding: 1.5rem;
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
-      background: var(--card-bg);
-      border: 1px solid rgba(200,164,78,0.2);
-      border-radius: 18px; padding: 1.75rem;
+      background: rgba(18,14,10,0.88);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(200,164,78,0.22);
+      border-radius: 22px; padding: 1.75rem;
       width: 100%; max-width: 380px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    html.light .modal-box {
+      background: rgba(248,244,238,0.90);
     }
     .modal-box h3 {
       font-family: 'Cormorant Garamond', serif;
@@ -1288,16 +1339,18 @@
     }
     #nc-modal {
       display:none; position:fixed; inset:0; z-index:500;
-      background:rgba(0,0,0,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      background:rgba(0,0,0,0.60); backdrop-filter:blur(14px) saturate(150%); -webkit-backdrop-filter:blur(14px) saturate(150%);
       align-items:center; justify-content:center; padding:1rem;
     }
     #nc-modal.show { display:flex; }
     .nc-box {
-      background:var(--card-bg); border:1px solid var(--border);
-      border-radius:20px; padding:24px 20px; width:100%; max-width:400px;
+      background:rgba(18,14,10,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border:1px solid rgba(200,164,78,0.22);
+      border-radius:24px; padding:24px 20px; width:100%; max-width:400px;
       max-height:90vh; overflow-y:auto;
+      box-shadow:0 24px 64px rgba(0,0,0,0.45);
     }
-    html.light .nc-box { background:#fff; }
+    html.light .nc-box { background:rgba(248,244,238,0.90); border-color:rgba(200,164,78,0.25); }
     .nc-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--gold); margin-bottom:3px; }
     .nc-sub { font-size:0.7rem; color:var(--muted); margin-bottom:20px; letter-spacing:0.12em; text-transform:uppercase; }
     .nc-label { font-size:0.73rem; color:var(--muted); margin-bottom:5px; margin-top:14px; display:block; letter-spacing:0.05em; }
@@ -1408,15 +1461,17 @@
     /* Modal confirmation suppression */
     #del-modal {
       display:none; position:fixed; inset:0; z-index:600;
-      background:rgba(0,0,0,0.75); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+      background:rgba(0,0,0,0.60); backdrop-filter:blur(14px) saturate(150%); -webkit-backdrop-filter:blur(14px) saturate(150%);
       align-items:center; justify-content:center; padding:1.5rem;
     }
     #del-modal.show { display:flex; }
     .del-box {
-      background:var(--card-bg); border:1px solid rgba(239,83,80,0.3);
-      border-radius:18px; padding:24px 20px; width:100%; max-width:340px; text-align:center;
+      background:rgba(18,14,10,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border:1px solid rgba(239,83,80,0.28);
+      border-radius:22px; padding:24px 20px; width:100%; max-width:340px; text-align:center;
+      box-shadow:0 24px 64px rgba(0,0,0,0.45);
     }
-    html.light .del-box { background:#fff; }
+    html.light .del-box { background:rgba(248,244,238,0.90); }
     .del-icon { font-size:2.2rem; margin-bottom:10px; }
     .del-title { font-weight:700; font-size:1.05rem; margin-bottom:6px; }
     .del-name { color:var(--gold); font-weight:700; }
@@ -1584,8 +1639,11 @@
 <!-- ══════════════ LOGIN ══════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo" style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:700;color:#c8a44e;letter-spacing:0.14em;margin-bottom:2px">GeNext</div>
-    <h1>GeNext Control</h1>
+    <div class="gn-login-logo-wrap">
+      <img id="gn-ctrl-login-dk" src="assets/gn-logo-dark.jpg" class="gn-login-logo gn-login-logo-dk" alt="GeNext" draggable="false">
+      <img id="gn-ctrl-login-lt" src="assets/gn-logo-light.jpg" class="gn-login-logo gn-login-logo-lt" alt="GeNext" draggable="false">
+      <div class="gn-login-subtitle">Control</div>
+    </div>
     <p class="login-sub">Accès privé</p>
     <div id="first-run-note" class="first-run-note" style="display:none">
       <strong>Premier lancement</strong> — Créez votre mot de passe d'accès à l'application.

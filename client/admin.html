@@ -45,7 +45,14 @@
       --bord2:  rgba(200,164,78,0.42);
     }
     html.light body { background:var(--bg); color:var(--cream); }
-    html.light .adm-header { background:rgba(245,240,232,0.98) !important; }
+    html.light .adm-header {
+      background:rgba(248,244,238,0.84) !important;
+      border-bottom-color:rgba(200,164,78,0.20) !important;
+      box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 16px rgba(0,0,0,0.05) !important;
+    }
+    html.light .adm-header::before {
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.05) 40%, rgba(200,164,78,0.10) 50%, rgba(200,164,78,0.05) 60%, transparent 100%);
+    }
     /* Textes et inputs */
     html.light .inline-input,
     html.light .info-input,
@@ -61,7 +68,34 @@
     html.light .ico-modal-title { color:var(--cream); }
     html.light .ico-modal-item { color:var(--cream); }
     html.light .ico-modal-close { background:var(--bg3); }
-    html.light .login-box { background:var(--bg3); }
+    html.light .login-box {
+      background:rgba(248,244,238,0.84) !important;
+      backdrop-filter:blur(24px) saturate(160%);
+      -webkit-backdrop-filter:blur(24px) saturate(160%);
+      border-color:rgba(200,164,78,0.22) !important;
+    }
+    /* Admin login screens — bokeh background */
+    #login-screen, #rid-sel-screen {
+      background-image:url(assets/gn-bg-dark.jpg) !important;
+      background-size:cover !important; background-position:center !important;
+    }
+    html.light #login-screen, html.light #rid-sel-screen {
+      background-image:url(assets/gn-bg-light.jpg) !important;
+    }
+    /* Admin login logo */
+    .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
+    .gna-login-logo {
+      width:80px; height:80px; object-fit:cover; border-radius:50%;
+      mix-blend-mode:screen; display:block;
+    }
+    .gna-login-logo-lt { display:none; }
+    html.light .gna-login-logo-dk { display:none !important; }
+    html.light .gna-login-logo-lt { display:block !important; mix-blend-mode:multiply; }
+    .gna-login-subtitle {
+      font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:600;
+      color:var(--gold); letter-spacing:0.28em; text-transform:uppercase;
+      margin-top:6px;
+    }
     html.light .cat-row { background:rgba(255,255,255,0.95); }
     /* Produit cards */
     html.light .prod-card { background:rgba(255,255,255,0.95); }
@@ -125,7 +159,7 @@
 
     /* ── LOGIN ── */
     #login-screen {
-      position:fixed; inset:0; background:var(--bg);
+      position:fixed; inset:0;
       display:flex; align-items:center; justify-content:center;
       z-index:9999; padding:24px;
     }
@@ -141,7 +175,9 @@
     .gna-logo-img {
       width:72vw;max-width:320px;height:auto;display:block;
       will-change:transform,opacity,filter;
+      border-radius:50%; mix-blend-mode:screen;
     }
+    html.light .gna-logo-img { mix-blend-mode:multiply; }
     #gna-logo-lt { display:none; }
     html.light #gna-logo-dk { display:none !important; }
     html.light #gna-logo-lt { display:block !important; }
@@ -200,8 +236,10 @@
     .llang-btn.on { border-color:#c8a44e;background:rgba(200,164,78,0.12); }
     .login-box {
       width:100%; max-width:360px;
-      background:var(--bg3); border:1px solid var(--bord2); border-radius:24px;
+      background:rgba(13,11,8,0.84); border:1px solid var(--bord2); border-radius:24px;
       padding:36px 28px; text-align:center;
+      backdrop-filter:blur(24px) saturate(160%);
+      -webkit-backdrop-filter:blur(24px) saturate(160%);
     }
     .login-logo { font-family:'Crimson Pro',serif; font-size:1.8rem; color:var(--gold); letter-spacing:0.12em; margin-bottom:4px; }
     .login-sub  { font-size:0.75rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:28px; }
@@ -235,12 +273,25 @@
     .login-err { font-size:0.78rem; color:var(--red); margin-top:10px; min-height:18px; }
 
     /* ── HEADER ── */
+    @keyframes gnBarFlow {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(200%); opacity: 0; }
+    }
     .adm-header {
-      background:rgba(15,9,6,0.92); backdrop-filter:blur(24px) saturate(180%);
-      border-top:1px solid rgba(255,255,255,0.04); border-bottom:1px solid var(--border);
+      background:rgba(15,9,6,0.82); backdrop-filter:blur(26px) saturate(170%);
+      -webkit-backdrop-filter:blur(26px) saturate(170%);
+      border-top:1px solid rgba(255,255,255,0.03); border-bottom:1px solid rgba(200,164,78,0.16);
+      box-shadow:0 1px 0 rgba(200,164,78,0.08), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
-      flex-wrap:wrap;
+      flex-wrap:wrap; overflow:hidden;
+    }
+    .adm-header::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.08) 40%, rgba(200,164,78,0.14) 50%, rgba(200,164,78,0.08) 60%, transparent 100%);
+      animation:gnBarFlow 8s ease-in-out infinite;
     }
     @media(max-width:767px) {
       .adm-header > :first-child { width:100%; }
@@ -1577,19 +1628,27 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background:rgba(10,9,8,0.97);
-    backdrop-filter:blur(32px) saturate(200%);
-    -webkit-backdrop-filter:blur(32px) saturate(200%);
-    border-top:1px solid rgba(200,164,78,0.1);
-    box-shadow:0 -8px 32px rgba(0,0,0,0.3);
+    background:rgba(10,9,8,0.82);
+    backdrop-filter:blur(28px) saturate(170%);
+    -webkit-backdrop-filter:blur(28px) saturate(170%);
+    border-top:1px solid rgba(200,164,78,0.15);
+    box-shadow:0 -1px 0 rgba(200,164,78,0.08), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
-    z-index:500;
+    z-index:500; overflow:hidden;
     padding-bottom:env(safe-area-inset-bottom);
   }
+  #admin-bottom-nav::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.06) 40%, rgba(200,164,78,0.11) 50%, rgba(200,164,78,0.06) 60%, transparent 100%);
+    animation:gnBarFlow 9s ease-in-out infinite reverse;
+  }
   html.light #admin-bottom-nav {
-    background:rgba(245,240,232,0.97);
-    border-top-color:rgba(200,164,78,0.18);
-    box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+    background:rgba(248,244,238,0.85);
+    border-top-color:rgba(200,164,78,0.20);
+    box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -4px 18px rgba(0,0,0,0.05);
+  }
+  html.light #admin-bottom-nav::before {
+    background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.04) 40%, rgba(200,164,78,0.08) 50%, rgba(200,164,78,0.04) 60%, transparent 100%);
   }
   .admin-nav-btn {
     flex:1; display:flex; flex-direction:column;
@@ -2023,10 +2082,13 @@
 <!-- ══════════════════════════════════════
      RID SELECTOR SCREEN (pas de ?rid= dans l'URL)
 ══════════════════════════════════════ -->
-<div id="rid-sel-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:10001;align-items:center;justify-content:center;padding:24px;">
+<div id="rid-sel-screen" style="display:none;position:fixed;inset:0;z-index:10001;align-items:center;justify-content:center;padding:24px;">
   <div class="login-box">
-    <div class="login-logo" style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:700;color:#c8a44e;letter-spacing:0.14em">GeNext</div>
-    <div class="login-sub" id="rsel-sub">Administration</div>
+    <div class="gna-login-logo-wrap">
+      <img src="assets/gn-logo-dark.jpg" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.jpg" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
+      <div class="gna-login-subtitle" id="rsel-sub">Administration</div>
+    </div>
     <div class="login-lang-strip" id="rsel-lang-strip">
       <button class="llang-btn" data-lang="fr" onclick="_ridSelPickLang('fr')">🇫🇷</button>
       <button class="llang-btn" data-lang="en" onclick="_ridSelPickLang('en')">🇬🇧</button>
@@ -2051,8 +2113,12 @@
 ══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo" id="login-logo"></div>
-    <div class="login-sub" id="login-sub-txt">Administration</div>
+    <div class="gna-login-logo-wrap">
+      <img src="assets/gn-logo-dark.jpg" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.jpg" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
+      <div class="gna-login-subtitle" id="login-sub-txt">Administration</div>
+      <div id="login-logo" style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;min-height:1.1em;margin-top:2px"></div>
+    </div>
     <div class="login-lang-strip" id="login-lang-strip">
       <button class="llang-btn" data-lang="fr" onclick="_loginPickLang('fr')">🇫🇷</button>
       <button class="llang-btn" data-lang="en" onclick="_loginPickLang('en')">🇬🇧</button>
