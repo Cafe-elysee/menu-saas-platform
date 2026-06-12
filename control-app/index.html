@@ -2417,8 +2417,12 @@ async function createNewClient() {
       localStorage.setItem('ctrl_cmd_done_' + _pendingCommandeKey, JSON.stringify(clientCreeData));
       const cmdKey = _pendingCommandeKey;
       _pendingCommandeKey = null;
-      // Passer la commande en "en cours" + persister clientCree dans Firebase
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
+      // Passer la commande en "en cours" + persister clientCree + programmer email livraison
+      _controlDb.ref('/commandes/' + cmdKey).update({
+        statut: 'en_cours', lu: true, clientCree: clientCreeData,
+        emailLivraisonProgramme: Date.now(),
+        emailData: { email: cmdData.email || null, rid, pwd, name, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
+      });
       // Surveiller le premier accès pour passer en "terminée"
       _watchFirstOpen(rid, cmdKey);
       // Re-render la carte commande pour mettre à jour les boutons de contact
@@ -3470,7 +3474,11 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const clientCreeData = { rid, pwd, name: restaurantName, forfait: fLabel };
     _lastCreatedClients[commandeKey] = clientCreeData;
     localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
-    _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
+    _controlDb.ref('/commandes/' + commandeKey).update({
+      statut: 'en_cours', lu: true, clientCree: clientCreeData,
+      emailLivraisonProgramme: Date.now(),
+      emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
+    });
     _watchFirstOpen(rid, commandeKey);
     showToast('✅ ' + escapeHtml(restaurantName) + ' créé');
     setTimeout(function() { _rerenderCommandeCard(commandeKey); }, 150);
@@ -3518,7 +3526,13 @@ function recreerClientDepuisCommande(btnEl) {
         const clientCreeData = { rid: oldRid, pwd, name: restaurantName, forfait: fLabel };
         _lastCreatedClients[commandeKey] = clientCreeData;
         localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
-        await _controlDb.ref('/commandes/' + commandeKey).update({ statut: 'en_cours', lu: true, clientCree: clientCreeData });
+        const _cmdDataRecr = _commandesCache[commandeKey] || {};
+        await _controlDb.ref('/commandes/' + commandeKey).update({
+          statut: 'en_cours', lu: true, clientCree: clientCreeData,
+          emailLivraisonProgramme: Date.now(),
+          emailLivraisonSent: null,
+          emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'monthly' }
+        });
         _watchFirstOpen(oldRid, commandeKey);
         showToast('✅ ' + escapeHtml(restaurantName) + ' recréé');
       } catch(e) {
