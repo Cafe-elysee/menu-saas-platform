@@ -7029,8 +7029,9 @@ async function _loadSubscriptionSection() {
     const annualNotice = payMode === 'annual'
       ? `<div style="font-size:0.77rem;color:var(--muted);background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.55">${t.subAnnualNotice || '⚠️ Abonnement annuel non remboursable.'}</div>`
       : '';
+    const _endDateLocale = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-MA', de:'de-DE' };
     const endDate      = _subData.endDate
-      ? `<div style="font-size:0.77rem;color:var(--muted);margin-bottom:8px">${t.subEndDate || 'Expire le'} <strong>${new Date(_subData.endDate).toLocaleDateString()}</strong></div>`
+      ? `<div style="font-size:0.77rem;color:var(--muted);margin-bottom:8px">${t.subEndDate || 'Expire le'} <strong>${new Date(_subData.endDate).toLocaleDateString(_endDateLocale[currentLang] || 'fr-FR', { day:'numeric', month:'long', year:'numeric' })}</strong></div>`
       : '';
     const pendingChange = _subData.pendingChange
       ? `<div style="font-size:0.77rem;background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.25);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.6">
@@ -7145,7 +7146,10 @@ async function _doScheduleForfait(newForfait) {
   const payMode = _subData?.paymentMode || 'monthly';
   const price   = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   try {
-    await _rref('/config/subscription/pendingChange').set({ forfait: newForfait, price });
+    await Promise.all([
+      _rref('/config/subscription/pendingChange').set({ forfait: newForfait, price }),
+      _rref('/config/subscription/lastForfaitChange').set(Date.now())
+    ]);
     const nameSnap = await _rref('profile/name').once('value');
     const restName = nameSnap.val() || _RID;
     fetch('/api/notify-forfait', {
@@ -7158,6 +7162,8 @@ async function _doScheduleForfait(newForfait) {
         paymentMode: payMode, pending: true
       })
     }).catch(() => {});
+    const t2 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+    showToast('📅 ' + (t2.subPendingNotice || 'Changement programmé pour fin de période'));
     setTimeout(() => _loadSubscriptionSection(), 600);
   } catch(e) {
     console.error('_doScheduleForfait error', e);
@@ -7165,7 +7171,6 @@ async function _doScheduleForfait(newForfait) {
 }
 
 async function _cancelScheduledForfait() {
-  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   try {
     await _rref('/config/subscription/pendingChange').set(null);
     fetch('/api/notify-forfait', {

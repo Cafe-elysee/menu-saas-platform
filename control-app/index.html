@@ -3161,7 +3161,8 @@ function _markPaid(key) {
       _controlDb.ref('/commandes/' + key).update(update)
         .then(function() {
           _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
-          const rid = d.clientCree?.rid;
+          // emailData.rid est permanent (clientCree est nullifié après firstOpen)
+          const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
           if (rid) {
             _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
             _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: nextReminderAt });
