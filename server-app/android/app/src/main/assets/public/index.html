@@ -96,22 +96,39 @@
     .nav-btn.notif .nav-badge    { animation:_nav-badge-pop 0.42s cubic-bezier(0.34,1.56,0.64,1) forwards; }
     .nav-btn.notif               { animation:_nav-glow 0.75s ease-out forwards; }
 
+    @keyframes gnBarFlow {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(200%); opacity: 0; }
+    }
     /* ── HEADER ── */
     .app-header {
       flex-shrink:0;
       height:var(--hdr-h);
-      background:rgba(10,9,8,0.96);
-      backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
-      border-bottom:1px solid rgba(200,164,78,0.1);
-      box-shadow:0 1px 0 rgba(200,164,78,0.06), 0 8px 32px rgba(0,0,0,0.35);
+      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+      background-size: auto, cover;
+      background-position: top left, center top;
+      border-bottom:1px solid rgba(200,164,78,0.18);
+      box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 6px 28px rgba(0,0,0,0.32);
       padding:0 18px;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      position:relative; z-index:50;
+      position:relative; z-index:50; overflow:hidden;
+    }
+    .app-header::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.09) 40%, rgba(200,164,78,0.16) 50%, rgba(200,164,78,0.09) 60%, transparent 100%);
+      animation:gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background:rgba(245,240,232,0.97);
-      border-bottom-color:rgba(200,164,78,0.18);
-      box-shadow:0 1px 0 rgba(200,164,78,0.07), 0 4px 20px rgba(0,0,0,0.06);
+      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+      background-size: auto, cover;
+      background-position: top left, center top;
+      border-bottom-color:rgba(200,164,78,0.22);
+      box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 18px rgba(0,0,0,0.05);
+    }
+    html.light .app-header::before {
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.05) 40%, rgba(200,164,78,0.12) 50%, rgba(200,164,78,0.05) 60%, transparent 100%);
     }
     .header-brand { display:flex; flex-direction:column; gap:2px; }
     .header-logo {
@@ -409,18 +426,29 @@
     .bottom-nav {
       flex-shrink:0;
       height:var(--nav-h);
-      background:rgba(10,9,8,0.97);
-      backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
-      border-top:1px solid rgba(200,164,78,0.1);
-      box-shadow:0 -8px 32px rgba(0,0,0,0.3);
+      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
+      background-size: auto, cover;
+      background-position: bottom left, center bottom;
+      border-top:1px solid rgba(200,164,78,0.18);
+      box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
       display:flex; align-items:stretch;
-      position:relative; z-index:50;
+      position:relative; z-index:50; overflow:hidden;
       padding-bottom:env(safe-area-inset-bottom);
     }
+    .bottom-nav::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.07) 40%, rgba(200,164,78,0.13) 50%, rgba(200,164,78,0.07) 60%, transparent 100%);
+      animation:gnBarFlow 9s ease-in-out infinite reverse;
+    }
     html.light .bottom-nav {
-      background:rgba(245,240,232,0.97);
-      border-top-color:rgba(200,164,78,0.18);
-      box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+      background-size: auto, cover;
+      background-position: bottom left, center bottom;
+      border-top-color:rgba(200,164,78,0.22);
+      box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
+    }
+    html.light .bottom-nav::before {
+      background:linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.04) 40%, rgba(200,164,78,0.10) 50%, rgba(200,164,78,0.04) 60%, transparent 100%);
     }
     .nav-btn {
       flex:1; display:flex; flex-direction:column;
@@ -497,10 +525,59 @@
     .gns-logo-img {
       width:72vw; max-width:320px; height:auto; display:block;
       will-change:transform,opacity,filter;
+      border-radius:50%; mix-blend-mode:screen;
     }
+    html.light .gns-logo-img { mix-blend-mode:multiply; }
     html.light #gns-logo-dk { display:none !important; }
     html.light #gns-logo-lt { display:block !important; }
     #gns-logo-lt { display:none; }
+    /* ── Setup screen logo (remplace texte GeNext) ── */
+    .gns-setup-logo-wrap {
+      display:flex; flex-direction:column; align-items:center; margin-bottom:1.5rem;
+    }
+    .gns-setup-logo {
+      width:160px; height:160px; object-fit:cover; display:block;
+      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+    }
+    html.light .gns-setup-logo {
+      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+    }
+    .gns-setup-logo-lt { display:none; }
+    html.light .gns-setup-logo-dk { display:none !important; }
+    html.light .gns-setup-logo-lt { display:block !important; }
+    html.light #setup-screen {
+      background-image:url(assets/gn-bg-light.jpg) !important;
+    }
+    /* Setup card: fond bokeh pour intégration logo sans décalage */
+    #setup-screen > div {
+      --card: rgba(0,0,0,0.38);
+      background-image: url(assets/gn-bg-dark.jpg) !important;
+      background-size: cover !important; background-position: center !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      border-color: rgba(200,164,78,0.28) !important;
+    }
+    html.light #setup-screen > div {
+      --card: rgba(255,255,255,0.50);
+      background-image: url(assets/gn-bg-light.jpg) !important;
+      background-size: cover !important; background-position: center !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    }
+    /* Pause/Forfait screens: fond bokeh */
+    #srv-pause-screen, #srv-forfait-screen {
+      background-image: url(assets/gn-bg-dark.jpg) !important;
+      background-size: cover !important; background-position: center !important;
+      background-color: transparent !important;
+    }
+    html.light #srv-pause-screen, html.light #srv-forfait-screen {
+      background-image: url(assets/gn-bg-light.jpg) !important;
+    }
+    .gns-setup-subtitle {
+      font-family:'Crimson Pro',Georgia,serif; font-size:0.62rem;
+      letter-spacing:0.32em; text-transform:uppercase;
+      color:var(--gold); opacity:0.72; margin-top:7px;
+    }
   </style>
   <script>
     (function() {
@@ -575,10 +652,13 @@
 </div>
 
 <!-- ÉCRAN CONFIGURATION (premier lancement) -->
-<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
-  <div style="max-width:340px;width:100%">
-    <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,164,78,0.1);border:1.5px solid rgba(200,164,78,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px">🍽️</div>
-    <div id="setup-app-title" style="font-family:'Crimson Pro',serif;font-size:1.6rem;color:#c8a44e;margin-bottom:6px;letter-spacing:0.04em">GeNext Serveur</div>
+<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <div style="max-width:340px;width:100%;background:rgba(10,9,8,0.80);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(200,164,78,0.22);border-radius:24px;padding:28px 24px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+    <div class="gns-setup-logo-wrap">
+      <img src="assets/gn-logo-dark.jpg" class="gns-setup-logo gns-setup-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.jpg" class="gns-setup-logo gns-setup-logo-lt" alt="GeNext" draggable="false">
+      <div class="gns-setup-subtitle" id="gns-subtitle-static">Serveur</div>
+    </div>
     <div id="setup-app-sub" style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Première connexion</div>
     <div class="setup-lang-strip" id="setup-lang-strip">
       <button class="slang-btn" data-lang="fr" onclick="_setupPickLang('fr')">🇫🇷</button>
@@ -1760,9 +1840,7 @@ function _renderSetupSavedIds() {
   var ridInput  = document.getElementById('setup-rid-input');
   var confirmBtn= document.getElementById('setup-confirm-btn');
 
-  // Titre et sous-titre de l'écran de configuration
-  var appTitle = document.getElementById('setup-app-title');
-  if (appTitle) appTitle.textContent = 'GeNext ' + t.appSub;
+  // Titre de l'écran de configuration (logo remplace le texte, pas de mise à jour)
   var appSub   = document.getElementById('setup-app-sub');
   if (appSub)   appSub.textContent   = t.setupSub;
   if (ridLabel)   ridLabel.textContent   = savedIds.length > 0 ? t.newId : t.ridLabel;

@@ -7830,8 +7830,8 @@ function _updateCCHeader() {
     const fullName = document.getElementById('hero-title-text')?.textContent || '';
     const sp = fullName.indexOf(' ');
     nameWrap.innerHTML = sp > 0
-      ? fullName.slice(0, sp) + ' <em>' + fullName.slice(sp + 1) + '</em>'
-      : fullName;
+      ? _esc(fullName.slice(0, sp)) + ' <em>' + _esc(fullName.slice(sp + 1)) + '</em>'
+      : _esc(fullName);
   }
   // WiFi dans cc-header
   const ccWifi = document.getElementById('cc-wifi');
@@ -8230,7 +8230,7 @@ function renderMenu() {
     sec.dataset.cat = ci;
     sec.innerHTML = `
       <div class="cat-hd">
-        <div class="cat-ico-box"><svg><use href="#${cat.ico}"/></svg></div>
+        <div class="cat-ico-box"><svg><use href="#${_esc(cat.ico||'')}"/></svg></div>
         <div class="cat-hd-txt">
           <div class="cat-name">${_esc(t.cats[ci]||'')}</div>
           <div class="cat-sub">${catItems.length} ${_esc(cat.sub[lang]||cat.sub.fr||'')}</div>
