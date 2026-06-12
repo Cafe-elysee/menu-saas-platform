@@ -5113,7 +5113,7 @@ function renderCatsSection() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
       </div>
       <div class="cat-row-ico" id="cat-ico-preview-${ci}">
-        ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : '<span style="width:18px;height:18px;display:inline-block;opacity:0.3">—</span>'}
+        ${currentIco ? `<svg width="18" height="18"><use href="#${esc(currentIco)}"/></svg>` : '<span style="width:18px;height:18px;display:inline-block;opacity:0.3">—</span>'}
       </div>
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
@@ -5290,7 +5290,7 @@ function renderProductsSection() {
 
     sec.innerHTML = `
       <div class="cat-products-hd">
-        ${cat.ico ? `<svg width="16" height="16" style="color:var(--gold)"><use href="#${cat.ico}"/></svg>` : ''}
+        ${cat.ico ? `<svg width="16" height="16" style="color:var(--gold)"><use href="#${esc(cat.ico)}"/></svg>` : ''}
         <div class="cat-products-name">${esc(cat.names[currentLang] || cat.names.fr || 'Catégorie ' + ci)}</div>
         <span style="font-size:0.72rem;color:var(--muted);margin-left:4px">${catItems.length} ${(ADMIN_UI[currentLang]||ADMIN_UI.fr).produits}</span>
       </div>

@@ -6639,7 +6639,7 @@ function buildFlipBook() {
       <div class="fp-hero-title">${u.explore || 'Menu'}</div>
       <div class="fp-hero-tag">${_esc(_restaurantName)}</div>
       <div class="fp-hero-sub">${_esc(u.tagline || '')}</div>
-      <div class="fp-hero-sub2">${(u.sub || []).join(' · ')}</div>
+      <div class="fp-hero-sub2">${(u.sub || []).map(_esc).join(' · ')}</div>
       <div class="fp-wifi">
         <div class="fp-wifi-row">
           <svg class="fp-wifi-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
@@ -6692,7 +6692,7 @@ function buildFlipBook() {
     }).join('');
 
     const photosHtml = activePhotos.length
-      ? `<div class="fp-cat-photos">${activePhotos.map(p => `<img src="${p}" alt="${catName}" loading="lazy">`).join('')}</div>`
+      ? `<div class="fp-cat-photos">${activePhotos.map(p => `<img src="${p}" alt="${_esc(catName)}" loading="lazy">`).join('')}</div>`
       : '';
 
     const page = document.createElement('div');
@@ -6700,7 +6700,7 @@ function buildFlipBook() {
     page.innerHTML = `
       ${photosHtml}
       <div class="fp-cat-header">
-        <div class="fp-cat-name">${catName}</div>
+        <div class="fp-cat-name">${_esc(catName)}</div>
         <div class="fp-cat-count">${catItems.length} ${catItems.length > 1 ? (lang === 'fr' ? 'articles' : lang === 'en' ? 'items' : lang === 'ar' ? 'عناصر' : lang === 'de' ? 'Artikel' : 'είδη') : (lang === 'fr' ? 'article' : lang === 'en' ? 'item' : lang === 'ar' ? 'عنصر' : lang === 'de' ? 'Artikel' : 'είδος')}</div>
       </div>
       <div class="fp-deco"><div class="fp-deco-line"></div><div class="fp-deco-ico">◆</div><div class="fp-deco-line"></div></div>
