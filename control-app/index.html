@@ -2424,9 +2424,11 @@ async function createNewClient() {
       const cmdKey = _pendingCommandeKey;
       _pendingCommandeKey = null;
       // Passer la commande en "en cours" + persister clientCree + programmer email livraison
+      const _nowTs = Date.now();
       _controlDb.ref('/commandes/' + cmdKey).update({
         statut: 'en_cours', lu: true, clientCree: clientCreeData,
-        emailLivraisonProgramme: Date.now(),
+        emailLivraisonProgramme: _nowTs,
+        nextReminderAt: _nowTs + 7 * 24 * 60 * 60 * 1000,
         emailData: { email: cmdData.email || null, rid, pwd, name, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
       });
       // Surveiller le premier accès pour passer en "terminée"
@@ -3484,9 +3486,11 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const clientCreeData = { rid, pwd, name: restaurantName, forfait: fLabel };
     _lastCreatedClients[commandeKey] = clientCreeData;
     localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
+    const _nowTs2 = Date.now();
     _controlDb.ref('/commandes/' + commandeKey).update({
       statut: 'en_cours', lu: true, clientCree: clientCreeData,
-      emailLivraisonProgramme: Date.now(),
+      emailLivraisonProgramme: _nowTs2,
+      nextReminderAt: _nowTs2 + 7 * 24 * 60 * 60 * 1000,
       emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
     });
     _watchFirstOpen(rid, commandeKey);
@@ -3541,10 +3545,13 @@ function recreerClientDepuisCommande(btnEl) {
         _lastCreatedClients[commandeKey] = clientCreeData;
         localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
         const _cmdDataRecr = _commandesCache[commandeKey] || {};
+        const _nowTs3 = Date.now();
         await _controlDb.ref('/commandes/' + commandeKey).update({
           statut: 'en_cours', lu: true, clientCree: clientCreeData,
-          emailLivraisonProgramme: Date.now(),
+          emailLivraisonProgramme: _nowTs3,
           emailLivraisonSent: null,
+          nextReminderAt: _nowTs3 + 7 * 24 * 60 * 60 * 1000,
+          lastReminderSent: null,
           emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'monthly' }
         });
         _watchFirstOpen(oldRid, commandeKey);
