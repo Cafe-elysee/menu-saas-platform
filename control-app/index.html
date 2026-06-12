@@ -1831,24 +1831,35 @@
 <div id="nc-modal" onclick="if(event.target===this)closeNewClientModal()">
   <div class="nc-box">
     <div class="nc-title">Nouveau client</div>
-    <div class="nc-sub">Création automatique Firebase</div>
+    <div class="nc-sub">Création automatique — email envoyé au client</div>
 
     <div id="nc-form">
       <label class="nc-label">Nom du restaurant *</label>
-      <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran" oninput="ncAutoRid(this.value)">
+      <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran">
 
-      <label class="nc-label">ID unique du restaurant</label>
-      <input type="text" id="nc-rid" class="nc-input" placeholder="Généré automatiquement" readonly style="opacity:0.7;cursor:default">
-      <div class="nc-rid-hint">Généré automatiquement à partir du nom + date/heure</div>
+      <label class="nc-label">Forfait *</label>
+      <select id="nc-forfait" class="nc-input" style="cursor:pointer">
+        <option value="menu-qr">Menu QR — Menu digital</option>
+        <option value="commandes-services">Commandes &amp; Services</option>
+      </select>
 
-      <label class="nc-label">Mot de passe admin *</label>
-      <div class="pw-wrap pw-wrap-nc">
-        <input type="password" id="nc-pwd" class="nc-input" placeholder="Généré automatiquement" oninput="this.dataset.edited='1'">
-        <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
-          <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-        </button>
-      </div>
+      <label class="nc-label">Mode de paiement *</label>
+      <select id="nc-mode" class="nc-input" style="cursor:pointer">
+        <option value="monthly">Mensuel</option>
+        <option value="annual">Annuel</option>
+      </select>
+
+      <label class="nc-label">Email du client *</label>
+      <input type="email" id="nc-email" class="nc-input" placeholder="ex: contact@restaurant.com">
+
+      <label class="nc-label">Langue du client</label>
+      <select id="nc-lang" class="nc-input" style="cursor:pointer">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+        <option value="el">Ελληνικά</option>
+        <option value="de">Deutsch</option>
+        <option value="ar">العربية</option>
+      </select>
 
       <div class="nc-err" id="nc-err"></div>
 
@@ -1860,6 +1871,7 @@
 
     <div class="nc-result" id="nc-result">
       <div class="nc-result-title">✓ Client créé avec succès !</div>
+      <div id="nc-result-email" style="font-size:0.82rem;color:var(--muted);text-align:center;margin-bottom:14px">📧 Email d'accès envoyé à <span id="nc-result-email-val" style="color:var(--gold)"></span></div>
 
       <div class="nc-link-row">
         <div class="nc-link-label">Lien Admin — à donner au client</div>
@@ -2298,9 +2310,10 @@ function showNewClientModal() {
   document.getElementById('nc-form').style.display = '';
   document.getElementById('nc-result').classList.remove('show');
   document.getElementById('nc-name').value = '';
-  document.getElementById('nc-rid').value = '';
-  const _ncPwd = document.getElementById('nc-pwd');
-  _ncPwd.value = ''; delete _ncPwd.dataset.edited;
+  document.getElementById('nc-email').value = '';
+  document.getElementById('nc-forfait').value = 'menu-qr';
+  document.getElementById('nc-mode').value = 'monthly';
+  document.getElementById('nc-lang').value = 'fr';
   document.getElementById('nc-err').textContent = '';
   const btn = document.getElementById('nc-create-btn');
   btn.textContent = 'Créer le client'; btn.disabled = false;
@@ -2354,91 +2367,50 @@ async function ncHashPwd(pwd) {
 }
 
 async function createNewClient() {
-  const name = document.getElementById('nc-name').value.trim();
-  const pwd  = document.getElementById('nc-pwd').value;
-  const err  = document.getElementById('nc-err');
+  const name    = document.getElementById('nc-name').value.trim();
+  const email   = document.getElementById('nc-email').value.trim();
+  const forfait = document.getElementById('nc-forfait').value;
+  const mode    = document.getElementById('nc-mode').value;
+  const lang    = document.getElementById('nc-lang').value;
+  const err     = document.getElementById('nc-err');
   err.textContent = '';
 
-  if (!name) { err.textContent = 'Le nom du restaurant est requis.'; return; }
-  if (!pwd || pwd.length < 6) { err.textContent = 'Mot de passe trop court (6 caractères minimum).'; return; }
+  if (!name)  { err.textContent = 'Le nom du restaurant est requis.'; return; }
+  if (!email || !email.includes('@')) { err.textContent = 'Un email valide est requis.'; return; }
 
   const btn = document.getElementById('nc-create-btn');
   btn.textContent = 'Création en cours…'; btn.disabled = true;
 
   try {
-    // Générer un ID frais au moment de la création (timestamp garanti unique)
-    let rid = _buildRidTs(name, 0);
-    document.getElementById('nc-rid').value = rid;
+    const forfaitLabel = forfait === 'commandes-services'
+      ? 'Commandes & Services — Menu QR + Prises de commandes'
+      : 'Menu QR — Menu digital';
 
-    // Collision (ultra-rare avec timestamp) → fallback avec une lettre de plus
-    const existing = await _saasDb.ref('restaurants/' + rid).once('value');
-    if (existing.exists()) {
-      rid = _buildRidTs(name, 1);
-      document.getElementById('nc-rid').value = rid;
-      const existing2 = await _saasDb.ref('restaurants/' + rid).once('value');
-      if (existing2.exists()) { err.textContent = 'Conflit rare — réessaie dans 1 seconde.'; btn.textContent = 'Créer le client'; btn.disabled = false; return; }
-    }
-
-    const hash = await ncHashPwd(pwd);
-    const ts   = Date.now();
-    const _isCS = _pendingCommandeKey && (_commandesCache[_pendingCommandeKey]?.forfait === 'commandes-services');
-
-    const _cmdDataForSub = _pendingCommandeKey ? (_commandesCache[_pendingCommandeKey] || {}) : {};
-    const _subForfait  = _cmdDataForSub.forfait || 'menu-qr';
-    const _subPayMode  = _cmdDataForSub.paymentMode || 'monthly';
-    const _subEmail    = _cmdDataForSub.email || null;
-    const _subPrice    = _isCS ? (_subPayMode === 'annual' ? 990 : 99) : (_subPayMode === 'annual' ? 490 : 49);
-    await _saasDb.ref('restaurants/' + rid).set({
-      profile: { name, createdAt: ts, langs: ['fr','en','el','de','ar'] },
-      config: {
-        adminHash: hash,
-        adminPwd: pwd,
-        tableCount: 0,
-        active: true,
-        features: {
-          callBtn: _isCS, orderUI: _isCS, photos: true,
-          tableSystem: _isCS, qrOrdering: _isCS, eventOverlay: true
-        },
-        retention: { calls: 2592000000, orders: 2592000000 },
-        subscription: { forfait: _subForfait, paymentMode: _subPayMode, price: _subPrice, email: _subEmail }
-      },
-      menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
-      firstOpen: false
+    const resp = await fetch('https://menu-pro-demo.vercel.app/api/notify-commande', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant: name,
+        forfait: forfaitLabel,
+        forfaitType: forfait,
+        paymentMode: mode,
+        langue: lang,
+        email: email,
+        source: 'admin'
+      })
     });
 
-    // Afficher le résultat
-    const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html';
-    document.getElementById('nc-admin-url').textContent = adminUrl;
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
+    if (!data.created || !data.created.rid) throw new Error('Création échouée — vérifier les env vars Vercel demo');
+
+    const rid = data.created.rid;
+    document.getElementById('nc-admin-url').textContent = 'https://menu-saas-platform.vercel.app/admin.html';
     document.getElementById('nc-rid-val').textContent = rid;
     document.getElementById('nc-rid-inline').textContent = rid;
+    document.getElementById('nc-result-email-val').textContent = email;
     document.getElementById('nc-form').style.display = 'none';
     document.getElementById('nc-result').classList.add('show');
-
-    // Si créé depuis une commande : stocker les infos pour les boutons de livraison
-    if (_pendingCommandeKey) {
-      const cmdData = _commandesCache[_pendingCommandeKey] || {};
-      const fLabel = cmdData.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-      const clientCreeData = { rid, pwd, name, forfait: fLabel };
-      _lastCreatedClients[_pendingCommandeKey] = clientCreeData;
-      localStorage.setItem('ctrl_cmd_done_' + _pendingCommandeKey, JSON.stringify(clientCreeData));
-      const cmdKey = _pendingCommandeKey;
-      _pendingCommandeKey = null;
-      // Passer la commande en "en cours" + persister clientCree + programmer email livraison
-      const _nowTs = Date.now();
-      _controlDb.ref('/commandes/' + cmdKey).update({
-        statut: 'en_cours', lu: true, clientCree: clientCreeData,
-        emailLivraisonProgramme: _nowTs,
-        nextReminderAt: _nowTs + 7 * 24 * 60 * 60 * 1000,
-        emailData: { email: cmdData.email || null, rid, pwd, name, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
-      });
-      // Surveiller le premier accès pour passer en "terminée"
-      _watchFirstOpen(rid, cmdKey);
-      // Re-render la carte commande pour mettre à jour les boutons de contact
-      setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 150);
-    } else {
-      _pendingCommandeKey = null;
-    }
-    // Le listener Firebase existant détecte le nouveau client et reconstruit automatiquement
 
   } catch(e) {
     err.textContent = 'Erreur : ' + (e.message || e);
