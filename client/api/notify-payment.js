@@ -33,49 +33,49 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
 
   const T = {
     fr: {
-      subject: `✅ Paiement reçu — Menu Pro`,
+      subject: `✅ Paiement reçu — GeNext`,
       greeting: `Bonjour ${safeName} 👋`,
       confirmed: `Votre paiement de <strong>${amountStr}</strong> a bien été reçu.`,
       nextLabel: `Prochain renouvellement`,
       nextDate: dateStr,
-      note: `Votre accès Menu Pro reste actif jusqu'à cette date. Vous recevrez un rappel quelques jours avant l'échéance.`,
-      closing: `Merci pour votre confiance — L'équipe Menu Pro`
+      note: `Votre accès GeNext reste actif jusqu'à cette date. Vous recevrez un rappel quelques jours avant l'échéance.`,
+      closing: `Merci pour votre confiance — L'équipe GeNext`
     },
     en: {
-      subject: `✅ Payment received — Menu Pro`,
+      subject: `✅ Payment received — GeNext`,
       greeting: `Hello ${safeName} 👋`,
       confirmed: `Your payment of <strong>${amountStr}</strong> has been received.`,
       nextLabel: `Next renewal`,
       nextDate: dateStr,
-      note: `Your Menu Pro access remains active until this date. You will receive a reminder a few days before the deadline.`,
-      closing: `Thank you for your trust — The Menu Pro Team`
+      note: `Your GeNext access remains active until this date. You will receive a reminder a few days before the deadline.`,
+      closing: `Thank you for your trust — The GeNext Team`
     },
     el: {
-      subject: `✅ Πληρωμή ελήφθη — Menu Pro`,
+      subject: `✅ Πληρωμή ελήφθη — GeNext`,
       greeting: `Γεια σας ${safeName} 👋`,
       confirmed: `Η πληρωμή σας <strong>${amountStr}</strong> ελήφθη.`,
       nextLabel: `Επόμενη ανανέωση`,
       nextDate: dateStr,
-      note: `Η πρόσβασή σας στο Menu Pro παραμένει ενεργή έως αυτήν την ημερομηνία. Θα λάβετε υπενθύμιση λίγες ημέρες πριν.`,
-      closing: `Ευχαριστούμε — Η ομάδα Menu Pro`
+      note: `Η πρόσβασή σας στο GeNext παραμένει ενεργή έως αυτήν την ημερομηνία. Θα λάβετε υπενθύμιση λίγες ημέρες πριν.`,
+      closing: `Ευχαριστούμε — Η ομάδα GeNext`
     },
     de: {
-      subject: `✅ Zahlung erhalten — Menu Pro`,
+      subject: `✅ Zahlung erhalten — GeNext`,
       greeting: `Guten Tag ${safeName} 👋`,
       confirmed: `Ihre Zahlung von <strong>${amountStr}</strong> wurde empfangen.`,
       nextLabel: `Nächste Verlängerung`,
       nextDate: dateStr,
-      note: `Ihr Menu Pro Zugang bleibt bis zu diesem Datum aktiv. Sie erhalten einige Tage vor Ablauf eine Erinnerung.`,
-      closing: `Vielen Dank — Das Menu Pro Team`
+      note: `Ihr GeNext Zugang bleibt bis zu diesem Datum aktiv. Sie erhalten einige Tage vor Ablauf eine Erinnerung.`,
+      closing: `Vielen Dank — Das GeNext Team`
     },
     ar: {
-      subject: `✅ تم استلام الدفع — Menu Pro`,
+      subject: `✅ تم استلام الدفع — GeNext`,
       greeting: `مرحباً ${safeName} 👋`,
       confirmed: `تم استلام دفعتك البالغة <strong>${amountStr}</strong>.`,
       nextLabel: `التجديد القادم`,
       nextDate: dateStr,
-      note: `يبقى وصولك إلى Menu Pro نشطاً حتى هذا التاريخ. ستتلقى تذكيراً قبل أيام قليلة من الموعد النهائي.`,
-      closing: `شكراً لثقتك — فريق Menu Pro`
+      note: `يبقى وصولك إلى GeNext نشطاً حتى هذا التاريخ. ستتلقى تذكيراً قبل أيام قليلة من الموعد النهائي.`,
+      closing: `شكراً لثقتك — فريق GeNext`
     }
   };
 
@@ -85,13 +85,13 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
 
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Menu Pro</title></head>
+<title>GeNext</title></head>
 <body style="margin:0;padding:0;background:#0f0f13;font-family:'Helvetica Neue',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f13;padding:32px 0">
 <tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="background:#1a1a22;border-radius:16px;overflow:hidden;max-width:560px;width:100%">
 <tr><td style="background:linear-gradient(135deg,#1e1a10 0%,#2a2010 100%);padding:28px 32px;text-align:center">
-  <div style="font-size:1.6rem;font-weight:800;color:#c8a44e;letter-spacing:-0.02em">Menu Pro</div>
+  <div style="font-size:1.6rem;font-weight:800;color:#c8a44e;letter-spacing:-0.02em">GeNext</div>
   <div style="font-size:0.75rem;color:rgba(200,164,78,.6);margin-top:4px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
 <tr><td style="padding:28px 32px;text-align:${align}">
@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
   try {
     const { subject, html } = buildPaymentEmail(safeLang, safeName, safeAmt, paymentMode, Number(nextDue));
     await createTransport().sendMail({
-      from: `"Menu Pro" <${process.env.GMAIL_USER}>`,
+      from: `"GeNext" <${process.env.GMAIL_USER}>`,
       to: email,
       subject,
       html

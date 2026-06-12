@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Pro — Administration</title>
+  <title>GeNext — Administration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -113,13 +113,23 @@
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body {
-      background:
-        radial-gradient(ellipse at 25% 0%, rgba(200,164,78,0.05) 0%, transparent 55%),
-        radial-gradient(ellipse at 75% 100%, rgba(200,164,78,0.03) 0%, transparent 50%),
-        var(--bg);
+      background-color:#141414;
+      background-image:
+        radial-gradient(ellipse at 15% 8%, rgba(200,164,78,0.12) 0%, transparent 42%),
+        radial-gradient(ellipse at 82% 88%, rgba(200,164,78,0.08) 0%, transparent 38%),
+        radial-gradient(ellipse at 62% 12%, rgba(200,164,78,0.05) 0%, transparent 30%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='20' height='20' fill='%23141414'/%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%231c1c1c'/%3E%3C/svg%3E");
+      background-size:cover,cover,cover,20px 20px;
       color:var(--cream); font-family:'Outfit','Noto Sans',sans-serif; font-weight:300; min-height:100vh;
     }
-    html.light body { background:var(--bg); }
+    html.light body {
+      background-color:#f5f5f5;
+      background-image:
+        radial-gradient(ellipse at 18% 12%, rgba(200,164,78,0.10) 0%, transparent 40%),
+        radial-gradient(ellipse at 82% 88%, rgba(200,164,78,0.07) 0%, transparent 36%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Crect width='18' height='18' fill='%23f5f5f5'/%3E%3Ccircle cx='9' cy='9' r='1.4' fill='%23ebebeb'/%3E%3C/svg%3E");
+      background-size:cover,cover,18px 18px;
+    }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }
@@ -132,29 +142,47 @@
       z-index:9999; padding:24px;
     }
     #login-screen.hidden { display:none; }
-    /* ── Admin loading screen ── */
-    @keyframes admLoadPulse { 0%,100%{opacity:0.6;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
-    @keyframes admLoadRot   { to{transform:rotate(360deg)} }
+    /* ══ GeNext Splash System ══ */
     @keyframes admLoadFadeOut { to{opacity:0;pointer-events:none} }
+    @keyframes gnLogoIn { 0%{transform:scale(0.22);opacity:0} 58%{transform:scale(1.08);opacity:1} 78%{transform:scale(0.96)} 100%{transform:scale(1);opacity:1} }
+    @keyframes gnRingExp { 0%{transform:translate(-50%,-50%) scale(0.5);opacity:0.8;border-color:rgba(200,164,78,0.7)} 100%{transform:translate(-50%,-50%) scale(1);opacity:0;border-color:rgba(200,164,78,0)} }
+    @keyframes gnParticle { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(calc(-50% + var(--gnpx)),calc(-50% + var(--gnpy))) scale(0)} }
+    @keyframes gnSweep { 0%{transform:translateX(-100%);opacity:0.8} 100%{transform:translateX(200%);opacity:0} }
+    @keyframes gnBokehFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(var(--gnbx),var(--gnby))} 66%{transform:translate(calc(var(--gnbx)*-.55),calc(var(--gnby)*.82))} }
+    .gn-logo-bg { fill:#111111; }
+    html.light .gn-logo-bg { fill:#eeeeee; }
     #adm-loading-screen {
-      position:fixed;inset:0;background:var(--bg);z-index:99999;
+      position:fixed;inset:0;z-index:99999;overflow:hidden;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background-color:#141414;
+      background-image:
+        radial-gradient(ellipse at 15% 8%, rgba(200,164,78,0.12) 0%, transparent 42%),
+        radial-gradient(ellipse at 82% 88%, rgba(200,164,78,0.08) 0%, transparent 38%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='20' height='20' fill='%23141414'/%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%231c1c1c'/%3E%3C/svg%3E");
+      background-size:cover,cover,20px 20px;
     }
-    #adm-loading-screen.hide { animation:admLoadFadeOut 0.4s ease forwards; }
-    .adm-load-logo { position:relative;width:72px;height:72px;margin-bottom:20px; }
-    .adm-load-logo-inner {
-      width:72px;height:72px;border-radius:20px;
-      background:var(--card);border:1px solid var(--bord2);
-      display:flex;align-items:center;justify-content:center;font-size:2rem;
-      animation:admLoadPulse 1.8s ease-in-out infinite;
+    html.light #adm-loading-screen {
+      background-color:#f5f5f5;
+      background-image:
+        radial-gradient(ellipse at 18% 12%, rgba(200,164,78,0.10) 0%, transparent 40%),
+        radial-gradient(ellipse at 82% 88%, rgba(200,164,78,0.07) 0%, transparent 36%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Crect width='18' height='18' fill='%23f5f5f5'/%3E%3Ccircle cx='9' cy='9' r='1.4' fill='%23ebebeb'/%3E%3C/svg%3E");
+      background-size:cover,cover,18px 18px;
     }
-    .adm-load-ring {
-      position:absolute;inset:-8px;border-radius:28px;
-      border:2px solid transparent;border-top-color:var(--gold);
-      animation:admLoadRot 1.4s linear infinite;
+    #adm-loading-screen.hide { animation:admLoadFadeOut 0.5s ease forwards; }
+    .gn-s-logo { animation:gnLogoIn 0.72s cubic-bezier(0.34,1.56,0.64,1) 0.12s both; position:relative;z-index:2; }
+    .gn-s-ring {
+      position:absolute;left:50%;top:50%;border-radius:50%;
+      border:2px solid rgba(200,164,78,0.6);pointer-events:none;
+      width:320px;height:320px;
+      animation:gnRingExp 0.9s cubic-bezier(0.2,0,0.55,1) var(--gnrd,0.28s) both;
     }
-    .adm-load-title { font-family:'Crimson Pro',serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:4px; }
-    .adm-load-sub   { font-size:0.72rem;color:var(--muted);letter-spacing:0.22em;text-transform:uppercase; }
+    .gn-s-particle { position:absolute;left:50%;top:50%;border-radius:50%;background:#c8a44e;opacity:0; }
+    .gn-s-sweep {
+      position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.14) 50%,transparent 100%);
+      width:200%;animation:gnSweep 0.7s ease-out 0.88s both;transform:translateX(-100%);opacity:0;
+    }
     /* ── First-login popups (defaultLang + primaryLang) ── */
     .fl-popup-overlay {
       position:fixed;inset:0;z-index:100000;
@@ -1571,6 +1599,27 @@
   </script>
 </head>
 <body>
+<script>
+(function(){
+  var isL=document.documentElement.classList.contains('light');
+  var el=document.createElement('div');
+  el.id='gn-bokeh';el.setAttribute('aria-hidden','true');
+  el.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;';
+  var b=[{x:7,y:6,s:85,op:0.26,dur:11,bx:16,by:11},{x:80,y:9,s:58,op:0.18,dur:14,bx:-13,by:17},
+    {x:3,y:57,s:68,op:0.17,dur:9,bx:21,by:-9},{x:88,y:54,s:96,op:0.21,dur:16,bx:-17,by:-11},
+    {x:44,y:80,s:52,op:0.15,dur:8,bx:9,by:-17},{x:24,y:36,s:38,op:0.13,dur:12,bx:-11,by:13},
+    {x:67,y:73,s:62,op:0.19,dur:10,bx:13,by:9},{x:14,y:83,s:44,op:0.14,dur:13,bx:-7,by:-13}];
+  var h='';
+  b.forEach(function(v,i){
+    var op=isL?v.op*0.5:v.op;
+    var bl=Math.round(v.s*0.42);
+    var dly=-(v.dur*0.38*(i%3));
+    h+='<div style="position:absolute;left:'+v.x+'%;top:'+v.y+'%;width:'+v.s+'px;height:'+v.s+'px;border-radius:50%;background:rgba(200,164,78,'+op.toFixed(2)+');filter:blur('+bl+'px);--gnbx:'+v.bx+'px;--gnby:'+v.by+'px;animation:gnBokehFloat '+v.dur+'s ease-in-out '+dly.toFixed(1)+'s infinite;"></div>';
+  });
+  el.innerHTML=h;
+  document.body.insertBefore(el,document.body.firstChild);
+})();
+</script>
 
 <!-- DEMO BANNER -->
 <style>
@@ -2017,15 +2066,56 @@
      ADMIN LOADING SCREEN
 ══════════════════════════════════════ -->
 <div id="adm-loading-screen">
-  <div class="adm-load-logo">
-    <div class="adm-load-logo-inner">⚙️</div>
-    <div class="adm-load-ring"></div>
+  <div class="gn-s-ring" style="--gnrd:0.26s"></div>
+  <div class="gn-s-ring" style="--gnrd:0.48s"></div>
+  <div id="gn-adm-ptc" style="position:absolute;inset:0;pointer-events:none"></div>
+  <div class="gn-s-logo">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:148px;height:148px;display:block;" aria-hidden="true">
+      <defs>
+        <linearGradient id="gna-gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8e890"/><stop offset="20%" stop-color="#e8cc72"/><stop offset="52%" stop-color="#c8a44e"/><stop offset="84%" stop-color="#d4ae58"/><stop offset="100%" stop-color="#9c7c36"/></linearGradient>
+        <linearGradient id="gna-gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0de82"/><stop offset="38%" stop-color="#c8a44e"/><stop offset="72%" stop-color="#b89040"/><stop offset="100%" stop-color="#8c6830"/></linearGradient>
+        <linearGradient id="gna-gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0de82"/><stop offset="32%" stop-color="#c8a44e"/><stop offset="68%" stop-color="#9c7c36"/><stop offset="100%" stop-color="#e8d070"/></linearGradient>
+        <radialGradient id="gna-gi" cx="48%" cy="42%" r="52%"><stop offset="0%" stop-color="rgba(200,164,78,0.09)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/></radialGradient>
+        <filter id="gna-fg" x="-22%" y="-22%" width="144%" height="144%"><feGaussianBlur in="SourceAlpha" stdDeviation="3.5" result="b"/><feFlood flood-color="#c8a44e" flood-opacity="0.42" result="c"/><feComposite in="c" in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="gna-ft" x="-8%" y="-25%" width="116%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="b"/><feFlood flood-color="#c8a44e" flood-opacity="0.52" result="c"/><feComposite in="c" in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <clipPath id="gna-cp"><circle cx="100" cy="100" r="86"/></clipPath>
+      </defs>
+      <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(200,164,78,0.07)" stroke-width="14"/>
+      <circle cx="100" cy="100" r="94" fill="none" stroke="url(#gna-gr)" stroke-width="3.5"/>
+      <circle cx="100" cy="100" r="89" fill="none" stroke="rgba(200,164,78,0.16)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="88" class="gn-logo-bg"/>
+      <circle cx="100" cy="100" r="88" fill="url(#gna-gi)"/>
+      <g clip-path="url(#gna-cp)" filter="url(#gna-fg)">
+        <rect x="55" y="53" width="20" height="91" rx="5" fill="url(#gna-gv)"/>
+        <rect x="125" y="53" width="20" height="91" rx="5" fill="url(#gna-gv)"/>
+        <polygon points="63,53 83,53 137,144 117,144" fill="url(#gna-gd)"/>
+        <rect x="55" y="53" width="20" height="32" rx="5" fill="url(#gna-gv)"/>
+        <rect x="125" y="112" width="20" height="32" rx="5" fill="url(#gna-gv)"/>
+        <polygon points="63,53 83,53 91,66 71,77" fill="rgba(255,248,200,0.52)"/>
+        <polygon points="124,131 137,144 117,144 107,133" fill="rgba(0,0,0,0.26)"/>
+        <path d="M 73 70 Q 100 100 125 130" fill="none" stroke="rgba(255,248,215,0.28)" stroke-width="5" stroke-linecap="round"/>
+        <rect x="55" y="53" width="20" height="13" rx="5" fill="rgba(255,248,200,0.42)"/>
+        <rect x="125" y="53" width="20" height="13" rx="5" fill="rgba(255,248,200,0.42)"/>
+      </g>
+      <line x1="68" y1="157" x2="132" y2="157" stroke="rgba(200,164,78,0.25)" stroke-width="0.8"/>
+      <text x="100" y="171" text-anchor="middle" font-family="'Outfit','Helvetica Neue',Arial,sans-serif" font-size="18" font-weight="600" letter-spacing="4" fill="url(#gna-gv)" filter="url(#gna-ft)">GeNext</text>
+    </svg>
   </div>
-  <div class="adm-load-title">Menu Pro</div>
-  <div class="adm-load-sub" id="adm-load-sub">Administration</div>
+  <div class="gn-s-sweep"></div>
 </div>
 <script>
-(function(){var _s={fr:'Administration',en:'Administration',de:'Verwaltung',el:'Διαχείριση',ar:'الإدارة'};var _e=document.getElementById('adm-load-sub');if(_e){var _l=localStorage.getItem('saas_ui_lang')||'fr';_e.textContent=_s[_l]||'Administration';}})();
+(function(){
+  var p=document.getElementById('gn-adm-ptc');if(!p)return;
+  var h='',as=[0,30,60,90,120,150,180,210,240,270,300,330];
+  as.forEach(function(a,i){
+    var d=88+(i%3)*26;
+    var px=(Math.cos(a*Math.PI/180)*d).toFixed(1);
+    var py=(Math.sin(a*Math.PI/180)*d).toFixed(1);
+    var s=3+(i%4);
+    h+='<div class="gn-s-particle" style="width:'+s+'px;height:'+s+'px;--gnpx:'+px+'px;--gnpy:'+py+'px;animation:gnParticle 0.65s ease-out '+(0.38+i*0.03).toFixed(2)+'s both"></div>';
+  });
+  p.innerHTML=h;
+})();
 </script>
 
 <!-- ══════════════════════════════════════
@@ -2033,7 +2123,7 @@
 ══════════════════════════════════════ -->
 <div id="rid-sel-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:10001;align-items:center;justify-content:center;padding:24px;">
   <div class="login-box">
-    <div class="login-logo">Menu Pro</div>
+    <div class="login-logo" style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:700;color:#c8a44e;letter-spacing:0.14em">GeNext</div>
     <div class="login-sub" id="rsel-sub">Administration</div>
     <div class="login-lang-strip" id="rsel-lang-strip">
       <button class="llang-btn" data-lang="fr" onclick="_ridSelPickLang('fr')">🇫🇷</button>
@@ -8579,7 +8669,7 @@ function _qrInitUI() {
   }
   // Header sub
   const sub = document.getElementById('qr-head-sub');
-  if (sub) sub.textContent = _tableCount + ' table' + (_tableCount > 1 ? 's' : '') + ' · Menu Pro';
+  if (sub) sub.textContent = _tableCount + ' table' + (_tableCount > 1 ? 's' : '') + ' · GeNext';
   // HSV picker
   _qrInitHsvEvents();
   qrColorTab(_QR._colorTarget || 'mod');
