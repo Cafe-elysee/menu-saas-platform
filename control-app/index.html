@@ -3186,6 +3186,9 @@ function _markPaid(key) {
       _controlDb.ref('/commandes/' + key).update(update)
         .then(function() {
           _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
+          // Réactiver aussi dans le Firebase principal (en cas de suspension par le cron)
+          const rid = d.clientCree?.rid;
+          if (rid) _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
         })
         .catch(function() {
           _commandesCache[key] = prev;
