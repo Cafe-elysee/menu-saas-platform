@@ -552,12 +552,14 @@
     }
     /* Setup card: fond bokeh pour intégration logo sans décalage */
     #setup-screen > div {
+      --card: rgba(0,0,0,0.38);
       background-image: url(assets/gn-bg-dark.jpg) !important;
       background-size: cover !important; background-position: center !important;
       backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
       border-color: rgba(200,164,78,0.28) !important;
     }
     html.light #setup-screen > div {
+      --card: rgba(255,255,255,0.50);
       background-image: url(assets/gn-bg-light.jpg) !important;
       background-size: cover !important; background-position: center !important;
       backdrop-filter: none !important; -webkit-backdrop-filter: none !important;

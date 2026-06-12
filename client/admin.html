@@ -71,12 +71,15 @@
     html.light .ico-modal-item { color:var(--cream); }
     html.light .ico-modal-close { background:var(--bg3); }
     html.light .login-box {
+      --card: rgba(255,255,255,0.50) !important;
       background-image:url(assets/gn-bg-light.jpg) !important;
       background-size:cover !important; background-position:center !important;
       backdrop-filter:none !important;
       -webkit-backdrop-filter:none !important;
       border-color:rgba(200,164,78,0.28) !important;
     }
+    /* Input visible sur fond bokeh — surpasse la règle light transparent */
+    html.light .login-box .login-input { background:rgba(255,255,255,0.50) !important; }
     /* Admin login screens — bokeh background */
     #login-screen, #rid-sel-screen {
       background-image:url(assets/gn-bg-dark.jpg) !important;
@@ -239,6 +242,7 @@
     }
     .llang-btn.on { border-color:#c8a44e;background:rgba(200,164,78,0.12); }
     .login-box {
+      --card: rgba(0,0,0,0.38);
       width:100%; max-width:360px;
       background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover; background-position:center;
