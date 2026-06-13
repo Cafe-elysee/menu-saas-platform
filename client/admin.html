@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{var rid=new URLSearchParams(location.search).get('rid')||'';var saved=(rid?localStorage.getItem(rid+'_admin_theme'):null)||localStorage.getItem('saas_last_theme');if(saved==='light')document.documentElement.classList.add('light');}catch(e){}})()</script>
   <title>GeNext — Administration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +47,7 @@
     }
     html.light body { background:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg) !important;
+      background-image: linear-gradient(rgba(230,226,220,0.55), rgba(230,226,220,0.55)), url(assets/gn-bg-light.jpg) !important;
       background-size: auto, cover !important;
       background-position: top left, center top !important;
       border-bottom-color:rgba(200,164,78,0.22) !important;
@@ -182,7 +183,7 @@
     .gna-logo-img {
       width:72vw;max-width:320px;height:auto;display:block;
       will-change:transform,opacity,filter;
-      border-radius:50%; mix-blend-mode:screen;
+      mix-blend-mode:screen;
     }
     html.light .gna-logo-img { mix-blend-mode:multiply; }
     #gna-logo-lt { display:none; }
@@ -1652,7 +1653,7 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+    background-image: linear-gradient(rgba(230,226,220,0.55), rgba(230,226,220,0.55)), url(assets/gn-bg-light.jpg);
     background-size: auto, cover;
     background-position: bottom left, center bottom;
     border-top-color:rgba(200,164,78,0.22);
@@ -3767,6 +3768,7 @@ async function _closeSession() {
 document.getElementById('adm-theme-btn').addEventListener('click', () => {
   const isLight = document.documentElement.classList.toggle('light');
   localStorage.setItem(_PFX+'admin_theme', isLight ? 'light' : 'dark');
+  localStorage.setItem('saas_last_theme', isLight ? 'light' : 'dark');
   const path = document.getElementById('adm-theme-ico-path');
   if (isLight) {
     path.setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');

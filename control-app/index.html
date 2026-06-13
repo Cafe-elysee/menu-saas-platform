@@ -55,12 +55,15 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg) !important;
+      background-image: linear-gradient(rgba(230,226,220,0.55), rgba(230,226,220,0.55)), url(assets/gn-bg-light.jpg) !important;
       background-size: auto, cover !important;
       background-position: bottom left, center bottom !important;
       border-top-color: rgba(200,164,78,0.22) !important;
       box-shadow: 0 -1px 0 rgba(200,164,78,0.12), 0 -4px 16px rgba(0,0,0,0.04) !important;
     }
+    /* Bottom-nav caché pendant le login */
+    nav.bottom-nav { display: none !important; }
+    #app.visible ~ nav.bottom-nav { display: flex !important; }
     .bottom-nav::before {
       content: ''; position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(90deg, transparent 0%, rgba(200,164,78,0.07) 40%, rgba(200,164,78,0.12) 50%, rgba(200,164,78,0.07) 60%, transparent 100%);
@@ -105,7 +108,7 @@
     html.light #ctrl-loading-screen { background-image:url(assets/gn-bg-light.jpg); }
     .gn-ctrl-logo {
       width:72vw;max-width:320px;height:auto;
-      display:block;border-radius:50%;
+      display:block;
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
     }
@@ -238,7 +241,7 @@
       animation: gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background-image: linear-gradient(rgba(230,226,220,0.78), rgba(230,226,220,0.78)), url(assets/gn-bg-light.jpg);
+      background-image: linear-gradient(rgba(230,226,220,0.55), rgba(230,226,220,0.55)), url(assets/gn-bg-light.jpg);
       background-size: auto, cover;
       background-position: top left, center top;
       border-bottom-color: rgba(200,164,78,0.22);
@@ -2299,12 +2302,18 @@ function switchTab(tab) {
 // ─── Swipe between tabs ───
 (function() {
   let _tx = 0, _ty = 0, _tt = 0;
+  const _loginActive = () => {
+    const ls = document.getElementById('login-screen');
+    return ls && !ls.classList.contains('hidden');
+  };
   document.addEventListener('touchstart', e => {
+    if (_loginActive()) return;
     _tx = e.touches[0].clientX;
     _ty = e.touches[0].clientY;
     _tt = Date.now();
   }, { passive: true });
   document.addEventListener('touchend', e => {
+    if (_loginActive()) return;
     const dx = e.changedTouches[0].clientX - _tx;
     const dy = e.changedTouches[0].clientY - _ty;
     const dt = Date.now() - _tt;
