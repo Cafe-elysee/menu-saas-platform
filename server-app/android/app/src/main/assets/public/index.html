@@ -518,16 +518,36 @@
     #srv-loading-screen {
       position:fixed; inset:0; z-index:99999;
       display:flex; align-items:center; justify-content:center;
+      background-color:#080604;
       background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover; background-position:center;
+      overflow:hidden;
     }
-    html.light #srv-loading-screen { background-image:url(assets/gn-bg-light.jpg); }
+    html.light #srv-loading-screen {
+      background-color:#f0ede8;
+      background-image:url(assets/gn-bg-light.jpg);
+    }
+    #srv-loading-screen::before {
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.08) 40%,rgba(200,164,78,0.14) 50%,rgba(200,164,78,0.08) 60%,transparent 100%);
+      animation:gnBarFlow 8s ease-in-out infinite;
+    }
+    html.light #srv-loading-screen::before {
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.05) 40%,rgba(200,164,78,0.09) 50%,rgba(200,164,78,0.05) 60%,transparent 100%);
+    }
     .gns-logo-img {
       width:72vw; max-width:320px; height:auto; display:block;
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
+      position:relative; z-index:1;
+      -webkit-mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+      mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
     }
-    html.light .gns-logo-img { mix-blend-mode:multiply; }
+    html.light .gns-logo-img {
+      mix-blend-mode:multiply;
+      -webkit-mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+      mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+    }
     html.light #gns-logo-dk { display:none !important; }
     html.light #gns-logo-lt { display:block !important; }
     #gns-logo-lt { display:none; }

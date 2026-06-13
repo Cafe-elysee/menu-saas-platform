@@ -176,14 +176,35 @@
     #adm-loading-screen {
       position:fixed;inset:0;z-index:99999;
       display:flex;align-items:center;justify-content:center;
+      background-color:#080604;
       background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover;background-position:center;
+      overflow:hidden;
     }
-    html.light #adm-loading-screen { background-image:url(assets/gn-bg-light.jpg); }
+    html.light #adm-loading-screen {
+      background-color:#f0ede8;
+      background-image:url(assets/gn-bg-light.jpg);
+    }
+    #adm-loading-screen::before {
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.08) 40%,rgba(200,164,78,0.14) 50%,rgba(200,164,78,0.08) 60%,transparent 100%);
+      animation:gnBarFlow 8s ease-in-out infinite;
+    }
+    html.light #adm-loading-screen::before {
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.05) 40%,rgba(200,164,78,0.09) 50%,rgba(200,164,78,0.05) 60%,transparent 100%);
+    }
     .gna-logo-img {
       width:72vw;max-width:320px;height:auto;display:block;
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
+      position:relative;z-index:1;
+      -webkit-mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+      mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+    }
+    html.light .gna-logo-img {
+      mix-blend-mode:multiply;
+      -webkit-mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+      mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
     }
     html.light .gna-logo-img { mix-blend-mode:multiply; }
     #gna-logo-lt { display:none; }
@@ -210,9 +231,10 @@
     .fl-popup-overlay.show .fl-popup-card { transform:none; }
     html.light .fl-popup-card { background-image:url(assets/gn-bg-light.jpg); }
     .fl-popup-step {
-      font-size:0.65rem;color:var(--muted);text-transform:uppercase;
+      font-size:0.65rem;color:rgba(244,234,210,0.80);text-transform:uppercase;
       letter-spacing:0.18em;margin-bottom:12px;
     }
+    html.light .fl-popup-step { color:rgba(28,23,16,0.80); }
     .fl-popup-icon { font-size:2.2rem;margin-bottom:8px; }
     .fl-popup-title {
       font-family:'Crimson Pro',serif;font-size:1.35rem;

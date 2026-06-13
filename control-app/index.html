@@ -103,17 +103,37 @@
     #ctrl-loading-screen {
       position:fixed;inset:0;z-index:9999;
       display:flex;align-items:center;justify-content:center;
+      background-color:#080604;
       background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover;background-position:center;
+      overflow:hidden;
     }
-    html.light #ctrl-loading-screen { background-image:url(assets/gn-bg-light.jpg); }
+    html.light #ctrl-loading-screen {
+      background-color:#f0ede8;
+      background-image:url(assets/gn-bg-light.jpg);
+    }
+    #ctrl-loading-screen::before {
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.08) 40%,rgba(200,164,78,0.14) 50%,rgba(200,164,78,0.08) 60%,transparent 100%);
+      animation:gnBarFlow 8s ease-in-out infinite;
+    }
+    html.light #ctrl-loading-screen::before {
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.05) 40%,rgba(200,164,78,0.09) 50%,rgba(200,164,78,0.05) 60%,transparent 100%);
+    }
     .gn-ctrl-logo {
       width:72vw;max-width:320px;height:auto;
       display:block;
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
+      position:relative;z-index:1;
+      -webkit-mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+      mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
     }
-    html.light .gn-ctrl-logo { mix-blend-mode:multiply; }
+    html.light .gn-ctrl-logo {
+      mix-blend-mode:multiply;
+      -webkit-mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+      mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+    }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
 
@@ -178,12 +198,14 @@
     .ctrl-pw-eye:hover { color:var(--gold); }
     .login-input {
       width: 100%; padding: 0.8rem 1rem;
-      background: var(--bg); border: 1px solid var(--border);
+      background: rgba(0,0,0,0.45); border: 1px solid var(--border);
       border-radius: 12px; color: var(--text);
       font-family: 'Outfit', sans-serif; font-size: 1rem;
       margin-bottom: 0.75rem; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+    html.light .login-input { background: rgba(255,255,255,0.70); color: #0d0804; }
+    html.light .login-box .login-sub { color: #5a4020; }
     .login-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,164,78,0.12); }
     .btn-gold {
       width: 100%; padding: 0.85rem 1rem;
@@ -1357,25 +1379,31 @@
     }
     #nc-modal.show { display:flex; }
     .nc-box {
-      background:rgba(18,14,10,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border:1px solid rgba(200,164,78,0.22);
+      background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
+      border:1px solid rgba(200,164,78,0.28);
       border-radius:24px; padding:24px 20px; width:100%; max-width:400px;
       max-height:90vh; overflow-y:auto;
-      box-shadow:0 24px 64px rgba(0,0,0,0.45);
+      box-shadow:0 0 0 1px rgba(200,164,78,0.10),0 24px 64px rgba(0,0,0,0.55);
     }
-    html.light .nc-box { background:rgba(248,244,238,0.90); border-color:rgba(200,164,78,0.25); }
+    html.light .nc-box {
+      background-image:url(assets/gn-bg-light.jpg);
+      border-color:rgba(200,164,78,0.22);
+      box-shadow:0 0 0 1px rgba(200,164,78,0.08),0 16px 40px rgba(0,0,0,0.12);
+    }
     .nc-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--gold); margin-bottom:3px; }
     .nc-sub { font-size:0.7rem; color:var(--muted); margin-bottom:20px; letter-spacing:0.12em; text-transform:uppercase; }
     .nc-label { font-size:0.73rem; color:var(--muted); margin-bottom:5px; margin-top:14px; display:block; letter-spacing:0.05em; }
+    html.light .nc-sub, html.light .nc-label { color:#5a4020; }
     .nc-input {
       width:100%; padding:10px 14px; border-radius:10px;
-      border:1.5px solid var(--border); background:var(--bg);
+      border:1.5px solid var(--border); background:rgba(0,0,0,0.45);
       color:var(--text); font-family:inherit; font-size:0.92rem; outline:none;
       transition:border-color 0.2s;
     }
-    html.light .nc-input { background:var(--card-bg); }
+    html.light .nc-input { background:rgba(255,255,255,0.70); color:#0d0804; }
     .nc-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,164,78,0.12); }
-    .nc-rid-hint { font-size:0.67rem; color:var(--muted); margin-top:4px; }
+    .nc-rid-hint { font-size:0.67rem; color:rgba(242,234,216,0.68); margin-top:4px; }
+    html.light .nc-rid-hint { color:#6a5030; }
     .nc-err { color:var(--red); font-size:0.78rem; margin-top:10px; min-height:16px; }
     .nc-actions { display:flex; gap:10px; margin-top:20px; }
     .nc-btn-create {
@@ -1479,16 +1507,20 @@
     }
     #del-modal.show { display:flex; }
     .del-box {
-      background:rgba(18,14,10,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border:1px solid rgba(239,83,80,0.28);
+      background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
+      border:1px solid rgba(239,83,80,0.38);
       border-radius:22px; padding:24px 20px; width:100%; max-width:340px; text-align:center;
-      box-shadow:0 24px 64px rgba(0,0,0,0.45);
+      box-shadow:0 0 0 1px rgba(239,83,80,0.10),0 24px 64px rgba(0,0,0,0.55);
     }
-    html.light .del-box { background:rgba(248,244,238,0.90); }
+    html.light .del-box {
+      background-image:url(assets/gn-bg-light.jpg);
+      box-shadow:0 0 0 1px rgba(239,83,80,0.08),0 16px 40px rgba(0,0,0,0.12);
+    }
     .del-icon { font-size:2.2rem; margin-bottom:10px; }
     .del-title { font-weight:700; font-size:1.05rem; margin-bottom:6px; }
     .del-name { color:var(--gold); font-weight:700; }
-    .del-warn { font-size:0.78rem; color:var(--muted); margin:10px 0 20px; line-height:1.6; }
+    .del-warn { font-size:0.78rem; color:rgba(242,234,216,0.75); margin:10px 0 20px; line-height:1.6; }
+    html.light .del-warn { color:#4a3515; }
     .del-actions { display:flex; gap:10px; }
     .del-btn-cancel { flex:1; padding:11px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; font-size:0.88rem; transition:transform 0.15s,box-shadow 0.15s; box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
     .del-btn-cancel:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
