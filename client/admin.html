@@ -47,10 +47,10 @@
     }
     html.light body { background:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg) !important;
-      background-size: auto, cover !important;
-      background-position: top left, center top !important;
-      border-bottom-color:rgba(200,164,78,0.22) !important;
+      background-image: url(assets/gn-bg-light.jpg) !important;
+      background-size: cover !important;
+      background-position: center top !important;
+      border-bottom-color:rgba(200,164,78,0.28) !important;
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05) !important;
     }
     html.light .adm-header::before {
@@ -313,10 +313,10 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-      background-size: auto, cover;
-      background-position: top left, center top;
-      border-top:1px solid rgba(255,255,255,0.02); border-bottom:1px solid rgba(200,164,78,0.18);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover;
+      background-position: center top;
+      border-top:1px solid rgba(200,164,78,0.10); border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -1664,10 +1664,10 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-    background-size: auto, cover;
-    background-position: bottom left, center bottom;
-    border-top:1px solid rgba(200,164,78,0.18);
+    background-image: url(assets/gn-bg-dark.jpg);
+    background-size: cover;
+    background-position: center bottom;
+    border-top:1px solid rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
     z-index:500; overflow:hidden;
@@ -1679,10 +1679,10 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg);
-    background-size: auto, cover;
-    background-position: bottom left, center bottom;
-    border-top-color:rgba(200,164,78,0.22);
+    background-image: url(assets/gn-bg-light.jpg);
+    background-size: cover;
+    background-position: center bottom;
+    border-top-color:rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
   }
   html.light #admin-bottom-nav::before {

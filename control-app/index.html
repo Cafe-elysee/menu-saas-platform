@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0908">
   <title>GeNext Control</title>
-  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t!=='dark')document.documentElement.classList.add('light');}catch(e){}})()</script>
+  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}})()</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -56,10 +56,10 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg) !important;
-      background-size: auto, cover !important;
-      background-position: bottom left, center bottom !important;
-      border-top-color: rgba(200,164,78,0.22) !important;
+      background-image: url(assets/gn-bg-light.jpg) !important;
+      background-size: cover !important;
+      background-position: center bottom !important;
+      border-top-color: rgba(200,164,78,0.28) !important;
       box-shadow: 0 -1px 0 rgba(200,164,78,0.12), 0 -4px 16px rgba(0,0,0,0.04) !important;
     }
     /* Bottom-nav caché pendant le login */
@@ -248,10 +248,10 @@
     }
     .app-header {
       flex-shrink: 0;
-      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-      background-size: auto, cover;
-      background-position: top left, center top;
-      border-bottom: 1px solid rgba(200,164,78,0.18);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover;
+      background-position: center top;
+      border-bottom: 1px solid rgba(200,164,78,0.28);
       box-shadow: 0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.35);
       padding: 0 1.25rem;
       height: 60px;
@@ -264,10 +264,10 @@
       animation: gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg);
-      background-size: auto, cover;
-      background-position: top left, center top;
-      border-bottom-color: rgba(200,164,78,0.22);
+      background-image: url(assets/gn-bg-light.jpg);
+      background-size: cover;
+      background-position: center top;
+      border-bottom-color: rgba(200,164,78,0.28);
       box-shadow: 0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05);
     }
     html.light .app-header::before {
@@ -329,10 +329,10 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-      background-size: auto, cover;
-      background-position: bottom left, center bottom;
-      border-top: 1px solid rgba(200,164,78,0.18);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover;
+      background-position: center bottom;
+      border-top: 1px solid rgba(200,164,78,0.28);
       box-shadow: 0 -1px 0 rgba(200,164,78,0.10), 0 -4px 20px rgba(0,0,0,0.3);
       display: flex; align-items: flex-start;
       padding-top: 10px;

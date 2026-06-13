@@ -106,10 +106,10 @@
     .app-header {
       flex-shrink:0;
       height:var(--hdr-h);
-      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-      background-size: auto, cover;
-      background-position: top left, center top;
-      border-bottom:1px solid rgba(200,164,78,0.18);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover;
+      background-position: center top;
+      border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 6px 28px rgba(0,0,0,0.32);
       padding:0 18px;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -121,10 +121,10 @@
       animation:gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg);
-      background-size: auto, cover;
-      background-position: top left, center top;
-      border-bottom-color:rgba(200,164,78,0.22);
+      background-image: url(assets/gn-bg-light.jpg);
+      background-size: cover;
+      background-position: center top;
+      border-bottom-color:rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 18px rgba(0,0,0,0.05);
     }
     html.light .app-header::before {
@@ -426,10 +426,10 @@
     .bottom-nav {
       flex-shrink:0;
       height:var(--nav-h);
-      background-image: linear-gradient(rgba(8,6,4,0.70), rgba(8,6,4,0.70)), url(assets/gn-bg-dark.jpg);
-      background-size: auto, cover;
-      background-position: bottom left, center bottom;
-      border-top:1px solid rgba(200,164,78,0.18);
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover;
+      background-position: center bottom;
+      border-top:1px solid rgba(200,164,78,0.28);
       box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
       display:flex; align-items:stretch;
       position:relative; z-index:50; overflow:hidden;
@@ -441,10 +441,10 @@
       animation:gnBarFlow 9s ease-in-out infinite reverse;
     }
     html.light .bottom-nav {
-      background-image: linear-gradient(rgba(230,226,220,0.45), rgba(230,226,220,0.45)), url(assets/gn-bg-light.jpg);
-      background-size: auto, cover;
-      background-position: bottom left, center bottom;
-      border-top-color:rgba(200,164,78,0.22);
+      background-image: url(assets/gn-bg-light.jpg);
+      background-size: cover;
+      background-position: center bottom;
+      border-top-color:rgba(200,164,78,0.28);
       box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
     }
     html.light .bottom-nav::before {
@@ -604,7 +604,7 @@
       var _r = localStorage.getItem('saas_rid');
       window._NEEDS_SETUP = !_r; // pas de rid → écran de configuration
       var _saved = _r ? localStorage.getItem(_r + '_app_theme') : localStorage.getItem('saas_last_theme');
-      if (_saved !== 'dark') document.documentElement.classList.add('light');
+      if (_saved === 'light') document.documentElement.classList.add('light');
     })();
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
