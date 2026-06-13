@@ -17,6 +17,7 @@
     html, body { height: 100%; overflow: hidden; }
     body {
       display: flex; flex-direction: column;
+      background-color: #080604;
       background-image: url(assets/gn-bg-dark.jpg);
       background-size: cover;
       background-position: center center;
@@ -25,6 +26,7 @@
       overscroll-behavior: none;
     }
     html.light body {
+      background-color: #e8e2d6;
       background-image: url(assets/gn-bg-light.jpg);
       color: #1a140a;
     }
@@ -126,13 +128,13 @@
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
       position:relative;z-index:1;
-      -webkit-mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
-      mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+      -webkit-mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     html.light .gn-ctrl-logo {
       mix-blend-mode:multiply;
-      -webkit-mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
-      mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+      -webkit-mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
@@ -158,12 +160,12 @@
     }
     .gn-login-logo {
       width: 160px; height: 160px; object-fit: cover; display: block;
-      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
-      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      -webkit-mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     html.light .gn-login-logo {
-      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
-      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      -webkit-mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     .gn-login-logo-lt { display: none; }
     html.light .gn-login-logo-dk { display: none !important; }
@@ -1657,12 +1659,7 @@
     background: rgba(200,164,78,0.12) !important;
   }
   </style>
-  <script>
-    (function(){
-      var t = localStorage.getItem('ctrl_theme');
-      if (t !== 'dark') document.documentElement.classList.add('light');
-    })();
-  </script>
+
 </head>
 <body>
 
@@ -2238,6 +2235,7 @@ function _hideCtrlLoadingScreen() {
     if (disp) disp.setAttribute('scale', (e * 160).toFixed(0));
     logo.style.opacity = (1 - Math.pow(t, 0.7)).toFixed(3);
     logo.style.transform = 'translateX('+(t*28).toFixed(1)+'px) translateY('+(t*-6).toFixed(1)+'px)';
+    screen.style.opacity = (1 - t).toFixed(3);
     if (t < 1) { requestAnimationFrame(step); }
     else { screen.remove(); }
   }

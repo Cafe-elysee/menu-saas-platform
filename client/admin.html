@@ -93,8 +93,8 @@
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
     .gna-login-logo {
       width:140px; height:140px; object-fit:cover; display:block;
-      -webkit-mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
-      mask: radial-gradient(circle at 50% 48%, black 36%, rgba(0,0,0,0.55) 55%, transparent 72%);
+      -webkit-mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask: radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     .gna-login-logo-lt { display:none; }
     html.light .gna-login-logo-dk { display:none !important; }
@@ -155,11 +155,12 @@
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body {
+      background-color:#080604;
       background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover; background-position:center; background-attachment:fixed;
       color:var(--cream); font-family:'Outfit','Noto Sans',sans-serif; font-weight:300; min-height:100vh;
     }
-    html.light body { background-image:url(assets/gn-bg-light.jpg); }
+    html.light body { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }
@@ -198,15 +199,14 @@
       will-change:transform,opacity,filter;
       mix-blend-mode:screen;
       position:relative;z-index:1;
-      -webkit-mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
-      mask:radial-gradient(ellipse 68% 68% at 50% 50%,black 32%,rgba(0,0,0,0.55) 55%,transparent 78%);
+      -webkit-mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
     html.light .gna-logo-img {
       mix-blend-mode:multiply;
-      -webkit-mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
-      mask:radial-gradient(ellipse 65% 65% at 50% 50%,black 36%,rgba(0,0,0,0.5) 58%,transparent 80%);
+      -webkit-mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
+      mask:radial-gradient(circle at 50% 50%, black 67%, rgba(0,0,0,0.15) 70%, transparent 74%);
     }
-    html.light .gna-logo-img { mix-blend-mode:multiply; }
     #gna-logo-lt { display:none; }
     html.light #gna-logo-dk { display:none !important; }
     html.light #gna-logo-lt { display:block !important; }
@@ -3779,7 +3779,7 @@ async function _closeSession() {
 /* ── THÈME ── */
 (function() {
   const saved = localStorage.getItem(_PFX+'admin_theme');
-  const isLight = saved !== 'dark';
+  const isLight = saved === 'light';
   if (isLight) document.documentElement.classList.add('light');
   // Init icône selon thème courant
   const path = document.getElementById('adm-theme-ico-path');
@@ -7977,6 +7977,7 @@ function _hideAdmLoadingScreen() {
     if (disp) disp.setAttribute('scale', (e * 160).toFixed(0));
     logo.style.opacity = (1 - Math.pow(t, 0.7)).toFixed(3);
     logo.style.transform = 'translateX('+(t*28).toFixed(1)+'px) translateY('+(t*-6).toFixed(1)+'px)';
+    screen.style.opacity = (1 - t).toFixed(3);
     if (t < 1) requestAnimationFrame(step);
     else screen.remove();
   }
