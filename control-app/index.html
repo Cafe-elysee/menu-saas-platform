@@ -125,7 +125,8 @@
     .gn-ctrl-logo {
       width:72vw;max-width:320px;height:auto;
       display:block;
-      will-change:transform,opacity,filter;
+      will-change:opacity,filter;
+      background:transparent;
       position:relative;z-index:1;
     }
     html.light #gn-ctrl-logo-dk { display:none !important; }
@@ -151,7 +152,8 @@
       margin-bottom: 1.25rem;
     }
     .gn-login-logo {
-      width: 160px; height: 160px; object-fit: cover; display: block;
+      width: 160px; height: 160px; object-fit: contain; display: block;
+      background: transparent;
     }
     .gn-login-logo-lt { display: none; }
     html.light .gn-login-logo-dk { display: none !important; }
