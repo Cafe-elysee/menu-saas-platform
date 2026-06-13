@@ -539,11 +539,7 @@
     .gns-logo-img {
       width:72vw; max-width:320px; height:auto; display:block;
       will-change:transform,opacity,filter;
-      mix-blend-mode:screen;
       position:relative; z-index:1;
-    }
-    html.light .gns-logo-img {
-      mix-blend-mode:multiply;
     }
     html.light #gns-logo-dk { display:none !important; }
     html.light #gns-logo-lt { display:block !important; }
@@ -553,7 +549,7 @@
       display:flex; flex-direction:column; align-items:center; margin-bottom:1.5rem;
     }
     .gns-setup-logo {
-      width:160px; height:160px; object-fit:cover; display:block;
+      width:160px; height:160px; object-fit:contain; display:block;
     }
     .gns-setup-logo-lt { display:none; }
     html.light .gns-setup-logo-dk { display:none !important; }
@@ -629,8 +625,8 @@
   </defs>
 </svg>
 <div id="srv-loading-screen">
-  <img id="gns-logo-dk" src="assets/gn-logo-dark.jpg" class="gns-logo-img" alt="GeNext" draggable="false">
-  <img id="gns-logo-lt" src="assets/gn-logo-light.jpg" class="gns-logo-img" alt="GeNext" draggable="false">
+  <img id="gns-logo-dk" src="assets/gn-logo-dark.png" class="gns-logo-img" alt="GeNext" draggable="false">
+  <img id="gns-logo-lt" src="assets/gn-logo-light.png" class="gns-logo-img" alt="GeNext" draggable="false">
 </div>
 
 <div id="srv-pause-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
@@ -666,8 +662,8 @@
 <div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:340px;width:100%;background:rgba(10,9,8,0.80);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(200,164,78,0.22);border-radius:24px;padding:28px 24px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
     <div class="gns-setup-logo-wrap">
-      <img src="assets/gn-logo-dark.jpg" class="gns-setup-logo gns-setup-logo-dk" alt="GeNext" draggable="false">
-      <img src="assets/gn-logo-light.jpg" class="gns-setup-logo gns-setup-logo-lt" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-dark.png" class="gns-setup-logo gns-setup-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.png" class="gns-setup-logo gns-setup-logo-lt" alt="GeNext" draggable="false">
       <div class="gns-setup-subtitle" id="gns-subtitle-static">Serveur</div>
     </div>
     <div id="setup-app-sub" style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Première connexion</div>

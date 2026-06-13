@@ -92,7 +92,7 @@
     /* Admin login logo */
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
     .gna-login-logo {
-      width:140px; height:140px; object-fit:cover; display:block;
+      width:140px; height:140px; object-fit:contain; display:block;
     }
     .gna-login-logo-lt { display:none; }
     html.light .gna-login-logo-dk { display:none !important; }
@@ -195,11 +195,7 @@
     .gna-logo-img {
       width:72vw;max-width:320px;height:auto;display:block;
       will-change:transform,opacity,filter;
-      mix-blend-mode:screen;
       position:relative;z-index:1;
-    }
-    html.light .gna-logo-img {
-      mix-blend-mode:multiply;
     }
     #gna-logo-lt { display:none; }
     html.light #gna-logo-dk { display:none !important; }
@@ -2108,8 +2104,8 @@
   </defs>
 </svg>
 <div id="adm-loading-screen">
-  <img id="gna-logo-dk" src="assets/gn-logo-dark.jpg" class="gna-logo-img" alt="GeNext" draggable="false">
-  <img id="gna-logo-lt" src="assets/gn-logo-light.jpg" class="gna-logo-img" alt="GeNext" draggable="false">
+  <img id="gna-logo-dk" src="assets/gn-logo-dark.png" class="gna-logo-img" alt="GeNext" draggable="false">
+  <img id="gna-logo-lt" src="assets/gn-logo-light.png" class="gna-logo-img" alt="GeNext" draggable="false">
 </div>
 
 <!-- ══════════════════════════════════════
@@ -2118,8 +2114,8 @@
 <div id="rid-sel-screen" style="display:none;position:fixed;inset:0;z-index:10001;align-items:center;justify-content:center;padding:24px;">
   <div class="login-box">
     <div class="gna-login-logo-wrap">
-      <img src="assets/gn-logo-dark.jpg" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
-      <img src="assets/gn-logo-light.jpg" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-dark.png" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.png" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
       <div class="gna-login-subtitle" id="rsel-sub">Administration</div>
     </div>
     <div class="login-lang-strip" id="rsel-lang-strip">
@@ -2147,8 +2143,8 @@
 <div id="login-screen">
   <div class="login-box">
     <div class="gna-login-logo-wrap">
-      <img src="assets/gn-logo-dark.jpg" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
-      <img src="assets/gn-logo-light.jpg" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-dark.png" class="gna-login-logo gna-login-logo-dk" alt="GeNext" draggable="false">
+      <img src="assets/gn-logo-light.png" class="gna-login-logo gna-login-logo-lt" alt="GeNext" draggable="false">
       <div class="gna-login-subtitle" id="login-sub-txt">Administration</div>
       <div id="login-logo" style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;min-height:1.1em;margin-top:2px"></div>
     </div>
