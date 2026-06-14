@@ -25,7 +25,7 @@
       --gold-l: #e2c278;
       --gold-d: #9a7a35;
       --cream:  #f4ead2;
-      --muted:  rgba(244,234,210,0.52);
+      --muted:  rgba(244,234,210,0.78);
       --border: rgba(200,164,78,0.18);
       --bord2:  rgba(200,164,78,0.36);
       --green:  #7ebd6a;
@@ -42,7 +42,7 @@
       --gold-l: #e2c278;
       --gold-d: #9a7a35;
       --cream:  #1c1710;
-      --muted:  rgba(28,23,16,0.52);
+      --muted:  rgba(28,23,16,0.70);
       --border: rgba(200,164,78,0.22);
       --bord2:  rgba(200,164,78,0.42);
     }
@@ -63,7 +63,7 @@
     html.light .login-input { color:var(--cream); background:transparent; }
     html.light .tagline-input { background:rgba(0,0,0,0.04); border-color:var(--bord2); }
     html.light .inline-input::placeholder,
-    html.light .info-input::placeholder { color:rgba(28,23,16,0.40); }
+    html.light .info-input::placeholder { color:rgba(28,23,16,0.58); }
     html.light .ico-pb-label { color:var(--cream) !important; }
     html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
     /* Popups et cards */
@@ -114,7 +114,7 @@
     html.light .prod-name::placeholder,
     html.light .prod-price::placeholder,
     html.light .prod-desc-input::placeholder,
-    html.light .prod-full-input::placeholder { color:rgba(28,23,16,0.38); }
+    html.light .prod-full-input::placeholder { color:rgba(28,23,16,0.58); }
     /* Toast */
     html.light #toast { background:var(--bg3); color:#2a7a2a; border-color:rgba(80,160,80,0.4); }
     /* Save FAB */
@@ -1962,6 +1962,31 @@
     padding:0 0 4px;
     border-bottom:1px solid rgba(200,164,78,0.12);
     margin-bottom:4px;
+  }
+  /* Lisibilité sur bokeh : text-shadow sur textes directs */
+  .settings-sec-hd,
+  .settings-section .settings-row,
+  .settings-section .feat-label,
+  .settings-section .toggle-label,
+  .settings-section .lang-toggle-label,
+  .settings-section .settings-sel,
+  .settings-section .section-label,
+  .settings-section .forfait-info,
+  .settings-section p,
+  .settings-section span:not(.settings-toggle-track):not(.settings-toggle-track::after) {
+    text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 2px rgba(0,0,0,0.35);
+  }
+  html.light .settings-sec-hd,
+  html.light .settings-section .settings-row,
+  html.light .settings-section .feat-label,
+  html.light .settings-section .toggle-label,
+  html.light .settings-section .lang-toggle-label,
+  html.light .settings-section .settings-sel,
+  html.light .settings-section .section-label,
+  html.light .settings-section .forfait-info,
+  html.light .settings-section p,
+  html.light .settings-section span:not(.settings-toggle-track):not(.settings-toggle-track::after) {
+    text-shadow: 0 1px 3px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,0.5);
   }
   .settings-section:last-child { border-bottom:none; margin-bottom:0; }
   html.light .settings-section { border-bottom-color:rgba(200,164,78,0.12); }
