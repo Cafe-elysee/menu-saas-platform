@@ -3535,11 +3535,9 @@ function _doRenderPaiements() {
       ? '<span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span>'
       : '<span class="commande-trial-badge urgency-ok">⏳ En attente · ' + trial.label + '</span>';
 
-    // Bouton Suspendre uniquement si le paiement est expiré (essai terminé)
-    const suspendBtn = trial.isExpired
-      ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + k + '\')">' +
-          (trial.isSuspended ? '▶ Réactiver' : '⏸ Suspendre') +
-        '</button>'
+    // Réactiver uniquement si suspendu (la suspension auto gère le reste)
+    const suspendBtn = trial.isSuspended
+      ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(\'' + k + '\')">▶ Réactiver</button>'
       : '';
 
     const card = document.createElement('div');
