@@ -2090,6 +2090,34 @@
     transition:transform 0.2s, box-shadow 0.2s;
   }
   .menu-empty-cta:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(200,164,78,0.38); }
+
+  /* ═══════════════════════════════════════════════
+     DESIGN UNIFIÉ CARTES — v1 (2026-06-14)
+     Dark  : rgba(8,6,4,0.72) + bord gold + blur 12px
+     Light : rgba(255,255,255,0.85) + ombre légère + blur 12px
+     ═══════════════════════════════════════════════ */
+  .adm-section,.stats-card,.info-card,.cat-row,.prod-card,.order-adm-card,.hero-img-card{
+    background:rgba(8,6,4,0.72);
+    border:1px solid rgba(200,164,78,0.18);
+    border-radius:20px;
+    box-shadow:0 4px 28px rgba(0,0,0,0.48);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  /* Indicateurs de statut commandes — conservés */
+  .order-adm-card.status-pending  { border-left:3px solid var(--gold); }
+  .order-adm-card.status-progress { border-left:3px solid #4db8ff; }
+  .order-adm-card.status-done     { border-left:3px solid var(--green); }
+  /* Light mode */
+  html.light .adm-section,html.light .stats-card,html.light .info-card,
+  html.light .cat-row,html.light .prod-card,html.light .order-adm-card,html.light .hero-img-card{
+    background:rgba(255,255,255,0.85);
+    border-color:rgba(255,255,255,0.92);
+    box-shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
+  }
+  html.light .order-adm-card.status-pending  { border-left:3px solid var(--gold); }
+  html.light .order-adm-card.status-progress { border-left:3px solid #4db8ff; }
+  html.light .order-adm-card.status-done     { border-left:3px solid var(--green); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 

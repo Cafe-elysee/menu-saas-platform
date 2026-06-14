@@ -1646,6 +1646,31 @@
   html.light .flatpickr-day:hover:not(.selected):not(.disabled):not(.flatpickr-disabled) {
     background: rgba(200,164,78,0.12) !important;
   }
+
+  /* ═══════════════════════════════════════════════
+     DESIGN UNIFIÉ CARTES — v1 (2026-06-14)
+     Dark  : rgba(8,6,4,0.72) + bord gold + blur 12px
+     Light : rgba(255,255,255,0.85) + ombre légère + blur 12px
+     ═══════════════════════════════════════════════ */
+  .commande-card,.client-card{
+    background:rgba(8,6,4,0.72);
+    border:1px solid rgba(200,164,78,0.18);
+    border-radius:20px;
+    box-shadow:0 4px 28px rgba(0,0,0,0.48);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  /* Indicateurs de statut — conservés */
+  .commande-card.nouveau   { border-left:3px solid var(--orange); }
+  .commande-card.en_cours  { border-left:3px solid var(--gold); }
+  /* Light mode */
+  html.light .commande-card,html.light .client-card{
+    background:rgba(255,255,255,0.85);
+    border-color:rgba(255,255,255,0.92);
+    box-shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
+  }
+  html.light .commande-card.nouveau  { border-left:3px solid var(--orange); }
+  html.light .commande-card.en_cours { border-left:3px solid var(--gold); }
   </style>
 
 </head>
