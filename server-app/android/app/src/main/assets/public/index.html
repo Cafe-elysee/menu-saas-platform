@@ -1804,12 +1804,15 @@ function renderOrders() {
         '<div class="order-items-lbl">' + itemsHtml + '</div>' +
         '<div class="order-total-lbl">' + t.ordTotal + ' : ' + escapeHtml(String(o.total || '—')) + '</div>' +
         '<div class="order-status-btns">' +
-          '<button class="order-st-btn '      + (o.status==='pending'     ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'pending\')">'     + t.ordPending  + '</button>' +
-          '<button class="order-st-btn prog ' + (o.status==='in_progress' ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'in_progress\')">' + t.ordProgress + '</button>' +
-          '<button class="order-st-btn done ' + (o.status==='done'        ?'active':'') + '" onclick="setOrderStatus(\'' + o.id + '\',\'done\')">'        + t.ordDone     + '</button>' +
+          '<button class="order-st-btn '      + (o.status==='pending'     ?'active':'') + '" data-st="pending">'     + t.ordPending  + '</button>' +
+          '<button class="order-st-btn prog ' + (o.status==='in_progress' ?'active':'') + '" data-st="in_progress">' + t.ordProgress + '</button>' +
+          '<button class="order-st-btn done ' + (o.status==='done'        ?'active':'') + '" data-st="done">'        + t.ordDone     + '</button>' +
         '</div>' +
       '</div></div></div>';
     card.querySelector('.order-card-hd').addEventListener('click', function() { card.classList.toggle('collapsed'); });
+    card.querySelectorAll('.order-st-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { setOrderStatus(card.dataset.id, btn.dataset.st); });
+    });
     list.appendChild(card);
   });
 
