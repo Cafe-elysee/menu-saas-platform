@@ -8108,14 +8108,9 @@ function switchAdminTab(tab) {
 
   // Restore overflow after animation + apply correct scroll position
   setTimeout(() => {
-    if (tab === 'settings') {
-      document.documentElement.style.overflowY = 'hidden';
-      document.body.style.overflowY = 'hidden';
-    } else {
-      document.documentElement.style.overflowY = '';
-      document.body.style.overflowY = '';
-      window.scrollTo({ top: _targetScroll, behavior: 'instant' });
-    }
+    document.documentElement.style.overflowY = '';
+    document.body.style.overflowY = '';
+    window.scrollTo({ top: _targetScroll, behavior: 'instant' });
   }, 240);
 }
 
