@@ -2553,11 +2553,29 @@ async function createNewClient() {
   const btn = document.getElementById('nc-create-btn');
   btn.textContent = 'Création en cours…'; btn.disabled = true;
 
+  let commandeKey = null;
   try {
     const forfaitLabel = forfait === 'commandes-services'
       ? 'Commandes & Services — Menu QR + Prises de commandes'
       : 'Menu QR — Menu digital';
 
+    // 1. Créer la commande dans menu-pro-control AVANT l'API
+    //    → l'API pourra la patcher avec clientCree + emailData
+    //    → listenCommandes() détectera clientCree.rid et lancera _watchFirstOpen() automatiquement
+    const cmdRef = await _controlDb.ref('/commandes').push({
+      restaurant: name,
+      forfait: forfaitLabel,
+      forfaitType: forfait,
+      paymentMode: mode,
+      langue: lang,
+      email: email,
+      ts: Date.now(),
+      statut: 'nouveau',
+      source: 'admin'
+    });
+    commandeKey = cmdRef.key;
+
+    // 2. Appeler l'API avec commandeKey → création restaurant + patch commande + email livraison
     const resp = await fetch('https://menu-pro-demo.vercel.app/api/notify-commande', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2568,6 +2586,7 @@ async function createNewClient() {
         paymentMode: mode,
         langue: lang,
         email: email,
+        commandeKey: commandeKey,
         source: 'admin'
       })
     });
@@ -2585,6 +2604,7 @@ async function createNewClient() {
     document.getElementById('nc-result').classList.add('show');
 
   } catch(e) {
+    if (commandeKey) _controlDb.ref('/commandes/' + commandeKey).remove().catch(() => {});
     err.textContent = 'Erreur : ' + (e.message || e);
     btn.textContent = 'Créer le client'; btn.disabled = false;
   }
