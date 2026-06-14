@@ -2495,6 +2495,18 @@ function showNewClientModal() {
 
 function closeNewClientModal() {
   document.getElementById('nc-modal').classList.remove('show');
+  if (_pendingCommandeKey) {
+    const key = _pendingCommandeKey;
+    _pendingCommandeKey = null;
+    switchTab('commandes');
+    setTimeout(function() {
+      const card = document.querySelector('.commande-card[data-key="' + key + '"]');
+      if (card) {
+        card.classList.add('open');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 120);
+  }
 }
 
 function _buildPwdDefault(name) {
@@ -2596,6 +2608,7 @@ async function createNewClient() {
     if (!data.created || !data.created.rid) throw new Error('Création échouée — vérifier les env vars Vercel demo');
 
     const rid = data.created.rid;
+    _pendingCommandeKey = commandeKey;
     document.getElementById('nc-admin-url').textContent = 'https://menu-saas-platform.vercel.app/admin.html';
     document.getElementById('nc-rid-val').textContent = rid;
     document.getElementById('nc-rid-inline').textContent = rid;
@@ -3012,7 +3025,9 @@ function _buildClientBillingSectionHTML(cmdKey, d, created) {
 
   const badgeHtml = !trial.noTrial
     ? '<div style="margin-bottom:0.5rem"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + trial.label + '</span></div>'
-    : '';
+    : (created && !d.firstOpenAt
+      ? '<div style="margin-bottom:0.5rem"><span style="font-size:0.78rem;background:rgba(200,164,78,0.12);color:var(--gold);padding:3px 10px;border-radius:20px;border:1px solid rgba(200,164,78,0.25)">⏳ Essai non commencé</span></div>'
+      : '');
 
   const _histBtn = '<button class="commande-action-btn hist-btn" onclick="_showPaymentHistory(\'' + cmdKey + '\')">📋 Historique</button>';
   const trialAction = !trial.noTrial
