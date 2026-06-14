@@ -3469,11 +3469,14 @@ function _doRenderPaiements() {
   const emptyEl = document.getElementById('paiements-empty');
   if (!listEl) return;
 
+  const _tc = {};
+  function _gt(k) { if (!_tc[k]) _tc[k] = _trialInfo(_commandesCache[k], k); return _tc[k]; }
+
   const pendingKeys = Object.keys(_commandesCache).filter(function(k) {
-    return !_trialInfo(_commandesCache[k], k).noTrial;
+    return !_gt(k).noTrial;
   }).sort(function(a, b) {
-    const ta = _trialInfo(_commandesCache[a], a);
-    const tb = _trialInfo(_commandesCache[b], b);
+    const ta = _gt(a);
+    const tb = _gt(b);
     // Expirés en premier (plus urgents)
     if (ta.isExpired !== tb.isExpired) return ta.isExpired ? -1 : 1;
     // Suspendus après les non-suspendus dans chaque groupe
@@ -3481,7 +3484,7 @@ function _doRenderPaiements() {
     return (ta.ts || 0) - (tb.ts || 0);
   });
 
-  const expiredCount = pendingKeys.filter(function(k) { return _trialInfo(_commandesCache[k], k).isExpired; }).length;
+  const expiredCount = pendingKeys.filter(function(k) { return _tc[k].isExpired; }).length;
   const badge = document.getElementById('badge-paiements');
   if (badge) {
     // Badge = expirés uniquement (action urgente) ; liste = tous les paiements en attente
@@ -3500,7 +3503,7 @@ function _doRenderPaiements() {
   const frag = document.createDocumentFragment();
   pendingKeys.forEach(function(k) {
     const d     = _commandesCache[k];
-    const trial = _trialInfo(d, k);
+    const trial = _tc[k];
     const created = d.clientCree || _lastCreatedClients[k];
     const rid   = created ? created.rid : (d.emailData ? d.emailData.rid : '—');
     const name  = d.restaurant || '—';
