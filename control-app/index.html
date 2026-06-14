@@ -306,12 +306,12 @@
     }
     .tabs-track {
       display: flex; height: 100%;
-      width: 300%;
+      width: 400%;
       will-change: transform;
       transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-pane {
-      width: 33.333%; flex-shrink: 0;
+      width: 25%; flex-shrink: 0;
       overflow-y: auto; overflow-x: hidden;
       padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
     }
@@ -1788,6 +1788,16 @@
       <div class="clients-list" id="clients-list"></div>
     </div>
 
+    <!-- TAB PAIEMENTS -->
+    <div class="tab-pane" id="pane-paiements">
+      <div class="section-title">Paiements en attente</div>
+      <div id="paiements-empty" class="commande-empty" style="display:none">
+        <div class="commande-empty-icon">✅</div>
+        Aucun paiement en attente.
+      </div>
+      <div id="paiements-list"></div>
+    </div>
+
     <!-- TAB RÉGLAGES -->
     <div class="tab-pane" id="pane-reglages">
       <div class="section-title">Réglages</div>
@@ -1903,6 +1913,16 @@
       </svg>
     </div>
     <span class="nav-label">Clients</span>
+  </button>
+  <button class="nav-btn" id="nav-paiements" onclick="switchTab('paiements')">
+    <div class="nav-badge" id="badge-paiements"></div>
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+    </div>
+    <span class="nav-label">Paiements</span>
   </button>
   <button class="nav-btn" id="nav-reglages" onclick="switchTab('reglages')">
     <div class="nav-icon">
@@ -2349,19 +2369,20 @@ function showApp() {
 // ════════════════════════════════════════════════════
 // TAB NAVIGATION
 // ════════════════════════════════════════════════════
-const TABS = ['commandes', 'clients', 'reglages'];
+const TABS = ['commandes', 'clients', 'paiements', 'reglages'];
 let _currentTab = 'commandes';
 
 function switchTab(tab) {
   _currentTab = tab;
   const idx = TABS.indexOf(tab);
-  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 33.333) + '%)';
+  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 25) + '%)';
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-' + tab).classList.add('active');
   // FAB: visible only in Clients tab
   const fab = document.getElementById('quick-nav-fab');
   if (fab) fab.style.display = tab === 'clients' ? 'flex' : 'none';
   if (tab === 'reglages') refreshNotifStatus();
+  if (tab === 'paiements') _doRenderPaiements();
 }
 
 // ─── Swipe between tabs ───
@@ -2779,6 +2800,14 @@ function listenCommandes() {
         }
       }
     }
+    // Clients auto-créés côté serveur : set up watchers firstOpen manquants
+    Object.keys(_commandesCache).forEach(function(k) {
+      var d = _commandesCache[k];
+      var foRid = d && d.clientCree && d.clientCree.rid;
+      if (foRid && d.statut !== 'traite' && !localStorage.getItem('ctrl_fopen_' + foRid)) {
+        _watchFirstOpen(foRid, k);
+      }
+    });
     renderCommandes();
     setTimeout(_checkAutoSuspend, 200); // vérifier après le rendu initial
     // Rafraîchir les sections facturation des cartes client déjà affichées
@@ -2823,6 +2852,7 @@ function _doRenderCommandes() {
   const frag = document.createDocumentFragment();
   keys.forEach(k => frag.appendChild(buildCommandeCard(k, _commandesCache[k])));
   wrap.appendChild(frag);
+  _doRenderPaiements();
 }
 
 function _trialInfo(d, key) {
@@ -2964,6 +2994,7 @@ function _buildClientBillingSectionHTML(cmdKey, d, created) {
     ? '<div style="margin-bottom:0.5rem"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + trial.label + '</span></div>'
     : '';
 
+  const _histBtn = '<button class="commande-action-btn hist-btn" onclick="_showPaymentHistory(\'' + cmdKey + '\')">📋 Historique</button>';
   const trialAction = !trial.noTrial
     ? '<div class="commande-trial-action">' +
         '<button class="commande-paid-btn" onclick="_markPaid(\'' + cmdKey + '\')">✅ Marquer comme payé</button>' +
@@ -2972,9 +3003,9 @@ function _buildClientBillingSectionHTML(cmdKey, d, created) {
               (trial.isSuspended ? '▶ Réactiver le compte' : '⏸ Suspendre le compte') +
             '</button>'
           : '') +
-        '<button class="commande-action-btn hist-btn" onclick="_showPaymentHistory(\'' + cmdKey + '\')">📋 Historique</button>' +
+        _histBtn +
       '</div>'
-    : '';
+    : '<div class="commande-trial-action">' + _histBtn + '</div>';
 
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
     '<div class="section-label">💳 Abonnement & Facturation</div>' +
@@ -3308,6 +3339,7 @@ function _markPaid(key) {
       const prev = _commandesCache[key];
       _commandesCache[key] = Object.assign({}, d, update);
       _rerenderCommandeCard(key);
+      _doRenderPaiements();
       const payEntry = { date: now, montant: _getCommandePrice(d), mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr' };
       _controlDb.ref('/commandes/' + key).update(update)
         .then(function() {
@@ -3395,6 +3427,94 @@ function _showPaymentHistory(cmdKey) {
 
 function _hideHistModal() {
   document.getElementById('hist-modal').style.display = 'none';
+}
+
+function _doRenderPaiements() {
+  const listEl  = document.getElementById('paiements-list');
+  const emptyEl = document.getElementById('paiements-empty');
+  if (!listEl) return;
+
+  const pendingKeys = Object.keys(_commandesCache).filter(function(k) {
+    return _trialInfo(_commandesCache[k], k).isExpired === true;
+  }).sort(function(a, b) {
+    const ta = _trialInfo(_commandesCache[a], a);
+    const tb = _trialInfo(_commandesCache[b], b);
+    if (ta.isSuspended !== tb.isSuspended) return ta.isSuspended ? 1 : -1;
+    return (ta.ts || 0) - (tb.ts || 0);
+  });
+
+  const badge = document.getElementById('badge-paiements');
+  if (badge) {
+    const n = pendingKeys.length;
+    if (n > 0) { badge.textContent = n > 9 ? '9+' : String(n); badge.classList.add('show'); }
+    else badge.classList.remove('show');
+  }
+
+  if (pendingKeys.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  const frag = document.createDocumentFragment();
+  pendingKeys.forEach(function(k) {
+    const d     = _commandesCache[k];
+    const trial = _trialInfo(d, k);
+    const created = d.clientCree || _lastCreatedClients[k];
+    const rid   = created ? created.rid : (d.emailData ? d.emailData.rid : '—');
+    const name  = d.restaurant || '—';
+    const price = _getCommandePrice(d);
+    const unit  = d.paymentMode === 'annual' ? 'an' : 'mois';
+    const langue = d.langue || 'fr';
+
+    const suspTag = trial.isSuspended
+      ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>'
+      : '';
+
+    var emailBtn = '';
+    if (d.email) {
+      const subj = _buildReminderSubject(name, langue);
+      const body = _buildPaymentReminderMsg(d, name, langue);
+      emailBtn = '<a class="commande-action-btn btn-email" href="mailto:' + encodeURIComponent(d.email) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body) + '" target="_system">✉️ Email</a>';
+    }
+    var waBtn = '';
+    if (d.whatsapp && d.whatsapp.numero) {
+      const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
+      const msg = _buildPaymentReminderMsg(d, name, langue);
+      waBtn = '<a class="commande-action-btn btn-wa" href="https://wa.me/' + num + '?text=' + encodeURIComponent(msg) + '" target="_system"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg> WhatsApp</a>';
+    }
+    var viberBtn = '';
+    if (d.viber && d.viber.numero) {
+      const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
+      viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>';
+    }
+
+    const card = document.createElement('div');
+    card.className = 'commande-card';
+    card.dataset.cmdkey = k;
+    card.innerHTML =
+      '<div class="commande-card-header" style="padding-bottom:6px">' +
+        '<div class="commande-client-name">' + escapeHtml(name) + suspTag + '</div>' +
+        '<div style="font-size:0.72rem;color:var(--muted);margin-top:3px">ID : <code style="color:var(--gold)">' + escapeHtml(rid) + '</code></div>' +
+      '</div>' +
+      '<div style="padding:0 12px 12px">' +
+        '<div style="margin-bottom:8px"><span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span></div>' +
+        '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">' + escapeHtml(price + ' €/' + unit) + '</div>' +
+        '<div class="commande-trial-action">' +
+          '<button class="commande-paid-btn" onclick="_markPaid(\'' + k + '\')">✅ Marquer comme payé</button>' +
+          '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + k + '\')">' +
+            (trial.isSuspended ? '▶ Réactiver' : '⏸ Suspendre') +
+          '</button>' +
+        '</div>' +
+        ((emailBtn || waBtn || viberBtn)
+          ? '<div class="commande-actions" style="margin-top:8px">' + emailBtn + waBtn + viberBtn + '</div>'
+          : '') +
+      '</div>';
+    frag.appendChild(card);
+  });
+  listEl.innerHTML = '';
+  listEl.appendChild(frag);
 }
 
 function _checkAutoSuspend() {

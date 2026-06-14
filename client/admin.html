@@ -7948,6 +7948,12 @@ function _revealAdmWrap() {
     startAnalyticsListener();
     requestAnimationFrame(() => requestAnimationFrame(() => updateAnalytics()));
   }
+  // Signal premier accès pour démarrer l'essai
+  if (_RID && _RID !== 'demo' && !isDemo) {
+    _rref('firstOpen').once('value').then(s => {
+      if (s.val() !== true) _rref('firstOpen').set(true).catch(() => {});
+    }).catch(() => {});
+  }
 }
 
 function _syncLoginLangStrip(containerId, activeLang) {
