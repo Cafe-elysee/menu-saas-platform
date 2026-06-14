@@ -86,27 +86,25 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
-<body style="margin:0;padding:0;background:#0f0f13;font-family:'Helvetica Neue',Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f13;padding:32px 0">
-<tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="background:#1a1a22;border-radius:16px;overflow:hidden;max-width:560px;width:100%">
-<tr><td style="background:linear-gradient(135deg,#1e1a10 0%,#2a2010 100%);padding:28px 32px;text-align:center">
-  <div style="font-size:1.6rem;font-weight:800;color:#c8a44e;letter-spacing:-0.02em">GeNext</div>
-  <div style="font-size:0.75rem;color:rgba(200,164,78,.6);margin-top:4px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
+<body style="margin:0;padding:0;background:#f2ece0">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0">
+<tr><td align="center" style="padding:24px 0">
+<table width="560" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;padding:26px 32px;border-bottom:1px solid #ead9b8">
+  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" style="display:block;margin:0 auto;max-width:140px;border:0">
+  <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td style="padding:28px 32px;text-align:${align}">
-  <p style="color:#e8e0d0;font-size:1rem;margin:0 0 16px">${t.greeting}</p>
-  <div style="background:rgba(80,200,120,.08);border:1px solid rgba(80,200,120,.25);border-radius:10px;padding:16px 20px;margin-bottom:20px">
-    <p style="color:#b8ffd0;font-size:0.95rem;line-height:1.6;margin:0">${t.confirmed}</p>
-  </div>
-  <div style="background:#fdf9f0;border:1px solid #e8d8a0;border-radius:10px;padding:18px 22px;margin-bottom:20px;text-align:center">
-    <div style="font-size:0.72rem;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${t.nextLabel}</div>
-    <div style="font-size:1.25rem;font-weight:700;color:#c8a44e">${t.nextDate}</div>
-  </div>
-  <p style="color:#888;font-size:0.85rem;line-height:1.6;margin:0">${t.note}</p>
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:28px 32px;text-align:${align}">
+  <p style="color:#2a1f10;font-size:1rem;margin:0 0 16px;font-weight:600">${t.greeting}</p>
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f0faf4" style="background-color:#f0faf4;border:1px solid #b8e8c8;border-left:3px solid #4caf80;border-radius:0 8px 8px 0;margin-bottom:20px"><tr><td style="padding:12px 16px;font-size:0.95rem;color:#2a1f10;line-height:1.6">${t.confirmed}</td></tr></table>
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8f4ec" style="background-color:#f8f4ec;border:1px solid #e8dfc8;border-radius:10px;margin-bottom:20px"><tr><td style="padding:16px 22px;text-align:center">
+    <div style="font-size:0.72rem;color:#9a8060;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${t.nextLabel}</div>
+    <div style="font-size:1.2rem;font-weight:700;color:#c8a44e">${t.nextDate}</div>
+  </td></tr></table>
+  <p style="color:#7a6555;font-size:0.85rem;line-height:1.6;margin:0">${t.note}</p>
 </td></tr>
-<tr><td style="background:#111118;padding:20px 32px;text-align:center">
-  <p style="color:#6b6880;font-size:0.78rem;margin:0">${t.closing}</p>
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;padding:14px 32px;border-top:1px solid #ead9b8">
+  <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing}</p>
 </td></tr>
 </table>
 </td></tr></table></body></html>`;

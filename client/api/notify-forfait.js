@@ -133,28 +133,28 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
   const dir   = isRTL ? 'rtl' : 'ltr';
   const align = isRTL ? 'right' : 'left';
   const paymentBlock = t.payment
-    ? `<div style="background:rgba(200,164,78,.15);border-left:3px solid #c8a44e;padding:12px 16px;border-radius:6px;margin:16px 0;font-size:0.9rem">${t.payment}</div>`
+    ? `<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-left:3px solid #c8a44e;border-radius:0 8px 8px 0;margin:16px 0 4px"><tr><td style="padding:12px 16px;font-size:0.88rem;color:#2a1f10;line-height:1.6">${t.payment}</td></tr></table>`
     : '';
 
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
-<body style="margin:0;padding:0;background:#0f0f13;font-family:'Helvetica Neue',Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f13;padding:32px 0">
-<tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="background:#1a1a22;border-radius:16px;overflow:hidden;max-width:560px;width:100%">
-<tr><td style="background:linear-gradient(135deg,#1e1a10 0%,#2a2010 100%);padding:28px 32px;text-align:center">
-  <div style="font-size:1.6rem;font-weight:800;color:#c8a44e;letter-spacing:-0.02em">GeNext</div>
-  <div style="font-size:0.75rem;color:rgba(200,164,78,.6);margin-top:4px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
+<body style="margin:0;padding:0;background:#f2ece0">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0">
+<tr><td align="center" style="padding:24px 0">
+<table width="560" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;padding:26px 32px;border-bottom:1px solid #ead9b8">
+  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" style="display:block;margin:0 auto;max-width:140px;border:0">
+  <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td style="padding:28px 32px;text-align:${align}">
-  <p style="color:#e8e0d0;font-size:1rem;margin:0 0 16px">${t.greeting}</p>
-  <p style="color:#b8b0a0;font-size:0.9rem;line-height:1.6;margin:0 0 12px">${t.intro}</p>
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:28px 32px;text-align:${align}">
+  <p style="color:#2a1f10;font-size:1rem;margin:0 0 12px;font-weight:600">${t.greeting}</p>
+  <p style="color:#4a3728;font-size:0.9rem;line-height:1.6;margin:0 0 4px">${t.intro}</p>
   ${paymentBlock}
-  <p style="color:#b8b0a0;font-size:0.88rem;line-height:1.6;margin:12px 0 0">${t.features}</p>
+  <p style="color:#7a6555;font-size:0.88rem;line-height:1.6;margin:12px 0 0">${t.features}</p>
 </td></tr>
-<tr><td style="background:#111118;padding:20px 32px;text-align:center">
-  <p style="color:#6b6880;font-size:0.78rem;margin:0">${t.closing}</p>
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;padding:14px 32px;border-top:1px solid #ead9b8">
+  <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
 </td></tr>
 </table>
 </td></tr></table></body></html>`;
@@ -208,22 +208,20 @@ function buildPendingEmail(lang, name, newForfait, paymentMode) {
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
-<body style="margin:0;padding:0;background:#0f0f13;font-family:'Helvetica Neue',Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f13;padding:32px 0">
-<tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="background:#1a1a22;border-radius:16px;overflow:hidden;max-width:560px;width:100%">
-<tr><td style="background:linear-gradient(135deg,#1e1a10 0%,#2a2010 100%);padding:28px 32px;text-align:center">
-  <div style="font-size:1.6rem;font-weight:800;color:#c8a44e;letter-spacing:-0.02em">GeNext</div>
-  <div style="font-size:0.75rem;color:rgba(200,164,78,.6);margin-top:4px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
+<body style="margin:0;padding:0;background:#f2ece0">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0">
+<tr><td align="center" style="padding:24px 0">
+<table width="560" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;padding:26px 32px;border-bottom:1px solid #ead9b8">
+  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" style="display:block;margin:0 auto;max-width:140px;border:0">
+  <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td style="padding:28px 32px;text-align:${align}">
-  <p style="color:#e8e0d0;font-size:1rem;margin:0 0 16px">${t.greeting}</p>
-  <div style="background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.25);border-radius:10px;padding:16px 20px;margin-bottom:16px">
-    <p style="color:#b8b0a0;font-size:0.9rem;line-height:1.6;margin:0">${t.body}</p>
-  </div>
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:28px 32px;text-align:${align}">
+  <p style="color:#2a1f10;font-size:1rem;margin:0 0 16px;font-weight:600">${t.greeting}</p>
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-left:3px solid #c8a44e;border-radius:0 8px 8px 0;margin-bottom:8px"><tr><td style="padding:14px 18px;font-size:0.9rem;color:#2a1f10;line-height:1.6">${t.body}</td></tr></table>
 </td></tr>
-<tr><td style="background:#111118;padding:20px 32px;text-align:center">
-  <p style="color:#6b6880;font-size:0.78rem;margin:0">${t.closing}</p>
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;padding:14px 32px;border-top:1px solid #ead9b8">
+  <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
 </td></tr>
 </table>
 </td></tr></table></body></html>`;

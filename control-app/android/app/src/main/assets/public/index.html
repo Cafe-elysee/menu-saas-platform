@@ -3533,7 +3533,7 @@ function _doRenderPaiements() {
     // Badge statut : pour essai actif → "⏳ En attente" ; pour expiré → label existant
     const statusBadge = trial.isExpired
       ? '<span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span>'
-      : '<span class="commande-trial-badge urgency-ok">⏳ En attente · ' + trial.label + '</span>';
+      : '<span class="commande-trial-badge urgency-' + trial.urgency + '">⏳ En attente · ' + trial.label + '</span>';
 
     // Réactiver uniquement si suspendu (la suspension auto gère le reste)
     const suspendBtn = trial.isSuspended
