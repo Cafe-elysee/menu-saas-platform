@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0908">
   <title>GeNext Control</title>
-  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}})()</script>
+  <style>html{background:#080604}html.light{background:#f0ede8}</style>
+  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}window._splashT0=Date.now();})()</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -2248,6 +2249,8 @@ let _isFirstRun = false;
 let _ctrlLoadHidden = false;
 function _hideCtrlLoadingScreen() {
   if (_ctrlLoadHidden) return;
+  var _elapsed = Date.now() - (window._splashT0 || 0);
+  if (_elapsed < 1600) { setTimeout(_hideCtrlLoadingScreen, 1600 - _elapsed); return; }
   _ctrlLoadHidden = true;
   const screen = document.getElementById('ctrl-loading-screen');
   if (!screen) return;

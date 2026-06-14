@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>(function(){try{var rid=new URLSearchParams(location.search).get('rid')||'';var saved=(rid?localStorage.getItem(rid+'_admin_theme'):null)||localStorage.getItem('saas_last_theme');if(saved==='light')document.documentElement.classList.add('light');}catch(e){}})()</script>
+  <style>html{background:#0c0a08}html.light{background:#f0ede8}</style>
+  <script>(function(){try{var rid=new URLSearchParams(location.search).get('rid')||'';var saved=(rid?localStorage.getItem(rid+'_admin_theme'):null)||localStorage.getItem('saas_last_theme');if(saved==='light')document.documentElement.classList.add('light');}catch(e){}window._splashT0=Date.now();})()</script>
   <title>GeNext — Administration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -7979,6 +7980,8 @@ function _ridSelPickLang(l) {
 let _admLoadHidden = false;
 function _hideAdmLoadingScreen() {
   if (_admLoadHidden) return;
+  var _elapsed = Date.now() - (window._splashT0 || 0);
+  if (_elapsed < 1600) { setTimeout(_hideAdmLoadingScreen, 1600 - _elapsed); return; }
   _admLoadHidden = true;
   const screen = document.getElementById('adm-loading-screen');
   if (!screen) return;

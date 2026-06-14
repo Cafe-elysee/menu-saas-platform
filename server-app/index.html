@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0908">
   <title>GeNext — Serveur</title>
+  <style>html{background:#0a0908}html.light{background:#f0ede8}</style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
@@ -628,6 +629,7 @@
       window._NEEDS_SETUP = !_r; // pas de rid → écran de configuration
       var _saved = _r ? localStorage.getItem(_r + '_app_theme') : localStorage.getItem('saas_last_theme');
       if (_saved === 'light') document.documentElement.classList.add('light');
+      window._splashT0 = Date.now();
     })();
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -2038,7 +2040,12 @@ function init() {
   });
 }
 
+var _srvLoadHidden = false;
 function _hideSrvLoading() {
+  if (_srvLoadHidden) return;
+  var _elapsed = Date.now() - (window._splashT0 || 0);
+  if (_elapsed < 1600) { setTimeout(_hideSrvLoading, 1600 - _elapsed); return; }
+  _srvLoadHidden = true;
   var screen = document.getElementById('srv-loading-screen');
   if (!screen) return;
   var isLight = document.documentElement.classList.contains('light');
