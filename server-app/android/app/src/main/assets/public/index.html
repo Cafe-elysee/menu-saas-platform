@@ -589,26 +589,38 @@
     }
 
   /* ═══════════════════════════════════════════════
-     DESIGN UNIFIÉ CARTES — v1 (2026-06-14)
-     Dark  : rgba(8,6,4,0.72) + bord gold + blur 12px
-     Light : rgba(255,255,255,0.85) + ombre légère + blur 12px
+     DESIGN UNIFIÉ CARTES — v2 (2026-06-14)
+     Référence : style fo-card page demo
+     Dark  : fond presque transparent + bordure gold subtile
+     Light : blanc semi-transparent rgba(255,255,255,.55) + ombre douce
      ═══════════════════════════════════════════════ */
+  /* ── Cartes appels / commandes / messages ── */
   .call-item,.order-card,.msg-bubble{
-    background:rgba(8,6,4,0.72);
-    border:1px solid rgba(200,164,78,0.18);
+    background:rgba(20,15,8,.72);
+    border:1px solid rgba(231,206,151,.18);
     border-radius:20px;
-    box-shadow:0 4px 28px rgba(0,0,0,0.48);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 2px 24px -8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
   }
-  /* Msg bubble garde sa forme de bulle */
   .msg-bubble{ border-radius:6px 20px 20px 20px; }
-  /* Light mode */
   html.light .call-item,html.light .order-card,html.light .msg-bubble{
-    background:rgba(255,255,255,0.85);
-    border-color:rgba(255,255,255,0.92);
-    box-shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
+    background:rgba(255,255,255,.55);
+    border-color:rgba(140,110,45,.28);
+    box-shadow:0 2px 24px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.85);
   }
+  /* ── Icônes nav inactives — plus visibles ── */
+  .nav-btn{ color:rgba(244,234,210,0.78); }
+  html.light .nav-btn{ color:rgba(28,23,16,0.60); }
+  /* ── État vide — texte et icône lisibles ── */
+  .empty-state{ color:rgba(244,234,210,0.85); }
+  .empty-state-icon{ opacity:0.60; filter:none; }
+  html.light .empty-state{ color:rgba(28,23,16,0.65); }
+  html.light .empty-state-icon{ opacity:0.50; }
+  /* ── Point de connexion inactif — plus visible ── */
+  .conn-dot{ background:rgba(244,234,210,0.45); }
+  html.light .conn-dot{ background:rgba(28,23,16,0.32); }
+  /* ── Label section settings ── */
+  #settings-section-title{ color:rgba(244,234,210,0.78) !important; }
+  html.light #settings-section-title{ color:rgba(28,23,16,0.62) !important; }
   </style>
   <script>
     (function() {
@@ -659,7 +671,7 @@
     <div id="srv-pause-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:12px">Service en pause</div>
     <div id="srv-pause-msg" style="font-size:0.85rem;color:var(--muted);line-height:1.9">Ce restaurant est momentanément en pause.<br>Merci de contacter l'administrateur.</div>
     <button id="srv-pause-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:#c8a44e;font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);">Changer de restaurant</button>
-    <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
+    <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.45">
       <div style="height:1px;width:24px;background:#c8a44e"></div>
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:#c8a44e;text-transform:uppercase">GeNext</div>
       <div style="height:1px;width:24px;background:#c8a44e"></div>
@@ -674,7 +686,7 @@
     <div id="srv-forfait-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.04em;margin-bottom:12px">Forfait Menu QR</div>
     <div id="srv-forfait-msg" style="font-size:0.85rem;color:var(--cream);opacity:0.65;line-height:1.9">Ce forfait n'inclut pas le service serveur.<br>Contactez l'administrateur pour activer le forfait Commandes & Services.</div>
     <button id="srv-forfait-change-btn" onclick="changeRestaurant()" style="margin-top:28px;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(200,164,78,0.35);background:rgba(200,164,78,0.08);color:var(--gold);font-family:'Crimson Pro',Georgia,serif;font-size:0.9rem;letter-spacing:0.06em;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.1);">Changer d'ID</button>
-    <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.25">
+    <div style="margin-top:24px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.45">
       <div style="height:1px;width:24px;background:var(--gold)"></div>
       <div style="font-size:0.58rem;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase">GeNext</div>
       <div style="height:1px;width:24px;background:var(--gold)"></div>
