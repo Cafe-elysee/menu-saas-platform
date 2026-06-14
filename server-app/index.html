@@ -594,20 +594,27 @@
      Dark  : fond presque transparent + bordure gold subtile
      Light : blanc semi-transparent rgba(255,255,255,.55) + ombre douce
      ═══════════════════════════════════════════════ */
+  /* ── Cartes appels / commandes / messages ── */
   .call-item,.order-card,.msg-bubble{
     background:rgba(20,15,8,.72);
     border:1px solid rgba(231,206,151,.18);
     border-radius:20px;
     box-shadow:0 2px 24px -8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
   }
-  /* Msg bubble garde sa forme de bulle */
   .msg-bubble{ border-radius:6px 20px 20px 20px; }
-  /* Light mode */
   html.light .call-item,html.light .order-card,html.light .msg-bubble{
     background:rgba(255,255,255,.55);
     border-color:rgba(140,110,45,.28);
     box-shadow:0 2px 24px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.85);
   }
+  /* ── Icônes nav inactives — plus visibles ── */
+  .nav-btn{ color:rgba(244,234,210,0.78); }
+  html.light .nav-btn{ color:rgba(28,23,16,0.60); }
+  /* ── État vide — texte et icône lisibles ── */
+  .empty-state{ color:rgba(244,234,210,0.85); }
+  .empty-state-icon{ opacity:0.60; filter:none; }
+  html.light .empty-state{ color:rgba(28,23,16,0.65); }
+  html.light .empty-state-icon{ opacity:0.50; }
   </style>
   <script>
     (function() {

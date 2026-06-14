@@ -1653,16 +1653,15 @@
      Dark  : fond presque transparent + bordure gold subtile
      Light : blanc semi-transparent rgba(255,255,255,.55) + ombre douce
      ═══════════════════════════════════════════════ */
+  /* ── Cartes commandes / clients ── */
   .commande-card,.client-card{
     background:rgba(20,15,8,.72);
     border:1px solid rgba(231,206,151,.18);
     border-radius:20px;
     box-shadow:0 2px 24px -8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
   }
-  /* Indicateurs de statut — conservés */
   .commande-card.nouveau   { border-left:3px solid var(--orange); }
   .commande-card.en_cours  { border-left:3px solid var(--gold); }
-  /* Light mode */
   html.light .commande-card,html.light .client-card{
     background:rgba(255,255,255,.55);
     border-color:rgba(140,110,45,.28);
@@ -1670,6 +1669,20 @@
   }
   html.light .commande-card.nouveau  { border-left:3px solid var(--orange); }
   html.light .commande-card.en_cours { border-left:3px solid var(--gold); }
+  /* ── Sections réglages ── */
+  .settings-section{
+    background:rgba(20,15,8,.72);
+    border-color:rgba(231,206,151,.18);
+    box-shadow:0 2px 24px -8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  html.light .settings-section{
+    background:rgba(255,255,255,.55);
+    border-color:rgba(140,110,45,.28);
+    box-shadow:0 2px 24px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  /* ── Login subtitle "Control" — lisible en light et dark ── */
+  .gn-login-subtitle{ opacity:1; }
+  html.light .gn-login-subtitle{ color:#8a6520; }
   </style>
 
 </head>
