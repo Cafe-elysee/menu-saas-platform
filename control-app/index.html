@@ -3470,17 +3470,22 @@ function _doRenderPaiements() {
   if (!listEl) return;
 
   const pendingKeys = Object.keys(_commandesCache).filter(function(k) {
-    return _trialInfo(_commandesCache[k], k).isExpired === true;
+    return !_trialInfo(_commandesCache[k], k).noTrial;
   }).sort(function(a, b) {
     const ta = _trialInfo(_commandesCache[a], a);
     const tb = _trialInfo(_commandesCache[b], b);
+    // Expirés en premier (plus urgents)
+    if (ta.isExpired !== tb.isExpired) return ta.isExpired ? -1 : 1;
+    // Suspendus après les non-suspendus dans chaque groupe
     if (ta.isSuspended !== tb.isSuspended) return ta.isSuspended ? 1 : -1;
     return (ta.ts || 0) - (tb.ts || 0);
   });
 
+  const expiredCount = pendingKeys.filter(function(k) { return _trialInfo(_commandesCache[k], k).isExpired; }).length;
   const badge = document.getElementById('badge-paiements');
   if (badge) {
-    const n = pendingKeys.length;
+    // Badge = expirés uniquement (action urgente) ; liste = tous les paiements en attente
+    const n = expiredCount > 0 ? expiredCount : pendingKeys.length;
     if (n > 0) { badge.textContent = n > 9 ? '9+' : String(n); badge.classList.add('show'); }
     else badge.classList.remove('show');
   }
@@ -3525,6 +3530,18 @@ function _doRenderPaiements() {
       viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>';
     }
 
+    // Badge statut : pour essai actif → "⏳ En attente" ; pour expiré → label existant
+    const statusBadge = trial.isExpired
+      ? '<span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span>'
+      : '<span class="commande-trial-badge urgency-ok">⏳ En attente · ' + trial.label + '</span>';
+
+    // Bouton Suspendre uniquement si le paiement est expiré (essai terminé)
+    const suspendBtn = trial.isExpired
+      ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + k + '\')">' +
+          (trial.isSuspended ? '▶ Réactiver' : '⏸ Suspendre') +
+        '</button>'
+      : '';
+
     const card = document.createElement('div');
     card.className = 'commande-card';
     card.dataset.cmdkey = k;
@@ -3534,13 +3551,11 @@ function _doRenderPaiements() {
         '<div style="font-size:0.72rem;color:var(--muted);margin-top:3px">ID : <code style="color:var(--gold)">' + escapeHtml(rid) + '</code></div>' +
       '</div>' +
       '<div style="padding:0 12px 12px">' +
-        '<div style="margin-bottom:8px"><span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span></div>' +
+        '<div style="margin-bottom:8px">' + statusBadge + '</div>' +
         '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">' + escapeHtml(price + ' €/' + unit) + '</div>' +
         '<div class="commande-trial-action">' +
           '<button class="commande-paid-btn" onclick="_markPaid(\'' + k + '\')">✅ Marquer comme payé</button>' +
-          '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + k + '\')">' +
-            (trial.isSuspended ? '▶ Réactiver' : '⏸ Suspendre') +
-          '</button>' +
+          suspendBtn +
         '</div>' +
         ((emailBtn || waBtn || viberBtn)
           ? '<div class="commande-actions" style="margin-top:8px">' + emailBtn + waBtn + viberBtn + '</div>'
