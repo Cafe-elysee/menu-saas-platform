@@ -4702,17 +4702,26 @@ function saveControlToken(tokenValue) {
 document.addEventListener('deviceready', () => {
   _devicereadyFired = true;
 
-  // Back button : ferme les modals ouverts avant de quitter l'app
+  // Back button : ferme les modals ouverts avant de quitter l'app (ordre z-index décroissant)
   const _CapApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
   if (_CapApp) {
     _CapApp.addListener('backButton', () => {
-      if (document.getElementById('variant-modal') && document.getElementById('variant-modal').classList.contains('open')) {
-        closeVariantModal(); return;
-      }
-      const ncModal = document.getElementById('nc-modal');
-      if (ncModal && ncModal.classList.contains('show')) {
-        closeNewClientModal(); return;
-      }
+      var _hm = document.getElementById('hist-modal');
+      if (_hm && _hm.style.display === 'flex') { _hideHistModal(); return; }
+      var _ccm = document.getElementById('ctrl-confirm-modal');
+      if (_ccm && _ccm.style.display === 'flex') { _hideCtrlConfirm(); return; }
+      var _dm = document.getElementById('del-modal');
+      if (_dm && _dm.classList.contains('show')) { closeDelModal(); return; }
+      var _nm = document.getElementById('nc-modal');
+      if (_nm && _nm.classList.contains('show')) { closeNewClientModal(); return; }
+      var _rm = document.getElementById('retention-modal');
+      if (_rm && _rm.classList.contains('open')) { cancelRetention(); return; }
+      var _lm = document.getElementById('lang-modal');
+      if (_lm && _lm.classList.contains('open')) { cancelLangDisable(); return; }
+      var _tm = document.getElementById('theme-modal');
+      if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
+      var _vm = document.getElementById('variant-modal');
+      if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
       _CapApp.exitApp();
     });
   }
