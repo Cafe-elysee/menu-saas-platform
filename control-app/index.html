@@ -3516,7 +3516,7 @@ function _doRenderPaiements() {
     var d = _commandesCache[k], trial = _tc[k];
     var created = d.clientCree || _lastCreatedClients[k];
     var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
-    var name = d.restaurant || '—';
+    var name = d.restaurant || (d.emailData && d.emailData.name) || '—';
     var price = _getCommandePrice(d), unit = d.paymentMode === 'annual' ? 'an' : 'mois';
     var suspTag = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
     var paieBadge;
