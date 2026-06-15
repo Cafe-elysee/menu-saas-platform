@@ -2964,6 +2964,7 @@ function _findCommandeForClient(slug) {
     var d = _commandesCache[k];
     var created = d.clientCree || _lastCreatedClients[k];
     if (created && created.rid === slug) return k;
+    if (d.emailData && d.emailData.rid === slug) return k;
   }
   return null;
 }
@@ -3529,14 +3530,16 @@ function _doRenderPaiements() {
     card.className = 'commande-card'; card.dataset.cmdkey = k;
     card.innerHTML =
       '<div class="commande-card-header" style="padding-bottom:6px">' +
-        '<div class="commande-client-name">'+escapeHtml(name)+suspTag+'</div>' +
-        '<div style="font-size:0.72rem;color:var(--muted);margin-top:3px">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+escapeHtml(price+' €/'+unit)+'</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px">' +
+          '<div class="commande-client-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(name)+suspTag+'</div>' +
+          '<button class="paie-voir-btn" style="flex-shrink:0" onclick="_gotoClientCard(\'' + ridEsc + '\')">&#128100; Voir</button>' +
+        '</div>' +
+        '<div style="font-size:0.72rem;color:var(--muted)">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+escapeHtml(price+' €/'+unit)+'</div>' +
       '</div>' +
       '<div style="padding:0 12px 12px">' +
         '<div style="margin-bottom:10px">'+paieBadge+'</div>' +
-        '<div class="commande-trial-action">' +
-          '<button class="commande-paid-btn" onclick="_markPaid(\'' + k + '\')">&#9989; Marquer comme payé</button>' +
-          '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc + '\')">&#128100; Voir le client</button>' +
+        '<div class="commande-trial-action" style="flex-direction:column;gap:6px">' +
+          '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + k + '\')">&#9989; Marquer comme payé</button>' +
           suspendBtn +
         '</div>' +
       '</div>';
@@ -3977,28 +3980,11 @@ function buildClientCard(client) {
   const langOpts = langs.map(l => '<option value="'+l+'">'+( LANG_LABELS[l]||l)+'</option>').join('');
   const retOpts  = RETENTION_OPTS.map(o => '<option value="'+o.ms+'"'+(o.ms===2592000000?' selected':'')+'>'+o.label+'</option>').join('');
 
-  const CTRL_CARTE_IDS  = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
-  const CTRL_LIVRE_IDS  = new Set(['paper-elegant','livre-noir','livre-botanique','livre-azure','livre-rose','livre-antique','livre-epure','livre-cerise','livre-indigo','livre-foret']);
-  const CTRL_ELEGANT_IDS = new Set(THEME_VARIANTS.map(t => t.family));
-  function _makeThemeRow(th) {
-    const btn = '<button class="variant-btn" onclick="openVariantPopup(\''+s+'\',\''+th.id+'\')">Couleurs</button>';
-    return '<div class="toggle-row"><span class="toggle-label">'+th.name+btn+'</span>'+
-           '<label class="toggle"><input type="checkbox" data-id="'+th.id+'" '+
-           'onchange="toggleThemeVis(\''+s+'\',\''+th.id+'\',this.checked)">'+
-           '<div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>';
-  }
-  const carteThemes   = ALL_THEMES_LIST.filter(th => CTRL_CARTE_IDS.has(th.id));
-  const livreThemes   = ALL_THEMES_LIST.filter(th => CTRL_LIVRE_IDS.has(th.id));
-  const elegantThemes = ALL_THEMES_LIST.filter(th => CTRL_ELEGANT_IDS.has(th.id));
-  const themeToggles =
-    (carteThemes.length   ? '<div class="theme-type-sep">🃏 Carte</div>'   + carteThemes.map(_makeThemeRow).join('')   : '') +
-    (livreThemes.length   ? '<div class="theme-type-sep">📖 Livre</div>'   + livreThemes.map(_makeThemeRow).join('')   : '') +
-    (elegantThemes.length ? '<div class="theme-type-sep">✨ Élégant</div>' + elegantThemes.map(_makeThemeRow).join('') : '');
-
   const _ck0   = _findCommandeForClient(s);
   const _cd0   = _ck0 ? _commandesCache[_ck0] : null;
-  const _cc0   = _cd0 && (_cd0.clientCree || _lastCreatedClients[_ck0]);
-  const _billInit = (_ck0 && _cd0 && _cc0) ? _buildClientBillingSectionHTML(_ck0, _cd0, _cc0) : '<div class="hist-inline-empty">Chargement…</div>';
+  const _cc0   = _cd0 && (_cd0.clientCree || _lastCreatedClients[_ck0]
+                  || (_cd0.emailData ? { rid: s, name: client.name, pwd: _cd0.emailData.pwd || '' } : { rid: s, name: client.name, pwd: '' }));
+  const _billInit = (_ck0 && _cd0) ? _buildClientBillingSectionHTML(_ck0, _cd0, _cc0 || { rid: s, name: client.name, pwd: '' }) : '<div class="hist-inline-empty">Aucune commande.</div>';
   const _histInit = (_ck0 && _cd0 && _cc0) ? _buildPaymentHistoryInlineHTML(_ck0, _cd0) : '';
   const _nameEsc  = (client.name || '').replace(/'/g, '&#39;');
 
@@ -4077,9 +4063,6 @@ function buildClientCard(client) {
       '<div class="retention-row"><span class="retention-label">&#128722; Commandes</span>'+
       '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\'' + s + '\',\'orders\',this)">'+retOpts+'</select></div>'+
       '<button class="btn-action-red" style="margin-top:12px;width:100%" onclick="askDeleteClient(\'' + s + '\',\''+_nameEsc+'\')">&#128465; Supprimer ce client</button>'+
-    '</div>'+
-    '<div class="card-section"><div class="card-section-header">&#127912; Thèmes disponibles</div>'+
-      themeToggles+
     '</div>'+
     '</div></div>';
 
