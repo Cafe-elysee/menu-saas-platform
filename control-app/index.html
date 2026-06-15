@@ -3524,7 +3524,7 @@ function _doRenderPaiements() {
       paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]\s*/u,'') + ' restant</span>';
     }
     var ridEsc = escapeHtml(rid);
-    var suspendBtn = trial.isSuspended ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(''+k+'')">&#9654; Réactiver</button>' : '';
+    var suspendBtn = trial.isSuspended ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(\'' + k + '\')">&#9654; Réactiver</button>' : '';
     var card = document.createElement('div');
     card.className = 'commande-card'; card.dataset.cmdkey = k;
     card.innerHTML =
@@ -3535,8 +3535,8 @@ function _doRenderPaiements() {
       '<div style="padding:0 12px 12px">' +
         '<div style="margin-bottom:10px">'+paieBadge+'</div>' +
         '<div class="commande-trial-action">' +
-          '<button class="commande-paid-btn" onclick="_markPaid(''+k+'')">&#9989; Marquer comme payé</button>' +
-          '<button class="paie-voir-btn" onclick="_gotoClientCard(''+ridEsc+'')">&#128100; Voir le client</button>' +
+          '<button class="commande-paid-btn" onclick="_markPaid(\'' + k + '\')">&#9989; Marquer comme payé</button>' +
+          '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc + '\')">&#128100; Voir le client</button>' +
           suspendBtn +
         '</div>' +
       '</div>';
@@ -3577,7 +3577,7 @@ function buildExClientCard(slug, d) {
   card.innerHTML =
     '<div class="exclient-header">' +
       '<span class="exclient-name">'+escapeHtml(d.name||slug)+'</span>' +
-      '<button class="exclient-restore-btn" onclick="_askRestoreClient(''+escapeHtml(slug)+'')">&#x21A9; Retour</button>' +
+      '<button class="exclient-restore-btn" onclick="_askRestoreClient(\'' + escapeHtml(slug) + '\')">&#x21A9; Retour</button>' +
     '</div>' +
     '<div class="exclient-info">Forfait : '+escapeHtml(d.forfait||'—')+'</div>' +
     '<div class="exclient-info">Paiement : '+escapeHtml(d.paymentMode||'—')+'</div>' +
