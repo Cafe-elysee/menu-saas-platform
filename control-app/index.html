@@ -3079,7 +3079,7 @@ function _buildPaymentHistoryInlineHTML(cmdKey, d) {
     var amt = p.montant !== undefined ? p.montant : '?';
     return '<div class="hist-inline-item"><span class="hist-inline-date">'+escapeHtml(ds)+'</span><span class="hist-inline-amt">'+escapeHtml(String(amt))+' €/'+unit+'</span></div>';
   }).join('');
-  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l'historique</button>';
+  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
 }
 
 // ── Sauvegarder le mode paiement (optimistic) ────────────────────────────────
