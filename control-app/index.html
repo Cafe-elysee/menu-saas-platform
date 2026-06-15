@@ -1702,7 +1702,7 @@
     .contact-indic-inp { width: 60px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,164,78,0.25); border-radius: 8px; padding: 5px 6px; font-size: 0.8rem; color: var(--text); text-align: center; }
     .contact-save-btn { background: rgba(200,164,78,0.18); border: 1px solid rgba(200,164,78,0.35); color: var(--gold); border-radius: 8px; padding: 5px 10px; font-size: 0.77rem; cursor: pointer; }
     .contact-cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--muted); border-radius: 8px; padding: 5px 10px; font-size: 0.77rem; cursor: pointer; }
-    body.light .contact-inp, body.light .contact-indic-inp { background: rgba(0,0,0,0.04); border-color: rgba(200,164,78,0.3); color: #333; }
+    html.light .contact-inp, html.light .contact-indic-inp { background: rgba(0,0,0,0.04); border-color: rgba(200,164,78,0.3); color: #333; }
     .exclient-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; margin: 0 12px 12px; padding: 14px 16px; animation: fadeSlide 0.3s ease; }
     .exclient-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .exclient-name { font-weight: 600; font-size: 0.91rem; color: var(--text); }
@@ -3624,8 +3624,7 @@ function _gotoClientCard(rid) {
     var card = document.getElementById('card-'+slugId);
     if (card) {
       card.scrollIntoView({ behavior:'smooth', block:'center' });
-      var inner = card.querySelector('.card-body');
-      if (inner && inner.style.display !== 'block') card.querySelector('.card-top').click();
+      if (!card.classList.contains('open')) card.querySelector('.card-top').click();
       setTimeout(function() {
         var billing = document.getElementById('billing-section-'+slugId);
         if (billing) billing.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -4294,7 +4293,7 @@ function _renderContactsSection(id, slug, contacts) {
       html += '<div class="contact-row" id="contact-row-'+t.key+'-'+id+'">'+
         '<span class="contact-type">'+t.icon+' '+t.label+'</span>'+
         '<span class="contact-val">'+escapeHtml(val)+'</span>'+
-        '<a class="contact-btn" href="'+t.href(val)+'" target="_system">Ouvrir</a>'+
+        '<a class="contact-btn" href="'+encodeURI(t.href(val))+'" target="_system">Ouvrir</a>'+
         '<button class="contact-btn" onclick="_editContact(\'' + slug + '\',\'' + t.key + '\',\'' + id + '\')">Modifier</button>'+
         '</div>';
     } else {
