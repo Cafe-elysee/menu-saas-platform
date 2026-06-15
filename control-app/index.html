@@ -1708,6 +1708,8 @@
     .exclient-name { font-weight: 600; font-size: 0.91rem; color: var(--text); }
     .exclient-restore-btn { background: rgba(200,164,78,0.15); border: 1px solid rgba(200,164,78,0.35); color: var(--gold); border-radius: 10px; padding: 5px 13px; font-size: 0.78rem; cursor: pointer; font-weight: 600; }
     .exclient-restore-btn:hover { background: rgba(200,164,78,0.28); }
+    .exclient-delete-btn { display: block; width: 100%; margin-top: 10px; background: rgba(220,60,60,0.12); border: 1px solid rgba(220,60,60,0.35); color: #e05555; border-radius: 10px; padding: 8px 12px; font-size: 0.8rem; cursor: pointer; font-weight: 600; text-align: center; }
+    .exclient-delete-btn:hover { background: rgba(220,60,60,0.25); }
     .exclient-info { font-size: 0.77rem; color: var(--muted); line-height: 1.85; }
     .exclient-info strong { color: var(--text); opacity: 0.75; font-weight: 500; }
     html.light .exclient-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.09); }
@@ -1939,7 +1941,7 @@
     </div>
     <span class="nav-label">Paiements</span>
   </button>
-  <button class="nav-btn" id="nav-exclients" onclick="switchTab('exclients')">
+  <button class="nav-btn" id="nav-exclients" onclick="switchTab('exclients')" style="display:none">
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
@@ -3561,8 +3563,13 @@ function _renderExClients() {
   var wrap = document.getElementById('exclients-list');
   if (!wrap) return;
   var keys = Object.keys(_archivedClientsCache);
+
+  var _navEx = document.getElementById('nav-exclients');
+  if (_navEx) _navEx.style.display = keys.length > 0 ? '' : 'none';
+  if (keys.length === 0 && _currentTab === 'exclients') switchTab('clients');
+
   if (keys.length === 0) {
-    wrap.innerHTML = '<div class="commande-empty-state" style="display:block">Aucun ex-client archivé.</div>';
+    wrap.innerHTML = '';
     return;
   }
   var frag = document.createDocumentFragment();
@@ -3577,16 +3584,37 @@ function buildExClientCard(slug, d) {
   var card = document.createElement('div');
   card.className = 'exclient-card';
   var deletedStr = d.deletedAt ? new Date(d.deletedAt).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  var slugEsc = escapeHtml(slug);
   card.innerHTML =
     '<div class="exclient-header">' +
       '<span class="exclient-name">'+escapeHtml(d.name||slug)+'</span>' +
-      '<button class="exclient-restore-btn" onclick="_askRestoreClient(\'' + escapeHtml(slug) + '\')">&#x21A9; Retour</button>' +
+      '<button class="exclient-restore-btn" onclick="_askRestoreClient(\'' + slugEsc + '\')">&#x21A9; Retour</button>' +
     '</div>' +
     '<div class="exclient-info">Forfait : '+escapeHtml(d.forfait||'—')+'</div>' +
     '<div class="exclient-info">Paiement : '+escapeHtml(d.paymentMode||'—')+'</div>' +
     '<div class="exclient-info">Email : '+escapeHtml(d.email||'—')+'</div>' +
-    '<div class="exclient-info" style="color:var(--muted);font-size:0.75rem">Supprimé le '+escapeHtml(deletedStr)+'</div>';
+    '<div class="exclient-info" style="color:var(--muted);font-size:0.75rem">Supprimé le '+escapeHtml(deletedStr)+'</div>' +
+    '<button class="exclient-delete-btn" onclick="_askPermanentDelete(\'' + slugEsc + '\')">&#128465; Supprimer définitivement</button>';
   return card;
+}
+
+function _askPermanentDelete(slug) {
+  var d = _archivedClientsCache[slug];
+  var name = (d && d.name) ? d.name : slug;
+  _showCtrlConfirm(
+    '🗑 Supprimer définitivement ?',
+    'Le client ' + escapeHtml(name) + ' sera supprimé définitivement et ne pourra pas être restauré.',
+    'Supprimer',
+    function() {
+      _controlDb.ref('/archivedClients/' + slug).remove().then(function() {
+        delete _archivedClientsCache[slug];
+        _renderExClients();
+      }).catch(function(e) {
+        alert('Erreur : ' + e.message);
+      });
+    },
+    true
+  );
 }
 
 function _askRestoreClient(slug) {
