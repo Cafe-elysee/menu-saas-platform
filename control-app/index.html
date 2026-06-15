@@ -1689,6 +1689,38 @@
   .dp-cam svg{ opacity:0.62; }
   .variant-star-btn{ opacity:0.52; }
   .variant-eye-btn.is-hidden{ opacity:0.50; }
+    .card-section { padding: 12px 0 10px; border-bottom: 1px solid rgba(200,164,78,0.08); }
+    .card-section:last-child { border-bottom: none; padding-bottom: 4px; }
+    .card-section-header { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; opacity: 0.85; }
+    .contact-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; font-size: 0.82rem; }
+    .contact-type { width: 68px; color: var(--muted); font-size: 0.72rem; flex-shrink: 0; }
+    .contact-val { flex: 1; color: var(--text); word-break: break-all; }
+    .contact-val.empty { color: var(--muted); font-style: italic; }
+    .contact-btn { background: rgba(200,164,78,0.10); border: 1px solid rgba(200,164,78,0.22); color: var(--gold); border-radius: 8px; padding: 3px 8px; font-size: 0.71rem; cursor: pointer; white-space: nowrap; }
+    .contact-edit-row { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+    .contact-inp { flex: 1; min-width: 100px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,164,78,0.25); border-radius: 8px; padding: 5px 9px; font-size: 0.8rem; color: var(--text); }
+    .contact-indic-inp { width: 60px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,164,78,0.25); border-radius: 8px; padding: 5px 6px; font-size: 0.8rem; color: var(--text); text-align: center; }
+    .contact-save-btn { background: rgba(200,164,78,0.18); border: 1px solid rgba(200,164,78,0.35); color: var(--gold); border-radius: 8px; padding: 5px 10px; font-size: 0.77rem; cursor: pointer; }
+    .contact-cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--muted); border-radius: 8px; padding: 5px 10px; font-size: 0.77rem; cursor: pointer; }
+    body.light .contact-inp, body.light .contact-indic-inp { background: rgba(0,0,0,0.04); border-color: rgba(200,164,78,0.3); color: #333; }
+    .exclient-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; margin: 0 12px 12px; padding: 14px 16px; animation: fadeSlide 0.3s ease; }
+    .exclient-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .exclient-name { font-weight: 600; font-size: 0.91rem; color: var(--text); }
+    .exclient-restore-btn { background: rgba(200,164,78,0.15); border: 1px solid rgba(200,164,78,0.35); color: var(--gold); border-radius: 10px; padding: 5px 13px; font-size: 0.78rem; cursor: pointer; font-weight: 600; }
+    .exclient-restore-btn:hover { background: rgba(200,164,78,0.28); }
+    .exclient-info { font-size: 0.77rem; color: var(--muted); line-height: 1.85; }
+    .exclient-info strong { color: var(--text); opacity: 0.75; font-weight: 500; }
+    body.light .exclient-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.09); }
+    .paie-badge-yellow { display: inline-flex; align-items: center; gap: 4px; background: rgba(200,164,78,0.14); border: 1px solid rgba(200,164,78,0.32); color: #c8a44e; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
+    .paie-badge-red { display: inline-flex; align-items: center; gap: 4px; background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.3); color: #e05252; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
+    .paie-voir-btn { background: rgba(200,164,78,0.10); border: 1px solid rgba(200,164,78,0.25); color: var(--gold); border-radius: 8px; padding: 5px 11px; font-size: 0.77rem; cursor: pointer; }
+    .hist-inline { margin-top: 4px; }
+    .hist-inline-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.77rem; }
+    .hist-inline-item:last-child { border-bottom: none; }
+    .hist-inline-date { color: var(--muted); }
+    .hist-inline-amt { color: var(--gold); font-weight: 600; }
+    .hist-inline-empty { font-size: 0.77rem; color: var(--muted); padding: 4px 0; font-style: italic; }
+    .hist-voir-tout { margin-top: 9px; font-size: 0.75rem; background: transparent; border: 1px solid rgba(200,164,78,0.2); color: var(--gold); border-radius: 8px; padding: 4px 11px; cursor: pointer; }
   </style>
 
 </head>
@@ -1764,26 +1796,11 @@
 
   <div class="tab-scroll">
   <div class="tabs-track" id="tabs-track">
-    <!-- TAB COMMANDES -->
-    <div class="tab-pane" id="pane-commandes">
-      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Commandes reçues</span>
-        <button class="btn-vider-commande" onclick="viderCommande()">🗑️ Vider tout</button>
-      </div>
-      <div class="commande-list" id="commande-list">
-        <div class="commande-empty" id="commande-empty">
-          <div class="commande-empty-icon">📋</div>
-          Aucune commande pour l'instant.<br>Elles apparaîtront ici en temps réel.
-        </div>
-        <div id="commande-cards"></div>
-      </div>
-    </div>
-
     <!-- TAB CLIENTS -->
     <div class="tab-pane" id="pane-clients">
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
         <button class="btn-lien-admin" onclick="copyAdminLink()">🔗 Lien admin</button>
-        <button class="btn-nouveau-client" onclick="showNewClientModal()">＋ Nouveau client</button>
+        
       </div>
       <div class="clients-list" id="clients-list"></div>
     </div>
@@ -1796,6 +1813,16 @@
         Aucun paiement en attente.
       </div>
       <div id="paiements-list"></div>
+    </div>
+
+    <!-- TAB EX-CLIENTS -->
+    <div class="tab-pane" id="pane-exclients">
+      <div class="section-title">Ex-Clients archivés</div>
+      <div class="commande-empty" id="exclients-empty" style="display:none">
+        <div class="commande-empty-icon">👤</div>
+        Aucun ex-client archivé.
+      </div>
+      <div id="exclients-list"></div>
     </div>
 
     <!-- TAB RÉGLAGES -->
@@ -1891,19 +1918,7 @@
 </div>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-commandes" onclick="switchTab('commandes')">
-    <div class="nav-badge" id="badge-commandes"></div>
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-        <polyline points="10 9 9 9 8 9"/>
-      </svg>
-    </div>
-    <span class="nav-label">Commandes</span>
-  </button>
-  <button class="nav-btn" id="nav-clients" onclick="switchTab('clients')">
+  <button class="nav-btn active" id="nav-clients" onclick="switchTab('clients')">
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -1914,7 +1929,7 @@
     </div>
     <span class="nav-label">Clients</span>
   </button>
-  <button class="nav-btn" id="nav-paiements" onclick="switchTab('paiements')">
+  <button class="nav-btn" id="nav-paiements" onclick="switchTab('paiements')" style="display:none">
     <div class="nav-badge" id="badge-paiements"></div>
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1923,6 +1938,15 @@
       </svg>
     </div>
     <span class="nav-label">Paiements</span>
+  </button>
+  <button class="nav-btn" id="nav-exclients" onclick="switchTab('exclients')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <line x1="1" y1="1" x2="23" y2="23"/>
+      </svg>
+    </div>
+    <span class="nav-label">Ex-Clients</span>
   </button>
   <button class="nav-btn" id="nav-reglages" onclick="switchTab('reglages')">
     <div class="nav-icon">
@@ -2369,20 +2393,21 @@ function showApp() {
 // ════════════════════════════════════════════════════
 // TAB NAVIGATION
 // ════════════════════════════════════════════════════
-const TABS = ['commandes', 'clients', 'paiements', 'reglages'];
-let _currentTab = 'commandes';
+const TABS = ['clients', 'paiements', 'exclients', 'reglages'];
+let _currentTab = 'clients';
 
 function switchTab(tab) {
   _currentTab = tab;
   const idx = TABS.indexOf(tab);
   document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 25) + '%)';
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('nav-' + tab).classList.add('active');
-  // FAB: visible only in Clients tab
+  const _navEl = document.getElementById('nav-' + tab);
+  if (_navEl) _navEl.classList.add('active');
   const fab = document.getElementById('quick-nav-fab');
   if (fab) fab.style.display = tab === 'clients' ? 'flex' : 'none';
   if (tab === 'reglages') refreshNotifStatus();
   if (tab === 'paiements') _doRenderPaiements();
+  if (tab === 'exclients') _renderExClients();
 }
 
 // ─── Swipe between tabs ───
@@ -2428,6 +2453,7 @@ function initFirebase() {
     _saasDb = firebase.database(saasApp);
   }
   listenCommandes();
+  loadArchivedClients();
   loadClientsFromFirebase();
   loadDemoPhotos();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
@@ -2498,7 +2524,7 @@ function closeNewClientModal() {
   if (_pendingCommandeKey) {
     const key = _pendingCommandeKey;
     _pendingCommandeKey = null;
-    switchTab('commandes');
+    switchTab('clients');
     setTimeout(function() {
       const card = document.querySelector('.commande-card[data-key="' + key + '"]');
       if (card) {
@@ -2643,6 +2669,7 @@ function getClientDb(slug) {
 // COMMANDES — temps réel
 // ════════════════════════════════════════════════════
 let _commandesCache = {};
+let _archivedClientsCache = {};
 let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
 let _lastCreatedClients = {};
@@ -2863,20 +2890,10 @@ function renderCommandes() {
 function _doRenderCommandes() {
   const empty = document.getElementById('commande-empty');
   const wrap  = document.getElementById('commande-cards');
+  _doRenderPaiements();
   if (!wrap) return;
   const keys  = Object.keys(_commandesCache).sort((a, b) => b - a);
   const newCount = keys.filter(k => !_commandesCache[k].lu).length;
-
-  // Décision onglet initial : Commandes si commandes non traitées, sinon Clients
-  if (!_initialTabDecided) {
-    _initialTabDecided = true;
-    const hasPending = keys.some(k => (_commandesCache[k].statut || 'nouveau') !== 'traite');
-    if (!hasPending) switchTab('clients');
-  }
-
-  const badge = document.getElementById('badge-commandes');
-  if (newCount > 0) { badge.textContent = newCount > 9 ? '9+' : newCount; badge.classList.add('show'); }
-  else badge.classList.remove('show');
 
   wrap.innerHTML = '';
   if (keys.length === 0) { empty.style.display = 'block'; return; }
@@ -3048,10 +3065,21 @@ function _buildClientBillingSectionHTML(cmdKey, d, created) {
     priceRow +
     paymodeRow +
     birthdateRow +
-    '<div class="section-label" style="margin-top:8px">📨 Contact client</div>' +
-    '<div class="commande-actions">' + emailBtn + waBtn + viberBtn + '</div>' +
     trialAction +
     '</div>';
+}
+
+function _buildPaymentHistoryInlineHTML(cmdKey, d) {
+  var paiementsObj = d.paiements || {};
+  var payments = Object.values(paiementsObj).filter(function(p) { return p && p.date; }).sort(function(a,b) { return b.date - a.date; });
+  if (payments.length === 0) return '<div class="hist-inline-empty">Aucun paiement enregistré.</div>';
+  var rows = payments.slice(0, 5).map(function(p) {
+    var ds = new Date(p.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+    var unit = p.mode === 'annual' ? 'an' : 'mois';
+    var amt = p.montant !== undefined ? p.montant : '?';
+    return '<div class="hist-inline-item"><span class="hist-inline-date">'+escapeHtml(ds)+'</span><span class="hist-inline-amt">'+escapeHtml(String(amt))+' €/'+unit+'</span></div>';
+  }).join('');
+  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l'historique</button>';
 }
 
 // ── Sauvegarder le mode paiement (optimistic) ────────────────────────────────
@@ -3074,34 +3102,15 @@ function _savePaymentMode(cmdKey, mode) {
 
 // ── Re-render la section facturation dans la carte client ────────────────────
 function _rerenderClientBillingSection(cmdKey) {
-  const d = _commandesCache[cmdKey];
+  var d = _commandesCache[cmdKey];
   if (!d) return;
-  const created = d.clientCree || _lastCreatedClients[cmdKey];
+  var created = d.clientCree || _lastCreatedClients[cmdKey];
   if (!created) return;
-
-  const newHtml = _buildClientBillingSectionHTML(cmdKey, d, created);
-  const temp = document.createElement('div');
-  temp.innerHTML = newHtml;
-  const newSection = temp.firstElementChild;
-
-  // Remplacer une section existante
-  const existing = document.querySelector('.client-billing-section[data-cmdkey="' + cmdKey + '"]');
-  if (existing) {
-    existing.parentNode.replaceChild(newSection, existing);
-    _initBirthdatePicker(cmdKey);
-    return;
-  }
-
-  // Ajouter dans la carte client si elle existe déjà (cas : commandes chargées après les clients)
-  const slugId = created.rid.replace(/-/g, '_');
-  const cardBodyInner = document.querySelector('#card-' + slugId + ' .card-body-inner');
-  if (cardBodyInner) {
-    const hr = document.createElement('hr');
-    hr.className = 'divider';
-    cardBodyInner.appendChild(hr);
-    cardBodyInner.appendChild(newSection);
-    _initBirthdatePicker(cmdKey);
-  }
+  var slugId = created.rid.replace(/-/g, '_');
+  var billingEl = document.getElementById('billing-section-' + slugId);
+  if (billingEl) { billingEl.innerHTML = _buildClientBillingSectionHTML(cmdKey, d, created); _initBirthdatePicker(cmdKey); }
+  var histEl = document.getElementById('hist-inline-' + slugId);
+  if (histEl) histEl.innerHTML = _buildPaymentHistoryInlineHTML(cmdKey, d);
 }
 
 // ── Copier le message d'attente/contact (commande non encore créée) ──────────
@@ -3484,88 +3493,145 @@ function _doRenderPaiements() {
     return (ta.ts || 0) - (tb.ts || 0);
   });
 
-  const expiredCount = pendingKeys.filter(function(k) { return _tc[k].isExpired; }).length;
-  const badge = document.getElementById('badge-paiements');
+  // Nav visibility
+  var _navP = document.getElementById('nav-paiements');
+  if (_navP) _navP.style.display = pendingKeys.length > 0 ? '' : 'none';
+  if (pendingKeys.length === 0 && _currentTab === 'paiements') switchTab('clients');
+
+  var expiredCount = pendingKeys.filter(function(k) { return _tc[k].isExpired; }).length;
+  var badge = document.getElementById('badge-paiements');
   if (badge) {
-    // Badge = expirés uniquement (action urgente) ; liste = tous les paiements en attente
-    const n = expiredCount > 0 ? expiredCount : pendingKeys.length;
+    var n = expiredCount > 0 ? expiredCount : pendingKeys.length;
     if (n > 0) { badge.textContent = n > 9 ? '9+' : String(n); badge.classList.add('show'); }
     else badge.classList.remove('show');
   }
-
-  if (pendingKeys.length === 0) {
-    listEl.innerHTML = '';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  const frag = document.createDocumentFragment();
+  if (pendingKeys.length === 0) { listEl.innerHTML = ''; if (emptyEl) emptyEl.style.display = 'block'; return; }
+  if (emptyEl) emptyEl.style.display = 'none';
+  var frag = document.createDocumentFragment();
+  var _now = Date.now();
   pendingKeys.forEach(function(k) {
-    const d     = _commandesCache[k];
-    const trial = _tc[k];
-    const created = d.clientCree || _lastCreatedClients[k];
-    const rid   = created ? created.rid : (d.emailData ? d.emailData.rid : '—');
-    const name  = d.restaurant || '—';
-    const price = _getCommandePrice(d);
-    const unit  = d.paymentMode === 'annual' ? 'an' : 'mois';
-    const langue = d.langue || 'fr';
-
-    const suspTag = trial.isSuspended
-      ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>'
-      : '';
-
-    var emailBtn = '';
-    if (d.email) {
-      const subj = _buildReminderSubject(name, langue);
-      const body = _buildPaymentReminderMsg(d, name, langue);
-      emailBtn = '<a class="commande-action-btn btn-email" href="mailto:' + encodeURIComponent(d.email) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body) + '" target="_system">✉️ Email</a>';
+    var d = _commandesCache[k], trial = _tc[k];
+    var created = d.clientCree || _lastCreatedClients[k];
+    var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
+    var name = d.restaurant || '—';
+    var price = _getCommandePrice(d), unit = d.paymentMode === 'annual' ? 'an' : 'mois';
+    var suspTag = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
+    var paieBadge;
+    if (trial.isExpired) {
+      var expAt = (trial.ts||0) + 7*24*3600*1000, od = Math.max(0,Math.floor((_now-expAt)/86400000));
+      paieBadge = '<span class="paie-badge-red">🔴 ' + (od > 0 ? '+'+od+'j de retard' : 'Expiré') + '</span>';
+    } else {
+      paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]s*/,'') + ' restant</span>';
     }
-    var waBtn = '';
-    if (d.whatsapp && d.whatsapp.numero) {
-      const num = (d.whatsapp.indicatif || '').replace(/\D/g,'') + d.whatsapp.numero.replace(/\D/g,'');
-      const msg = _buildPaymentReminderMsg(d, name, langue);
-      waBtn = '<a class="commande-action-btn btn-wa" href="https://wa.me/' + num + '?text=' + encodeURIComponent(msg) + '" target="_system"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.073 23.927a.5.5 0 0 0 .613.613l6.072-1.459A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.93 0-3.733-.524-5.28-1.435l-.379-.224-3.927.944.96-3.926-.247-.397A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182 17.43 2.182 21.818 6.57 21.818 12c0 5.43-4.388 9.818-9.818 9.818z"/></svg> WhatsApp</a>';
-    }
-    var viberBtn = '';
-    if (d.viber && d.viber.numero) {
-      const num = (d.viber.indicatif || '').replace(/\D/g,'') + d.viber.numero.replace(/\D/g,'');
-      viberBtn = '<a class="commande-action-btn btn-viber" href="viber://chat?number=%2B' + num + '" target="_system">📞 Viber</a>';
-    }
-
-    // Badge statut : pour essai actif → "⏳ En attente" ; pour expiré → label existant
-    const statusBadge = trial.isExpired
-      ? '<span class="commande-trial-badge urgency-' + trial.urgency + '">' + trial.label + '</span>'
-      : '<span class="commande-trial-badge urgency-' + trial.urgency + '">⏳ En attente · ' + trial.label + '</span>';
-
-    // Réactiver uniquement si suspendu (la suspension auto gère le reste)
-    const suspendBtn = trial.isSuspended
-      ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(\'' + k + '\')">▶ Réactiver</button>'
-      : '';
-
-    const card = document.createElement('div');
-    card.className = 'commande-card';
-    card.dataset.cmdkey = k;
+    var ridEsc = escapeHtml(rid);
+    var suspendBtn = trial.isSuspended ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(''+k+'')">&#9654; Réactiver</button>' : '';
+    var card = document.createElement('div');
+    card.className = 'commande-card'; card.dataset.cmdkey = k;
     card.innerHTML =
       '<div class="commande-card-header" style="padding-bottom:6px">' +
-        '<div class="commande-client-name">' + escapeHtml(name) + suspTag + '</div>' +
-        '<div style="font-size:0.72rem;color:var(--muted);margin-top:3px">ID : <code style="color:var(--gold)">' + escapeHtml(rid) + '</code></div>' +
+        '<div class="commande-client-name">'+escapeHtml(name)+suspTag+'</div>' +
+        '<div style="font-size:0.72rem;color:var(--muted);margin-top:3px">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+escapeHtml(price+' €/'+unit)+'</div>' +
       '</div>' +
       '<div style="padding:0 12px 12px">' +
-        '<div style="margin-bottom:8px">' + statusBadge + '</div>' +
-        '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">' + escapeHtml(price + ' €/' + unit) + '</div>' +
+        '<div style="margin-bottom:10px">'+paieBadge+'</div>' +
         '<div class="commande-trial-action">' +
-          '<button class="commande-paid-btn" onclick="_markPaid(\'' + k + '\')">✅ Marquer comme payé</button>' +
+          '<button class="commande-paid-btn" onclick="_markPaid(''+k+'')">&#9989; Marquer comme payé</button>' +
+          '<button class="paie-voir-btn" onclick="_gotoClientCard(''+ridEsc+'')">&#128100; Voir le client</button>' +
           suspendBtn +
         '</div>' +
-        ((emailBtn || waBtn || viberBtn)
-          ? '<div class="commande-actions" style="margin-top:8px">' + emailBtn + waBtn + viberBtn + '</div>'
-          : '') +
       '</div>';
     frag.appendChild(card);
   });
   listEl.innerHTML = '';
   listEl.appendChild(frag);
+}
+
+
+function loadArchivedClients() {
+  _controlDb.ref('/archivedClients').on('value', function(snap) {
+    _archivedClientsCache = snap.val() || {};
+    _renderExClients();
+  });
+}
+
+function _renderExClients() {
+  var wrap = document.getElementById('exclients-list');
+  if (!wrap) return;
+  var keys = Object.keys(_archivedClientsCache);
+  if (keys.length === 0) {
+    wrap.innerHTML = '<div class="commande-empty-state" style="display:block">Aucun ex-client archivé.</div>';
+    return;
+  }
+  var frag = document.createDocumentFragment();
+  keys.forEach(function(slug) {
+    frag.appendChild(buildExClientCard(slug, _archivedClientsCache[slug]));
+  });
+  wrap.innerHTML = '';
+  wrap.appendChild(frag);
+}
+
+function buildExClientCard(slug, d) {
+  var card = document.createElement('div');
+  card.className = 'exclient-card';
+  var deletedStr = d.deletedAt ? new Date(d.deletedAt).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  card.innerHTML =
+    '<div class="exclient-header">' +
+      '<span class="exclient-name">'+escapeHtml(d.name||slug)+'</span>' +
+      '<button class="exclient-restore-btn" onclick="_askRestoreClient(''+escapeHtml(slug)+'')">&#x21A9; Retour</button>' +
+    '</div>' +
+    '<div class="exclient-info">Forfait : '+escapeHtml(d.forfait||'—')+'</div>' +
+    '<div class="exclient-info">Paiement : '+escapeHtml(d.paymentMode||'—')+'</div>' +
+    '<div class="exclient-info">Email : '+escapeHtml(d.email||'—')+'</div>' +
+    '<div class="exclient-info" style="color:var(--muted);font-size:0.75rem">Supprimé le '+escapeHtml(deletedStr)+'</div>';
+  return card;
+}
+
+function _askRestoreClient(slug) {
+  var d = _archivedClientsCache[slug];
+  if (!d) return;
+  _showCtrlConfirm(
+    '↩ Restaurer ce client ?',
+    'Le client <b>'+escapeHtml(d.name||slug)+'</b> sera recréé avec son forfait précédent (<b>'+escapeHtml(d.forfait||'—')+'</b>). Il devra se reconnecter.',
+    'Restaurer',
+    function() { restoreClient(slug, d); },
+    false
+  );
+}
+
+async function restoreClient(slug, d) {
+  try {
+    var rid = slug;
+    var pwd = _buildPwdDefault(d.name||slug);
+    var pwdHash = ncHashPwd(pwd);
+    await _saasDb.ref('restaurants/'+rid+'/profile').set({
+      name: d.name||slug,
+      lang: d.lang||'fr',
+      contacts: { email: d.email||'' },
+      createdAt: Date.now()
+    });
+    await _saasDb.ref('restaurants/'+rid+'/access').set({ password: pwdHash });
+    await _controlDb.ref('/archivedClients/'+rid).remove();
+    _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
+  } catch(e) {
+    alert('Erreur restauration : ' + e.message);
+  }
+}
+
+function _gotoClientCard(rid) {
+  switchTab('clients');
+  setTimeout(function() {
+    var slugId = rid.replace(/-/g,'_');
+    var card = document.getElementById('card-'+slugId);
+    if (card) {
+      card.scrollIntoView({ behavior:'smooth', block:'center' });
+      var inner = card.querySelector('.card-body');
+      if (inner && inner.style.display !== 'block') card.querySelector('.card-top').click();
+      setTimeout(function() {
+        var billing = document.getElementById('billing-section-'+slugId);
+        if (billing) billing.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 350);
+    }
+  }, 200);
 }
 
 function _checkAutoSuspend() {
@@ -3912,12 +3978,6 @@ function buildClientCard(client) {
   const langOpts = langs.map(l => '<option value="'+l+'">'+( LANG_LABELS[l]||l)+'</option>').join('');
   const retOpts  = RETENTION_OPTS.map(o => '<option value="'+o.ms+'"'+(o.ms===2592000000?' selected':'')+'>'+o.label+'</option>').join('');
 
-  function togFeat(key, label, fn) {
-    return '<div class="feat-row"><span class="feat-label">'+label+'</span>'+
-           '<label class="toggle"><input type="checkbox" id="'+key+'-'+id+'" onchange="'+fn+'">'+
-           '<div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>';
-  }
-
   const CTRL_CARTE_IDS  = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
   const CTRL_LIVRE_IDS  = new Set(['paper-elegant','livre-noir','livre-botanique','livre-azure','livre-rose','livre-antique','livre-epure','livre-cerise','livre-indigo','livre-foret']);
   const CTRL_ELEGANT_IDS = new Set(THEME_VARIANTS.map(t => t.family));
@@ -3936,88 +3996,92 @@ function buildClientCard(client) {
     (livreThemes.length   ? '<div class="theme-type-sep">📖 Livre</div>'   + livreThemes.map(_makeThemeRow).join('')   : '') +
     (elegantThemes.length ? '<div class="theme-type-sep">✨ Élégant</div>' + elegantThemes.map(_makeThemeRow).join('') : '');
 
+  const _ck0   = _findCommandeForClient(s);
+  const _cd0   = _ck0 ? _commandesCache[_ck0] : null;
+  const _cc0   = _cd0 && (_cd0.clientCree || _lastCreatedClients[_ck0]);
+  const _billInit = (_ck0 && _cd0 && _cc0) ? _buildClientBillingSectionHTML(_ck0, _cd0, _cc0) : '<div class="hist-inline-empty">Chargement…</div>';
+  const _histInit = (_ck0 && _cd0 && _cc0) ? _buildPaymentHistoryInlineHTML(_ck0, _cd0) : '';
+  const _nameEsc  = (client.name || '').replace(/'/g, '&#39;');
+
   const div = document.createElement('div');
   div.className = 'client-card';
   div.id = 'card-' + id;
   div.innerHTML =
-    '<div class="card-top" onclick="toggleCard(\''+id+'\')">' +
-      '<span class="card-name">'+escapeHtml(client.name)+'</span>' +
-      '<div class="card-top-right">' +
-        '<span class="client-status-badge active" id="active-badge-'+id+'">Actif</span>' +
-        '<div class="status-dot' + (_deviceStatus[s] ? ' online' : '') + '" id="status-'+id+'"></div>' +
-        '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
-      '</div>' +
-    '</div>' +
-    '<div class="card-body"><div class="card-body-inner">' +
-      '<div class="card-links">' +
-        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'&table=1\',\'_system\')">Menu ↗</span>' +
-        '<span class="card-link" onclick="openAdmin(event,\''+s+'\')">Admin ↗</span>' +
-      '</div>' +
-
-      '<div class="section-label">✏️ Informations client</div>' +
-      '<div class="info-edit-row">' +
-        '<span class="info-edit-lbl">Nom</span>' +
-        '<div class="info-edit-wrap">' +
-          '<input type="text" class="info-edit-input" id="rename-'+id+'" value="'+client.name.replace(/'/g,"&#39;")+'" placeholder="Nom du restaurant">' +
-          '<button class="btn-update" onclick="renameClient(\''+s+'\',\'rename-'+id+'\')">Mettre à jour</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="section-label" style="margin-top:10px">🔑 Mot de passe actuel</div>' +
-      '<div class="cur-pwd-row">' +
-        '<div class="pw-wrap" style="flex:1;min-width:0">' +
-          '<input type="password" id="admcurpwd-'+id+'" class="cur-pwd-inp" value="" placeholder="—" readonly>' +
-          '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1"><svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="section-label" style="margin-top:10px">Changer le mot de passe</div>' +
-      '<div class="pw-row">' +
-        '<div class="pw-wrap pw-wrap-row">' +
-          '<input type="password" id="pw-'+id+'" placeholder="Nouveau mot de passe">' +
-          '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1"><svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>' +
-        '</div>' +
-        '<button class="btn-update" onclick="updatePassword(\''+s+'\')">Mettre à jour</button>' +
-      '</div>' +
-      '<div class="pw-feedback" id="pwfb-'+id+'"></div>' +
-      '<div class="info-edit-row" style="margin-top:10px">' +
-        '<span class="info-edit-lbl">ID</span>' +
-        '<div class="info-edit-wrap">' +
-          '<input type="text" class="info-edit-input" id="changeid-'+id+'" value="'+s+'" placeholder="nouvel-id">' +
-          '<button class="btn-update" onclick="changeClientId(\''+s+'\',\'changeid-'+id+'\')">Mettre à jour</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="info-edit-warn" id="idwarn-'+id+'"></div>' +
-
-      '<hr class="divider">' +
-      '<div class="section-label">Forfait Client</div>' +
-      '<div class="forfait-seg">' +
-        '<div class="forfait-seg-wrap" id="forfait-wrap-'+id+'">' +
-          '<div class="forfait-seg-slider"></div>' +
-          '<button class="forfait-seg-btn" id="forfait-menu-qr-'+id+'" onclick="writeForfait(\''+s+'\',\'menu-qr\')">📋 Menu QR</button>' +
-          '<button class="forfait-seg-btn" id="forfait-services-'+id+'" onclick="writeForfait(\''+s+'\',\'services\')">🛎 Commandes & Services</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="btn-forfait-actions">' +
-        '<button class="btn-action-yellow" id="pause-btn-'+id+'" onclick="toggleClientActive(\''+s+'\')">⏸ Mettre en pause</button>' +
-        '<button class="btn-action-red" onclick="askDeleteClient(\''+s+'\',\''+client.name+'\')">🗑️ Supprimer</button>' +
-      '</div>' +
-
-      '<hr class="divider">' +
-      '<div class="section-label">🗑️ Historique — Suppression automatique</div>' +
-      '<div class="retention-row"><span class="retention-label">🔔 Appels (serveur)</span>' +
-      '<select class="retention-sel" id="ret-calls-'+id+'" onchange="writeRetention(\''+s+'\',\'calls\',this)">'+retOpts+'</select></div>' +
-      '<div class="retention-row"><span class="retention-label">🛒 Commandes</span>' +
-      '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\''+s+'\',\'orders\',this)">'+retOpts+'</select></div>' +
-
-      // Section facturation (si commande associée trouvée)
-      (function() {
-        var cmdKey = _findCommandeForClient(s);
-        if (!cmdKey) return '';
-        var cd = _commandesCache[cmdKey];
-        var cmdCreated = cd && (cd.clientCree || _lastCreatedClients[cmdKey]);
-        if (!cmdCreated) return '';
-        return '<hr class="divider">' + _buildClientBillingSectionHTML(cmdKey, cd, cmdCreated);
-      })() +
-
+    '<div class="card-top" onclick="toggleCard(\'' + id + '\')">'+
+      '<span class="card-name">'+escapeHtml(client.name)+'</span>'+
+      '<div class="card-top-right">'+
+        '<span class="client-status-badge active" id="active-badge-'+id+'">Actif</span>'+
+        '<div class="status-dot' + (_deviceStatus[s] ? ' online' : '') + '" id="status-'+id+'"></div>'+
+        '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card-body"><div class="card-body-inner">'+
+    '<div class="card-section"><div class="card-section-header">&#128100; Informations client</div>'+
+      '<div class="card-links">'+
+        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'&table=1\',\'_system\')">Menu &#8599;</span>'+
+        '<span class="card-link" onclick="openAdmin(event,\'' + s + '\')">Admin &#8599;</span>'+
+      '</div>'+
+      '<div class="info-edit-row">'+
+        '<span class="info-edit-lbl">Nom</span>'+
+        '<div class="info-edit-wrap">'+
+          '<input type="text" class="info-edit-input" id="rename-'+id+'" value="'+_nameEsc+'" placeholder="Nom du restaurant">'+
+          '<button class="btn-update" onclick="renameClient(\'' + s + '\',\'rename-'+id+'\')">Mettre à jour</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="info-edit-row" style="margin-top:8px">'+
+        '<span class="info-edit-lbl">ID</span>'+
+        '<div class="info-edit-wrap">'+
+          '<input type="text" class="info-edit-input" id="changeid-'+id+'" value="'+s+'" placeholder="nouvel-id">'+
+          '<button class="btn-update" onclick="changeClientId(\'' + s + '\',\'changeid-'+id+'\')">Mettre à jour</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="info-edit-warn" id="idwarn-'+id+'"></div>'+
+      '<div class="section-label" style="margin-top:10px">&#128273; Mot de passe actuel</div>'+
+      '<div class="cur-pwd-row"><div class="pw-wrap" style="flex:1;min-width:0">'+
+        '<input type="password" id="admcurpwd-'+id+'" class="cur-pwd-inp" value="" placeholder="—" readonly>'+
+        '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1">'+
+          '<svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+
+          '<svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'+
+        '</button>'+
+      '</div></div>'+
+      '<div class="section-label" style="margin-top:10px">Changer le mot de passe</div>'+
+      '<div class="pw-row">'+
+        '<div class="pw-wrap pw-wrap-row">'+
+          '<input type="password" id="pw-'+id+'" placeholder="Nouveau mot de passe">'+
+          '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1">'+
+            '<svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+
+            '<svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'+
+          '</button>'+
+        '</div>'+
+        '<button class="btn-update" onclick="updatePassword(\'' + s + '\')">Mettre à jour</button>'+
+      '</div>'+
+      '<div class="pw-feedback" id="pwfb-'+id+'"></div>'+
+    '</div>'+
+    '<div class="card-section"><div class="card-section-header">&#128203; Forfait &amp; Abonnement</div>'+
+      '<div class="forfait-seg"><div class="forfait-seg-wrap" id="forfait-wrap-'+id+'">'+
+        '<div class="forfait-seg-slider"></div>'+
+        '<button class="forfait-seg-btn" id="forfait-menu-qr-'+id+'" onclick="writeForfait(\'' + s + '\',\'menu-qr\')">&#128203; Menu QR</button>'+
+        '<button class="forfait-seg-btn" id="forfait-services-'+id+'" onclick="writeForfait(\'' + s + '\',\'services\')">&#128717; Commandes &amp; Services</button>'+
+      '</div></div>'+
+      '<div id="billing-section-'+id+'" class="client-billing-section" data-slug="'+s+'">'+_billInit+'</div>'+
+      '<button class="btn-action-yellow" id="pause-btn-'+id+'" onclick="toggleClientActive(\'' + s + '\')">&#9208; Mettre en pause</button>'+
+    '</div>'+
+    '<div class="card-section"><div class="card-section-header">&#128176; Historique de paiement</div>'+
+      '<div class="hist-inline" id="hist-inline-'+id+'">'+_histInit+'</div>'+
+    '</div>'+
+    '<div class="card-section"><div class="card-section-header">&#128222; Contacts</div>'+
+      '<div id="contacts-list-'+id+'"><div class="hist-inline-empty">Chargement…</div></div>'+
+    '</div>'+
+    '<div class="card-section"><div class="card-section-header">&#128465; Suppression automatique</div>'+
+      '<div class="retention-row"><span class="retention-label">&#128276; Appels (serveur)</span>'+
+      '<select class="retention-sel" id="ret-calls-'+id+'" onchange="writeRetention(\'' + s + '\',\'calls\',this)">'+retOpts+'</select></div>'+
+      '<div class="retention-row"><span class="retention-label">&#128722; Commandes</span>'+
+      '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\'' + s + '\',\'orders\',this)">'+retOpts+'</select></div>'+
+      '<button class="btn-action-red" style="margin-top:12px;width:100%" onclick="askDeleteClient(\'' + s + '\',\''+_nameEsc+'\')">&#128465; Supprimer ce client</button>'+
+    '</div>'+
+    '<div class="card-section"><div class="card-section-header">&#127912; Thèmes disponibles</div>'+
+      themeToggles+
+    '</div>'+
     '</div></div>';
 
   return div;
@@ -4073,8 +4137,22 @@ async function confirmDeleteClient() {
   if (!_deleteSlug) return;
   const slug = _deleteSlug;
   const btn = document.getElementById('del-confirm-btn');
-  btn.textContent = 'Suppression…'; btn.disabled = true;
+  btn.textContent = 'Archivage…'; btn.disabled = true;
   try {
+    var _dPSnap = await _saasDb.ref('restaurants/' + slug + '/profile').once('value');
+    var _dProf  = _dPSnap.val() || {};
+    var _dCk    = _findCommandeForClient(slug);
+    var _dCd    = _dCk ? _commandesCache[_dCk] : null;
+    await _controlDb.ref('/archivedClients/' + slug).set({
+      name:        _dProf.name || slug,
+      forfait:     (_dCd && (_dCd.forfaitType || (_dCd.forfait === 'commandes-services' ? 'commandes-services' : 'menu-qr'))) || 'menu-qr',
+      paymentMode: (_dCd && _dCd.paymentMode) || 'monthly',
+      email:       (_dProf.contacts && _dProf.contacts.email) || (_dCd && _dCd.email) || '',
+      lang:        (_dCd && _dCd.langue) || 'fr',
+      deletedAt:   Date.now(),
+      cmdKey:      _dCk || null
+    });
+    btn.textContent = 'Suppression…';
     await _saasDb.ref('restaurants/' + slug).remove();
     closeDelModal();
     // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
@@ -4195,7 +4273,71 @@ function loadClientData(client) {
     if (pwEl) pwEl.value = cfg.adminPwd || '';
   });
 
+  // Contacts listener (profile du restaurant)
+  _saasDb.ref('restaurants/' + s + '/profile/contacts').on('value', function(snap) {
+    _renderContactsSection(id, s, snap.val() || {});
+  });
+}
 
+function _renderContactsSection(id, slug, contacts) {
+  var wrap = document.getElementById('contacts-list-' + id);
+  if (!wrap) return;
+  var types = [
+    { key:'email', label:'Email', icon:'&#9993;', href: function(v) { return 'mailto:'+v; } },
+    { key:'whatsapp', label:'WhatsApp', icon:'&#128241;', href: function(v) { return 'https://wa.me/'+v.replace(/[^0-9]/g,''); } },
+    { key:'viber', label:'Viber', icon:'&#128222;', href: function(v) { return 'viber://chat?number='+v.replace(/[^0-9]/g,''); } }
+  ];
+  var html = '';
+  types.forEach(function(t) {
+    var val = contacts[t.key] || '';
+    if (val) {
+      html += '<div class="contact-row" id="contact-row-'+t.key+'-'+id+'">'+
+        '<span class="contact-type">'+t.icon+' '+t.label+'</span>'+
+        '<span class="contact-val">'+escapeHtml(val)+'</span>'+
+        '<a class="contact-btn" href="'+t.href(val)+'" target="_system">Ouvrir</a>'+
+        '<button class="contact-btn" onclick="_editContact(\'' + slug + '\',\'' + t.key + '\',\'' + id + '\')">Modifier</button>'+
+        '</div>';
+    } else {
+      html += '<div class="contact-row" id="contact-row-'+t.key+'-'+id+'">'+
+        '<span class="contact-type">'+t.icon+' '+t.label+'</span>'+
+        '<span class="contact-val" style="color:var(--muted)">—</span>'+
+        '<button class="contact-btn" onclick="_editContact(\'' + slug + '\',\'' + t.key + '\',\'' + id + '\')">Ajouter</button>'+
+        '</div>';
+    }
+  });
+  wrap.innerHTML = html || '<div class="hist-inline-empty">Aucun contact.</div>';
+}
+
+function _editContact(slug, type, id) {
+  var row = document.getElementById('contact-row-'+type+'-'+id);
+  if (!row) return;
+  var currentVal = row.querySelector('.contact-val') ? (row.querySelector('.contact-val').textContent === '—' ? '' : row.querySelector('.contact-val').textContent) : '';
+  var indic = type === 'email' ? '' : '+';
+  var placeholder = type === 'email' ? 'adresse@email.com' : (type === 'whatsapp' ? '+213xxxxxxxx' : '+213xxxxxxxx');
+  row.innerHTML =
+    '<span class="contact-type">'+( type==='email'?'&#9993; Email' : type==='whatsapp'?'&#128241; WhatsApp':'&#128222; Viber')+'</span>'+
+    '<div class="contact-edit-row">'+
+      (type!=='email' ? '<input class="contact-indic-inp" value="'+escapeHtml(indic)+'" readonly>' : '')+
+      '<input class="contact-inp" id="contact-inp-'+type+'-'+id+'" type="'+(type==='email'?'email':'tel')+'" value="'+escapeHtml(currentVal)+'" placeholder="'+placeholder+'">'+
+    '</div>'+
+    '<button class="contact-save-btn" onclick="_saveContact(\'' + slug + '\',\'' + type + '\',\'' + id + '\')">Enregistrer</button>'+
+    '<button class="contact-cancel-btn" onclick="_saasDb.ref(\'restaurants/'+slug+'/profile/contacts\').once(\'value\').then(function(s){_renderContactsSection(\''+id+'\',\''+slug+'\',s.val()||{})})">Annuler</button>';
+}
+
+async function _saveContact(slug, type, id) {
+  var inp = document.getElementById('contact-inp-'+type+'-'+id);
+  if (!inp) return;
+  var val = inp.value.trim();
+  try {
+    if (val) {
+      await _saasDb.ref('restaurants/'+slug+'/profile/contacts/'+type).set(val);
+    } else {
+      await _saasDb.ref('restaurants/'+slug+'/profile/contacts/'+type).remove();
+    }
+    showToast('Contact enregistré ✅');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+  }
 }
 
 
@@ -4921,8 +5063,8 @@ document.addEventListener('deviceready', () => {
     // ── Listeners EN PREMIER, avant tout appel à register() ──
     Push.addListener('registration', token => saveControlToken(token.value));
     Push.addListener('registrationError', () => setTimeout(() => Push.register(), 15000));
-    Push.addListener('pushNotificationReceived', notif => { showToast('🆕 Nouvelle commande !'); switchTab('commandes'); });
-    Push.addListener('pushNotificationActionPerformed', action => { switchTab('commandes'); });
+    Push.addListener('pushNotificationReceived', notif => { showToast('🆕 Nouvelle commande !'); switchTab('clients'); });
+    Push.addListener('pushNotificationActionPerformed', action => { switchTab('clients'); });
     if (!window._ctrlVisibilityListenerAdded) {
       window._ctrlVisibilityListenerAdded = true;
       document.addEventListener('visibilitychange', () => {
