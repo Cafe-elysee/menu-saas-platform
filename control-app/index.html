@@ -1710,7 +1710,7 @@
     .exclient-restore-btn:hover { background: rgba(200,164,78,0.28); }
     .exclient-info { font-size: 0.77rem; color: var(--muted); line-height: 1.85; }
     .exclient-info strong { color: var(--text); opacity: 0.75; font-weight: 500; }
-    body.light .exclient-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.09); }
+    html.light .exclient-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.09); }
     .paie-badge-yellow { display: inline-flex; align-items: center; gap: 4px; background: rgba(200,164,78,0.14); border: 1px solid rgba(200,164,78,0.32); color: #c8a44e; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
     .paie-badge-red { display: inline-flex; align-items: center; gap: 4px; background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.3); color: #e05252; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
     .paie-voir-btn { background: rgba(200,164,78,0.10); border: 1px solid rgba(200,164,78,0.25); color: var(--gold); border-radius: 8px; padding: 5px 11px; font-size: 0.77rem; cursor: pointer; }
@@ -3521,7 +3521,7 @@ function _doRenderPaiements() {
       var expAt = (trial.ts||0) + 7*24*3600*1000, od = Math.max(0,Math.floor((_now-expAt)/86400000));
       paieBadge = '<span class="paie-badge-red">🔴 ' + (od > 0 ? '+'+od+'j de retard' : 'Expiré') + '</span>';
     } else {
-      paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]s*/,'') + ' restant</span>';
+      paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]\s*/u,'') + ' restant</span>';
     }
     var ridEsc = escapeHtml(rid);
     var suspendBtn = trial.isSuspended ? '<button class="commande-suspend-btn reactivate-action" onclick="_toggleSuspend(''+k+'')">&#9654; Réactiver</button>' : '';
