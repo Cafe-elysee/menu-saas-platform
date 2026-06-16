@@ -3341,6 +3341,11 @@ function _askRestoreClient(slug) {
 async function restoreClient(slug, d) {
   try {
     var rid = slug;
+    var existing = await _saasDb.ref('restaurants/'+rid).once('value');
+    if (existing.exists()) {
+      _showCtrlConfirm('Restauration impossible', 'Un restaurant actif utilise déjà l\'ID <code>'+escapeHtml(rid)+'</code>. Supprimez-le ou changez son ID avant de restaurer cet ex-client.', 'OK', null, false);
+      return;
+    }
     var pwd = _buildPwdDefault(d.name||slug);
     var hash = await ncHashPwd(pwd);
     var isCS = d.forfait === 'commandes-services';
