@@ -3561,7 +3561,7 @@ function _doRenderPaiements() {
 
 
 function loadArchivedClients() {
-  _controlDb.ref('/archivedClients').on('value', function(snap) {
+  _saasDb.ref('/archivedClients').on('value', function(snap) {
     _archivedClientsCache = snap.val() || {};
     _renderExClients();
   });
@@ -3614,7 +3614,7 @@ function _askPermanentDelete(slug) {
     'Le client ' + escapeHtml(name) + ' sera supprimé définitivement et ne pourra pas être restauré.',
     'Supprimer',
     function() {
-      _controlDb.ref('/archivedClients/' + slug).remove().then(function() {
+      _saasDb.ref('/archivedClients/' + slug).remove().then(function() {
         delete _archivedClientsCache[slug];
         _renderExClients();
       }).catch(function(e) {
@@ -3649,7 +3649,7 @@ async function restoreClient(slug, d) {
       createdAt: Date.now()
     });
     await _saasDb.ref('restaurants/'+rid+'/access').set({ password: pwdHash });
-    await _controlDb.ref('/archivedClients/'+rid).remove();
+    await _saasDb.ref('/archivedClients/'+rid).remove();
     _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
   } catch(e) {
     alert('Erreur restauration : ' + e.message);
@@ -4159,7 +4159,7 @@ async function confirmDeleteClient() {
     var _dProf  = _dPSnap.val() || {};
     var _dCk    = _findCommandeForClient(slug);
     var _dCd    = _dCk ? _commandesCache[_dCk] : null;
-    await _controlDb.ref('/archivedClients/' + slug).set({
+    await _saasDb.ref('/archivedClients/' + slug).set({
       name:        _dProf.name || slug,
       forfait:     (_dCd && (_dCd.forfaitType || (_dCd.forfait === 'commandes-services' ? 'commandes-services' : 'menu-qr'))) || 'menu-qr',
       paymentMode: (_dCd && _dCd.paymentMode) || 'monthly',
