@@ -80,7 +80,6 @@
     html.light .section-title,
     html.light .card-name,
     html.light .app-header h2,
-    html.light .nc-title,
     html.light .modal-box h3 { color: var(--text); }
     html.light .client-card,
     html.light .commande-card,
@@ -179,8 +178,6 @@
     .pw-wrap-login .login-input { margin-bottom:0; padding-right:44px; box-sizing:border-box; }
     .pw-wrap-row { flex:1; min-width:0; }
     .pw-wrap-row input { padding-right:36px; box-sizing:border-box; width:100%; }
-    .pw-wrap-nc { width:100%; }
-    .pw-wrap-nc .nc-input { padding-right:44px; box-sizing:border-box; }
     .ctrl-pw-eye {
       position:absolute; right:10px; top:50%; transform:translateY(-50%);
       background:none; border:none; cursor:pointer; padding:4px; line-height:0;
@@ -1336,103 +1333,6 @@
         0 1px 0 #7a5018,
         0 2px 5px rgba(0,0,0,0.30);
     }
-    .btn-nouveau-client {
-      padding:7px 14px; border-radius:10px; border:none;
-      background:linear-gradient(160deg, #e8c060 0%, #c8a44e 45%, #9e7428 100%);
-      color:#1a1208; font-size:0.78rem; font-weight:700; font-family:'Outfit',sans-serif;
-      letter-spacing:0.03em;
-      display:flex; align-items:center; gap:5px; cursor:pointer;
-      white-space:nowrap; position:relative; overflow:hidden;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.30) inset,
-        0 -1px 0 rgba(0,0,0,0.20) inset,
-        0 3px 0 #7a5018,
-        0 4px 10px rgba(0,0,0,0.40);
-      text-shadow:0 1px 1px rgba(0,0,0,0.15);
-      transition:transform 0.1s, box-shadow 0.1s;
-    }
-    .btn-nouveau-client::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:50%;
-      background:linear-gradient(to bottom, rgba(255,255,255,0.20), transparent);
-      border-radius:10px 10px 0 0; pointer-events:none;
-    }
-    .btn-nouveau-client:active {
-      transform:translateY(2px);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.30) inset,
-        0 -1px 0 rgba(0,0,0,0.20) inset,
-        0 1px 0 #7a5018,
-        0 2px 5px rgba(0,0,0,0.30);
-    }
-    #nc-modal {
-      display:none; position:fixed; inset:0; z-index:500;
-      background:rgba(0,0,0,0.60); backdrop-filter:blur(14px) saturate(150%); -webkit-backdrop-filter:blur(14px) saturate(150%);
-      align-items:center; justify-content:center; padding:1rem;
-    }
-    #nc-modal.show { display:flex; }
-    .nc-box {
-      background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
-      border:1px solid rgba(200,164,78,0.28);
-      border-radius:24px; padding:24px 20px; width:100%; max-width:400px;
-      max-height:90vh; overflow-y:auto;
-      box-shadow:0 0 0 1px rgba(200,164,78,0.10),0 24px 64px rgba(0,0,0,0.55);
-    }
-    html.light .nc-box {
-      background-image:url(assets/gn-bg-light.jpg);
-      border-color:rgba(200,164,78,0.22);
-      box-shadow:0 0 0 1px rgba(200,164,78,0.08),0 16px 40px rgba(0,0,0,0.12);
-    }
-    .nc-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--gold); margin-bottom:3px; }
-    .nc-sub { font-size:0.7rem; color:var(--muted); margin-bottom:20px; letter-spacing:0.12em; text-transform:uppercase; }
-    .nc-label { font-size:0.73rem; color:var(--muted); margin-bottom:5px; margin-top:14px; display:block; letter-spacing:0.05em; }
-    html.light .nc-sub, html.light .nc-label { color:#5a4020; }
-    .nc-input {
-      width:100%; padding:10px 14px; border-radius:10px;
-      border:1.5px solid var(--border); background:rgba(0,0,0,0.45);
-      color:var(--text); font-family:inherit; font-size:0.92rem; outline:none;
-      transition:border-color 0.2s;
-    }
-    html.light .nc-input { background:rgba(255,255,255,0.70); color:#0d0804; }
-    .nc-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,164,78,0.12); }
-    .nc-rid-hint { font-size:0.67rem; color:rgba(242,234,216,0.68); margin-top:4px; }
-    html.light .nc-rid-hint { color:#6a5030; }
-    .nc-err { color:var(--red); font-size:0.78rem; margin-top:10px; min-height:16px; }
-    .nc-actions { display:flex; gap:10px; margin-top:20px; }
-    .nc-btn-create {
-      flex:2; padding:12px; border-radius:12px; border:none;
-      background:linear-gradient(135deg, #e2c278, #c8a44e, #9a7a35);
-      color:#0c0a08; font-weight:700; font-size:0.9rem; font-family:inherit; cursor:pointer;
-      box-shadow:0 4px 14px rgba(200,164,78,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
-      transition:transform 0.22s, box-shadow 0.22s;
-    }
-    .nc-btn-create:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,164,78,0.45), inset 0 1px 0 rgba(255,255,255,0.22); }
-    .nc-btn-create:active { transform:translateY(1px); box-shadow:0 1px 6px rgba(200,164,78,0.2); }
-    .nc-btn-create:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
-    .nc-btn-cancel {
-      flex:1; padding:12px; border-radius:12px; border:1px solid var(--border);
-      background:transparent; color:var(--muted); font-family:inherit; cursor:pointer;
-      transition:transform 0.15s,box-shadow 0.15s;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09);
-    }
-    .nc-btn-cancel:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09); }
-    .nc-btn-cancel:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
-    .nc-result { display:none; }
-    .nc-result.show { display:block; }
-    .nc-result-title { color:#4caf50; font-weight:700; font-size:1.05rem; margin-bottom:16px; }
-    .nc-link-row {
-      background:var(--bg); border:1px solid var(--border); border-radius:10px;
-      padding:10px 12px; margin-bottom:8px;
-    }
-    html.light .nc-link-row { background:rgba(0,0,0,0.03); }
-    .nc-link-label { font-size:0.67rem; color:var(--muted); margin-bottom:4px; letter-spacing:0.08em; text-transform:uppercase; }
-    .nc-link-val { font-size:0.73rem; color:var(--gold); word-break:break-all; font-family:monospace; }
-    .nc-copy-btn {
-      margin-top:6px; padding:5px 12px; border-radius:8px;
-      border:1px solid var(--border); background:transparent; color:var(--muted);
-      font-size:0.7rem; font-family:inherit; cursor:pointer;
-    }
-    .nc-copy-btn.copied { color:var(--gold); border-color:var(--gold); }
-    .nc-instructions { font-size:0.73rem; color:var(--muted); line-height:1.7; }
 
     /* ═══════════════════════════════
        STATUT CLIENT (actif / pause)
@@ -2021,76 +1921,6 @@
   </div>
 </div>
 
-<div id="nc-modal" onclick="if(event.target===this)closeNewClientModal()">
-  <div class="nc-box">
-    <div class="nc-title">Nouveau client</div>
-    <div class="nc-sub">Création automatique — email envoyé au client</div>
-
-    <div id="nc-form">
-      <label class="nc-label">Nom du restaurant *</label>
-      <input type="text" id="nc-name" class="nc-input" placeholder="ex: Café Oran">
-
-      <label class="nc-label">Forfait *</label>
-      <select id="nc-forfait" class="nc-input" style="cursor:pointer">
-        <option value="menu-qr">Menu QR — Menu digital</option>
-        <option value="commandes-services">Commandes &amp; Services</option>
-      </select>
-
-      <label class="nc-label">Mode de paiement *</label>
-      <select id="nc-mode" class="nc-input" style="cursor:pointer">
-        <option value="monthly">Mensuel</option>
-        <option value="annual">Annuel</option>
-      </select>
-
-      <label class="nc-label">Email du client *</label>
-      <input type="email" id="nc-email" class="nc-input" placeholder="ex: contact@restaurant.com">
-
-      <label class="nc-label">Langue du client</label>
-      <select id="nc-lang" class="nc-input" style="cursor:pointer">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-        <option value="el">Ελληνικά</option>
-        <option value="de">Deutsch</option>
-        <option value="ar">العربية</option>
-      </select>
-
-      <div class="nc-err" id="nc-err"></div>
-
-      <div class="nc-actions">
-        <button class="nc-btn-cancel" onclick="closeNewClientModal()">Annuler</button>
-        <button class="nc-btn-create" id="nc-create-btn" onclick="createNewClient()">Créer le client</button>
-      </div>
-    </div>
-
-    <div class="nc-result" id="nc-result">
-      <div class="nc-result-title">✓ Client créé avec succès !</div>
-      <div id="nc-result-email" style="font-size:0.82rem;color:var(--muted);text-align:center;margin-bottom:14px">📧 Email d'accès envoyé à <span id="nc-result-email-val" style="color:var(--gold)"></span></div>
-
-      <div class="nc-link-row">
-        <div class="nc-link-label">Lien Admin — à donner au client</div>
-        <div class="nc-link-val" id="nc-admin-url"></div>
-        <button class="nc-copy-btn" onclick="ncCopy(this,'nc-admin-url','Copier')">Copier</button>
-      </div>
-
-      <div class="nc-link-row">
-        <div class="nc-link-label">App Serveur — ID à entrer au 1er lancement</div>
-        <div class="nc-link-val" id="nc-rid-val"></div>
-        <button class="nc-copy-btn" onclick="ncCopy(this,'nc-rid-val','Copier l\'ID')">Copier l'ID</button>
-      </div>
-
-      <div class="nc-link-row">
-        <div class="nc-link-label">Instructions pour le staff</div>
-        <div class="nc-instructions">
-          1. Télécharger l'app serveur (Android) : <a href="https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk" onclick="window.open(this.href,'_system');return false;" style="color:var(--gold);word-break:break-all">github.com/Cafe-elysee/…/MenuProServeur-SaaS-v1.0.apk</a><br>
-          2. Au premier lancement : entrer l'ID <strong id="nc-rid-inline" style="color:var(--gold)"></strong><br>
-          3. Le menu admin : ouvrir le lien ci-dessus
-        </div>
-      </div>
-
-      <button class="nc-btn-create" style="width:100%;margin-top:16px" onclick="closeNewClientModal()">Fermer</button>
-    </div>
-  </div>
-</div>
 
 <div class="modal-overlay" id="retention-modal">
   <div class="modal-box">
@@ -2526,161 +2356,6 @@ function loadClientsFromFirebase() {
   });
 }
 
-// ════════════════════════════════════════════════════
-// NOUVEAU CLIENT
-// ════════════════════════════════════════════════════
-function showNewClientModal() {
-  document.getElementById('nc-form').style.display = '';
-  document.getElementById('nc-result').classList.remove('show');
-  document.getElementById('nc-name').value = '';
-  document.getElementById('nc-email').value = '';
-  document.getElementById('nc-forfait').value = 'menu-qr';
-  document.getElementById('nc-mode').value = 'monthly';
-  document.getElementById('nc-lang').value = 'fr';
-  document.getElementById('nc-err').textContent = '';
-  const btn = document.getElementById('nc-create-btn');
-  btn.textContent = 'Créer le client'; btn.disabled = false;
-  document.getElementById('nc-modal').classList.add('show');
-  setTimeout(() => document.getElementById('nc-name').focus(), 200);
-}
-
-function closeNewClientModal() {
-  document.getElementById('nc-modal').classList.remove('show');
-  if (_pendingCommandeKey) {
-    const key = _pendingCommandeKey;
-    _pendingCommandeKey = null;
-    switchTab('clients');
-    setTimeout(function() {
-      const card = document.querySelector('.commande-card[data-key="' + key + '"]');
-      if (card) {
-        card.classList.add('open');
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 120);
-  }
-}
-
-function _buildPwdDefault(name) {
-  const words = name.trim()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, '')
-    .trim()
-    .split(/\s+/)
-    .filter(w => w.length > 0);
-  if (!words.length) return 'pr' + new Date().getFullYear();
-  const initials = words.length === 1 ? words[0].slice(0, 2) : words.map(w => w[0]).join('');
-  return initials + new Date().getFullYear();
-}
-
-function _buildRidTs(name, extraLetters) {
-  const words = name.trim()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, '')
-    .trim()
-    .split(/\s+/)
-    .filter(w => w.length > 0);
-  if (!words.length) return '';
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const ts  = pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds())
-            + pad(now.getDate()) + pad(now.getMonth()+1) + String(now.getFullYear()).slice(-2);
-  const prefix = words[0].slice(0, 1 + (extraLetters || 0)) + words.slice(1).map(w => w[0]).join('');
-  return prefix + ts;
-}
-
-function ncAutoRid(name) {
-  document.getElementById('nc-rid').value = name.trim() ? _buildRidTs(name, 0) : '';
-  const pwdEl = document.getElementById('nc-pwd');
-  if (pwdEl && !pwdEl.dataset.edited) pwdEl.value = name.trim() ? _buildPwdDefault(name) : '';
-}
-
-async function ncHashPwd(pwd) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-async function createNewClient() {
-  const name    = document.getElementById('nc-name').value.trim();
-  const email   = document.getElementById('nc-email').value.trim();
-  const forfait = document.getElementById('nc-forfait').value;
-  const mode    = document.getElementById('nc-mode').value;
-  const lang    = document.getElementById('nc-lang').value;
-  const err     = document.getElementById('nc-err');
-  err.textContent = '';
-
-  if (!name)  { err.textContent = 'Le nom du restaurant est requis.'; return; }
-  if (!email || !email.includes('@')) { err.textContent = 'Un email valide est requis.'; return; }
-
-  const btn = document.getElementById('nc-create-btn');
-  btn.textContent = 'Création en cours…'; btn.disabled = true;
-
-  let commandeKey = null;
-  try {
-    const forfaitLabel = forfait === 'commandes-services'
-      ? 'Commandes & Services — Menu QR + Prises de commandes'
-      : 'Menu QR — Menu digital';
-
-    // 1. Créer la commande dans menu-pro-control AVANT l'API
-    //    → l'API pourra la patcher avec clientCree + emailData
-    //    → listenCommandes() détectera clientCree.rid et lancera _watchFirstOpen() automatiquement
-    const cmdRef = await _controlDb.ref('/commandes').push({
-      restaurant: name,
-      forfait: forfaitLabel,
-      forfaitType: forfait,
-      paymentMode: mode,
-      langue: lang,
-      email: email,
-      ts: Date.now(),
-      statut: 'nouveau',
-      source: 'admin'
-    });
-    commandeKey = cmdRef.key;
-
-    // 2. Appeler l'API avec commandeKey → création restaurant + patch commande + email livraison
-    const resp = await fetch('https://menu-pro-demo.vercel.app/api/notify-commande', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        restaurant: name,
-        forfait: forfaitLabel,
-        forfaitType: forfait,
-        paymentMode: mode,
-        langue: lang,
-        email: email,
-        commandeKey: commandeKey,
-        source: 'admin'
-      })
-    });
-
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
-    if (!data.created || !data.created.rid) throw new Error('Création échouée — vérifier les env vars Vercel demo');
-
-    const rid = data.created.rid;
-    _pendingCommandeKey = commandeKey;
-    document.getElementById('nc-admin-url').textContent = 'https://menu-saas-platform.vercel.app/admin.html';
-    document.getElementById('nc-rid-val').textContent = rid;
-    document.getElementById('nc-rid-inline').textContent = rid;
-    document.getElementById('nc-result-email-val').textContent = email;
-    document.getElementById('nc-form').style.display = 'none';
-    document.getElementById('nc-result').classList.add('show');
-
-  } catch(e) {
-    if (commandeKey) _controlDb.ref('/commandes/' + commandeKey).remove().catch(() => {});
-    err.textContent = 'Erreur : ' + (e.message || e);
-    btn.textContent = 'Créer le client'; btn.disabled = false;
-  }
-}
-
-function ncCopy(btn, elId, label) {
-  const text = document.getElementById(elId).textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copié !'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2500);
-  });
-}
 
 function getClientDb(slug) {
   // SaaS : un seul Firebase platform, chemins préfixés par restaurants/{slug}/
@@ -2702,7 +2377,6 @@ let _lastCreatedClients = {};
 let _deletedClients = {};
 // Commandes dont le client créé est en pause : commandeKey → rid
 let _pausedClients = {};
-let _pendingCommandeKey = null;
 
 function _findCmdKeyForRid(rid) {
   return Object.keys(_commandesCache).find(function(k) {
@@ -3917,7 +3591,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const _nowTs2 = Date.now();
     _controlDb.ref('/commandes/' + commandeKey).update({
       statut: 'en_cours', lu: true, clientCree: clientCreeData,
-      emailLivraisonProgramme: _nowTs2,
+      emailLivraisonProgramme: _nowTs2 + 2 * 60 * 60 * 1000,
       emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
     });
     _watchFirstOpen(rid, commandeKey);
@@ -3975,7 +3649,7 @@ function recreerClientDepuisCommande(btnEl) {
         const _nowTs3 = Date.now();
         await _controlDb.ref('/commandes/' + commandeKey).update({
           statut: 'en_cours', lu: true, clientCree: clientCreeData,
-          emailLivraisonProgramme: _nowTs3,
+          emailLivraisonProgramme: _nowTs3 + 2 * 60 * 60 * 1000,
           emailLivraisonSent: null,
           lastReminderSent: null,
           emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'monthly' }
