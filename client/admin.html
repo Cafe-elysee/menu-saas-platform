@@ -6785,7 +6785,7 @@ function saveMenuTheme(themeId) {
   _rref('menu/menuTheme').set(themeId);
   // Déduire le style automatiquement selon la famille du thème
   const isLayout = LAYOUTS_DATA.some(l => l.variants.some(v => v.id === themeId));
-  const _CARTE_IDS_SET = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
+  const _CARTE_IDS_SET = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc','genext']);
   const deduced  = (isLayout || _CARTE_IDS_SET.has(themeId)) ? 'simple' : 'paper';
   if (deduced !== currentMenuMode) {
     currentMenuMode = deduced;
@@ -6901,14 +6901,6 @@ function renderThemeSelector() {
     });
   }
 
-  if (genextThemes.length > 0) {
-    grid.appendChild(makeSep('GeNext'));
-    genextThemes.forEach(th => {
-      const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
-      grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
-    });
-  }
-
   if (livreThemes.length > 0) {
     const lbl = currentLang==='en'?'Book':currentLang==='de'?'Buch':currentLang==='ar'?'كتاب':'Livre';
     grid.appendChild(makeSep(lbl));
@@ -6926,6 +6918,14 @@ function renderThemeSelector() {
       const isActive = layout.variants.some(v => v.id === currentMenuTheme);
       const name = layout.names[currentLang] || layout.names.fr || layout.names.en || '';
       grid.appendChild(makeCard(layout.family, name, isActive));
+    });
+  }
+
+  if (genextThemes.length > 0) {
+    grid.appendChild(makeSep('GeNext'));
+    genextThemes.forEach(th => {
+      const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
+      grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
     });
   }
 }
