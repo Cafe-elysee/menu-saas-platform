@@ -86,12 +86,12 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
-<body style="margin:0;padding:0;background:#f2ece0">
-<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0">
-<tr><td align="center" style="padding:24px 0">
-<table width="560" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
+<body style="margin:0;padding:0;background-color:#f2ece0">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
+<tr><td align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="padding:24px 0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center">
+<table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
 <tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;padding:26px 32px;border-bottom:1px solid #ead9b8">
-  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" style="display:block;margin:0 auto;max-width:140px;border:0">
+  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
   <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
 <tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:28px 32px;text-align:${align}">

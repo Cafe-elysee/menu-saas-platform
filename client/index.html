@@ -26,6 +26,7 @@
         }
         if (mode === 'light') document.documentElement.classList.add('light');
       } catch(e) {}
+      window._splashT0 = Date.now();
     })();
   </script>
   <title>GeNext</title>
@@ -825,6 +826,27 @@
       --gold:#3a4070; --gold-lt:#505890; --gold-dk:#202850; --cream:#080a18;
       --muted:rgba(8,10,24,0.50); --border:color-mix(in srgb, var(--gold) 15%, transparent); --border2:color-mix(in srgb, var(--gold) 32%, transparent);
       --shadow:0 4px 16px rgba(0,0,0,0.06); --shadow-h:0 8px 28px color-mix(in srgb, var(--gold) 12%, transparent),0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    /* ══ GENEXT — Design admin/demo (bokeh + glassmorphism) ══ */
+    html[data-menu-theme="genext"] {
+      --bg:#080604; --bg2:#0c0a08; --bg-card:rgba(20,15,8,.72); --bg-nav:rgba(8,6,4,0.92);
+      --gold:#c8a44e; --gold-lt:#e2c278; --gold-dk:#9a7a35; --cream:#f0ead8;
+      --muted:rgba(240,234,216,0.70); --border:rgba(231,206,151,.18); --border2:rgba(231,206,151,.32);
+      --shadow:0 2px 24px -8px rgba(0,0,0,.4); --shadow-h:0 12px 40px rgba(200,164,78,0.22),0 4px 20px rgba(0,0,0,.5);
+      --badge-new:#c8a44e; --badge-pop:#e8854a; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="genext"] body {
+      background-image:url('assets/gn-bg-dark.jpg'); background-size:cover; background-position:center; background-attachment:fixed;
+    }
+    html[data-menu-theme="genext"].light {
+      --bg:#f0ede8; --bg2:#e8e3da; --bg-card:rgba(255,255,255,.55); --bg-nav:rgba(245,242,237,0.92);
+      --gold:#8a6520; --gold-lt:#a87c2c; --gold-dk:#6a4c14; --cream:#241b0c;
+      --muted:rgba(36,27,12,0.70); --border:rgba(140,110,45,.28); --border2:rgba(140,110,45,.42);
+      --shadow:0 2px 24px -8px rgba(0,0,0,.09); --shadow-h:0 8px 28px rgba(140,110,45,.15),0 4px 14px rgba(0,0,0,.12);
+    }
+    html[data-menu-theme="genext"].light body {
+      background-image:url('assets/gn-bg-light.jpg');
     }
 
     /* ══ VARIANTES DYN-BENTO ══ */
@@ -2334,80 +2356,40 @@
     }
 
     /* ================================================
-       PRELOADER
+       PRELOADER (splash GeNext — logo du restaurant uniquement)
     ================================================ */
     #preloader {
-      position:fixed; inset:0;
-      background:#0c0a08;
-      z-index:9999;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+      position:fixed; inset:0; z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      background-color:#080604;
+      background-image:url('assets/gn-bg-dark.jpg');
+      background-size:cover; background-position:center;
+      overflow:hidden;
     }
-    html.light #preloader { background: var(--bg); }
-    html.light .pre-title { color: var(--cream); }
-    html.light .pre-tagline { color: rgba(0,0,0,0.42); }
-    html.light .pre-orn-line { background: linear-gradient(90deg,transparent,rgba(0,0,0,0.2)); }
-    html.light .pre-orn-line:last-child { background: linear-gradient(270deg,transparent,rgba(0,0,0,0.2)); }
-    html.light .pre-shimmer { background: linear-gradient(90deg,transparent,var(--gold),transparent); }
-    /* Logo animé dans le preloader */
-    .pre-logo {
-      height:clamp(8rem,32vw,13rem); width:auto;
-      opacity:0; transform:scale(0.5) translateY(30px);
-      /* Délai 0.05s → visible dès l'ouverture, durée 1s pour effet élégant */
-      animation:preLogoIn 1s cubic-bezier(0.34,1.2,0.64,1) 0.05s forwards;
-      filter:drop-shadow(0 6px 32px rgba(200,164,78,0.6));
-      margin-bottom:6px;
+    html.light #preloader {
+      background-color:#f0ede8;
+      background-image:url('assets/gn-bg-light.jpg');
     }
-    @keyframes preLogoIn {
-      to { opacity:1; transform:scale(1) translateY(0); }
+    #preloader::before {
+      content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.08) 40%,rgba(200,164,78,0.14) 50%,rgba(200,164,78,0.08) 60%,transparent 100%);
+      animation:gnBarFlow 8s ease-in-out infinite;
     }
-    .pre-ornament {
-      display:flex; align-items:center; gap:16px;
-      opacity:0; animation:preUp 0.5s ease 0.7s forwards;
+    html.light #preloader::before {
+      background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.05) 40%,rgba(200,164,78,0.09) 50%,rgba(200,164,78,0.05) 60%,transparent 100%);
     }
-    .pre-orn-line {
-      width:60px; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(200,164,78,0.6));
+    .pre-logo-img {
+      width:72vw; max-width:320px; height:auto; display:block;
+      will-change:opacity,filter;
+      background:transparent;
+      position:relative; z-index:1;
     }
-    .pre-orn-line:last-child { background:linear-gradient(270deg,transparent,rgba(200,164,78,0.6)); }
-    .pre-orn-diamond { width:10px; height:10px; background:var(--gold); transform:rotate(45deg); }
-    .pre-title {
-      font-family:'Cormorant',serif;
-      font-size:clamp(2.2rem,9vw,3.8rem);
-      font-weight:300;
-      color:#c8a44e;
-      letter-spacing:0.14em;
-      text-align:center;
-      opacity:0; transform:translateY(18px);
-      animation:preUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.88s forwards;
+    @keyframes gnBarFlow {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(200%); opacity: 0; }
     }
-    .pre-tagline {
-      font-family:'Cormorant',serif;
-      font-style:italic;
-      font-size:clamp(0.8rem,2.8vw,1rem);
-      color:rgba(200,164,78,0.65);
-      letter-spacing:0.22em;
-      text-transform:uppercase;
-      opacity:0; transform:translateY(10px);
-      animation:preUp 0.45s ease 1.1s forwards;
-    }
-    .pre-shimmer {
-      width:140px; height:1px;
-      background:linear-gradient(90deg,transparent,#d4956b,transparent);
-      background-size:200% 100%;
-      opacity:0;
-      animation:preUp 0.45s ease 1.25s forwards, shimmer 2.4s ease 1.25s infinite;
-    }
-    @keyframes preUp { to { opacity:1; transform:translateY(0); } }
-    @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-    /* Animations bloquées tant que le logo n'est pas connu */
-    .pre-logo, .pre-ornament, .pre-title, .pre-tagline, .pre-shimmer { animation-play-state:paused; }
-    #preloader.ready .pre-logo,
-    #preloader.ready .pre-ornament,
-    #preloader.ready .pre-title,
-    #preloader.ready .pre-tagline,
-    #preloader.ready .pre-shimmer { animation-play-state:running; }
-    #preloader.out { animation:fadeOut 0.55s ease forwards; }
-    @keyframes fadeOut { to { opacity:0; pointer-events:none; } }
 
     /* ================================================
        HERO
@@ -5267,16 +5249,16 @@
   </div>
 </div>
 
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+  <defs>
+    <filter id="gnm-sand-f" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feTurbulence type="turbulence" baseFrequency="0.022" numOctaves="4" seed="8" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="gnm-sand-disp"/>
+    </filter>
+  </defs>
+</svg>
 <div id="preloader">
-  <img id="pre-logo-img" class="pre-logo" style="display:none" alt="">
-  <div class="pre-ornament">
-    <div class="pre-orn-line"></div>
-    <div class="pre-orn-diamond"></div>
-    <div class="pre-orn-line" style="background:linear-gradient(270deg,transparent,rgba(200,164,78,0.6))"></div>
-  </div>
-  <div class="pre-title" id="pre-title"></div>
-  <div class="pre-tagline" id="pre-tag"></div>
-  <div class="pre-shimmer"></div>
+  <img id="pre-logo-img" class="pre-logo-img" alt="" draggable="false">
 </div>
 
 <!-- ================================================
@@ -5944,8 +5926,6 @@ function loadAdminData() {
       if (heroTitle) heroTitle.textContent = cached;
       const ccName = document.getElementById('cc-name-wrap');
       if (ccName) ccName.textContent = cached;
-      const preTitle = document.getElementById('pre-title');
-      if (preTitle) preTitle.textContent = cached;
       const ftCr = document.getElementById('ft-cr');
       if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + cached;
     }
@@ -5961,8 +5941,6 @@ function loadAdminData() {
       if (heroTitle) heroTitle.textContent = name;
       const ccName = document.getElementById('cc-name-wrap');
       if (ccName) ccName.textContent = name;
-      const preTitle = document.getElementById('pre-title');
-      if (preTitle) preTitle.textContent = name;
       const ftCr = document.getElementById('ft-cr');
       if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + name;
       document.title = name + ' — Menu';
@@ -7858,16 +7836,37 @@ function _startPreloader() {
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
   if (!pre) return;
-  const tag = document.getElementById('pre-tag');
-  if (tag) tag.textContent = UI[lang].preTag;
-  pre.classList.add('ready'); // déclenche les animations CSS
-  setTimeout(() => {
-    pre.classList.add('out');
-    setTimeout(() => {
-      pre.style.display = 'none';
-      setTimeout(_triggerHeroAutoScroll, 650);
-    }, 500);
-  }, 1800);
+  // Pas de logo uploadé → aucune animation, le menu apparaît directement
+  if (!_logoUrl) { pre.remove(); _triggerHeroAutoScroll(); return; }
+  const img = document.getElementById('pre-logo-img');
+  if (img) img.src = _logoUrl;
+  _dissolvePreloader(pre);
+}
+
+let _preloaderHidden = false;
+function _dissolvePreloader(pre) {
+  if (_preloaderHidden) return;
+  const elapsed = Date.now() - (window._splashT0 || 0);
+  if (elapsed < 1600) { setTimeout(() => _dissolvePreloader(pre), 1600 - elapsed); return; }
+  _preloaderHidden = true;
+  const img  = document.getElementById('pre-logo-img');
+  const disp = document.getElementById('gnm-sand-disp');
+  if (!img) { pre.remove(); _triggerHeroAutoScroll(); return; }
+  img.style.filter = 'url(#gnm-sand-f)';
+  let t0 = null;
+  const dur = 2000;
+  function step(ts) {
+    if (!t0) t0 = ts;
+    const t = Math.min((ts - t0) / dur, 1);
+    const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    if (disp) disp.setAttribute('scale', (e * 160).toFixed(0));
+    img.style.opacity = (1 - Math.pow(t, 0.7)).toFixed(3);
+    img.style.transform = 'translateX('+(t*28).toFixed(1)+'px) translateY('+(t*-6).toFixed(1)+'px)';
+    pre.style.opacity = (1 - t).toFixed(3);
+    if (t < 1) requestAnimationFrame(step);
+    else { pre.remove(); _triggerHeroAutoScroll(); }
+  }
+  requestAnimationFrame(step);
 }
 
 function applyLogoUrl(url) {
@@ -7876,10 +7875,8 @@ function applyLogoUrl(url) {
 
   // Ne mettre à jour le preloader QUE si l'animation n'a pas encore démarré
   if (!_preloaderStarted) {
-    const preImg   = document.getElementById('pre-logo-img');
-    const preTitle = document.getElementById('pre-title');
-    if (preImg) { preImg.src = _logoUrl; preImg.style.display = hasLogo ? '' : 'none'; }
-    if (preTitle) preTitle.style.display = hasLogo ? 'none' : '';
+    const preImg = document.getElementById('pre-logo-img');
+    if (preImg && hasLogo) preImg.src = _logoUrl;
   }
 
   // Hero dynamique
