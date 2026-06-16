@@ -5,8 +5,10 @@
 ============================================================ */
 
 const nodemailer = require('nodemailer');
+const path       = require('path');
 
 const DATE_LOCALE = { fr: 'fr-FR', en: 'en-GB', el: 'el-GR', ar: 'ar-MA', de: 'de-DE' };
+const LOGO_ATTACHMENT = { filename: 'gn-logo-light.png', path: path.join(__dirname, '../assets/gn-logo-light.png'), cid: 'gnlogo' };
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -90,11 +92,11 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
 <table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
 <tr><td align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="padding:24px 0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center">
 <table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
-<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;padding:26px 32px;border-bottom:1px solid #ead9b8">
-  <img src="https://menu-saas-platform.vercel.app/assets/gn-logo-light.png" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
+<tr><td bgcolor="#ffffff" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
+  <img src="cid:gnlogo" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
   <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:28px 32px;text-align:${align}">
+<tr><td bgcolor="#ffffff" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
   <p style="color:#2a1f10;font-size:1rem;margin:0 0 16px;font-weight:600">${t.greeting}</p>
   <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f0faf4" style="background-color:#f0faf4;border:1px solid #b8e8c8;border-left:3px solid #4caf80;border-radius:0 8px 8px 0;margin-bottom:20px"><tr><td style="padding:12px 16px;font-size:0.95rem;color:#2a1f10;line-height:1.6">${t.confirmed}</td></tr></table>
   <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8f4ec" style="background-color:#f8f4ec;border:1px solid #e8dfc8;border-radius:10px;margin-bottom:20px"><tr><td style="padding:16px 22px;text-align:center">
@@ -103,7 +105,7 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
   </td></tr></table>
   <p style="color:#7a6555;font-size:0.85rem;line-height:1.6;margin:0">${t.note}</p>
 </td></tr>
-<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;padding:14px 32px;border-top:1px solid #ead9b8">
+<tr><td bgcolor="#f2ece0" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
   <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing}</p>
 </td></tr>
 </table>
@@ -136,7 +138,8 @@ module.exports = async function handler(req, res) {
       from: `"GeNext" <${process.env.GMAIL_USER}>`,
       to: email,
       subject,
-      html
+      html,
+      attachments: [LOGO_ATTACHMENT]
     });
     return res.status(200).json({ ok: true, email: 'sent' });
   } catch(e) {

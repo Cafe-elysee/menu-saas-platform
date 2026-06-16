@@ -2980,6 +2980,10 @@ const ADMIN_UI = {
     noneIco:       '— Καμία —',
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
+    logoGreenTitle:'Φόντο λογοτύπου',
+    logoGreenMsg:  'Αν θέλετε το φόντο του λογοτύπου σας να αφαιρεθεί (διαφανές), προετοιμάστε την εικόνα με <strong style="color:var(--gold)">ΠΡΑΣΙΝΟ</strong> φόντο. Θα αφαιρεθεί αυτόματα. Διαφορετικά, το λογότυπο θα εμφανιστεί όπως είναι, με το φόντο του.',
+    logoGreenOk:   'Επιλογή λογοτύπου',
+    logoGreenCancel:'Άκυρο',
     tabDisplay:'🎨 Εμφάνιση Μενού', tabOrders:'🧾 Παραγγελίες & Κλήσεις', tabSettings:'⚙️ Ρυθμίσεις',
     settingsIdentity:'Πρόσβαση & Εστιατόριο', settingsLangSection:'Ρυθμίσεις γλώσσας',
     settingsName:'Όνομα', settingsLangs:'Διαθέσιμες γλώσσες', settingsLangParams:'Γλώσσες — Ρυθμίσεις',
@@ -3107,6 +3111,10 @@ const ADMIN_UI = {
     noneIco:       '— Aucune —',
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
+    logoGreenTitle:'Fond du logo',
+    logoGreenMsg:  'Si vous voulez que le fond de votre logo ne s\'affiche pas (transparent), préparez votre image avec un fond <strong style="color:var(--gold)">VERT</strong>. Il sera supprimé automatiquement. Sinon, le logo sera affiché tel quel, avec son fond.',
+    logoGreenOk:   'Choisir le logo',
+    logoGreenCancel:'Annuler',
     tabDisplay:'🎨 Affichage Menu', tabOrders:'🧾 Commandes & Appels', tabSettings:'⚙️ Réglages',
     settingsIdentity:'Accès & Restaurant', settingsLangSection:'Paramètres de langue',
     settingsName:'Nom', settingsLangs:'Langues disponibles', settingsLangParams:'Langues — Paramètres',
@@ -3234,6 +3242,10 @@ const ADMIN_UI = {
     noneIco:       '— None —',
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
+    logoGreenTitle:'Logo background',
+    logoGreenMsg:  'If you want your logo\'s background to be removed (transparent), prepare your image with a <strong style="color:var(--gold)">GREEN</strong> background. It will be removed automatically. Otherwise, the logo will be displayed as is, with its background.',
+    logoGreenOk:   'Choose logo',
+    logoGreenCancel:'Cancel',
     tabDisplay:'🎨 Menu Display', tabOrders:'🧾 Orders & Calls', tabSettings:'⚙️ Settings',
     settingsIdentity:'Access & Restaurant', settingsLangSection:'Language settings',
     settingsName:'Name', settingsLangs:'Available languages', settingsLangParams:'Languages — Settings',
@@ -3361,6 +3373,10 @@ const ADMIN_UI = {
     noneIco:       '— Keines —',
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
+    logoGreenTitle:'Logo-Hintergrund',
+    logoGreenMsg:  'Wenn der Hintergrund Ihres Logos entfernt werden soll (transparent), bereiten Sie Ihr Bild mit einem <strong style="color:var(--gold)">GRÜNEN</strong> Hintergrund vor. Er wird automatisch entfernt. Andernfalls wird das Logo so angezeigt, wie es ist, mit seinem Hintergrund.',
+    logoGreenOk:   'Logo auswählen',
+    logoGreenCancel:'Abbrechen',
     tabDisplay:'🎨 Menü-Ansicht', tabOrders:'🧾 Bestellungen & Anrufe', tabSettings:'⚙️ Einstellungen',
     settingsIdentity:'Zugang & Restaurant', settingsLangSection:'Spracheinstellungen',
     settingsName:'Name', settingsLangs:'Verfügbare Sprachen', settingsLangParams:'Sprachen — Einstellungen',
@@ -3488,6 +3504,10 @@ const ADMIN_UI = {
     noneIco:       '— لا شيء —',
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
+    logoGreenTitle:'خلفية الشعار',
+    logoGreenMsg:  'إذا كنت تريد إزالة خلفية شعارك (شفافة)، جهّز صورتك بخلفية <strong style="color:var(--gold)">خضراء</strong>. ستتم إزالتها تلقائياً. وإلا، سيظهر الشعار كما هو مع خلفيته.',
+    logoGreenOk:   'اختيار الشعار',
+    logoGreenCancel:'إلغاء',
     tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات', tabSettings:'⚙️ الإعدادات',
     settingsIdentity:'الوصول والمطعم', settingsLangSection:'إعدادات اللغة',
     settingsName:'الاسم', settingsLangs:'اللغات المتاحة', settingsLangParams:'اللغات — الإعدادات',
@@ -4376,11 +4396,66 @@ function renderNoteSection() {
 }
 
 /* ─── SECTION LOGO ─── */
+// Suppression automatique d'un fond vert (chroma key) — BFS depuis les bordures de l'image
+// pour ne supprimer que le vert CONNECTÉ au bord (jamais du vert qui ferait partie du logo lui-même)
+function _removeGreenScreen(ctx, w, h) {
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const n = w * h;
+  const removed = new Uint8Array(n);
+  const visited  = new Uint8Array(n);
+  const isGreen   = (r, g, b) => g > 60 && g > r * 1.15 && g > b * 1.05;
+  const isGreenish= (r, g, b) => g > 45 && g >= r * 0.95 && g >= b * 0.95;
+
+  const stack = [];
+  for (let x = 0; x < w; x++) { stack.push(x); stack.push((h - 1) * w + x); }
+  for (let y = 0; y < h; y++) { stack.push(y * w); stack.push(y * w + w - 1); }
+
+  let any = false;
+  while (stack.length) {
+    const p = stack.pop();
+    if (visited[p]) continue;
+    visited[p] = 1;
+    const o = p * 4;
+    if (!isGreen(data[o], data[o + 1], data[o + 2])) continue;
+    data[o + 3] = 0; removed[p] = 1; any = true;
+    const x = p % w, y = (p / w) | 0;
+    if (x > 0)     stack.push(p - 1);
+    if (x < w - 1) stack.push(p + 1);
+    if (y > 0)     stack.push(p - w);
+    if (y < h - 1) stack.push(p + w);
+  }
+
+  if (any) {
+    // Lissage des bords (anti-spill) : pixels encore légèrement verts au contact d'une zone supprimée
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const p = y * w + x;
+        if (removed[p]) continue;
+        const o = p * 4;
+        if (data[o + 3] === 0) continue;
+        let nearRemoved = false;
+        if (x > 0     && removed[p - 1]) nearRemoved = true;
+        if (x < w - 1 && removed[p + 1]) nearRemoved = true;
+        if (y > 0     && removed[p - w]) nearRemoved = true;
+        if (y < h - 1 && removed[p + w]) nearRemoved = true;
+        if (nearRemoved && isGreenish(data[o], data[o + 1], data[o + 2])) {
+          data[o + 3] = Math.round(data[o + 3] * 0.35);
+          data[o + 1] = Math.round((data[o] + data[o + 2]) / 2);
+        }
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+  return any;
+}
+
 function renderLogoSection() {
   const logoImg   = document.getElementById('pm-logo');
   const logoInput = document.getElementById('logo-file-input');
   const logoDelBtn= document.getElementById('logo-del-btn');
   if (!logoImg || !logoInput || !logoDelBtn) return;
+  const uploadLabel = logoInput.previousElementSibling;
 
   function setLogo(src) {
     const titleEl = document.getElementById('pm-title');
@@ -4398,9 +4473,24 @@ function renderLogoSection() {
 
   setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
 
+  // Popup d'information AVANT l'ouverture du sélecteur de fichier (fond vert = transparence auto)
+  if (uploadLabel && !uploadLabel._greenInfoBound) {
+    uploadLabel._greenInfoBound = true;
+    uploadLabel.addEventListener('click', e => {
+      e.preventDefault();
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+      _showAdmConfirm(
+        t.logoGreenTitle  || 'Fond du logo',
+        t.logoGreenMsg    || 'Si vous voulez que le fond de votre logo ne s\'affiche pas (transparent), préparez votre image avec un fond <strong style="color:var(--gold)">VERT</strong>. Il sera supprimé automatiquement. Sinon, le logo sera affiché tel quel, avec son fond.',
+        t.logoGreenOk     || 'Choisir le logo',
+        t.logoGreenCancel || 'Annuler',
+        () => logoInput.click()
+      );
+    });
+  }
+
   logoInput.addEventListener('change', () => {
     const file = logoInput.files[0]; if (!file) return;
-    const uploadLabel = logoInput.previousElementSibling;
     const origLabel = uploadLabel ? uploadLabel.innerHTML : '';
     const reader = new FileReader();
     reader.onload = e => {
@@ -4411,7 +4501,9 @@ function renderLogoSection() {
         if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const bgRemoved = _removeGreenScreen(ctx, w, h);
         setLogo(canvas.toDataURL('image/png', 0.9));
         if (uploadLabel) { uploadLabel.innerHTML = '<span style="opacity:.6">⏳ Upload…</span>'; uploadLabel.style.pointerEvents = 'none'; }
         canvas.toBlob(blob => {
@@ -4422,19 +4514,11 @@ function renderLogoSection() {
           fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
             .then(r => r.json()).then(json => {
               if (!json.secure_url) throw new Error('Upload failed');
-              const finish = (url, bgRemoved) => {
-                adminData.logoUrl = url;
-                _rref('menu/logoUrl').set(url);
-                setLogo(url);
-                if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-                showToast(bgRemoved ? '✅ Logo mis à jour (fond supprimé automatiquement)' : '✅ Logo mis à jour');
-              };
-              // Suppression de fond automatique via Cloudinary AI — fallback silencieux si indisponible sur le plan
-              const bgRemovedUrl = json.secure_url.replace('/image/upload/', '/image/upload/e_background_removal/f_png/');
-              const testImg = new Image();
-              testImg.onload  = () => finish(bgRemovedUrl, true);
-              testImg.onerror = () => finish(json.secure_url, false);
-              testImg.src = bgRemovedUrl;
+              adminData.logoUrl = json.secure_url;
+              _rref('menu/logoUrl').set(json.secure_url);
+              setLogo(json.secure_url);
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+              showToast(bgRemoved ? '✅ Logo mis à jour (fond vert supprimé)' : '✅ Logo mis à jour');
             }).catch(err => {
               console.error('Logo upload error:', err);
               if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }

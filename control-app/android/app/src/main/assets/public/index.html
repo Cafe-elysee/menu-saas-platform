@@ -2137,6 +2137,27 @@ async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
+async function ncHashPwd(pwd) { return sha256(pwd); }
+
+// ── Génération ID / mot de passe par défaut (initiales + date) ──────────────
+function _nameInitials(name, count) {
+  const clean = String(name || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const words = clean.split(/[^a-z0-9]+/).filter(Boolean);
+  let out = '';
+  for (let i = 0; i < words.length && out.length < count; i++) out += words[i].charAt(0);
+  if (out.length < count && words.length) out += words[0].slice(1, count - out.length + 1);
+  return (out || 'rs').slice(0, count);
+}
+function _buildRidTs(name, extraLetters) {
+  const letters = _nameInitials(name, 2 + (extraLetters || 0));
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  const ts = p(d.getDate()) + p(d.getMonth() + 1) + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + String(d.getFullYear()).slice(2);
+  return letters + ts;
+}
+function _buildPwdDefault(name) {
+  return _nameInitials(name, 2) + new Date().getFullYear();
+}
 
 // ════════════════════════════════════════════════════
 // AUTH — Login / first run
@@ -2570,11 +2591,12 @@ function listenCommandes() {
     renderCommandes();
     setTimeout(_checkAutoSuspend, 200); // vérifier après le rendu initial
     // Rafraîchir les sections facturation des cartes client déjà affichées
+    // (y compris clients dont clientCree=null après firstOpen — on détecte via emailData.rid)
     setTimeout(function() {
       Object.keys(_commandesCache).forEach(function(k) {
         var d = _commandesCache[k];
-        var created = d && (d.clientCree || _lastCreatedClients[k]);
-        if (created) _rerenderClientBillingSection(k);
+        var hasRef = d && (d.clientCree || _lastCreatedClients[k] || (d.emailData && d.emailData.rid));
+        if (hasRef) _rerenderClientBillingSection(k);
       });
     }, 200);
   });
@@ -3127,13 +3149,12 @@ function _showPaymentHistory(cmdKey) {
       const dt = new Date(p.date);
       const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
       const montant = (p.montant || 0) + ' €/' + (p.mode === 'annual' ? 'an' : 'mois');
-      const mode = p.mode === 'annual' ? 'annuel' : 'mensuel';
       const forfait = forfaitLabels[p.forfait] || p.forfait || '—';
       return '<div class="hist-item">' +
         '<span class="hist-item-badge">✅</span>' +
         '<div class="hist-item-body">' +
           '<div class="hist-item-date">' + escapeHtml(dateStr) + '</div>' +
-          '<div class="hist-item-detail">' + escapeHtml(montant) + ' · ' + escapeHtml(mode) + ' · ' + escapeHtml(forfait) + '</div>' +
+          '<div class="hist-item-detail">' + escapeHtml(montant) + ' · ' + escapeHtml(forfait) + '</div>' +
         '</div></div>';
     }).join('');
   }
@@ -3307,9 +3328,10 @@ function _askPermanentDelete(slug) {
 function _askRestoreClient(slug) {
   var d = _archivedClientsCache[slug];
   if (!d) return;
+  var fLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
   _showCtrlConfirm(
     '↩ Restaurer ce client ?',
-    'Le client <b>'+escapeHtml(d.name||slug)+'</b> sera recréé avec son forfait précédent (<b>'+escapeHtml(d.forfait||'—')+'</b>). Il devra se reconnecter.',
+    'Le client <b>'+escapeHtml(d.name||slug)+'</b> sera recréé avec son forfait précédent (<b>'+escapeHtml(fLabel)+'</b>). Il devra se reconnecter.',
     'Restaurer',
     function() { restoreClient(slug, d); },
     false
@@ -3320,16 +3342,24 @@ async function restoreClient(slug, d) {
   try {
     var rid = slug;
     var pwd = _buildPwdDefault(d.name||slug);
-    var pwdHash = ncHashPwd(pwd);
-    await _saasDb.ref('restaurants/'+rid+'/profile').set({
-      name: d.name||slug,
-      lang: d.lang||'fr',
-      contacts: { email: d.email||'' },
-      createdAt: Date.now()
+    var hash = await ncHashPwd(pwd);
+    var isCS = d.forfait === 'commandes-services';
+    var paymentMode = d.paymentMode === 'annual' ? 'annual' : 'monthly';
+    var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
+    await _saasDb.ref('restaurants/'+rid).set({
+      profile: { name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] },
+      config: {
+        adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+        features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
+        retention: { calls: 2592000000, orders: 2592000000 },
+        subscription: { forfait: d.forfait||'menu-qr', paymentMode: paymentMode, price: price, email: d.email||null }
+      },
+      menu: { menuTheme: 'carte-classique', menuStyle: 'simple' },
+      firstOpen: false
     });
-    await _saasDb.ref('restaurants/'+rid+'/access').set({ password: pwdHash });
     await _saasDb.ref('/archivedClients/'+rid).remove();
-    _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
+    var fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
+    _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> ('+escapeHtml(fLabel)+') a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
   } catch(e) {
     alert('Erreur restauration : ' + e.message);
   }
@@ -3443,7 +3473,7 @@ setInterval(function() {
 let _ctrlConfirmCb = null;
 function _showCtrlConfirm(title, msg, okLabel, cb, isDanger) {
   document.getElementById('ctrl-confirm-title').textContent = title;
-  document.getElementById('ctrl-confirm-msg').textContent   = msg;
+  document.getElementById('ctrl-confirm-msg').innerHTML      = msg;
   const okBtn = document.getElementById('ctrl-confirm-ok-btn');
   okBtn.textContent = okLabel;
   okBtn.style.background = isDanger ? 'linear-gradient(135deg,#e87070,#d94040,#b02020)' : 'linear-gradient(135deg,#d4a94e,#c8a44e,#b8922e)';
@@ -3609,7 +3639,7 @@ function recreerClientDepuisCommande(btnEl) {
   const restaurantName = btnEl.dataset.rest;
   _showCtrlConfirm(
     'Recréer ce restaurant ?',
-    'Recréer « ' + restaurantName + ' » avec l\'ID ' + oldRid + ' ?',
+    'Recréer « ' + escapeHtml(restaurantName) + ' » avec l\'ID ' + escapeHtml(oldRid) + ' ?',
     'Recréer',
     async function() {
       btnEl.disabled = true; btnEl.textContent = '⏳…';
@@ -3969,8 +3999,24 @@ function loadClientData(client) {
   });
 
   // Contacts listener (profile du restaurant)
+  // Fallback depuis la commande si le profil est vide (email/whatsapp/viber fournis lors de la commande)
   _saasDb.ref('restaurants/' + s + '/profile/contacts').on('value', function(snap) {
-    _renderContactsSection(id, s, snap.val() || {});
+    var profileContacts = snap.val() || {};
+    var merged = Object.assign({}, profileContacts);
+    var ck = _findCommandeForClient(s);
+    var cmd = ck ? _commandesCache[ck] : null;
+    if (cmd) {
+      if (!merged.email) {
+        merged.email = cmd.email || (cmd.emailData && cmd.emailData.email) || '';
+      }
+      if (!merged.whatsapp && cmd.whatsapp && cmd.whatsapp.numero) {
+        merged.whatsapp = (cmd.whatsapp.indicatif || '') + cmd.whatsapp.numero;
+      }
+      if (!merged.viber && cmd.viber && cmd.viber.numero) {
+        merged.viber = (cmd.viber.indicatif || '') + cmd.viber.numero;
+      }
+    }
+    _renderContactsSection(id, s, merged);
   });
 }
 
