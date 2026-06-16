@@ -3868,6 +3868,7 @@ document.getElementById('adm-theme-btn').addEventListener('click', () => {
     path.setAttribute('d','M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42');
     path.setAttribute('stroke-linecap','round');
   }
+  if (typeof _updateHeroSectionForTheme === 'function') _updateHeroSectionForTheme();
 });
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
@@ -4567,6 +4568,25 @@ function renderTaglineSection() {
   });
 }
 
+/* ─── GeNext : pas de photo d'accueil — masque l'upload, simule le bokeh du thème ─── */
+function _updateHeroSectionForTheme() {
+  const isGenext = currentMenuTheme === 'genext';
+  const controls = document.querySelector('.hero-controls');
+  const hint      = document.getElementById('hero-hint-txt');
+  const phoneBg   = document.getElementById('phone-hero-bg');
+  if (controls) controls.style.display = isGenext ? 'none' : '';
+  if (hint)      hint.style.display      = isGenext ? 'none' : '';
+  if (!phoneBg) return;
+  if (isGenext) {
+    const bgFile = document.documentElement.classList.contains('light') ? 'assets/gn-bg-light.jpg' : 'assets/gn-bg-dark.jpg';
+    phoneBg.style.backgroundImage = `url('${bgFile}')`;
+    phoneBg.classList.add('flow');
+  } else {
+    phoneBg.style.backgroundImage = adminData.heroImage ? `url('${adminData.heroImage}')` : '';
+    if (!adminData.heroImage) phoneBg.classList.remove('flow');
+  }
+}
+
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
   const delBtn    = document.getElementById('hero-del-btn');
@@ -4574,6 +4594,7 @@ function renderHeroImageSection() {
   const phoneBg   = document.getElementById('phone-hero-bg');
 
   function setPhoneBg(src) {
+    if (currentMenuTheme === 'genext') return; // simulation pilotée par _updateHeroSectionForTheme
     if (src) {
       phoneBg.style.backgroundImage = `url('${src}')`;
       requestAnimationFrame(() => requestAnimationFrame(() => phoneBg.classList.add('flow')));
@@ -4587,6 +4608,7 @@ function renderHeroImageSection() {
 
   // Afficher l'image actuelle dans le mockup
   setPhoneBg(adminData.heroImage || '');
+  _updateHeroSectionForTheme();
 
   // Upload fichier → compression canvas → Cloudinary
   fileInput.addEventListener('change', () => {
@@ -6864,6 +6886,7 @@ function loadMenuTheme() {
     if (t !== currentMenuTheme) {
       currentMenuTheme = t;
       renderThemeSelector();
+      _updateHeroSectionForTheme();
     }
   });
   _rref('menu/hiddenThemes').on('value', snap => {
@@ -6885,6 +6908,7 @@ function saveMenuTheme(themeId) {
     syncStyleAdminUI(deduced);
   }
   renderThemeSelector();
+  _updateHeroSectionForTheme();
 }
 
 /* ══════════════════════════════════════════
