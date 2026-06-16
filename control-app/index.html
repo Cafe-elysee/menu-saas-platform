@@ -315,6 +315,7 @@
       overflow-y: auto; overflow-x: hidden;
       padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
     }
+    .tab-pane.tab-hidden { visibility: hidden; }
 
     .bottom-nav {
       flex-shrink: 0;
@@ -1817,7 +1818,7 @@
     </div>
 
     <!-- TAB PAIEMENTS -->
-    <div class="tab-pane" id="pane-paiements">
+    <div class="tab-pane tab-hidden" id="pane-paiements">
       <div class="section-title">Paiements en attente</div>
       <div id="paiements-empty" class="commande-empty" style="display:none">
         <div class="commande-empty-icon">✅</div>
@@ -1827,7 +1828,7 @@
     </div>
 
     <!-- TAB EX-CLIENTS -->
-    <div class="tab-pane" id="pane-exclients">
+    <div class="tab-pane tab-hidden" id="pane-exclients">
       <div class="section-title">Ex-Clients archivés</div>
       <div class="commande-empty" id="exclients-empty" style="display:none">
         <div class="commande-empty-icon">👤</div>
@@ -3506,7 +3507,9 @@ function _doRenderPaiements() {
 
   // Nav visibility
   var _navP = document.getElementById('nav-paiements');
+  var _paneP = document.getElementById('pane-paiements');
   if (_navP) _navP.style.display = pendingKeys.length > 0 ? '' : 'none';
+  if (_paneP) _paneP.classList.toggle('tab-hidden', pendingKeys.length === 0);
   if (pendingKeys.length === 0 && _currentTab === 'paiements') switchTab('clients');
 
   var expiredCount = pendingKeys.filter(function(k) { return _tc[k].isExpired; }).length;
@@ -3573,7 +3576,9 @@ function _renderExClients() {
   var keys = Object.keys(_archivedClientsCache);
 
   var _navEx = document.getElementById('nav-exclients');
+  var _paneEx = document.getElementById('pane-exclients');
   if (_navEx) _navEx.style.display = keys.length > 0 ? '' : 'none';
+  if (_paneEx) _paneEx.classList.toggle('tab-hidden', keys.length === 0);
   if (keys.length === 0 && _currentTab === 'exclients') switchTab('clients');
 
   if (keys.length === 0) {
