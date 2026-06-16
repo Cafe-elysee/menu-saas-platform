@@ -830,23 +830,58 @@
 
     /* ══ GENEXT — Design admin/demo (bokeh + glassmorphism) ══ */
     html[data-menu-theme="genext"] {
-      --bg:#080604; --bg2:#0c0a08; --bg-card:rgba(20,15,8,.72); --bg-nav:rgba(8,6,4,0.92);
+      --bg:#080604; --bg2:#0c0a08;
+      --bg-card:color-mix(in srgb, var(--gold) 6%, rgba(20,15,8,.72));
+      --bg-nav:rgba(8,6,4,0.92);
       --gold:#c8a44e; --gold-lt:#e2c278; --gold-dk:#9a7a35; --cream:#f0ead8;
-      --muted:rgba(240,234,216,0.70); --border:rgba(231,206,151,.18); --border2:rgba(231,206,151,.32);
-      --shadow:0 2px 24px -8px rgba(0,0,0,.4); --shadow-h:0 12px 40px rgba(200,164,78,0.22),0 4px 20px rgba(0,0,0,.5);
-      --badge-new:#c8a44e; --badge-pop:#e8854a; --badge-veg:#7ebd6a;
+      --muted:rgba(240,234,216,0.70);
+      --border:color-mix(in srgb, var(--gold) 18%, transparent);
+      --border2:color-mix(in srgb, var(--gold) 32%, transparent);
+      --shadow:0 2px 24px -8px rgba(0,0,0,.4);
+      --shadow-h:0 12px 40px color-mix(in srgb, var(--gold) 22%, transparent),0 4px 20px rgba(0,0,0,.5);
+      --badge-new:var(--gold); --badge-pop:#e8854a; --badge-veg:#7ebd6a;
+      --r-pill:10px;
     }
     html[data-menu-theme="genext"] body {
-      background-image:url('assets/gn-bg-dark.jpg'); background-size:cover; background-position:center; background-attachment:fixed;
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--gold) 16%, transparent), color-mix(in srgb, var(--gold) 16%, transparent)),
+        url('assets/gn-bg-dark.jpg');
+      background-blend-mode:overlay;
+      background-size:cover; background-position:center; background-attachment:fixed;
     }
     html[data-menu-theme="genext"].light {
-      --bg:#f0ede8; --bg2:#e8e3da; --bg-card:rgba(255,255,255,.55); --bg-nav:rgba(245,242,237,0.92);
+      --bg:#f0ede8; --bg2:#e8e3da;
+      --bg-card:color-mix(in srgb, var(--gold) 6%, rgba(255,255,255,.55));
+      --bg-nav:rgba(245,242,237,0.92);
       --gold:#8a6520; --gold-lt:#a87c2c; --gold-dk:#6a4c14; --cream:#241b0c;
-      --muted:rgba(36,27,12,0.70); --border:rgba(140,110,45,.28); --border2:rgba(140,110,45,.42);
-      --shadow:0 2px 24px -8px rgba(0,0,0,.09); --shadow-h:0 8px 28px rgba(140,110,45,.15),0 4px 14px rgba(0,0,0,.12);
+      --muted:rgba(36,27,12,0.70);
+      --border:color-mix(in srgb, var(--gold) 24%, transparent);
+      --border2:color-mix(in srgb, var(--gold) 38%, transparent);
+      --shadow:0 2px 24px -8px rgba(0,0,0,.09);
+      --shadow-h:0 8px 28px color-mix(in srgb, var(--gold) 15%, transparent),0 4px 14px rgba(0,0,0,.12);
     }
     html[data-menu-theme="genext"].light body {
-      background-image:url('assets/gn-bg-light.jpg');
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--gold) 10%, transparent), color-mix(in srgb, var(--gold) 10%, transparent)),
+        url('assets/gn-bg-light.jpg');
+      background-blend-mode:overlay;
+    }
+    /* ── GeNext : boutons façon admin (gradient statique 3D, pas de shimmer) ── */
+    html[data-menu-theme="genext"] .cat-pill.on {
+      animation:none; background-size:auto;
+      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk));
+      box-shadow:0 4px 12px rgba(200,164,78,0.32), inset 0 1.5px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.18);
+    }
+    html[data-menu-theme="genext"] #call-fab,
+    html[data-menu-theme="genext"] #cart-fab {
+      animation:none !important; background-size:auto;
+      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk));
+      border-radius:10px;
+      box-shadow:0 4px 12px rgba(200,164,78,0.32), inset 0 1.5px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.18);
+    }
+    html[data-menu-theme="genext"] .card-qty-ctrl .card-add-btn {
+      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.18);
     }
 
     /* ══ VARIANTES DYN-BENTO ══ */
@@ -7836,8 +7871,8 @@ function _startPreloader() {
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
   if (!pre) return;
-  // Pas de logo uploadé → aucune animation, le menu apparaît directement
-  if (!_logoUrl) { pre.remove(); _triggerHeroAutoScroll(); return; }
+  // Pas de logo uploadé → aucune animation, le menu apparaît directement sur la photo d'accueil (pas de scroll forcé)
+  if (!_logoUrl) { pre.remove(); return; }
   const img = document.getElementById('pre-logo-img');
   if (img) img.src = _logoUrl;
   _dissolvePreloader(pre);

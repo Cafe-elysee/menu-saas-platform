@@ -4422,11 +4422,19 @@ function renderLogoSection() {
           fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
             .then(r => r.json()).then(json => {
               if (!json.secure_url) throw new Error('Upload failed');
-              adminData.logoUrl = json.secure_url;
-              _rref('menu/logoUrl').set(json.secure_url);
-              setLogo(json.secure_url);
-              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-              showToast('✅ Logo mis à jour');
+              const finish = (url, bgRemoved) => {
+                adminData.logoUrl = url;
+                _rref('menu/logoUrl').set(url);
+                setLogo(url);
+                if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+                showToast(bgRemoved ? '✅ Logo mis à jour (fond supprimé automatiquement)' : '✅ Logo mis à jour');
+              };
+              // Suppression de fond automatique via Cloudinary AI — fallback silencieux si indisponible sur le plan
+              const bgRemovedUrl = json.secure_url.replace('/image/upload/', '/image/upload/e_background_removal/f_png/');
+              const testImg = new Image();
+              testImg.onload  = () => finish(bgRemovedUrl, true);
+              testImg.onerror = () => finish(json.secure_url, false);
+              testImg.src = bgRemovedUrl;
             }).catch(err => {
               console.error('Logo upload error:', err);
               if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
