@@ -2570,11 +2570,12 @@ function listenCommandes() {
     renderCommandes();
     setTimeout(_checkAutoSuspend, 200); // vérifier après le rendu initial
     // Rafraîchir les sections facturation des cartes client déjà affichées
+    // (y compris clients dont clientCree=null après firstOpen — on détecte via emailData.rid)
     setTimeout(function() {
       Object.keys(_commandesCache).forEach(function(k) {
         var d = _commandesCache[k];
-        var created = d && (d.clientCree || _lastCreatedClients[k]);
-        if (created) _rerenderClientBillingSection(k);
+        var hasRef = d && (d.clientCree || _lastCreatedClients[k] || (d.emailData && d.emailData.rid));
+        if (hasRef) _rerenderClientBillingSection(k);
       });
     }, 200);
   });
@@ -3969,8 +3970,24 @@ function loadClientData(client) {
   });
 
   // Contacts listener (profile du restaurant)
+  // Fallback depuis la commande si le profil est vide (email/whatsapp/viber fournis lors de la commande)
   _saasDb.ref('restaurants/' + s + '/profile/contacts').on('value', function(snap) {
-    _renderContactsSection(id, s, snap.val() || {});
+    var profileContacts = snap.val() || {};
+    var merged = Object.assign({}, profileContacts);
+    var ck = _findCommandeForClient(s);
+    var cmd = ck ? _commandesCache[ck] : null;
+    if (cmd) {
+      if (!merged.email) {
+        merged.email = cmd.email || (cmd.emailData && cmd.emailData.email) || '';
+      }
+      if (!merged.whatsapp && cmd.whatsapp && cmd.whatsapp.numero) {
+        merged.whatsapp = (cmd.whatsapp.indicatif || '') + cmd.whatsapp.numero;
+      }
+      if (!merged.viber && cmd.viber && cmd.viber.numero) {
+        merged.viber = (cmd.viber.indicatif || '') + cmd.viber.numero;
+      }
+    }
+    _renderContactsSection(id, s, merged);
   });
 }
 
