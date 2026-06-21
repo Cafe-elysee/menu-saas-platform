@@ -849,6 +849,8 @@
     .qr-ctxt:focus { border-color:var(--gold); background:rgba(200,164,78,0.04); }
     html.light .qr-ctxt { background:rgba(0,0,0,0.04); }
     .qr-ctxt-h { font-size:0.63rem; color:var(--muted); text-align:center; margin-top:4px; }
+    .qr-logo-btn { display:flex; align-items:center; justify-content:center; gap:7px; padding:9px 14px; border-radius:10px; border:1.5px solid rgba(200,164,78,0.5); background:rgba(200,164,78,0.10); color:#c8a44e; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.18s; width:100%; margin-bottom:8px; }
+    .qr-logo-btn:active { background:rgba(200,164,78,0.2); }
     .qr-upl { display:flex; align-items:center; justify-content:center; gap:7px; padding:10px 14px; border-radius:10px; border:1.5px dashed rgba(200,164,78,0.28); color:var(--muted); font-family:inherit; font-size:0.78rem; cursor:pointer; transition:all 0.2s; width:100%; }
     .qr-upl:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.04); }
     .qr-fname { font-size:0.66rem; color:var(--gold); text-align:center; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -2728,6 +2730,7 @@
             <div class="qr-ctxt-h">Affiché au centre — 7 caractères max · fond transparent</div>
           </div>
           <div id="qr-ctr-img" class="qr-ctr-sub" style="display:none">
+            <button class="qr-logo-btn" id="qr-logo-btn" onclick="qrLoadRestaurantLogo()">🏷 Logo du restaurant</button>
             <label class="qr-upl">
               📎 Choisir une image (logo, icône…)
               <input type="file" id="qr-center-file" accept="image/*" style="display:none" onchange="qrLoadImage(this)">
@@ -8920,17 +8923,17 @@ window.addEventListener('pageshow', event => {
    QR CODES MODAL — SVG vectoriel haute qualité
 ═══════════════════════════════════════════ */
 const _QR = {
-  color:'#ff0000', bgColor:'#ffffff', textColor:'#ff0000',
-  _hsv:{h:0,s:1,v:1}, _hsvBg:{h:0,s:0,v:1}, _hsvTxt:{h:0,s:1,v:1},
+  color:'#c8a44e', bgColor:'#0a0a0a', textColor:'#ffffff',
+  _hsv:{h:43,s:0.61,v:0.78}, _hsvBg:{h:0,s:0,v:0.04}, _hsvTxt:{h:0,s:0,v:1},
   _colorTarget:'mod',
-  dotStyle:'square', eyeStyle:'square',
-  centerType:'none', centerText:'', centerImg:null,
+  dotStyle:'rounded', eyeStyle:'rounded',
+  centerType:'text', centerText:'', centerImg:null,
   libsReady:false
 };
 
 const _QR_PRESETS = [
+  { color:'#c8a44e', label:'GeNext' },
   { color:'#0a0a0a', label:'Noir' },
-  { color:'#a07828', label:'Doré' },
   { color:'#0d2137', label:'Marine' },
   { color:'#133319', label:'Forêt' },
   { color:'#2e0a0a', label:'Bordeaux' },
@@ -9134,7 +9137,20 @@ function openQRModal() {
   document.getElementById('qr-modal').classList.add('open');
   history.pushState({ qrModal: true }, '');
   _qrHistoryPushed = true;
-  _qrLoadLibs().then(() => { _qrInitUI(); qrUpdatePreview(); });
+  // Auto-remplir le texte centre avec le nom du restaurant (première ouverture)
+  if (!_QR.centerText) {
+    _QR.centerText = (adminData?.info?.name || '').slice(0, 7);
+  }
+  _qrLoadLibs().then(() => {
+    _qrInitUI();
+    const ctInp = document.getElementById('qr-center-text');
+    if (ctInp) ctInp.value = _QR.centerText;
+    // Synchroniser l'affichage du sous-panneau centre
+    document.getElementById('qr-ctr-text').style.display  = _QR.centerType === 'text'  ? '' : 'none';
+    document.getElementById('qr-ctr-img').style.display   = _QR.centerType === 'image' ? '' : 'none';
+    document.querySelectorAll('.qr-cp').forEach(b => b.classList.toggle('on', b.dataset.center === _QR.centerType));
+    qrUpdatePreview();
+  });
 }
 function closeQRModal() {
   document.getElementById('qr-modal').classList.remove('open');
@@ -9185,6 +9201,13 @@ function qrLoadImage(input) {
   const r = new FileReader();
   r.onload = e => { _QR.centerImg = e.target.result; qrUpdatePreview(); };
   r.readAsDataURL(f);
+}
+function qrLoadRestaurantLogo() {
+  const url = (adminData && (adminData.logoUrl || (adminData.info && adminData.info.logoUrl))) || null;
+  if (!url) { typeof _showToast === 'function' && _showToast('Aucun logo uploadé pour ce restaurant'); return; }
+  _QR.centerImg = url;
+  document.getElementById('qr-upload-fname').textContent = 'Logo restaurant ✓';
+  qrUpdatePreview();
 }
 
 /* ── SVG QR Generator ── */
@@ -9243,12 +9266,17 @@ function _qrBuildSVG(url, size) {
   // Centre
   let center = '';
   const cSz = size * 0.22, cx = (size-cSz)/2, cy = (size-cSz)/2;
+  const _hasCtr = (_QR.centerType === 'text' && _QR.centerText.trim()) || (_QR.centerType === 'image' && _QR.centerImg);
+  if (_hasCtr) {
+    const padSz = cSz * 1.22, padX = (size-padSz)/2, padY = (size-padSz)/2;
+    center = `<rect x="${padX}" y="${padY}" width="${padSz}" height="${padSz}" rx="${padSz*0.15}" fill="${bg}"/>`;
+  }
   if (_QR.centerType === 'text' && _QR.centerText.trim()) {
     const txt = _QR.centerText.trim().slice(0, 7);
     const fs  = Math.round(cSz * Math.min(0.58, 2.6 / Math.max(txt.length, 1)));
-    center = `<text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" fill="${_QR.textColor||fg}" font-family="Outfit,sans-serif" textLength="${Math.round(cSz*0.9)}" lengthAdjust="spacingAndGlyphs">${txt}</text>`;
+    center += `<text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" fill="${_QR.textColor||fg}" font-family="Outfit,sans-serif" textLength="${Math.round(cSz*0.9)}" lengthAdjust="spacingAndGlyphs">${txt}</text>`;
   } else if (_QR.centerType === 'image' && _QR.centerImg) {
-    center = `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
+    center += `<image x="${cx}" y="${cy}" width="${cSz}" height="${cSz}" href="${_QR.centerImg}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${size} ${size}" width="100%" height="100%" style="display:block" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/>${mods}${eyes}${center}</svg>`;
