@@ -1321,18 +1321,11 @@
     html.light .adm-sel-popup button { color:var(--cream); }
     html.light .adm-sel-popup button:hover { background:rgba(200,164,78,0.1); }
     /* ── Panneau Commandes (visibility managed by tab panel) ── */
-    /* En mode papier/carte : cacher toute la section photo des produits (upload, preview, label, toggle) */
-    body[data-style="paper"] .photo-form-group,
-    body[data-style="simple"] .photo-form-group { display:none !important; }
-    /* Exception GeNext : thème 'simple' qui AFFICHE les photos produits */
-    body[data-theme="genext"] .photo-form-group { display:block !important; }
-    /* En mode papier/carte : cacher les miniatures produit dans l'en-tête des cartes */
+    /* En mode papier (flipbook) : cacher les photos produits — le flipbook n'utilise que les photos catégorie */
+    body[data-style="paper"] .photo-form-group { display:none !important; }
+    /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
     body[data-style="paper"] .prod-thumb,
-    body[data-style="paper"] .prod-thumb-empty,
-    body[data-style="simple"] .prod-thumb,
-    body[data-style="simple"] .prod-thumb-empty { display:none !important; }
-    body[data-theme="genext"] .prod-thumb,
-    body[data-theme="genext"] .prod-thumb-empty { display:block !important; }
+    body[data-style="paper"] .prod-thumb-empty { display:none !important; }
     /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
     .cat-photos-row { display:none; }
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
@@ -1862,13 +1855,14 @@
   .flatpickr-calendar.arrowBottom:before { border-top-color:var(--border) !important; }
   .flatpickr-calendar.arrowBottom:after  { border-top-color:var(--bg2) !important; }
   .flatpickr-months { background:rgba(200,164,78,0.06); padding:4px 0; }
-  .flatpickr-month { color:var(--gold) !important; fill:var(--gold) !important; height:40px; }
-  .flatpickr-current-month { font-size:0.9rem; color:var(--gold) !important; padding-top:8px; }
-  .flatpickr-current-month input.cur-year { color:var(--gold) !important; }
+  .flatpickr-month { color:var(--gold) !important; fill:var(--gold) !important; height:48px; }
+  .flatpickr-current-month { font-size:1rem; color:var(--gold) !important; padding-top:10px; }
+  .flatpickr-current-month input.cur-year { color:var(--gold) !important; font-size:1rem; font-weight:700; }
   .flatpickr-current-month .flatpickr-monthDropdown-months {
-    background:var(--bg2) !important; color:var(--gold) !important; border:none;
+    background:var(--bg2) !important; color:var(--gold) !important; border:none; font-size:1rem; font-weight:700;
   }
-  .flatpickr-prev-month svg, .flatpickr-next-month svg { fill:var(--gold) !important; }
+  .flatpickr-prev-month, .flatpickr-next-month { padding:12px 14px !important; }
+  .flatpickr-prev-month svg, .flatpickr-next-month svg { fill:var(--gold) !important; width:16px; height:16px; }
   .flatpickr-prev-month:hover, .flatpickr-next-month:hover { background:rgba(200,164,78,0.1) !important; }
   .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill:var(--gold-l) !important; }
   .flatpickr-weekday { color:var(--muted) !important; font-size:0.67rem; }
@@ -4438,9 +4432,9 @@ function _removeGreenScreen(ctx, w, h) {
   const n = w * h;
   const removed = new Uint8Array(n);
   const visited  = new Uint8Array(n);
-  // Seuils resserrés — évite de traiter des fonds olive/beige/crème comme du fond vert
-  const isGreen   = (r, g, b) => g > 80 && g > r * 1.3 && g > b * 1.2;
-  const isGreenish= (r, g, b) => g > 70 && g > r * 1.15 && g > b * 1.1;
+  // Seuils stricts — seul le vert vif de fond de studio (chromakey) est supprimé, pas l'olive/beige
+  const isGreen   = (r, g, b) => g > 90 && g > r * 1.5 && g > b * 1.4 && g - r > 30 && g - b > 20;
+  const isGreenish= (r, g, b) => g > 80 && g > r * 1.3 && g > b * 1.25 && g - r > 15;
 
   const stack = [];
   for (let x = 0; x < w; x++) { stack.push(x); stack.push((h - 1) * w + x); }
@@ -4558,9 +4552,11 @@ function renderLogoSection() {
             fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
               .then(r => r.json()).then(json => {
                 if (!json.secure_url) throw new Error('Upload failed');
-                adminData.logoUrl = json.secure_url;
+                // Cache-bust : force le browser à recharger même si même URL Cloudinary
+                const freshUrl = json.secure_url + '?v=' + Date.now();
+                adminData.logoUrl = json.secure_url; // stocker URL propre en Firebase (sans ?v=)
                 _rref('menu/logoUrl').set(json.secure_url);
-                setLogo(json.secure_url);
+                setLogo(freshUrl);
                 if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
                 showToast(bgRemoved ? '✅ Logo mis à jour (fond vert supprimé)' : '✅ Logo mis à jour');
               }).catch(err => {
@@ -8125,6 +8121,8 @@ function copyTableURL(btn, url) {
   // ── Lang select ──
   const langBtn   = document.getElementById('lang-sel-btn');
   const langPopup = document.getElementById('lang-sel-popup');
+  // Déplacer le popup hors du header (backdrop-filter crée un stacking context qui piège position:fixed)
+  if (langPopup && langPopup.parentNode !== document.body) document.body.appendChild(langPopup);
 
   window._updateLangBtn = function(l) {
     if (langBtn) langBtn.textContent = LANG_FLAGS[l] || '🌐';
@@ -8675,6 +8673,28 @@ function _fpSetLocale(lang) {
   _fpStart.set('locale', locale);
   _fpEnd.set('locale', locale);
 }
+
+// Swipe gauche/droite sur le calendrier flatpickr → mois précédent/suivant
+(function() {
+  var _fpTx = null;
+  document.addEventListener('touchstart', function(e) {
+    var cal = e.target.closest('.flatpickr-calendar');
+    if (!cal) { _fpTx = null; return; }
+    _fpTx = e.touches[0].clientX;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (_fpTx === null) return;
+    var cal = e.target.closest('.flatpickr-calendar');
+    if (!cal) { _fpTx = null; return; }
+    var dx = e.changedTouches[0].clientX - _fpTx;
+    _fpTx = null;
+    if (Math.abs(dx) < 40) return;
+    var fp = (cal.classList.contains('open') ? null : null); // trouver l'instance active
+    // trouver le bouton prev/next dans le calendrier touché
+    if (dx > 0) { var btn = cal.querySelector('.flatpickr-prev-month'); if (btn) btn.click(); }
+    else        { var btn2 = cal.querySelector('.flatpickr-next-month'); if (btn2) btn2.click(); }
+  }, { passive: true });
+})();
 
 function _getAnalyticsPeriod() {
   if (_adminCurrentPeriod === 'custom' && _adminCustomStart && _adminCustomEnd) {
