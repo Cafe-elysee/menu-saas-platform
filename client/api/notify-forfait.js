@@ -11,6 +11,22 @@ const nodemailer = require('nodemailer');
 const CONTROL_DB = 'https://menu-pro-control-default-rtdb.europe-west1.firebasedatabase.app';
 const LOGO_ATTACHMENT = { filename: 'gn-logo-email.png', path: 'https://menu-saas-platform.vercel.app/assets/gn-logo-email.png', cid: 'gnlogo' };
 
+const REVOLUT_URL = 'https://revolut.me/malekhkk7';
+const PAY_METHODS_F = {
+  fr: '💳 Revolut : <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (mentionnez votre ID dans les détails) · 💵 Espèces (Athènes) · Preuve de paiement par email, WhatsApp ou Viber avec votre ID.',
+  en: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (add your ID in the details) · 💵 Cash (Athens) · Send proof of payment by email, WhatsApp or Viber with your ID.',
+  el: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (αναφέρετε το ID σας στις λεπτομέρειες) · 💵 Μετρητά (Αθήνα) · Αποστολή απόδειξης πληρωμής μέσω email, WhatsApp ή Viber με το ID σας.',
+  de: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (ID in den Details angeben) · 💵 Barzahlung (Athen) · Zahlungsnachweis per E-Mail, WhatsApp oder Viber mit Ihrer ID senden.',
+  ar: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (اذكر ID في التفاصيل) · 💵 نقداً (أثينا) · أرسل إيصال الدفع عبر البريد أو WhatsApp أو Viber مع ID.'
+};
+const WEEK_PAYMENT_F = {
+  fr: 'Vous avez <strong>7 jours</strong> pour effectuer votre paiement.',
+  en: 'You have <strong>7 days</strong> to complete your payment.',
+  el: 'Έχετε <strong>7 ημέρες</strong> για να ολοκληρώσετε την πληρωμή σας.',
+  de: 'Sie haben <strong>7 Tage</strong> Zeit, Ihre Zahlung zu leisten.',
+  ar: 'لديك <strong>7 أيام</strong> لإتمام الدفع.'
+};
+
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -68,6 +84,8 @@ const PRICE = {
 function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymentMode) {
   const isCS    = newForfait === 'commandes-services';
   const safeName = escHtml(name);
+  const payM = PAY_METHODS_F[lang] || PAY_METHODS_F.fr;
+  const weekP = WEEK_PAYMENT_F[lang] || WEEK_PAYMENT_F.fr;
   const forfaitLabel = {
     fr: { mq: 'Menu QR', cs: 'Commandes &amp; Services', monthly: 'mensuel',   annual: 'annuel'     },
     en: { mq: 'Menu QR', cs: 'Orders &amp; Services',    monthly: 'monthly',   annual: 'annual'     },
@@ -96,35 +114,35 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
       intro: isUpgrade
         ? `Votre forfait a été mis à niveau vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`
         : `Votre forfait a été modifié vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isUpgrade ? `Vous avez <strong>7 jours</strong> pour effectuer votre paiement.` : null,
+      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Vos nouvelles fonctionnalités : prise de commandes en ligne, bouton d'appel, système de tables et QR ordering.` : `Votre menu digital reste actif. Les fonctionnalités de commande et d'appel ont été désactivées.`,
       closing: `L'équipe GeNext`
     },
     en: {
       greeting: `Hello ${safeName} 👋`,
       intro: isUpgrade ? `Your plan has been upgraded to <strong>${newLabel}</strong> (${modeLabel} — €${price}).` : `Your plan has been changed to <strong>${newLabel}</strong> (${modeLabel} — €${price}).`,
-      payment: isUpgrade ? `You have <strong>7 days</strong> to complete your payment.` : null,
+      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Your new features: online ordering, call button, table system and QR ordering.` : `Your digital menu remains active. Ordering and call features have been disabled.`,
       closing: `The GeNext Team`
     },
     el: {
       greeting: `Γεια σας ${safeName} 👋`,
       intro: isUpgrade ? `Η συνδρομή σας αναβαθμίστηκε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Η συνδρομή σας άλλαξε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isUpgrade ? `Έχετε <strong>7 ημέρες</strong> για να ολοκληρώσετε την πληρωμή σας.` : null,
+      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Νέες λειτουργίες: online παραγγελίες, κουμπί κλήσης, σύστημα τραπεζιών και QR παραγγελία.` : `Το ψηφιακό σας μενού παραμένει ενεργό. Οι λειτουργίες παραγγελίας και κλήσης έχουν απενεργοποιηθεί.`,
       closing: `Η ομάδα GeNext`
     },
     de: {
       greeting: `Guten Tag ${safeName} 👋`,
       intro: isUpgrade ? `Ihr Plan wurde auf <strong>${newLabel}</strong> aktualisiert (${modeLabel} — ${price}€).` : `Ihr Plan wurde auf <strong>${newLabel}</strong> geändert (${modeLabel} — ${price}€).`,
-      payment: isUpgrade ? `Sie haben <strong>7 Tage</strong> Zeit, Ihre Zahlung zu leisten.` : null,
+      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Ihre neuen Funktionen: Online-Bestellungen, Anrufschaltfläche, Tischsystem und QR-Bestellung.` : `Ihr digitales Menü bleibt aktiv. Bestell- und Anruffunktionen wurden deaktiviert.`,
       closing: `Das GeNext Team`
     },
     ar: {
       greeting: `مرحباً ${safeName} 👋`,
       intro: isUpgrade ? `تمت ترقية خطتك إلى <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `تغيّرت خطتك إلى <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isUpgrade ? `لديك <strong>7 أيام</strong> لإتمام الدفع.` : null,
+      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `مميزاتك الجديدة: الطلب عبر الإنترنت، زر الاستدعاء، نظام الطاولات وطلب QR.` : `قائمتك الرقمية تبقى نشطة. تم تعطيل ميزات الطلب والاستدعاء.`,
       closing: `فريق GeNext`
     }
