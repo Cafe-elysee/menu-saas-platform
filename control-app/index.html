@@ -1660,8 +1660,8 @@
 </svg>
 <!-- ══════════════ LOADING ══════════════ -->
 <div id="ctrl-loading-screen">
-  <img id="gn-ctrl-logo-dk" src="assets/gn-logo-dark.png" class="gn-ctrl-logo" alt="GeNext" draggable="false">
-  <img id="gn-ctrl-logo-lt" src="assets/gn-logo-light.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="display:none">
+  <img id="gn-ctrl-logo-dk" src="assets/gn-logo-dark.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="opacity:0">
+  <img id="gn-ctrl-logo-lt" src="assets/gn-logo-light.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="display:none;opacity:0">
 </div>
 
 <!-- ══════════════ LOGIN ══════════════ -->
@@ -3427,8 +3427,9 @@ async function restoreClient(slug, d) {
     var isCS = d.forfait === 'commandes-services';
     var paymentMode = d.paymentMode === 'annual' ? 'annual' : 'monthly';
     var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
+    const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     await _saasDb.ref('restaurants/'+rid).set({
-      profile: { name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] },
+      profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] }, _restoreContacts),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3683,8 +3684,9 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const _subPayMode2 = cmdData.paymentMode || 'monthly';
     const _subEmail2   = cmdData.email || null;
     const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
+    const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).set({
-      profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+      profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3739,8 +3741,9 @@ function recreerClientDepuisCommande(btnEl) {
         const _subPayModeR = cmdData.paymentMode || 'monthly';
         const _subEmailR   = cmdData.email || null;
         const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
+        const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).set({
-          profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+          profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContactsR),
           config: {
             adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
             features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
