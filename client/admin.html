@@ -1997,6 +1997,19 @@
   }
   .settings-section:last-child { border-bottom:none; margin-bottom:0; }
   html.light .settings-section { border-bottom-color:rgba(200,164,78,0.12); }
+  /* Subscription 4-choice grid */
+  .sub-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .sub-opt { background:rgba(200,164,78,.07); border:1.5px solid rgba(200,164,78,.18); border-radius:14px; padding:13px 11px 11px; text-align:left; cursor:pointer; transition:background .18s,border-color .18s; position:relative; width:100%; box-sizing:border-box; }
+  .sub-opt.sub-opt-active { background:rgba(200,164,78,.18); border-color:#c8a44e; box-shadow:0 0 0 1px rgba(200,164,78,.28); }
+  .sub-opt:not(.sub-opt-active):active { background:rgba(200,164,78,.14); }
+  .sub-opt-check { position:absolute; top:8px; right:9px; color:#c8a44e; font-size:0.7rem; font-weight:800; opacity:0; transition:opacity .15s; }
+  .sub-opt-active .sub-opt-check { opacity:1; }
+  .sub-opt-forfait { font-size:0.71rem; font-weight:700; color:var(--cream); letter-spacing:0.01em; margin-bottom:1px; }
+  .sub-opt-mode { font-size:0.61rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .sub-opt-price { font-size:1rem; font-weight:700; color:#c8a44e; margin-top:5px; line-height:1; }
+  .sub-opt-price span { font-size:0.6rem; font-weight:400; color:var(--muted); }
+  html.light .sub-opt { background:rgba(200,164,78,.07); }
+  html.light .sub-opt.sub-opt-active { background:rgba(200,164,78,.2); }
   .settings-sec-hd {
     font-family:'Crimson Pro',serif; font-size:1.1rem; font-weight:600;
     color:var(--cream); padding:8px 18px 5px;
@@ -7336,29 +7349,122 @@ async function _loadSubscriptionSection() {
            <br><button onclick="_cancelScheduledForfait()" style="background:none;border:none;color:var(--muted);font-size:0.72rem;text-decoration:underline;cursor:pointer;padding:0;margin-top:4px">${t.subPendingCancel || 'Annuler le changement prévu'}</button>
          </div>`
       : '';
+    const _perMonth = { fr:'/mois', en:'/month', el:'/μήνα', ar:'/شهر', de:'/Mon.' };
+    const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', ar:'/سنة',  de:'/Jahr' };
+    const _subOpts = [];
+    for (const _f of ['menu-qr','commandes-services']) {
+      for (const _m of ['monthly','annual']) {
+        const _act   = _f === forfait && _m === payMode;
+        const _pr    = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
+        const _sfx   = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
+        const _fLbl  = _f === 'commandes-services' ? (t.subForfaitCS||'C&S') : (t.subForfaitMenuQR||'Menu QR');
+        const _mLbl  = _m === 'annual' ? (t.subAnnual||'Annuel') : (t.subMonthly||'Mensuel');
+        _subOpts.push(`<button class="sub-opt${_act?' sub-opt-active':''}" onclick="_changeSubscription('${_f}','${_m}')"><span class="sub-opt-check">✓</span><div class="sub-opt-forfait">${_fLbl}</div><div class="sub-opt-mode">${_mLbl}</div><div class="sub-opt-price">${_pr}€<span>${_sfx}</span></div></button>`);
+      }
+    }
     el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <span style="font-size:0.95rem;font-weight:700;color:var(--gold)">${forfaitLabel}</span>
-        <span style="font-size:0.78rem;color:var(--muted);background:rgba(200,164,78,.12);border-radius:20px;padding:2px 10px">${modeLabel}</span>
-        <span style="font-size:0.78rem;color:var(--muted)">${price}€</span>
-      </div>
       ${endDate}
       ${annualNotice}
       ${pendingChange}
-      <button onclick="_changeSubscriptionForfait('${isCS ? 'menu-qr' : 'commandes-services'}')"
-        style="background:rgba(200,164,78,.15);border:1px solid #c8a44e;color:#c8a44e;border-radius:10px;padding:9px 16px;font-size:0.83rem;font-weight:600;width:100%;cursor:pointer;transition:background .2s;margin-bottom:8px"
-        onmouseover="this.style.background='rgba(200,164,78,.28)'" onmouseout="this.style.background='rgba(200,164,78,.15)'"
-        id="sub-change-btn">${btnLabel}</button>
-      <button onclick="_changeSubscriptionPaymentMode('${payMode === 'annual' ? 'monthly' : 'annual'}')"
-        style="background:transparent;border:1px solid var(--bord2);color:var(--muted);border-radius:10px;padding:9px 16px;font-size:0.83rem;font-weight:600;width:100%;cursor:pointer;transition:background .2s"
-        onmouseover="this.style.background='rgba(200,164,78,.10)'" onmouseout="this.style.background='transparent'"
-        id="sub-change-mode-btn">${payMode === 'annual' ? (t.subChangeModeToMonthly || 'Repasser en paiement mensuel') : (t.subChangeModeToAnnual || 'Passer en paiement annuel')}</button>
-      <div id="sub-change-fb" style="font-size:0.78rem;margin-top:8px;color:var(--muted);min-height:16px"></div>`;
+      <div class="sub-grid">${_subOpts.join('')}</div>
+      <div id="sub-change-fb" style="font-size:0.78rem;margin-top:2px;color:var(--muted);min-height:16px;text-align:center"></div>`;
   } catch(e) {
     el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted)">—</div>';
   }
 }
 
+async function _changeSubscription(newForfait, newMode) {
+  const t          = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const curForfait = _subData?.forfait      || 'menu-qr';
+  const curMode    = _subData?.paymentMode  || 'monthly';
+  if (newForfait === curForfait && newMode === curMode) return;
+
+  // Anti-spam : 1 changement max par mois
+  const lastChange = _subData?.lastForfaitChange || 0;
+  if (lastChange && (Date.now() - lastChange) < 30 * 24 * 60 * 60 * 1000) {
+    const contactUrl = 'https://menu-pro-demo.vercel.app/#contact';
+    _showAdmConfirm(
+      t.subSpamTitle || 'Changement déjà effectué',
+      (t.subSpamMsg || 'Vous avez déjà modifié votre forfait ce mois-ci. Veuillez nous contacter.') +
+        ' <a href="' + contactUrl + '" onclick="window.open(this.href,\'_system\');return false;" style="color:#c8a44e;text-decoration:underline">' + (t.subSpamContact || 'Nous contacter') + '</a>',
+      t.subSpamContact || 'Nous contacter',
+      t.subSpamClose || 'Fermer',
+      () => { window.open(contactUrl, '_system'); }
+    );
+    return;
+  }
+
+  // Passage annuel → mensuel : avertissement non-remboursable
+  if (curMode === 'annual' && newMode === 'monthly') {
+    const bs = 'display:inline-block;margin:6px 4px 0;padding:8px 14px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;';
+    _showAdmConfirm(
+      t.subModeAnnualWarnTitle || 'Changement de mode de paiement annuel',
+      (t.subModeAnnualWarnMsg || 'Votre abonnement annuel a été réglé en avance à tarif préférentiel.') +
+      '<div style="margin-top:14px;text-align:center">' +
+        '<button onclick="_hideAdmConfirm()" style="' + bs + 'background:rgba(200,164,78,.18);color:#c8a44e;border:1px solid #c8a44e">' + (t.subModeAnnualWarnKeep || '✓ Garder jusqu\'à la fin') + '</button>' +
+        '<button onclick="_hideAdmConfirm();_doChangeSubscription(\'' + newForfait + '\',\'' + newMode + '\')" style="' + bs + 'background:rgba(220,80,80,.15);color:#e07070;border:1px solid #e07070">' + (t.subModeAnnualWarnNow || 'Changer maintenant') + '</button>' +
+      '</div>',
+      '',
+      t.subConfirmCancel || 'Annuler',
+      null
+    );
+    return;
+  }
+
+  // Confirmation normale
+  const isCSNew = newForfait === 'commandes-services';
+  const newPrice = isCSNew ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
+  const newFLbl  = isCSNew ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR');
+  const newMLbl  = newMode === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
+  const isUpgrade = newForfait === 'commandes-services' && curForfait !== 'commandes-services';
+  const isDownForfait = curForfait === 'commandes-services' && newForfait !== 'commandes-services';
+  const confirmTitle = isUpgrade ? (t.subUpgradeTitle || 'Passer à Commandes & Services ?')
+                     : isDownForfait ? (t.subDowngradeTitle || 'Revenir à Menu QR ?')
+                     : (t.subModeUpgradeTitle || 'Changer le mode de paiement ?');
+  _showAdmConfirm(
+    confirmTitle,
+    `${newFLbl} · ${newMLbl} · <strong style="color:var(--gold)">${newPrice}€</strong>`,
+    t.subConfirmOk || 'Confirmer',
+    t.subConfirmCancel || 'Annuler',
+    () => _doChangeSubscription(newForfait, newMode, t)
+  );
+}
+
+async function _doChangeSubscription(newForfait, newMode, t) {
+  if (!t) t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const fb = document.getElementById('sub-change-fb');
+  if (fb) fb.textContent = t.subChanging || 'Mise à jour…';
+  try {
+    const isCS     = newForfait === 'commandes-services';
+    const newPrice = isCS ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
+    const newFeats = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
+    const now      = Date.now();
+    await Promise.all([
+      _rref('/config/features').set(newFeats),
+      _rref('/config/subscription/forfait').set(newForfait),
+      _rref('/config/subscription/paymentMode').set(newMode),
+      _rref('/config/subscription/price').set(newPrice),
+      _rref('/config/subscription/lastForfaitChange').set(now)
+    ]);
+    const nameSnap = await _rref('profile/name').once('value');
+    const restName = nameSnap.val() || _RID;
+    fetch('/api/notify-forfait', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rid: _RID, name: restName,
+        oldForfait: _subData?.forfait || 'menu-qr', newForfait,
+        email: _subData?.email || null, lang: currentLang, paymentMode: newMode
+      })
+    }).catch(() => {});
+    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subChanged || '✅ Forfait mis à jour'; }
+    setTimeout(() => _loadSubscriptionSection(), 1800);
+  } catch(e) {
+    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = '❌ Erreur'; }
+  }
+}
+
+/* ── DEPRECATED — kept for backward compat (called from pendingChange flow only) ── */
 async function _changeSubscriptionForfait(newForfait) {
   const t         = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const isUpgrade = newForfait === 'commandes-services';
