@@ -658,6 +658,36 @@
       font-family: 'Outfit', sans-serif;
     }
     .commande-price-save-btn:hover { background: rgba(200,164,78,0.22); }
+    /* ── Grille 4 formules forfait × mode ── */
+    .f4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .f4-combo {
+      border: 1.5px solid rgba(200,164,78,0.2); border-radius: 14px;
+      padding: 11px 10px; cursor: pointer; user-select: none;
+      background: rgba(200,164,78,0.03);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .f4-combo.active {
+      border-color: #c8a44e; background: rgba(200,164,78,0.1);
+      box-shadow: 0 0 0 1px rgba(200,164,78,0.2);
+    }
+    .f4-name { font-size: 0.72rem; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
+    .f4-mode { font-size: 0.67rem; color: var(--muted); margin-bottom: 8px; }
+    .f4-active-badge {
+      font-size: 0.58rem; padding: 1px 5px; border-radius: 8px;
+      background: #c8a44e; color: #0c0a08; font-weight: 700; vertical-align: middle;
+    }
+    .f4-price-wrap { display: flex; align-items: center; gap: 4px; }
+    .f4-price-inp {
+      width: 54px; padding: 3px 5px;
+      background: rgba(200,164,78,0.07); border: 1px solid rgba(200,164,78,0.28);
+      border-radius: 8px; color: var(--gold); font-family: inherit;
+      font-size: 0.88rem; font-weight: 700; text-align: center; outline: none;
+      -moz-appearance: textfield;
+    }
+    .f4-price-inp::-webkit-outer-spin-button,
+    .f4-price-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .f4-price-inp:focus { border-color: #c8a44e; }
+    .f4-unit { font-size: 0.67rem; color: var(--muted); }
     /* ── Mode paiement (edit inline) ── */
     .commande-paymode-row {
       display: flex; align-items: center; gap: 0.45rem;
@@ -1660,8 +1690,8 @@
 </svg>
 <!-- ══════════════ LOADING ══════════════ -->
 <div id="ctrl-loading-screen">
-  <img id="gn-ctrl-logo-dk" src="assets/gn-logo-dark.png" class="gn-ctrl-logo" alt="GeNext" draggable="false">
-  <img id="gn-ctrl-logo-lt" src="assets/gn-logo-light.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="display:none">
+  <img id="gn-ctrl-logo-dk" src="assets/gn-logo-dark.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="opacity:0">
+  <img id="gn-ctrl-logo-lt" src="assets/gn-logo-light.png" class="gn-ctrl-logo" alt="GeNext" draggable="false" style="display:none;opacity:0">
 </div>
 
 <!-- ══════════════ LOGIN ══════════════ -->
@@ -2062,9 +2092,10 @@ function _setupSubSyncListener(slug, cmdKey) {
     if (sub.price != null && sub.price !== d.price)           { d.price = sub.price; changed = true; }
     if (sub.forfait && sub.forfait !== d.forfait)             { d.forfait = sub.forfait; changed = true; }
     if (sub.paymentMode && sub.paymentMode !== d.paymentMode) { d.paymentMode = sub.paymentMode; changed = true; }
+    if (sub.prices && JSON.stringify(sub.prices) !== JSON.stringify(d.prices)) { d.prices = sub.prices; changed = true; }
     if (changed) {
       // Persiste dans control Firebase pour offline/historique
-      _controlDb.ref('/commandes/' + cmdKey).update({ price: d.price, forfait: d.forfait, paymentMode: d.paymentMode });
+      _controlDb.ref('/commandes/' + cmdKey).update({ price: d.price, forfait: d.forfait, paymentMode: d.paymentMode, prices: d.prices || null });
       _rerenderClientBillingSection(cmdKey);
       _doRenderPaiements();
     }
@@ -2754,43 +2785,61 @@ function _findCommandeForClient(slug) {
   return null;
 }
 
-// ── Construire le HTML de la section facturation (carte client) ──────────────
+// ── Clé combo (forfait + mode) ─────────────────────────────────────────────
+function _comboKey(forfait, mode) {
+  var f = (forfait === 'commandes-services') ? 'srv' : 'qr';
+  var m = (mode === 'annual') ? 'annual' : 'monthly';
+  return f + '-' + m;
+}
+
+// ── Prix pour une combinaison forfait+mode ────────────────────────────────
+function _getComboPrice(d, forfait, mode) {
+  var ck = _comboKey(forfait, mode);
+  if (d.prices && d.prices[ck] != null) return d.prices[ck];
+  // Compatibilité : si la combo active correspond au prix custom actuel
+  if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'monthly') && d.price != null) return d.price;
+  return mode === 'annual' ? (_PRICE_ANNUAL[forfait] || 0) : (_PRICE_MONTHLY[forfait] || 0);
+}
+
+// ── Construire le HTML de la section facturation (grille 4 formules) ─────
 function _buildClientBillingSectionHTML(cmdKey, d) {
-  const price     = _getCommandePrice(d);
-  const priceUnit = d.paymentMode === 'annual' ? 'an' : 'mois';
-  const isMonthly = d.paymentMode !== 'annual';
+  if (d.paymentMode == null) return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '"></div>';
+  var activeForfait = d.forfait || 'menu-qr';
+  var activeMode = d.paymentMode || 'monthly';
 
-  const priceRow = d.paymentMode != null
-    ? '<div class="commande-price-row">' +
-        '<span class="commande-price-label">&#128182; Prix :</span>' +
-        '<input type="number" class="commande-price-input" id="price-inp-' + cmdKey + '"' +
-        ' value="' + price + '" min="0" step="1"' +
-        ' onkeydown="if(event.key===\'Enter\'){_saveCommandePrice(\'' + cmdKey + '\',this.value);this.blur();}">' +
-        '<span class="commande-price-unit" id="price-unit-' + cmdKey + '">&#8364;/' + priceUnit + '</span>' +
-        '<button class="commande-price-save-btn" onclick="_saveCommandePrice(\'' + cmdKey + '\',document.getElementById(\'price-inp-' + cmdKey + '\').value)">&#128190;</button>' +
-      '</div>'
-    : '';
+  var combos = [
+    { forfait: 'menu-qr',            mode: 'monthly', label: '&#128203; Menu QR',       modeLabel: 'Mensuel', unit: '&#8364;/mois' },
+    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',       modeLabel: 'Annuel',  unit: '&#8364;/an'   },
+    { forfait: 'commandes-services', mode: 'monthly', label: '&#128717; Commandes',     modeLabel: 'Mensuel', unit: '&#8364;/mois' },
+    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes',     modeLabel: 'Annuel',  unit: '&#8364;/an'   }
+  ];
 
-  const paymodeRow = d.paymentMode != null
-    ? '<div class="paymode-label">&#128179; Mode de paiement</div>' +
-      '<div class="forfait-seg" style="padding:4px 0 10px">' +
-        '<div class="forfait-seg-wrap' + (isMonthly ? '' : ' right') + '" id="paymode-wrap-' + cmdKey + '">' +
-          '<div class="forfait-seg-slider"></div>' +
-          '<button class="forfait-seg-btn' + (isMonthly ? ' active' : '') + '" onclick="_savePaymentMode(\'' + cmdKey + '\',\'monthly\')">&#128198; Mensuel</button>' +
-          '<button class="forfait-seg-btn' + (!isMonthly ? ' active' : '') + '" onclick="_savePaymentMode(\'' + cmdKey + '\',\'annual\')">&#128197; Annuel</button>' +
-        '</div>' +
-      '</div>'
-    : '';
+  var gridHtml = combos.map(function(c) {
+    var ck = _comboKey(c.forfait, c.mode);
+    var price = _getComboPrice(d, c.forfait, c.mode);
+    var isActive = c.forfait === activeForfait && c.mode === activeMode;
+    return '<div class="f4-combo' + (isActive ? ' active' : '') + '"' +
+      ' onclick="_setActiveCombo(\'' + cmdKey + '\',\'' + c.forfait + '\',\'' + c.mode + '\')">' +
+      '<div class="f4-name">' + c.label + (isActive ? ' <span class="f4-active-badge">actif</span>' : '') + '</div>' +
+      '<div class="f4-mode">' + c.modeLabel + '</div>' +
+      '<div class="f4-price-wrap">' +
+        '<input class="f4-price-inp" type="number" value="' + price + '" min="0" step="1"' +
+        ' onclick="event.stopPropagation()"' +
+        ' onchange="_saveComboPrice(\'' + cmdKey + '\',\'' + ck + '\',this.value)"' +
+        ' onkeydown="if(event.key===\'Enter\'){event.stopPropagation();_saveComboPrice(\'' + cmdKey + '\',\'' + ck + '\',this.value);this.blur();}">' +
+        '<span class="f4-unit">' + c.unit + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 
-  const birthdateRow = d.paymentMode != null
-    ? '<div class="commande-birthdate-row">' +
-        '<span class="commande-birthdate-label">&#128197; Date d\'anniversaire :</span>' +
-        '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
-      '</div>'
-    : '';
+  var birthdateRow = '<div class="commande-birthdate-row">' +
+    '<span class="commande-birthdate-label">&#128197; Date d\'anniversaire :</span>' +
+    '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
+  '</div>';
 
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
-    priceRow + paymodeRow + birthdateRow +
+    '<div class="f4-grid">' + gridHtml + '</div>' +
+    birthdateRow +
   '</div>';
 }
 
@@ -3072,10 +3121,13 @@ function _addMonths(ts, n) {
 }
 
 function _getCommandePrice(d) {
+  // Priorité : prix combo actif → prix custom → défaut
+  var activeForfait = d.forfait || 'menu-qr';
+  var activeMode    = d.paymentMode || 'monthly';
+  var ck = _comboKey(activeForfait, activeMode);
+  if (d.prices && d.prices[ck] != null) return d.prices[ck];
   if (d.price != null && d.price >= 0) return d.price;
-  return (d.paymentMode === 'annual'
-    ? (_PRICE_ANNUAL[d.forfait]  || 0)
-    : (_PRICE_MONTHLY[d.forfait] || 0));
+  return activeMode === 'annual' ? (_PRICE_ANNUAL[activeForfait] || 0) : (_PRICE_MONTHLY[activeForfait] || 0);
 }
 
 function _saveCommandePrice(key, rawVal) {
@@ -3092,6 +3144,62 @@ function _saveCommandePrice(key, rawVal) {
   showToast('💾 Prix mis à jour : ' + price + ' €');
   _rerenderClientBillingSection(key);
   _doRenderPaiements();
+}
+
+// ── Activer une formule (forfait + mode) et synchroniser partout ────────────
+function _setActiveCombo(cmdKey, forfait, mode) {
+  const d = _commandesCache[cmdKey];
+  if (!d) return;
+  const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
+  const normMode    = (mode === 'annual') ? 'annual' : 'monthly';
+  if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'monthly')) return;
+
+  // Prix correspondant à la combo sélectionnée
+  const comboPrice = _getComboPrice(d, normForfait, normMode);
+  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice });
+
+  // Mettre à jour les features si changement de forfait
+  const slug = _getSlugFromCmdKey(cmdKey);
+  if (slug) {
+    const isServices = normForfait === 'commandes-services';
+    const db = getClientDb(slug);
+    db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
+    db.ref('/config/subscription').update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
+    _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
+  }
+  _controlDb.ref('/commandes/' + cmdKey).update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
+
+  _rerenderClientBillingSection(cmdKey);
+  _doRenderPaiements();
+  showToast('&#9989; Formule mise à jour');
+}
+
+// ── Enregistrer le prix d'une formule spécifique ────────────────────────────
+function _saveComboPrice(cmdKey, comboKey, rawVal) {
+  const price = Math.max(0, parseInt(rawVal, 10) || 0);
+  const d = _commandesCache[cmdKey];
+  if (!d) return;
+  const prices = Object.assign({}, d.prices || {});
+  if (prices[comboKey] === price) return;
+  prices[comboKey] = price;
+  _commandesCache[cmdKey] = Object.assign({}, d, { prices });
+
+  // Si la combo modifiée est la combo active → mettre à jour le prix actif aussi
+  var activeForfait = d.forfait || 'menu-qr';
+  var activeMode    = d.paymentMode || 'monthly';
+  var activeComboKey = _comboKey(activeForfait, activeMode);
+  var isActiveCombo = (comboKey === activeComboKey);
+  if (isActiveCombo) {
+    _commandesCache[cmdKey].price = price;
+    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices });
+    const slug = _getSlugFromCmdKey(cmdKey);
+    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices });
+  } else {
+    _controlDb.ref('/commandes/' + cmdKey + '/prices').update({ [comboKey]: price });
+    const slug = _getSlugFromCmdKey(cmdKey);
+    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
+  }
+  showToast('&#128190; Prix enregistré : ' + price + ' €');
 }
 
 // ── Date d'anniversaire ─────────────────────────────────────────────────────
@@ -3427,8 +3535,9 @@ async function restoreClient(slug, d) {
     var isCS = d.forfait === 'commandes-services';
     var paymentMode = d.paymentMode === 'annual' ? 'annual' : 'monthly';
     var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
+    const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     await _saasDb.ref('restaurants/'+rid).set({
-      profile: { name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] },
+      profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] }, _restoreContacts),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3683,8 +3792,9 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const _subPayMode2 = cmdData.paymentMode || 'monthly';
     const _subEmail2   = cmdData.email || null;
     const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
+    const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).set({
-      profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+      profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3739,8 +3849,9 @@ function recreerClientDepuisCommande(btnEl) {
         const _subPayModeR = cmdData.paymentMode || 'monthly';
         const _subEmailR   = cmdData.email || null;
         const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
+        const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).set({
-          profile: { name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] },
+          profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContactsR),
           config: {
             adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
             features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3867,11 +3978,6 @@ function buildClientCard(client) {
       '<div class="pw-feedback" id="pwfb-'+id+'"></div>'+
     '</div>'+
     '<div class="card-section"><div class="card-section-header">&#128203; Forfait &amp; Abonnement</div>'+
-      '<div class="forfait-seg"><div class="forfait-seg-wrap" id="forfait-wrap-'+id+'">'+
-        '<div class="forfait-seg-slider"></div>'+
-        '<button class="forfait-seg-btn" id="forfait-menu-qr-'+id+'" onclick="writeForfait(\'' + s + '\',\'menu-qr\')">&#128203; Menu QR</button>'+
-        '<button class="forfait-seg-btn" id="forfait-services-'+id+'" onclick="writeForfait(\'' + s + '\',\'services\')">&#128717; Commandes &amp; Services</button>'+
-      '</div></div>'+
       '<div id="billing-section-'+id+'" class="client-billing-section" data-slug="'+s+'">'+_billInit+'</div>'+
     '</div>'+
     '<div class="card-section"><div class="card-section-header">&#128176; Paiement</div>'+
