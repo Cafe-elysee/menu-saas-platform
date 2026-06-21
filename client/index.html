@@ -7917,7 +7917,7 @@ function _startPreloader() {
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
   if (!pre) return;
-  // Pas de logo uploadé → aucune animation, le menu apparaît directement sur la photo d'accueil (pas de scroll forcé)
+  // Pas de logo uploadé → fade-out élégant puis auto-scroll hero→nav
   if (!_logoUrl) {
     // Fade-out élégant même sans logo (évite flash bokeh brusque)
     pre.style.transition = 'opacity 0.35s ease';
@@ -8128,35 +8128,46 @@ function _setupHeroParallax() {
 
 /* Auto-scroll fluide vers #nav après le preloader */
 function _triggerHeroAutoScroll() {
-  // Uniquement en style dynamique
+  // Uniquement en style dynamique (pas paper)
   if (document.body.getAttribute('data-style') === 'paper') return;
   const nav = document.getElementById('nav');
   if (!nav) return;
-  const startY = window.scrollY;
-  if (startY > 80) return; // L'utilisateur a déjà scrollé
-  const target = nav.getBoundingClientRect().top + startY;
-  if (target - startY < 30) return; // Déjà en position
+  // Vérification rapide de position avant le délai
+  if (window.scrollY > 120) return; // déjà scrollé par l'utilisateur
+  const _preTarget = nav.getBoundingClientRect().top + window.scrollY;
+  if (_preTarget - window.scrollY < 30) return; // déjà en position
 
-  let cancelled = false;
-  const cancel = () => { cancelled = true; };
-  window.addEventListener('touchstart',  cancel, { once: true, passive: true });
-  window.addEventListener('wheel',       cancel, { once: true, passive: true });
-  window.addEventListener('pointerdown', cancel, { once: true, passive: true });
-  window.addEventListener('keydown',     cancel, { once: true });
+  // Délai 320ms pour éviter les faux annulations depuis la dissolution du preloader
+  // (événements pointerdown/touchstart générés par la suppression du DOM preloader)
+  setTimeout(function() {
+    const startY = window.scrollY;
+    if (startY > 120) return; // recalcul — utilisateur a scrollé pendant le délai
+    const target = nav.getBoundingClientRect().top + startY;
+    if (target - startY < 30) return;
 
-  let t0 = null;
-  const dur  = 1450; // durée ms — lent et premium
-  const dist = target - startY;
-  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+    let cancelled = false;
+    const cancel = () => { cancelled = true; };
+    window.addEventListener('touchstart',  cancel, { once: true, passive: true });
+    window.addEventListener('wheel',       cancel, { once: true, passive: true });
+    window.addEventListener('pointerdown', cancel, { once: true, passive: true });
+    window.addEventListener('keydown',     cancel, { once: true });
 
-  function step(ts) {
-    if (cancelled) return;
-    if (!t0) t0 = ts;
-    const p = Math.min((ts - t0) / dur, 1);
-    window.scrollTo(0, startY + dist * ease(p));
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
+    let t0 = null;
+    const dur  = 1450; // durée ms — lent et premium
+    const dist = target - startY;
+    function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+    function step(ts) {
+      if (cancelled) return;
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / dur, 1);
+      // behavior:'instant' pour court-circuiter scroll-behavior:smooth sur html
+      // (sinon le CSS smooth scroll entre en conflit avec notre easing JS)
+      window.scrollTo({ top: startY + dist * ease(p), behavior: 'instant' });
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }, 320);
 }
 
 /* ================================================

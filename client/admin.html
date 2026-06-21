@@ -4401,6 +4401,8 @@ function renderNoteSection() {
 }
 
 /* ─── SECTION LOGO ─── */
+let _logoUploading = false; // A-4 fix: garde pour éviter renderLogoSection() pendant upload
+
 // Suppression automatique d'un fond vert (chroma key) — BFS depuis les bordures de l'image
 // pour ne supprimer que le vert CONNECTÉ au bord (jamais du vert qui ferait partie du logo lui-même)
 function _removeGreenScreen(ctx, w, h) {
@@ -4409,8 +4411,9 @@ function _removeGreenScreen(ctx, w, h) {
   const n = w * h;
   const removed = new Uint8Array(n);
   const visited  = new Uint8Array(n);
-  const isGreen   = (r, g, b) => g > 60 && g > r * 1.15 && g > b * 1.05;
-  const isGreenish= (r, g, b) => g > 45 && g >= r * 0.95 && g >= b * 0.95;
+  // Seuils resserrés — évite de traiter des fonds olive/beige/crème comme du fond vert
+  const isGreen   = (r, g, b) => g > 80 && g > r * 1.3 && g > b * 1.2;
+  const isGreenish= (r, g, b) => g > 70 && g > r * 1.15 && g > b * 1.1;
 
   const stack = [];
   for (let x = 0; x < w; x++) { stack.push(x); stack.push((h - 1) * w + x); }
@@ -4476,7 +4479,10 @@ function renderLogoSection() {
     }
   }
 
-  setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
+  // Ne pas écraser le canvas preview si un upload est en cours (A-4 fix)
+  if (!_logoUploading) {
+    setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
+  }
 
   // Popup d'information AVANT l'ouverture du sélecteur de fichier (fond vert = transparence auto)
   if (uploadLabel && !uploadLabel._greenInfoBound) {
@@ -4494,48 +4500,55 @@ function renderLogoSection() {
     });
   }
 
-  logoInput.addEventListener('change', () => {
-    const file = logoInput.files[0]; if (!file) return;
-    const origLabel = uploadLabel ? uploadLabel.innerHTML : '';
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 800;
-        let w = img.width, h = img.height;
-        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const bgRemoved = _removeGreenScreen(ctx, w, h);
-        setLogo(canvas.toDataURL('image/png', 0.9));
-        if (uploadLabel) { uploadLabel.innerHTML = '<span style="opacity:.6">⏳ Upload…</span>'; uploadLabel.style.pointerEvents = 'none'; }
-        canvas.toBlob(blob => {
-          const fd = new FormData();
-          fd.append('file', blob);
-          fd.append('upload_preset', CLOUDINARY_PRESET);
-          fd.append('public_id', _RID + '/logo');
-          fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
-            .then(r => r.json()).then(json => {
-              if (!json.secure_url) throw new Error('Upload failed');
-              adminData.logoUrl = json.secure_url;
-              _rref('menu/logoUrl').set(json.secure_url);
-              setLogo(json.secure_url);
-              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-              showToast(bgRemoved ? '✅ Logo mis à jour (fond vert supprimé)' : '✅ Logo mis à jour');
-            }).catch(err => {
-              console.error('Logo upload error:', err);
-              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-              showToast('❌ Erreur upload logo');
-            });
-        }, 'image/png', 0.9);
+  // A-4 fix : _changeBound évite les listeners multiples (renderAll() appelé plusieurs fois)
+  if (!logoInput._changeBound) {
+    logoInput._changeBound = true;
+    logoInput.addEventListener('change', () => {
+      const file = logoInput.files[0]; if (!file) return;
+      const origLabel = uploadLabel ? uploadLabel.innerHTML : '';
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 800;
+          let w = img.width, h = img.height;
+          if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const bgRemoved = _removeGreenScreen(ctx, w, h);
+          // Afficher le canvas preview immédiatement (avant upload)
+          setLogo(canvas.toDataURL('image/png', 0.9));
+          _logoUploading = true; // bloquer renderLogoSection() pendant l'upload
+          if (uploadLabel) { uploadLabel.innerHTML = '<span style="opacity:.6">⏳ Upload…</span>'; uploadLabel.style.pointerEvents = 'none'; }
+          canvas.toBlob(blob => {
+            const fd = new FormData();
+            fd.append('file', blob);
+            fd.append('upload_preset', CLOUDINARY_PRESET);
+            fd.append('public_id', _RID + '/logo');
+            fd.append('invalidate', 'true'); // purge CDN cache Cloudinary
+            fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
+              .then(r => r.json()).then(json => {
+                if (!json.secure_url) throw new Error('Upload failed');
+                adminData.logoUrl = json.secure_url;
+                _rref('menu/logoUrl').set(json.secure_url);
+                setLogo(json.secure_url);
+                if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+                showToast(bgRemoved ? '✅ Logo mis à jour (fond vert supprimé)' : '✅ Logo mis à jour');
+              }).catch(err => {
+                console.error('Logo upload error:', err);
+                if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+                showToast('❌ Erreur upload logo');
+              }).finally(() => { _logoUploading = false; });
+          }, 'image/png', 0.9);
+        };
+        img.src = e.target.result;
       };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    logoInput.value = '';
-  });
+      reader.readAsDataURL(file);
+      logoInput.value = '';
+    });
+  }
 
   logoDelBtn.addEventListener('click', () => {
     adminData.logoUrl = '';
