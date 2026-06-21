@@ -2036,6 +2036,41 @@ const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL  = { 'menu-qr': 490, 'commandes-services': 990 };
 
+// ── Sync subscription temps réel (admin ↔ control) ────────────────
+const _subSyncActive = {}; // slug → true (évite doublons de listeners)
+
+function _getSlugFromCmdKey(key) {
+  const d = _commandesCache[key];
+  if (!d) return null;
+  return (d.clientCree && d.clientCree.rid) || (d.emailData && d.emailData.rid) || null;
+}
+function _getCmdKeyForSlug(slug) {
+  return Object.keys(_commandesCache).find(function(k) {
+    var d = _commandesCache[k];
+    return d && ((d.clientCree && d.clientCree.rid === slug) || (d.emailData && d.emailData.rid === slug));
+  }) || null;
+}
+function _setupSubSyncListener(slug, cmdKey) {
+  if (_subSyncActive[slug]) return;
+  _subSyncActive[slug] = true;
+  _saasDb.ref('restaurants/' + slug + '/config/subscription').on('value', function(snap) {
+    var sub = snap.val();
+    if (!sub) return;
+    var d = _commandesCache[cmdKey];
+    if (!d) return;
+    var changed = false;
+    if (sub.price != null && sub.price !== d.price)           { d.price = sub.price; changed = true; }
+    if (sub.forfait && sub.forfait !== d.forfait)             { d.forfait = sub.forfait; changed = true; }
+    if (sub.paymentMode && sub.paymentMode !== d.paymentMode) { d.paymentMode = sub.paymentMode; changed = true; }
+    if (changed) {
+      // Persiste dans control Firebase pour offline/historique
+      _controlDb.ref('/commandes/' + cmdKey).update({ price: d.price, forfait: d.forfait, paymentMode: d.paymentMode });
+      _rerenderClientBillingSection(cmdKey);
+      _doRenderPaiements();
+    }
+  });
+}
+
 const ALL_THEMES_LIST = [
   { id:'gold-noir',       name:'Gold Noir',                accent:'#c8a44e' },
   { id:'neon-tokyo',      name:'Neon Pulse',               accent:'#00f5d4' },
@@ -2815,6 +2850,9 @@ function _savePaymentMode(cmdKey, mode) {
     _rerenderCommandeCard(cmdKey);
     showToast('⚠ Erreur de synchronisation');
   });
+  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
+  const _slugPM = _getSlugFromCmdKey(cmdKey);
+  if (_slugPM) _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/paymentMode').set(mode);
   showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
 }
 
@@ -2822,6 +2860,9 @@ function _savePaymentMode(cmdKey, mode) {
 function _rerenderClientBillingSection(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
+  // Activer le listener temps réel admin→control si pas encore fait
+  var slug = _getSlugFromCmdKey(cmdKey);
+  if (slug) _setupSubSyncListener(slug, cmdKey);
   var created = d.clientCree || _lastCreatedClients[cmdKey];
   var slugId;
   if (created) {
@@ -3043,8 +3084,14 @@ function _saveCommandePrice(key, rawVal) {
   if (!d) return;
   if (d.price === price) return;
   _commandesCache[key] = Object.assign({}, d, { price });
+  // Sync vers control Firebase (local)
   _controlDb.ref('/commandes/' + key + '/price').set(price);
+  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
+  const slug = _getSlugFromCmdKey(key);
+  if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/price').set(price);
   showToast('💾 Prix mis à jour : ' + price + ' €');
+  _rerenderClientBillingSection(key);
+  _doRenderPaiements();
 }
 
 // ── Date d'anniversaire ─────────────────────────────────────────────────────
@@ -4190,8 +4237,10 @@ function writeForfait(slug, forfait) {
   const btn = document.getElementById(btnId);
   if (btn && btn.classList.contains('active')) return;
 
-  const isServices = forfait === 'services';
-  const isMenuQR   = !isServices;
+  // Normaliser : 'services' → 'commandes-services' (valeur canonique)
+  const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
+  const isServices  = normForfait === 'commandes-services';
+  const isMenuQR    = !isServices;
   // Mise à jour visuelle immédiate
   const btnQR  = document.getElementById('forfait-menu-qr-'+id);
   const btnSrv = document.getElementById('forfait-services-'+id);
@@ -4199,12 +4248,20 @@ function writeForfait(slug, forfait) {
   if (btnQR)  btnQR.classList.toggle('active',  isMenuQR);
   if (btnSrv) btnSrv.classList.toggle('active', isServices);
   if (wrap)   wrap.classList.toggle('right', isServices);
-  // Écriture Firebase
+  // Écriture features + subscription/forfait dans main Firebase
   const db = getClientDb(slug);
-  db.ref('/config/features/callBtn').set(isServices);
-  db.ref('/config/features/orderUI').set(isServices);
-  db.ref('/config/features/tableSystem').set(isServices);
-  db.ref('/config/features/qrOrdering').set(isServices);
+  db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
+  db.ref('/config/subscription/forfait').set(normForfait);
+  // Écriture dans control Firebase (commande) pour sync local
+  const cmdKey = _getCmdKeyForSlug(slug);
+  if (cmdKey) {
+    _controlDb.ref('/commandes/' + cmdKey + '/forfait').set(normForfait);
+    if (_commandesCache[cmdKey]) {
+      _commandesCache[cmdKey].forfait = normForfait;
+      _rerenderClientBillingSection(cmdKey);
+      _doRenderPaiements();
+    }
+  }
 }
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
