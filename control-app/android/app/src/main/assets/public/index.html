@@ -128,9 +128,16 @@
       will-change:opacity,filter;
       background:transparent;
       position:relative;z-index:1;
+      opacity:0;
+      animation:ctrlLogoIn 0.4s ease 0.22s forwards;
     }
+    @keyframes ctrlLogoIn { to { opacity:1; } }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
+    /* E-1 fix : halo doré pour faire ressortir le disque sombre du logo sur fond bokeh noir */
+    #gn-ctrl-logo-dk {
+      filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
 
     .login-box {
       background-image: url(assets/gn-bg-dark.jpg);
@@ -1201,15 +1208,18 @@
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
-      background: rgba(18,14,10,0.88);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(200,164,78,0.22);
+      background-color: #120e0a;
+      background-image: url(assets/gn-bg-dark.jpg);
+      background-size: cover; background-position: center;
+      border: 1px solid rgba(200,164,78,0.28);
       border-radius: 22px; padding: 1.75rem;
       width: 100%; max-width: 380px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.12);
     }
     html.light .modal-box {
-      background: rgba(248,244,238,0.90);
+      background-color: #f5f0e8;
+      background-image: url(assets/gn-bg-light.jpg);
+      border-color: rgba(200,164,78,0.22);
     }
     .modal-box h3 {
       font-family: 'Cormorant Garamond', serif;
@@ -1470,8 +1480,9 @@
   @keyframes ctrlConfirmIn  { from { opacity:0; transform:scale(0.88) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
   @keyframes ctrlConfirmOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.9); } }
   #ctrl-confirm-modal { display:none; position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px; }
-  .ctrl-confirm-box { width:100%; max-width:320px; background:var(--card-bg); border:1px solid var(--border); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
+  .ctrl-confirm-box { width:100%; max-width:320px; background-color:#120e0a; background-image:url(assets/gn-bg-dark.jpg); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.12); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .ctrl-confirm-box.out { animation:ctrlConfirmOut 0.18s ease forwards; }
+  html.light .ctrl-confirm-box { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); border-color:rgba(200,164,78,0.22); }
 
   /* ── Date d'anniversaire ── */
   .commande-birthdate-row {
@@ -2025,6 +2036,41 @@ const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL  = { 'menu-qr': 490, 'commandes-services': 990 };
 
+// ── Sync subscription temps réel (admin ↔ control) ────────────────
+const _subSyncActive = {}; // slug → true (évite doublons de listeners)
+
+function _getSlugFromCmdKey(key) {
+  const d = _commandesCache[key];
+  if (!d) return null;
+  return (d.clientCree && d.clientCree.rid) || (d.emailData && d.emailData.rid) || null;
+}
+function _getCmdKeyForSlug(slug) {
+  return Object.keys(_commandesCache).find(function(k) {
+    var d = _commandesCache[k];
+    return d && ((d.clientCree && d.clientCree.rid === slug) || (d.emailData && d.emailData.rid === slug));
+  }) || null;
+}
+function _setupSubSyncListener(slug, cmdKey) {
+  if (_subSyncActive[slug]) return;
+  _subSyncActive[slug] = true;
+  _saasDb.ref('restaurants/' + slug + '/config/subscription').on('value', function(snap) {
+    var sub = snap.val();
+    if (!sub) return;
+    var d = _commandesCache[cmdKey];
+    if (!d) return;
+    var changed = false;
+    if (sub.price != null && sub.price !== d.price)           { d.price = sub.price; changed = true; }
+    if (sub.forfait && sub.forfait !== d.forfait)             { d.forfait = sub.forfait; changed = true; }
+    if (sub.paymentMode && sub.paymentMode !== d.paymentMode) { d.paymentMode = sub.paymentMode; changed = true; }
+    if (changed) {
+      // Persiste dans control Firebase pour offline/historique
+      _controlDb.ref('/commandes/' + cmdKey).update({ price: d.price, forfait: d.forfait, paymentMode: d.paymentMode });
+      _rerenderClientBillingSection(cmdKey);
+      _doRenderPaiements();
+    }
+  });
+}
+
 const ALL_THEMES_LIST = [
   { id:'gold-noir',       name:'Gold Noir',                accent:'#c8a44e' },
   { id:'neon-tokyo',      name:'Neon Pulse',               accent:'#00f5d4' },
@@ -2150,9 +2196,11 @@ function _nameInitials(name, count) {
 }
 function _buildRidTs(name, extraLetters) {
   const letters = _nameInitials(name, 2 + (extraLetters || 0));
-  const d = new Date();
+  // Force UTC+3 (Athens) pour IDs cohérents quelle que soit la timezone de l'appareil
+  const _utc = new Date();
+  const d = new Date(_utc.getTime() + 3 * 3600000);
   const p = n => String(n).padStart(2, '0');
-  const ts = p(d.getDate()) + p(d.getMonth() + 1) + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + String(d.getFullYear()).slice(2);
+  const ts = p(d.getUTCDate()) + p(d.getUTCMonth() + 1) + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + String(d.getUTCFullYear()).slice(2);
   return letters + ts;
 }
 function _buildPwdDefault(name) {
@@ -2390,6 +2438,7 @@ function getClientDb(slug) {
 // COMMANDES — temps réel
 // ════════════════════════════════════════════════════
 let _commandesCache = {};
+let _profileContactsCache = {}; // D-3 fix: cache profileContacts pour re-render post-commandes
 let _archivedClientsCache = {};
 let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
@@ -2596,7 +2645,22 @@ function listenCommandes() {
       Object.keys(_commandesCache).forEach(function(k) {
         var d = _commandesCache[k];
         var hasRef = d && (d.clientCree || _lastCreatedClients[k] || (d.emailData && d.emailData.rid));
-        if (hasRef) _rerenderClientBillingSection(k);
+        if (hasRef) {
+          _rerenderClientBillingSection(k);
+          // D-3 fix : re-render contacts section si le cache est déjà prêt
+          var _slug = (d.clientCree && d.clientCree.rid)
+            || (_lastCreatedClients[k] && _lastCreatedClients[k].rid)
+            || (d.emailData && d.emailData.rid);
+          if (_slug && _profileContactsCache.hasOwnProperty(_slug)) {
+            var _pid = _slug.replace(/-/g, '_');
+            var _pcache = _profileContactsCache[_slug];
+            var _pm = Object.assign({}, _pcache);
+            if (!_pm.email) _pm.email = d.email || (d.emailData && d.emailData.email) || '';
+            if (!_pm.whatsapp && d.whatsapp && d.whatsapp.numero) _pm.whatsapp = (d.whatsapp.indicatif||'')+d.whatsapp.numero;
+            if (!_pm.viber   && d.viber   && d.viber.numero)   _pm.viber   = (d.viber.indicatif  ||'')+d.viber.numero;
+            _renderContactsSection(_pid, _slug, _pm);
+          }
+        }
       });
     }, 200);
   });
@@ -2786,6 +2850,9 @@ function _savePaymentMode(cmdKey, mode) {
     _rerenderCommandeCard(cmdKey);
     showToast('⚠ Erreur de synchronisation');
   });
+  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
+  const _slugPM = _getSlugFromCmdKey(cmdKey);
+  if (_slugPM) _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/paymentMode').set(mode);
   showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
 }
 
@@ -2793,6 +2860,9 @@ function _savePaymentMode(cmdKey, mode) {
 function _rerenderClientBillingSection(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
+  // Activer le listener temps réel admin→control si pas encore fait
+  var slug = _getSlugFromCmdKey(cmdKey);
+  if (slug) _setupSubSyncListener(slug, cmdKey);
   var created = d.clientCree || _lastCreatedClients[cmdKey];
   var slugId;
   if (created) {
@@ -3014,8 +3084,14 @@ function _saveCommandePrice(key, rawVal) {
   if (!d) return;
   if (d.price === price) return;
   _commandesCache[key] = Object.assign({}, d, { price });
+  // Sync vers control Firebase (local)
   _controlDb.ref('/commandes/' + key + '/price').set(price);
+  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
+  const slug = _getSlugFromCmdKey(key);
+  if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/price').set(price);
   showToast('💾 Prix mis à jour : ' + price + ' €');
+  _rerenderClientBillingSection(key);
+  _doRenderPaiements();
 }
 
 // ── Date d'anniversaire ─────────────────────────────────────────────────────
@@ -4007,6 +4083,7 @@ function loadClientData(client) {
   // Fallback depuis la commande si le profil est vide (email/whatsapp/viber fournis lors de la commande)
   _saasDb.ref('restaurants/' + s + '/profile/contacts').on('value', function(snap) {
     var profileContacts = snap.val() || {};
+    _profileContactsCache[s] = profileContacts; // cache pour re-render post-commandesCache
     var merged = Object.assign({}, profileContacts);
     var ck = _findCommandeForClient(s);
     var cmd = ck ? _commandesCache[ck] : null;
@@ -4160,8 +4237,10 @@ function writeForfait(slug, forfait) {
   const btn = document.getElementById(btnId);
   if (btn && btn.classList.contains('active')) return;
 
-  const isServices = forfait === 'services';
-  const isMenuQR   = !isServices;
+  // Normaliser : 'services' → 'commandes-services' (valeur canonique)
+  const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
+  const isServices  = normForfait === 'commandes-services';
+  const isMenuQR    = !isServices;
   // Mise à jour visuelle immédiate
   const btnQR  = document.getElementById('forfait-menu-qr-'+id);
   const btnSrv = document.getElementById('forfait-services-'+id);
@@ -4169,12 +4248,20 @@ function writeForfait(slug, forfait) {
   if (btnQR)  btnQR.classList.toggle('active',  isMenuQR);
   if (btnSrv) btnSrv.classList.toggle('active', isServices);
   if (wrap)   wrap.classList.toggle('right', isServices);
-  // Écriture Firebase
+  // Écriture features + subscription/forfait dans main Firebase
   const db = getClientDb(slug);
-  db.ref('/config/features/callBtn').set(isServices);
-  db.ref('/config/features/orderUI').set(isServices);
-  db.ref('/config/features/tableSystem').set(isServices);
-  db.ref('/config/features/qrOrdering').set(isServices);
+  db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
+  db.ref('/config/subscription/forfait').set(normForfait);
+  // Écriture dans control Firebase (commande) pour sync local
+  const cmdKey = _getCmdKeyForSlug(slug);
+  if (cmdKey) {
+    _controlDb.ref('/commandes/' + cmdKey + '/forfait').set(normForfait);
+    if (_commandesCache[cmdKey]) {
+      _commandesCache[cmdKey].forfait = normForfait;
+      _rerenderClientBillingSection(cmdKey);
+      _doRenderPaiements();
+    }
+  }
 }
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
