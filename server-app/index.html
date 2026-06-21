@@ -1372,10 +1372,22 @@ function applyLang() {
   if (notifTxt) notifTxt.textContent = t.notifBannerTxt;
   if (notifBtn) notifBtn.textContent = t.notifBannerBtn;
   var _ls = document.getElementById('lang-select'); if (_ls) _ls.value = lang;
-  var _fBtn = document.getElementById('srv-forfait-change-btn');
-  if (_fBtn && document.getElementById('srv-forfait-screen').style.display !== 'none') {
-    var _fChangeId = { fr:"Changer de restaurant", en:'Change restaurant', el:'Αλλαγή εστιατορίου', de:'Restaurant wechseln', ar:'تغيير المطعم' };
-    _fBtn.textContent = _fChangeId[lang] || _fChangeId.fr;
+  var _fs2 = document.getElementById('srv-forfait-screen');
+  if (_fs2 && _fs2.style.display !== 'none') {
+    var _fLangs = {
+      fr:{ title:'Accès limité', msg:'Cet abonnement inclut uniquement le menu numérique.\nContactez l\'administrateur pour activer les appels et les commandes.', btn:"Changer de restaurant" },
+      en:{ title:'Limited access', msg:'This plan includes the digital menu only.\nContact the administrator to enable calls and orders.', btn:'Change restaurant' },
+      el:{ title:'Περιορισμένη πρόσβαση', msg:'Αυτό το πακέτο περιλαμβάνει μόνο το ψηφιακό μενού.\nΕπικοινωνήστε με τον διαχειριστή για να ενεργοποιήσετε κλήσεις και παραγγελίες.', btn:'Αλλαγή εστιατορίου' },
+      de:{ title:'Eingeschränkter Zugang', msg:'Dieses Paket enthält nur das digitale Menü.\nKontaktieren Sie den Administrator, um Anrufe und Bestellungen zu aktivieren.', btn:'Restaurant ändern' },
+      ar:{ title:'وصول محدود', msg:'هذا الاشتراك يشمل القائمة الرقمية فقط.\nتواصل مع المسؤول لتفعيل النداءات والطلبات.', btn:'تغيير المطعم' }
+    };
+    var _fl = _fLangs[lang] || _fLangs.fr;
+    var _ftEl = document.getElementById('srv-forfait-title');
+    var _fmEl = document.getElementById('srv-forfait-msg');
+    var _fbEl = document.getElementById('srv-forfait-change-btn');
+    if (_ftEl) _ftEl.textContent = _fl.title;
+    if (_fmEl) { _fmEl.style.whiteSpace = 'pre-line'; _fmEl.textContent = _fl.msg; }
+    if (_fbEl) _fbEl.textContent = _fl.btn;
   }
   renderCalls();
   renderOrders();
@@ -1900,7 +1912,8 @@ function _renderSetupSavedIds() {
   var ridInput  = document.getElementById('setup-rid-input');
   var confirmBtn= document.getElementById('setup-confirm-btn');
 
-  // Titre de l'écran de configuration (logo remplace le texte, pas de mise à jour)
+  var subtitleEl = document.getElementById('gns-subtitle-static');
+  if (subtitleEl) subtitleEl.textContent = t.appSub;
   var appSub   = document.getElementById('setup-app-sub');
   if (appSub)   appSub.textContent   = t.setupSub;
   if (ridLabel)   ridLabel.textContent   = savedIds.length > 0 ? t.newId : t.ridLabel;
