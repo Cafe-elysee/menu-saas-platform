@@ -849,6 +849,13 @@
     .qr-ctxt:focus { border-color:var(--gold); background:rgba(200,164,78,0.04); }
     html.light .qr-ctxt { background:rgba(0,0,0,0.04); }
     .qr-ctxt-h { font-size:0.63rem; color:var(--muted); text-align:center; margin-top:4px; }
+    .sub-custom-price-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:9px 12px; background:rgba(200,164,78,.06); border:1px solid rgba(200,164,78,.18); border-radius:11px; flex-wrap:wrap; }
+    .sub-custom-price-label { font-size:0.75rem; color:var(--muted); white-space:nowrap; }
+    .sub-custom-price-edit { display:flex; align-items:center; gap:5px; }
+    .sub-price-inp { width:68px; background:rgba(200,164,78,.10); border:1.5px solid rgba(200,164,78,.3); border-radius:8px; padding:5px 8px; font-size:0.88rem; font-weight:700; color:#c8a44e; text-align:center; font-family:inherit; }
+    .sub-price-unit { font-size:0.72rem; color:var(--muted); white-space:nowrap; }
+    .sub-price-save-btn { background:rgba(200,164,78,.15); border:1px solid rgba(200,164,78,.35); border-radius:7px; color:#c8a44e; padding:4px 10px; font-size:0.75rem; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .sub-price-save-btn:active { background:rgba(200,164,78,.3); }
     .qr-logo-btn { display:flex; align-items:center; justify-content:center; gap:7px; padding:9px 14px; border-radius:10px; border:1.5px solid rgba(200,164,78,0.5); background:rgba(200,164,78,0.10); color:#c8a44e; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.18s; width:100%; margin-bottom:8px; }
     .qr-logo-btn:active { background:rgba(200,164,78,0.2); }
     .qr-upl { display:flex; align-items:center; justify-content:center; gap:7px; padding:10px 14px; border-radius:10px; border:1.5px dashed rgba(200,164,78,0.28); color:var(--muted); font-family:inherit; font-size:0.78rem; cursor:pointer; transition:all 0.2s; width:100%; }
@@ -3145,7 +3152,7 @@ const ADMIN_UI = {
     ridSelSaved:'IDs enregistrés', ridSelNew:'Entrer un autre ID', ridSelPlaceholder:'ex: cafe-paris', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Code invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, sans espaces.',
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
     changeIdBtn:'Déconnexion', changeIdConfirmTitle:'Se déconnecter', changeIdConfirmMsg:'Vous serez redirigé vers l\'écran de connexion. Votre session est sauvegardée — revenez ici sans ressaisir votre mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
-    subTitle:'Mon abonnement', subForfaitMenuQR:'Menu QR', subForfaitCS:'Commandes & Services', subMonthly:'Mensuel', subAnnual:'Annuel', subUpgradeBtn:'Passer à Commandes & Services', subDowngradeBtn:'Revenir à Menu QR', subUpgradeTitle:'Passer à Commandes & Services ?', subUpgradeMsg:'Votre forfait passera à Commandes & Services. Vous aurez 7 jours pour effectuer votre paiement.', subDowngradeTitle:'Revenir à Menu QR ?', subDowngradeMsg:'Votre forfait passera à Menu QR. Les fonctionnalités de commande et d\'appel seront désactivées.', subConfirmOk:'Confirmer', subConfirmCancel:'Annuler', subChanged:'✅ Forfait mis à jour', subChanging:'Mise à jour…', subAnnualNotice:'⚠️ Abonnement annuel non remboursable — vous bénéficiez d\'un tarif préférentiel pour toute l\'année.', subAnnualWarnTitle:'Changement de forfait annuel', subAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif réduit. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin et d\'effectuer le changement lors de votre prochain paiement.', subAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subAnnualWarnNow:'Changer maintenant', subSpamTitle:'Changement déjà effectué', subSpamMsg:'Vous avez déjà modifié votre forfait ce mois-ci. Pour toute modification supplémentaire, veuillez nous contacter.', subSpamContact:'Nous contacter', subSpamClose:'Fermer', subEndDate:'Expire le', subPendingNotice:'📅 Changement en fin de période →', subPendingCancel:'Annuler le changement prévu', subChangeModeToAnnual:'Passer en paiement annuel', subChangeModeToMonthly:'Repasser en paiement mensuel', subModeUpgradeTitle:'Passer en paiement annuel ?', subModeUpgradeMsg:'Votre abonnement passera en facturation annuelle, avec un tarif préférentiel.', subModeAnnualWarnTitle:'Changement de mode de paiement annuel', subModeAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif préférentiel. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin avant de repasser en mensuel.', subModeAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subModeAnnualWarnNow:'Changer maintenant', subModeChanged:'✅ Mode de paiement mis à jour',
+    subTitle:'Mon abonnement', subForfaitMenuQR:'Menu QR', subForfaitCS:'Commandes & Services', subMonthly:'Mensuel', subAnnual:'Annuel', subUpgradeBtn:'Passer à Commandes & Services', subDowngradeBtn:'Revenir à Menu QR', subUpgradeTitle:'Passer à Commandes & Services ?', subUpgradeMsg:'Votre forfait passera à Commandes & Services. Vous aurez 7 jours pour effectuer votre paiement.', subDowngradeTitle:'Revenir à Menu QR ?', subDowngradeMsg:'Votre forfait passera à Menu QR. Les fonctionnalités de commande et d\'appel seront désactivées.', subConfirmOk:'Confirmer', subConfirmCancel:'Annuler', subChanged:'✅ Forfait mis à jour', subChanging:'Mise à jour…', subAnnualNotice:'⚠️ Abonnement annuel non remboursable — vous bénéficiez d\'un tarif préférentiel pour toute l\'année.', subAnnualWarnTitle:'Changement de forfait annuel', subAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif réduit. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin et d\'effectuer le changement lors de votre prochain paiement.', subAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subAnnualWarnNow:'Changer maintenant', subSpamTitle:'Changement déjà effectué', subSpamMsg:'Vous avez déjà modifié votre forfait ce mois-ci. Pour toute modification supplémentaire, veuillez nous contacter.', subSpamContact:'Nous contacter', subSpamClose:'Fermer', subEndDate:'Expire le', subPendingNotice:'📅 Changement en fin de période →', subPendingCancel:'Annuler le changement prévu', subChangeModeToAnnual:'Passer en paiement annuel', subChangeModeToMonthly:'Repasser en paiement mensuel', subModeUpgradeTitle:'Passer en paiement annuel ?', subModeUpgradeMsg:'Votre abonnement passera en facturation annuelle, avec un tarif préférentiel.', subModeAnnualWarnTitle:'Changement de mode de paiement annuel', subModeAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif préférentiel. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin avant de repasser en mensuel.', subModeAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subModeAnnualWarnNow:'Changer maintenant', subModeChanged:'✅ Mode de paiement mis à jour', subCustomPrice:'Prix pour ce client',
     settingsDefaultLang:'Langue affichée aux clients (par défaut)', settingsPrimaryLang:'Langue du personnel et de l\'administration',
     emptyMenuTitle:'Votre menu est vide', emptyMenuSub:'Commencez par créer votre première catégorie pour ajouter des produits.',
     phPassword:'Mot de passe', phPasswordNew:'Nouveau mot de passe', phRestaurantName:'Nom du restaurant',
@@ -7320,60 +7327,102 @@ let _settingsLangData = { enabled:{}, default:'fr', primary:'fr' };
 
 // ── Subscription section ────────────────────────────────────────────
 let _subData = null;
+let _subDataListenerFn = null; // listener Firebase temps réel
 
 async function _loadSubscriptionSection() {
   const el = document.getElementById('subscription-content');
   if (!el) return;
+  // Annuler l'ancien listener temps réel si existe
+  if (_subDataListenerFn) {
+    try { _rref('/config/subscription').off('value', _subDataListenerFn); } catch(e) {}
+    _subDataListenerFn = null;
+  }
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  // Listener temps réel — se déclenche aussi quand control-app modifie le forfait/prix
+  _subDataListenerFn = (snap) => {
+    _subData = snap.val() || {};
+    _renderSubSection(el, t, _subData);
+  };
   try {
-    const [subSnap, featSnap] = await Promise.all([
-      _rref('/config/subscription').once('value'),
-      _rref('/config/features').once('value')
-    ]);
-    _subData = subSnap.val() || {};
-    const feats = featSnap.val() || {};
-    const forfait  = _subData.forfait || 'menu-qr';
-    const isCS     = forfait === 'commandes-services';
-    const payMode  = _subData.paymentMode || 'monthly';
-    const price    = _subData.price || (isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49));
-    const forfaitLabel = isCS ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR');
-    const modeLabel    = payMode === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
-    const canUpgrade   = !isCS;
-    const btnLabel     = canUpgrade ? (t.subUpgradeBtn || 'Passer à Commandes & Services') : (t.subDowngradeBtn || 'Revenir à Menu QR');
-    const annualNotice = payMode === 'annual'
-      ? `<div style="font-size:0.77rem;color:var(--muted);background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.55">${t.subAnnualNotice || '⚠️ Abonnement annuel non remboursable.'}</div>`
-      : '';
-    const _endDateLocale = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-MA', de:'de-DE' };
-    const endDate      = _subData.endDate
-      ? `<div style="font-size:0.77rem;color:var(--muted);margin-bottom:8px">${t.subEndDate || 'Expire le'} <strong>${new Date(_subData.endDate).toLocaleDateString(_endDateLocale[currentLang] || 'fr-FR', { day:'numeric', month:'long', year:'numeric' })}</strong></div>`
-      : '';
-    const pendingChange = _subData.pendingChange
-      ? `<div style="font-size:0.77rem;background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.25);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.6">
-           ${t.subPendingNotice || '📅 Changement en fin de période →'} <strong style="color:var(--gold)">${_subData.pendingChange.forfait === 'commandes-services' ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR')}</strong>
-           <br><button onclick="_cancelScheduledForfait()" style="background:none;border:none;color:var(--muted);font-size:0.72rem;text-decoration:underline;cursor:pointer;padding:0;margin-top:4px">${t.subPendingCancel || 'Annuler le changement prévu'}</button>
-         </div>`
-      : '';
-    const _perMonth = { fr:'/mois', en:'/month', el:'/μήνα', ar:'/شهر', de:'/Mon.' };
-    const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', ar:'/سنة',  de:'/Jahr' };
-    const _subOpts = [];
-    for (const _f of ['menu-qr','commandes-services']) {
-      for (const _m of ['monthly','annual']) {
-        const _act   = _f === forfait && _m === payMode;
-        const _pr    = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
-        const _sfx   = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
-        const _fLbl  = _f === 'commandes-services' ? (t.subForfaitCS||'C&S') : (t.subForfaitMenuQR||'Menu QR');
-        const _mLbl  = _m === 'annual' ? (t.subAnnual||'Annuel') : (t.subMonthly||'Mensuel');
-        _subOpts.push(`<button class="sub-opt${_act?' sub-opt-active':''}" onclick="_changeSubscription('${_f}','${_m}')"><span class="sub-opt-check">✓</span><div class="sub-opt-forfait">${_fLbl}</div><div class="sub-opt-mode">${_mLbl}</div><div class="sub-opt-price">${_pr}€<span>${_sfx}</span></div></button>`);
-      }
-    }
-    el.innerHTML = `
-      ${endDate}
-      ${annualNotice}
-      ${pendingChange}
-      <div class="sub-grid">${_subOpts.join('')}</div>
-      <div id="sub-change-fb" style="font-size:0.78rem;margin-top:2px;color:var(--muted);min-height:16px;text-align:center"></div>`;
+    _rref('/config/subscription').on('value', _subDataListenerFn);
   } catch(e) {
     el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted)">—</div>';
+  }
+}
+
+function _renderSubSection(el, t, sub) {
+  const forfait  = sub.forfait || 'menu-qr';
+  const isCS     = forfait === 'commandes-services';
+  const payMode  = sub.paymentMode || 'monthly';
+  const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
+  const price    = sub.price != null ? sub.price : defaultPrice;
+  const annualNotice = payMode === 'annual'
+    ? `<div style="font-size:0.77rem;color:var(--muted);background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.55">${t.subAnnualNotice || '⚠️ Abonnement annuel non remboursable.'}</div>`
+    : '';
+  const _endDateLocale = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-MA', de:'de-DE' };
+  const endDate = sub.endDate
+    ? `<div style="font-size:0.77rem;color:var(--muted);margin-bottom:8px">${t.subEndDate || 'Expire le'} <strong>${new Date(sub.endDate).toLocaleDateString(_endDateLocale[currentLang] || 'fr-FR', { day:'numeric', month:'long', year:'numeric' })}</strong></div>`
+    : '';
+  const pendingChange = sub.pendingChange
+    ? `<div style="font-size:0.77rem;background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.25);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.6">
+         ${t.subPendingNotice || '📅 Changement en fin de période →'} <strong style="color:var(--gold)">${sub.pendingChange.forfait === 'commandes-services' ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR')}</strong>
+         <br><button onclick="_cancelScheduledForfait()" style="background:none;border:none;color:var(--muted);font-size:0.72rem;text-decoration:underline;cursor:pointer;padding:0;margin-top:4px">${t.subPendingCancel || 'Annuler le changement prévu'}</button>
+       </div>`
+    : '';
+  const _perMonth = { fr:'/mois', en:'/month', el:'/μήνα', ar:'/شهر', de:'/Mon.' };
+  const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', ar:'/سنة',  de:'/Jahr' };
+  const priceUnit = payMode === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
+  const _subOpts = [];
+  for (const _f of ['menu-qr','commandes-services']) {
+    for (const _m of ['monthly','annual']) {
+      const _act  = _f === forfait && _m === payMode;
+      const _std  = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
+      const _sfx  = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
+      const _fLbl = _f === 'commandes-services' ? (t.subForfaitCS||'C&S') : (t.subForfaitMenuQR||'Menu QR');
+      const _mLbl = _m === 'annual' ? (t.subAnnual||'Annuel') : (t.subMonthly||'Mensuel');
+      // Prix affiché dans la grille = prix standard (le prix custom est affiché séparément)
+      _subOpts.push(`<button class="sub-opt${_act?' sub-opt-active':''}" onclick="_changeSubscription('${_f}','${_m}')"><span class="sub-opt-check">✓</span><div class="sub-opt-forfait">${_fLbl}</div><div class="sub-opt-mode">${_mLbl}</div><div class="sub-opt-price">${_std}€<span>${_sfx}</span></div></button>`);
+    }
+  }
+  el.innerHTML = `
+    ${endDate}${annualNotice}${pendingChange}
+    <div class="sub-grid">${_subOpts.join('')}</div>
+    <div class="sub-custom-price-row">
+      <span class="sub-custom-price-label">${t.subCustomPrice||'Prix pour ce client'}</span>
+      <div class="sub-custom-price-edit">
+        <input type="number" id="sub-price-inp" class="sub-price-inp" value="${price}" min="1" step="1" onkeydown="if(event.key==='Enter')_saveCustomPrice()">
+        <span class="sub-price-unit">${priceUnit}</span>
+        <button class="sub-price-save-btn" onclick="_saveCustomPrice()">${t.settingsSave||'💾'}</button>
+      </div>
+    </div>
+    <div id="sub-change-fb" style="font-size:0.78rem;margin-top:4px;color:var(--muted);min-height:16px;text-align:center"></div>`;
+}
+
+async function _saveCustomPrice() {
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const inp = document.getElementById('sub-price-inp');
+  if (!inp) return;
+  const price = parseInt(inp.value, 10);
+  if (!price || price < 1) return;
+  const fb = document.getElementById('sub-change-fb');
+  if (fb) fb.textContent = t.subChanging || 'Mise à jour…';
+  try {
+    await _rref('/config/subscription/price').set(price);
+    if (_subData) _subData.price = price;
+    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subChanged || '✅ Prix mis à jour'; }
+    // Notifier control-app via API pour sync immédiate
+    const nameSnap = await _rref('profile/name').once('value');
+    fetch('/api/notify-forfait', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        rid: _RID, name: nameSnap.val() || _RID,
+        oldForfait: _subData?.forfait||'menu-qr', newForfait: _subData?.forfait||'menu-qr',
+        email: _subData?.email||null, lang: currentLang,
+        paymentMode: _subData?.paymentMode||'monthly', newPrice: price
+      })
+    }).catch(()=>{});
+  } catch(e) {
+    if (fb) { fb.style.color = 'var(--red)'; fb.textContent = '❌ Erreur'; }
   }
 }
 
@@ -7439,10 +7488,14 @@ async function _doChangeSubscription(newForfait, newMode, t) {
   const fb = document.getElementById('sub-change-fb');
   if (fb) fb.textContent = t.subChanging || 'Mise à jour…';
   try {
-    const isCS     = newForfait === 'commandes-services';
-    const newPrice = isCS ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
-    const newFeats = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
-    const now      = Date.now();
+    const isCS       = newForfait === 'commandes-services';
+    const stdPrice   = isCS ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
+    // Conserver le prix custom si l'utilisateur en a saisi un, sinon prix standard du forfait
+    const inpEl      = document.getElementById('sub-price-inp');
+    const customP    = inpEl ? parseInt(inpEl.value, 10) : NaN;
+    const newPrice   = (customP > 0 && customP !== (isCS ? (newMode==='annual'?990:99):(newMode==='annual'?490:49)) ? customP : stdPrice);
+    const newFeats   = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
+    const now        = Date.now();
     await Promise.all([
       _rref('/config/features').set(newFeats),
       _rref('/config/subscription/forfait').set(newForfait),
