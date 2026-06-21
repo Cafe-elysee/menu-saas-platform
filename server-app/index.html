@@ -729,13 +729,13 @@
 
 
 <!-- Confirmation modal élégant -->
-<div id="confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
-  <div id="confirm-box" style="width:100%;max-width:320px;background:var(--surface);border:1px solid var(--bord2);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(200,164,78,0.09),inset 0 1px 0 rgba(255,255,255,0.06);">
-    <div id="confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
-    <div id="confirm-msg" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:24px;">
+  <div id="confirm-box" style="width:100%;max-width:320px;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;background-color:#080604;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.08);">
+    <div id="confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.2rem;font-weight:600;color:#c8a44e;letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
+    <div id="confirm-msg" style="font-size:0.82rem;color:rgba(230,210,170,0.75);line-height:1.7;margin-bottom:24px"></div>
     <div style="display:flex;gap:10px;">
-      <button id="confirm-cancel-btn" onclick="_hideConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bord2);background:transparent;color:var(--cream);font-family:inherit;font-size:0.85rem;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -1px 0 rgba(0,0,0,0.09);"></button>
-      <button id="confirm-ok-btn"     onclick="_doConfirm()"  style="flex:1;padding:11px 6px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 12px rgba(200,164,78,0.32),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18);"></button>
+      <button id="confirm-cancel-btn" onclick="_hideConfirm()" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid rgba(200,164,78,0.25);background:rgba(255,255,255,0.06);color:rgba(230,210,170,0.85);font-family:inherit;font-size:0.85rem;cursor:pointer;"></button>
+      <button id="confirm-ok-btn"     onclick="_doConfirm()"  style="flex:1;padding:11px 6px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4b46a,#c8a44e,#a8842e);color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(200,164,78,0.35);"></button>
     </div>
   </div>
 </div>
@@ -1829,6 +1829,18 @@ function _showConfirm(title, msg, cancelLabel, okLabel, cb) {
   document.getElementById('confirm-cancel-btn').textContent = cancelLabel;
   document.getElementById('confirm-ok-btn').textContent     = okLabel;
   _confirmCb = cb;
+  // Fond bokeh light/dark selon le thème actif
+  var isLight = document.documentElement.classList.contains('light');
+  var box = document.getElementById('confirm-box');
+  if (box) {
+    box.style.backgroundImage = 'url(assets/' + (isLight ? 'gn-bg-light.jpg' : 'gn-bg-dark.jpg') + ')';
+    box.style.backgroundColor = isLight ? '#f0ede8' : '#080604';
+    box.style.color = isLight ? '#2a1f10' : '';
+    var msg2 = document.getElementById('confirm-msg');
+    if (msg2) msg2.style.color = isLight ? 'rgba(80,55,20,0.75)' : 'rgba(230,210,170,0.75)';
+    var cancel = document.getElementById('confirm-cancel-btn');
+    if (cancel) { cancel.style.borderColor = isLight ? 'rgba(200,164,78,0.3)' : 'rgba(200,164,78,0.25)'; cancel.style.color = isLight ? '#5a3e1a' : 'rgba(230,210,170,0.85)'; }
+  }
   document.getElementById('confirm-modal').style.display = 'flex';
 }
 function _hideConfirm() {
