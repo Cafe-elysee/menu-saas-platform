@@ -2890,7 +2890,9 @@ function _savePaymentMode(cmdKey, mode) {
   var unitEl = document.getElementById('price-unit-' + cmdKey);
   if (unitEl) unitEl.textContent = '€/' + (mode === 'annual' ? 'an' : 'mois');
   const prev = Object.assign({}, d);
-  _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode });
+  const baseTs = d.paidAt || d.firstOpenAt;
+  const newNextReminderAt = baseTs ? _addMonths(baseTs, mode === 'annual' ? 12 : 1) : d.nextReminderAt;
+  _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode, nextReminderAt: newNextReminderAt });
   _rerenderClientBillingSection(cmdKey);
   _rerenderCommandeCard(cmdKey);
   _controlDb.ref('/commandes/' + cmdKey + '/paymentMode').set(mode).catch(function() {
@@ -2899,9 +2901,17 @@ function _savePaymentMode(cmdKey, mode) {
     _rerenderCommandeCard(cmdKey);
     showToast('⚠ Erreur de synchronisation');
   });
+  if (newNextReminderAt && newNextReminderAt !== d.nextReminderAt) {
+    _controlDb.ref('/commandes/' + cmdKey + '/nextReminderAt').set(newNextReminderAt).catch(function() {});
+  }
   // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
   const _slugPM = _getSlugFromCmdKey(cmdKey);
-  if (_slugPM) _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/paymentMode').set(mode);
+  if (_slugPM) {
+    _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/paymentMode').set(mode);
+    if (newNextReminderAt && newNextReminderAt !== d.nextReminderAt) {
+      _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/endDate').set(newNextReminderAt);
+    }
+  }
   showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
 }
 
@@ -3156,7 +3166,11 @@ function _setActiveCombo(cmdKey, forfait, mode) {
 
   // Prix correspondant à la combo sélectionnée
   const comboPrice = _getComboPrice(d, normForfait, normMode);
-  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice });
+  const prevMode = d.paymentMode || 'monthly';
+  const modeChanged = normMode !== prevMode;
+  const baseTs = d.paidAt || d.firstOpenAt;
+  const newNextReminderAt = (modeChanged && baseTs) ? _addMonths(baseTs, normMode === 'annual' ? 12 : 1) : d.nextReminderAt;
+  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice, nextReminderAt: newNextReminderAt });
 
   // Mettre à jour les features si changement de forfait
   const slug = _getSlugFromCmdKey(cmdKey);
@@ -3164,10 +3178,14 @@ function _setActiveCombo(cmdKey, forfait, mode) {
     const isServices = normForfait === 'commandes-services';
     const db = getClientDb(slug);
     db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
-    db.ref('/config/subscription').update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
-    _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
+    const subUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
+    if (modeChanged && newNextReminderAt) subUpdate.endDate = newNextReminderAt;
+    db.ref('/config/subscription').update(subUpdate);
+    _saasDb.ref('restaurants/' + slug + '/config/subscription').update(subUpdate);
   }
-  _controlDb.ref('/commandes/' + cmdKey).update({ forfait: normForfait, paymentMode: normMode, price: comboPrice });
+  const controlUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
+  if (modeChanged && newNextReminderAt) controlUpdate.nextReminderAt = newNextReminderAt;
+  _controlDb.ref('/commandes/' + cmdKey).update(controlUpdate);
 
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
