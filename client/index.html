@@ -2445,6 +2445,20 @@
     html.light #preloader::before {
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.05) 40%,rgba(200,164,78,0.09) 50%,rgba(200,164,78,0.05) 60%,transparent 100%);
     }
+    /* C-1 fix : GeNext preloader aligné sur background body (même gradient overlay) */
+    html[data-menu-theme="genext"] #preloader {
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--gold) 16%, transparent), color-mix(in srgb, var(--gold) 16%, transparent)),
+        url('assets/gn-bg-dark.jpg');
+      background-blend-mode:overlay;
+    }
+    html[data-menu-theme="genext"].light #preloader {
+      background-color:#f0ede8;
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--gold) 10%, transparent), color-mix(in srgb, var(--gold) 10%, transparent)),
+        url('assets/gn-bg-light.jpg');
+      background-blend-mode:overlay;
+    }
     .pre-logo-img {
       width:72vw; max-width:320px; height:auto; display:block;
       will-change:opacity,filter;
@@ -7904,7 +7918,13 @@ function _startPreloader() {
   const pre = document.getElementById('preloader');
   if (!pre) return;
   // Pas de logo uploadé → aucune animation, le menu apparaît directement sur la photo d'accueil (pas de scroll forcé)
-  if (!_logoUrl) { pre.remove(); return; }
+  if (!_logoUrl) {
+    // Fade-out élégant même sans logo (évite flash bokeh brusque)
+    pre.style.transition = 'opacity 0.35s ease';
+    pre.style.opacity = '0';
+    setTimeout(() => { pre.remove(); _triggerHeroAutoScroll(); }, 370);
+    return;
+  }
   const img = document.getElementById('pre-logo-img');
   if (img) img.src = _logoUrl;
   _dissolvePreloader(pre);

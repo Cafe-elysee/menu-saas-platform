@@ -128,7 +128,10 @@
       will-change:opacity,filter;
       background:transparent;
       position:relative;z-index:1;
+      opacity:0;
+      animation:ctrlLogoIn 0.4s ease 0.22s forwards;
     }
+    @keyframes ctrlLogoIn { to { opacity:1; } }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
 
@@ -2150,9 +2153,11 @@ function _nameInitials(name, count) {
 }
 function _buildRidTs(name, extraLetters) {
   const letters = _nameInitials(name, 2 + (extraLetters || 0));
-  const d = new Date();
+  // Force UTC+3 (Athens) pour IDs cohérents quelle que soit la timezone de l'appareil
+  const _utc = new Date();
+  const d = new Date(_utc.getTime() + 3 * 3600000);
   const p = n => String(n).padStart(2, '0');
-  const ts = p(d.getDate()) + p(d.getMonth() + 1) + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + String(d.getFullYear()).slice(2);
+  const ts = p(d.getUTCDate()) + p(d.getUTCMonth() + 1) + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + String(d.getUTCFullYear()).slice(2);
   return letters + ts;
 }
 function _buildPwdDefault(name) {
@@ -2390,6 +2395,7 @@ function getClientDb(slug) {
 // COMMANDES — temps réel
 // ════════════════════════════════════════════════════
 let _commandesCache = {};
+let _profileContactsCache = {}; // D-3 fix: cache profileContacts pour re-render post-commandes
 let _archivedClientsCache = {};
 let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
@@ -2596,7 +2602,22 @@ function listenCommandes() {
       Object.keys(_commandesCache).forEach(function(k) {
         var d = _commandesCache[k];
         var hasRef = d && (d.clientCree || _lastCreatedClients[k] || (d.emailData && d.emailData.rid));
-        if (hasRef) _rerenderClientBillingSection(k);
+        if (hasRef) {
+          _rerenderClientBillingSection(k);
+          // D-3 fix : re-render contacts section si le cache est déjà prêt
+          var _slug = (d.clientCree && d.clientCree.rid)
+            || (_lastCreatedClients[k] && _lastCreatedClients[k].rid)
+            || (d.emailData && d.emailData.rid);
+          if (_slug && _profileContactsCache.hasOwnProperty(_slug)) {
+            var _pid = _slug.replace(/-/g, '_');
+            var _pcache = _profileContactsCache[_slug];
+            var _pm = Object.assign({}, _pcache);
+            if (!_pm.email) _pm.email = d.email || (d.emailData && d.emailData.email) || '';
+            if (!_pm.whatsapp && d.whatsapp && d.whatsapp.numero) _pm.whatsapp = (d.whatsapp.indicatif||'')+d.whatsapp.numero;
+            if (!_pm.viber   && d.viber   && d.viber.numero)   _pm.viber   = (d.viber.indicatif  ||'')+d.viber.numero;
+            _renderContactsSection(_pid, _slug, _pm);
+          }
+        }
       });
     }, 200);
   });
@@ -4007,6 +4028,7 @@ function loadClientData(client) {
   // Fallback depuis la commande si le profil est vide (email/whatsapp/viber fournis lors de la commande)
   _saasDb.ref('restaurants/' + s + '/profile/contacts').on('value', function(snap) {
     var profileContacts = snap.val() || {};
+    _profileContactsCache[s] = profileContacts; // cache pour re-render post-commandesCache
     var merged = Object.assign({}, profileContacts);
     var ck = _findCommandeForClient(s);
     var cmd = ck ? _commandesCache[ck] : null;

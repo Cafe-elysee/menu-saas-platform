@@ -1283,10 +1283,10 @@
     }
     .adm-sel-btn:hover, .adm-sel-btn.open { border-color:var(--gold); }
     .adm-sel-popup {
-      position:absolute; top:calc(100% + 6px); left:0;
+      position:fixed; top:0; left:0;
       background:rgba(22,16,12,0.88); backdrop-filter:blur(20px) saturate(160%);
       border:1px solid var(--bord2); border-radius:12px;
-      padding:6px; z-index:500; min-width:160px;
+      padding:6px; z-index:99999; min-width:160px;
       box-shadow:0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(200,164,78,0.06);
       opacity:0; pointer-events:none;
       transform:translateY(-4px);
@@ -1312,11 +1312,15 @@
     /* En mode papier/carte : cacher toute la section photo des produits (upload, preview, label, toggle) */
     body[data-style="paper"] .photo-form-group,
     body[data-style="simple"] .photo-form-group { display:none !important; }
+    /* Exception GeNext : thème 'simple' qui AFFICHE les photos produits */
+    body[data-theme="genext"] .photo-form-group { display:block !important; }
     /* En mode papier/carte : cacher les miniatures produit dans l'en-tête des cartes */
     body[data-style="paper"] .prod-thumb,
     body[data-style="paper"] .prod-thumb-empty,
     body[data-style="simple"] .prod-thumb,
     body[data-style="simple"] .prod-thumb-empty { display:none !important; }
+    body[data-theme="genext"] .prod-thumb,
+    body[data-theme="genext"] .prod-thumb-empty { display:block !important; }
     /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
     .cat-photos-row { display:none; }
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
@@ -2499,7 +2503,7 @@
     <div class="settings-section">
       <div style="display:flex;align-items:center;justify-content:space-between;padding-right:18px">
         <div id="sec-settings-identity-hd" class="settings-sec-hd">Accès & Restaurant</div>
-        <button id="btn-change-id" class="btn-settings-red" onclick="changeRestaurantId()">Changer d'ID</button>
+        <button id="btn-change-id" class="btn-settings-red" onclick="changeRestaurantId()">Déconnexion</button>
       </div>
 
       <div id="sec-settings-name" style="padding:0 18px 2px">
@@ -2990,7 +2994,7 @@ const ADMIN_UI = {
     settingsPwd:'Κωδικός πρόσβασης', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
     ridSelSaved:'Αποθηκευμένα IDs', ridSelNew:'Εισαγωγή άλλου ID', ridSelPlaceholder:'π.χ. cafe-paris', ridSelConnect:'Σύνδεση', ridSelContinue:'Συνέχεια', ridSelErr:'Μη έγκυρος κωδικός: μόνο πεζά γράμματα, αριθμοί και παύλες, χωρίς κενά.',
     pwdConfirmTitle:'Αλλαγή κωδικού', pwdConfirmMsg:'Αυτή η αλλαγή θα σας αποσυνδέσει από όλες τις συσκευές. Θα χρειαστεί να συνδεθείτε ξανά με τον νέο κωδικό.', pwdConfirmOk:'Επιβεβαίωση', pwdConfirmCancel:'Ακύρωση', pwdChangedLogout:'✅ Κωδικός άλλαξε — συνδεθείτε ξανά',
-    changeIdBtn:'Αλλαγή ID', changeIdConfirmTitle:'Αλλαγή ID', changeIdConfirmMsg:'Θα μεταφερθείτε στην επιλογή ID. Μπορείτε να επιστρέψετε εδώ χωρίς να εισάγετε ξανά τον κωδικό.', changeIdConfirmOk:'Επιβεβαίωση', changeIdConfirmCancel:'Ακύρωση',
+    changeIdBtn:'Αποσύνδεση', changeIdConfirmTitle:'Αποσύνδεση', changeIdConfirmMsg:'Θα μεταφερθείτε στην οθόνη σύνδεσης. Η συνεδρία σας είναι αποθηκευμένη — επιστρέψτε χωρίς να εισάγετε ξανά τον κωδικό.', changeIdConfirmOk:'Επιβεβαίωση', changeIdConfirmCancel:'Ακύρωση',
     subTitle:'Η συνδρομή μου', subForfaitMenuQR:'Menu QR', subForfaitCS:'Παραγγελίες & Υπηρεσίες', subMonthly:'Μηνιαία', subAnnual:'Ετήσια', subUpgradeBtn:'Αναβάθμιση σε Παραγγελίες & Υπηρεσίες', subDowngradeBtn:'Επιστροφή σε Menu QR', subUpgradeTitle:'Αναβάθμιση;', subUpgradeMsg:'Το πλάνο σας θα αλλάξει σε Παραγγελίες & Υπηρεσίες. Έχετε 7 ημέρες για την πληρωμή.', subDowngradeTitle:'Επιστροφή σε Menu QR;', subDowngradeMsg:'Το πλάνο σας θα αλλάξει σε Menu QR. Οι λειτουργίες παραγγελιών θα απενεργοποιηθούν.', subConfirmOk:'Επιβεβαίωση', subConfirmCancel:'Ακύρωση', subChanged:'✅ Πλάνο ενημερώθηκε', subChanging:'Ενημέρωση…', subAnnualNotice:'⚠️ Ετήσια συνδρομή μη επιστρεπτέα — απολαμβάνετε μειωμένη τιμή για όλο το χρόνο.', subAnnualWarnTitle:'Αλλαγή ετήσιου πλάνου', subAnnualWarnMsg:'Η ετήσια συνδρομή σας πληρώθηκε εκ των προτέρων σε μειωμένη τιμή. Σας συνιστούμε να απολαύσετε το τρέχον πλάνο σας μέχρι το τέλος και να κάνετε την αλλαγή κατά την επόμενη πληρωμή σας.', subAnnualWarnKeep:'✓ Κρατώ μέχρι το τέλος', subAnnualWarnNow:'Αλλαγή τώρα', subSpamTitle:'Αλλαγή ήδη πραγματοποιήθηκε', subSpamMsg:'Έχετε ήδη αλλάξει το πλάνο σας αυτόν τον μήνα. Για περαιτέρω αλλαγές παρακαλούμε επικοινωνήστε μαζί μας.', subSpamContact:'Επικοινωνία', subSpamClose:'Κλείσιμο', subEndDate:'Λήγει στις', subPendingNotice:'📅 Αλλαγή στο τέλος περιόδου →', subPendingCancel:'Ακύρωση προγραμματισμένης αλλαγής',
     settingsDefaultLang:'Γλώσσα που βλέπουν οι πελάτες (προεπιλογή)', settingsPrimaryLang:'Γλώσσα προσωπικού και διαχείρισης',
     emptyMenuTitle:'Το μενού σας είναι άδειο', emptyMenuSub:'Ξεκινήστε δημιουργώντας την πρώτη σας κατηγορία.',
@@ -3121,7 +3125,7 @@ const ADMIN_UI = {
     settingsPwd:'Mot de passe d\'accès', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     ridSelSaved:'IDs enregistrés', ridSelNew:'Entrer un autre ID', ridSelPlaceholder:'ex: cafe-paris', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Code invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, sans espaces.',
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
-    changeIdBtn:'Changer d\'ID', changeIdConfirmTitle:'Changer de restaurant', changeIdConfirmMsg:'Vous serez redirigé vers la sélection de restaurant. Vous pourrez revenir ici sans entrer à nouveau votre mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
+    changeIdBtn:'Déconnexion', changeIdConfirmTitle:'Se déconnecter', changeIdConfirmMsg:'Vous serez redirigé vers l\'écran de connexion. Votre session est sauvegardée — revenez ici sans ressaisir votre mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
     subTitle:'Mon abonnement', subForfaitMenuQR:'Menu QR', subForfaitCS:'Commandes & Services', subMonthly:'Mensuel', subAnnual:'Annuel', subUpgradeBtn:'Passer à Commandes & Services', subDowngradeBtn:'Revenir à Menu QR', subUpgradeTitle:'Passer à Commandes & Services ?', subUpgradeMsg:'Votre forfait passera à Commandes & Services. Vous aurez 7 jours pour effectuer votre paiement.', subDowngradeTitle:'Revenir à Menu QR ?', subDowngradeMsg:'Votre forfait passera à Menu QR. Les fonctionnalités de commande et d\'appel seront désactivées.', subConfirmOk:'Confirmer', subConfirmCancel:'Annuler', subChanged:'✅ Forfait mis à jour', subChanging:'Mise à jour…', subAnnualNotice:'⚠️ Abonnement annuel non remboursable — vous bénéficiez d\'un tarif préférentiel pour toute l\'année.', subAnnualWarnTitle:'Changement de forfait annuel', subAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif réduit. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin et d\'effectuer le changement lors de votre prochain paiement.', subAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subAnnualWarnNow:'Changer maintenant', subSpamTitle:'Changement déjà effectué', subSpamMsg:'Vous avez déjà modifié votre forfait ce mois-ci. Pour toute modification supplémentaire, veuillez nous contacter.', subSpamContact:'Nous contacter', subSpamClose:'Fermer', subEndDate:'Expire le', subPendingNotice:'📅 Changement en fin de période →', subPendingCancel:'Annuler le changement prévu', subChangeModeToAnnual:'Passer en paiement annuel', subChangeModeToMonthly:'Repasser en paiement mensuel', subModeUpgradeTitle:'Passer en paiement annuel ?', subModeUpgradeMsg:'Votre abonnement passera en facturation annuelle, avec un tarif préférentiel.', subModeAnnualWarnTitle:'Changement de mode de paiement annuel', subModeAnnualWarnMsg:'Votre abonnement annuel a été réglé en avance à tarif préférentiel. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin avant de repasser en mensuel.', subModeAnnualWarnKeep:'✓ Garder jusqu\'à la fin', subModeAnnualWarnNow:'Changer maintenant', subModeChanged:'✅ Mode de paiement mis à jour',
     settingsDefaultLang:'Langue affichée aux clients (par défaut)', settingsPrimaryLang:'Langue du personnel et de l\'administration',
     emptyMenuTitle:'Votre menu est vide', emptyMenuSub:'Commencez par créer votre première catégorie pour ajouter des produits.',
@@ -3252,7 +3256,7 @@ const ADMIN_UI = {
     settingsPwd:'Access password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
     ridSelSaved:'Saved IDs', ridSelNew:'Enter another ID', ridSelPlaceholder:'e.g. cafe-paris', ridSelConnect:'Sign in', ridSelContinue:'Continue', ridSelErr:'Invalid code: use only lowercase letters, numbers and hyphens, no spaces.',
     pwdConfirmTitle:'Change password', pwdConfirmMsg:'This change will sign you out of all devices. You will need to sign in again with the new password.', pwdConfirmOk:'Confirm', pwdConfirmCancel:'Cancel', pwdChangedLogout:'✅ Password changed — please sign in again',
-    changeIdBtn:'Change ID', changeIdConfirmTitle:'Change ID', changeIdConfirmMsg:'You will be redirected to the ID selector. You can return here without entering your password again.', changeIdConfirmOk:'Confirm', changeIdConfirmCancel:'Cancel',
+    changeIdBtn:'Log out', changeIdConfirmTitle:'Log out', changeIdConfirmMsg:'You will be redirected to the login screen. Your session is saved — return here without re-entering your password.', changeIdConfirmOk:'Confirm', changeIdConfirmCancel:'Cancel',
     subTitle:'My subscription', subForfaitMenuQR:'Menu QR', subForfaitCS:'Orders & Services', subMonthly:'Monthly', subAnnual:'Annual', subUpgradeBtn:'Upgrade to Orders & Services', subDowngradeBtn:'Switch back to Menu QR', subUpgradeTitle:'Upgrade to Orders & Services?', subUpgradeMsg:'Your plan will change to Orders & Services. You will have 7 days to make your payment.', subDowngradeTitle:'Switch back to Menu QR?', subDowngradeMsg:'Your plan will change to Menu QR. Order and call features will be disabled.', subConfirmOk:'Confirm', subConfirmCancel:'Cancel', subChanged:'✅ Plan updated', subChanging:'Updating…', subAnnualNotice:'⚠️ Annual plan — non-refundable. You benefit from a discounted rate for the full year.', subAnnualWarnTitle:'Annual plan change', subAnnualWarnMsg:'Your annual plan was paid in advance at a reduced rate. We recommend you enjoy your current plan until the end and make the change on your next payment.', subAnnualWarnKeep:'✓ Keep until the end', subAnnualWarnNow:'Change now', subSpamTitle:'Change already made', subSpamMsg:'You have already changed your plan this month. For any further changes, please contact us.', subSpamContact:'Contact us', subSpamClose:'Close', subEndDate:'Expires on', subPendingNotice:'📅 Scheduled change at period end →', subPendingCancel:'Cancel scheduled change', subChangeModeToAnnual:'Switch to annual billing', subChangeModeToMonthly:'Switch back to monthly billing', subModeUpgradeTitle:'Switch to annual billing?', subModeUpgradeMsg:'Your subscription will switch to annual billing, at a preferential rate.', subModeAnnualWarnTitle:'Annual payment mode change', subModeAnnualWarnMsg:'Your annual subscription was paid in advance at a preferential rate. We recommend enjoying your current plan until the end before switching back to monthly.', subModeAnnualWarnKeep:'✓ Keep until the end', subModeAnnualWarnNow:'Change now', subModeChanged:'✅ Payment mode updated',
     settingsDefaultLang:'Language shown to customers (default)', settingsPrimaryLang:'Staff and administration language',
     emptyMenuTitle:'Your menu is empty', emptyMenuSub:'Start by creating your first category to add products.',
@@ -3383,7 +3387,7 @@ const ADMIN_UI = {
     settingsPwd:'Zugangspasswort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
     ridSelSaved:'Gespeicherte IDs', ridSelNew:'Andere ID eingeben', ridSelPlaceholder:'z.B. cafe-paris', ridSelConnect:'Anmelden', ridSelContinue:'Weiter', ridSelErr:'Ungültiger Code: nur Kleinbuchstaben, Zahlen und Bindestriche erlaubt, keine Leerzeichen.',
     pwdConfirmTitle:'Passwort ändern', pwdConfirmMsg:'Diese Änderung meldet Sie auf allen Geräten ab. Sie müssen sich mit dem neuen Passwort erneut anmelden.', pwdConfirmOk:'Bestätigen', pwdConfirmCancel:'Abbrechen', pwdChangedLogout:'✅ Passwort geändert — bitte erneut anmelden',
-    changeIdBtn:'ID ändern', changeIdConfirmTitle:'ID ändern', changeIdConfirmMsg:'Sie werden zur ID-Auswahl weitergeleitet. Sie können ohne erneute Passworteingabe zurückkehren.', changeIdConfirmOk:'Bestätigen', changeIdConfirmCancel:'Abbrechen',
+    changeIdBtn:'Abmelden', changeIdConfirmTitle:'Abmelden', changeIdConfirmMsg:'Sie werden zur Anmeldeseite weitergeleitet. Ihre Sitzung ist gespeichert — kehren Sie ohne erneute Passworteingabe zurück.', changeIdConfirmOk:'Bestätigen', changeIdConfirmCancel:'Abbrechen',
     subTitle:'Mein Abonnement', subForfaitMenuQR:'Menu QR', subForfaitCS:'Bestellungen & Services', subMonthly:'Monatlich', subAnnual:'Jährlich', subUpgradeBtn:'Upgrade auf Bestellungen & Services', subDowngradeBtn:'Zurück zu Menu QR', subUpgradeTitle:'Upgrade auf Bestellungen & Services?', subUpgradeMsg:'Ihr Plan wechselt zu Bestellungen & Services. Sie haben 7 Tage Zeit für Ihre Zahlung.', subDowngradeTitle:'Zurück zu Menu QR?', subDowngradeMsg:'Ihr Plan wechselt zu Menu QR. Bestell- und Anruffunktionen werden deaktiviert.', subConfirmOk:'Bestätigen', subConfirmCancel:'Abbrechen', subChanged:'✅ Plan aktualisiert', subChanging:'Aktualisierung…', subAnnualNotice:'⚠️ Jahresabonnement nicht erstattungsfähig — Sie profitieren von einem Vorzugspreis für das ganze Jahr.', subAnnualWarnTitle:'Jahresplan ändern', subAnnualWarnMsg:'Ihr Jahresabonnement wurde im Voraus zu einem ermäßigten Preis bezahlt. Wir empfehlen Ihnen, Ihren aktuellen Plan bis zum Ende zu nutzen und die Änderung bei der nächsten Zahlung vorzunehmen.', subAnnualWarnKeep:'✓ Bis zum Ende behalten', subAnnualWarnNow:'Jetzt ändern', subSpamTitle:'Änderung bereits vorgenommen', subSpamMsg:'Sie haben Ihren Plan bereits diesen Monat geändert. Für weitere Änderungen kontaktieren Sie uns bitte.', subSpamContact:'Kontaktieren', subSpamClose:'Schließen', subEndDate:'Läuft ab am', subPendingNotice:'📅 Geplante Änderung zum Periodenende →', subPendingCancel:'Geplante Änderung stornieren', subChangeModeToAnnual:'Zu jährlicher Zahlung wechseln', subChangeModeToMonthly:'Zurück zu monatlicher Zahlung', subModeUpgradeTitle:'Zu jährlicher Zahlung wechseln?', subModeUpgradeMsg:'Ihr Abonnement wechselt zu jährlicher Abrechnung mit einem bevorzugten Tarif.', subModeAnnualWarnTitle:'Änderung des jährlichen Zahlungsmodus', subModeAnnualWarnMsg:'Ihr Jahresabonnement wurde im Voraus zu einem bevorzugten Tarif bezahlt. Wir empfehlen, Ihren aktuellen Plan bis zum Ende zu nutzen, bevor Sie zu monatlicher Zahlung zurückkehren.', subModeAnnualWarnKeep:'✓ Bis zum Ende behalten', subModeAnnualWarnNow:'Jetzt ändern', subModeChanged:'✅ Zahlungsmodus aktualisiert',
     settingsDefaultLang:'Angezeigte Sprache für Kunden (Standard)', settingsPrimaryLang:'Sprache des Personals und der Verwaltung',
     emptyMenuTitle:'Ihr Menü ist leer', emptyMenuSub:'Erstellen Sie zunächst Ihre erste Kategorie, um Produkte hinzuzufügen.',
@@ -3514,7 +3518,7 @@ const ADMIN_UI = {
     settingsPwd:'كلمة مرور الدخول', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
     ridSelSaved:'المعرّفات المحفوظة', ridSelNew:'أدخل معرّفاً آخر', ridSelPlaceholder:'مثال: cafe-paris', ridSelConnect:'تسجيل الدخول', ridSelContinue:'متابعة', ridSelErr:'رمز غير صالح: استخدم فقط أحرفاً صغيرة وأرقاماً وشرطات، بدون مسافات.',
     pwdConfirmTitle:'تغيير كلمة المرور', pwdConfirmMsg:'هذا التغيير سيُسجّل خروجك من جميع الأجهزة. ستحتاج إلى تسجيل الدخول مجدداً بكلمة المرور الجديدة.', pwdConfirmOk:'تأكيد', pwdConfirmCancel:'إلغاء', pwdChangedLogout:'✅ تم تغيير كلمة المرور — سجّل الدخول مجدداً',
-    changeIdBtn:'تغيير المعرّف', changeIdConfirmTitle:'تغيير المعرّف', changeIdConfirmMsg:'ستنتقل إلى شاشة اختيار المعرّف. يمكنك العودة هنا دون إدخال كلمة المرور مجدداً.', changeIdConfirmOk:'تأكيد', changeIdConfirmCancel:'إلغاء',
+    changeIdBtn:'تسجيل الخروج', changeIdConfirmTitle:'تسجيل الخروج', changeIdConfirmMsg:'ستنتقل إلى شاشة تسجيل الدخول. جلستك محفوظة — عُد هنا دون إدخال كلمة المرور مجدداً.', changeIdConfirmOk:'تأكيد', changeIdConfirmCancel:'إلغاء',
     subTitle:'اشتراكي', subForfaitMenuQR:'Menu QR', subForfaitCS:'الطلبات والخدمات', subMonthly:'شهري', subAnnual:'سنوي', subUpgradeBtn:'الترقية إلى الطلبات والخدمات', subDowngradeBtn:'العودة إلى Menu QR', subUpgradeTitle:'الترقية إلى الطلبات والخدمات؟', subUpgradeMsg:'ستتغير خطتك إلى الطلبات والخدمات. لديك 7 أيام لإتمام الدفع.', subDowngradeTitle:'العودة إلى Menu QR؟', subDowngradeMsg:'ستتغير خطتك إلى Menu QR. ستُعطَّل ميزات الطلب والاستدعاء.', subConfirmOk:'تأكيد', subConfirmCancel:'إلغاء', subChanged:'✅ تم تحديث الخطة', subChanging:'جارٍ التحديث…', subAnnualNotice:'⚠️ الاشتراك السنوي غير قابل للاسترداد — تستفيد من سعر مخفض لكامل العام.', subAnnualWarnTitle:'تغيير الخطة السنوية', subAnnualWarnMsg:'دفعت اشتراكك السنوي مسبقًا بسعر مخفض. نوصيك بالاستفادة من خطتك الحالية حتى النهاية وإجراء التغيير عند دفعتك القادمة.', subAnnualWarnKeep:'✓ الاحتفاظ حتى النهاية', subAnnualWarnNow:'التغيير الآن', subSpamTitle:'تم التغيير مسبقًا', subSpamMsg:'لقد غيّرت خطتك هذا الشهر بالفعل. لأي تغيير إضافي يرجى التواصل معنا.', subSpamContact:'تواصل معنا', subSpamClose:'إغلاق', subEndDate:'تنتهي في', subPendingNotice:'📅 تغيير مجدول في نهاية الفترة ←', subPendingCancel:'إلغاء التغيير المجدول', subChangeModeToAnnual:'التبديل إلى الدفع السنوي', subChangeModeToMonthly:'العودة إلى الدفع الشهري', subModeUpgradeTitle:'التبديل إلى الدفع السنوي؟', subModeUpgradeMsg:'سينتقل اشتراكك إلى الفوترة السنوية بسعر تفضيلي.', subModeAnnualWarnTitle:'تغيير وضع الدفع السنوي', subModeAnnualWarnMsg:'تم دفع اشتراكك السنوي مسبقاً بسعر تفضيلي. نوصي بالاستفادة من خطتك الحالية حتى النهاية قبل العودة إلى الدفع الشهري.', subModeAnnualWarnKeep:'✓ الاحتفاظ حتى النهاية', subModeAnnualWarnNow:'تغيير الآن', subModeChanged:'✅ تم تحديث وضع الدفع',
     settingsDefaultLang:'اللغة المعروضة للعملاء (افتراضي)', settingsPrimaryLang:'لغة الموظفين والإدارة',
     emptyMenuTitle:'قائمتك فارغة', emptyMenuSub:'ابدأ بإنشاء أول فئة لإضافة المنتجات.',
@@ -7740,6 +7744,7 @@ function syncStyleAdminUI(mode) {
 
   // En style papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
   document.body.setAttribute('data-style', mode);
+  document.body.setAttribute('data-theme', currentMenuTheme);
   // En style papier, la section info n'affiche que le WiFi (pas les horaires ni l'adresse)
   const infoCard = document.getElementById('info-card');
   if (infoCard) {
@@ -7958,6 +7963,18 @@ function copyTableURL(btn, url) {
   langBtn?.addEventListener('click', e => {
     e.stopPropagation();
     const open = langPopup.classList.toggle('open');
+    if (open && langBtn) {
+      const rect = langBtn.getBoundingClientRect();
+      langPopup.style.top  = (rect.bottom + 6) + 'px';
+      const isRtl = document.documentElement.dir === 'rtl';
+      if (isRtl) {
+        langPopup.style.left  = 'auto';
+        langPopup.style.right = (window.innerWidth - rect.right) + 'px';
+      } else {
+        langPopup.style.left  = rect.left + 'px';
+        langPopup.style.right = 'auto';
+      }
+    }
     langBtn.classList.toggle('open', open);
     langBtn.setAttribute('aria-expanded', String(open));
   });
@@ -8725,6 +8742,7 @@ window.addEventListener('pageshow', event => {
 
   document.addEventListener('touchstart', function(e) {
     if (document.getElementById('qr-modal').classList.contains('open')) { _ax = _ay = null; return; }
+    if (e.target.closest('.flatpickr-calendar')) { _ax = _ay = null; return; }
     _ax = e.touches[0].clientX;
     _ay = e.touches[0].clientY;
     _swipeDir = null;
@@ -8735,6 +8753,7 @@ window.addEventListener('pageshow', event => {
   document.addEventListener('touchmove', function(e) {
     if (_ax === null) return;
     if (document.getElementById('qr-modal').classList.contains('open')) return;
+    if (e.target.closest('.flatpickr-calendar')) return; // calendrier : laisser passer
     if (_swipeDir === 'vert') return; // scroll vertical : laisser passer
     var dx = e.touches[0].clientX - _ax;
     var dy = e.touches[0].clientY - _ay;
