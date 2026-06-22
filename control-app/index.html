@@ -3324,6 +3324,15 @@ function _toggleSuspend(key) {
     // Sync Firebase silencieux en arrière-plan
     _controlDb.ref('/commandes/' + key + '/suspendu').set(willSuspend)
       .then(function() {
+        // Sync SaaS Firebase active/suspendu (suspension manuelle ET réactivation)
+        const ridSync = (d.emailData && d.emailData.rid) || (d.clientCree && d.clientCree.rid);
+        if (ridSync) {
+          if (willSuspend) {
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: false, suspendu: true });
+          } else {
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false });
+          }
+        }
         if (!willSuspend) {
           const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
           if (emailAddr) {

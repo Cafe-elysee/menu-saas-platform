@@ -157,7 +157,7 @@ module.exports = async function handler(req, res) {
 
   const { rid, email, name, lang, amount, paymentMode, nextDue, type } = req.body || {};
   if (!email) return res.status(400).json({ error: 'Missing email' });
-  if (type !== 'creation' && type !== 'reactivation' && !nextDue) return res.status(400).json({ error: 'Missing nextDue' });
+  if (!nextDue && type !== 'reactivation') return res.status(400).json({ error: 'Missing nextDue' });
 
   if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
     return res.status(500).json({ error: 'GMAIL credentials missing' });
