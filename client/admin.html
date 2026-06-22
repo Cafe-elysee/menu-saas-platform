@@ -7349,6 +7349,8 @@ function _renderSubSection(el, t, sub) {
   const payMode  = sub.paymentMode || 'monthly';
   const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   const price    = sub.price != null ? sub.price : defaultPrice;
+  const defaultCreationFee = isCS ? 299 : 149;
+  const creationFeePrice = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : defaultCreationFee;
   const now      = Date.now();
   const trialEndAt   = sub.trialEndAt || 0;
   const isInTrial    = trialEndAt && now < trialEndAt;
@@ -7363,7 +7365,7 @@ function _renderSubSection(el, t, sub) {
   const trialBanner = isInTrial
     ? `<div style="font-size:0.77rem;background:rgba(200,164,78,.10);border:1px solid rgba(200,164,78,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;line-height:1.6">
         <strong style="color:#c8a44e">🎁 ${t.subTrialActive || 'Période d\'essai en cours'}</strong><br>
-        ${!creationDone ? (t.subCreationFeeLabel || 'Frais de création') + ' — ' + price + '€ ' + (t.subEndDate || 'avant le') + ' <strong>' + new Date(sub.endDate || now).toLocaleDateString(_endDateLocale[currentLang]||'fr-FR',{day:'numeric',month:'long',year:'numeric'}) + '</strong>' : '✅ ' + (t.subCreationFeeLabel || 'Frais de création') + ' réglés · Changement de formule libre jusqu\'au <strong>' + new Date(trialEndAt).toLocaleDateString(_endDateLocale[currentLang]||'fr-FR',{day:'numeric',month:'long',year:'numeric'}) + '</strong>'}
+        ${!creationDone ? (t.subCreationFeeLabel || 'Frais de création') + ' — <strong>' + creationFeePrice + '€</strong> ' + (t.subEndDate || 'avant le') + ' <strong>' + new Date(sub.endDate || now).toLocaleDateString(_endDateLocale[currentLang]||'fr-FR',{day:'numeric',month:'long',year:'numeric'}) + '</strong>' : '✅ ' + (t.subCreationFeeLabel || 'Frais de création') + ' réglés (<strong>' + creationFeePrice + '€</strong>) · Changement libre jusqu\'au <strong>' + new Date(trialEndAt).toLocaleDateString(_endDateLocale[currentLang]||'fr-FR',{day:'numeric',month:'long',year:'numeric'}) + '</strong>'}
        </div>`
     : '';
 
@@ -7381,9 +7383,11 @@ function _renderSubSection(el, t, sub) {
   // Bouton "Payer" visible si paiement en attente (endDate dans ≤4j ou déjà passé)
   const endTs = sub.endDate || 0;
   const payDue = endTs && (now >= endTs - 4 * 24 * 60 * 60 * 1000);
+  const payAmountDue = !creationDone ? creationFeePrice : price;
   const payBtn = payDue
     ? `<div style="background:rgba(200,164,78,.10);border:1px solid rgba(200,164,78,.35);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-        <div style="font-size:0.82rem;font-weight:700;color:#c8a44e;margin-bottom:10px">${t.subPayBtn || '💳 Effectuer mon paiement'}</div>
+        <div style="font-size:0.82rem;font-weight:700;color:#c8a44e;margin-bottom:6px">${t.subPayBtn || '💳 Effectuer mon paiement'}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">${!creationDone ? (t.subCreationFeeLabel || 'Frais de création') : (t.subMonthly || 'Abonnement')} — <strong style="color:var(--text)">${payAmountDue}€</strong></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button onclick="_subPayRevolut()" style="flex:1;min-width:130px;padding:10px 12px;border-radius:9px;border:1.5px solid #c8a44e;background:rgba(200,164,78,.15);color:#c8a44e;font-size:0.82rem;font-weight:600;cursor:pointer">💳 ${t.subPayRevolut || 'Virement Revolut'}</button>
           <button onclick="_subPayCash()" style="flex:1;min-width:130px;padding:10px 12px;border-radius:9px;border:1.5px solid rgba(200,164,78,.4);background:rgba(200,164,78,.07);color:var(--text);font-size:0.82rem;font-weight:600;cursor:pointer">💵 ${t.subPayCash || 'Espèces (Athènes)'}</button>
@@ -7406,8 +7410,8 @@ function _renderSubSection(el, t, sub) {
   }
   // Ligne historique frais de création
   const _creationStatus = creationDone
-    ? `<span style="color:#4caf84;font-weight:700">✅ ${t.subCreationFeeLabel || 'Frais de création'} — payés</span>`
-    : `<span style="color:#e09050;font-weight:700">⏳ ${t.subCreationFeeLabel || 'Frais de création'} — en attente</span>`;
+    ? `<span style="color:#4caf84;font-weight:700">✅ ${t.subCreationFeeLabel || 'Frais de création'} — <strong>${creationFeePrice}€</strong> — payés</span>`
+    : `<span style="color:#e09050;font-weight:700">⏳ ${t.subCreationFeeLabel || 'Frais de création'} — <strong>${creationFeePrice}€</strong> — en attente</span>`;
   const creationHistRow = sub.trialEndAt || sub.creationFeePaid
     ? `<div style="font-size:0.78rem;border-top:1px solid rgba(200,164,78,.15);padding-top:10px;margin-top:10px">${_creationStatus}</div>`
     : '';
@@ -7442,8 +7446,15 @@ function _subPayCash() {
   const t    = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const rid  = _RID || '';
   const sub  = _subData || {};
-  const price = sub.price != null ? sub.price : 49;
-  const mode  = sub.paymentMode === 'annual' ? 'annuel' : 'mensuel';
+  const _isCS = (sub.forfait || '') === 'commandes-services';
+  const _defCreation = _isCS ? 299 : 149;
+  const _creationFee = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : _defCreation;
+  const _creationDone = sub.creationFeePaid === true;
+  const _subPrice = sub.price != null ? sub.price : (_isCS ? 99 : 49);
+  const price = _creationDone ? _subPrice : _creationFee;
+  const mode  = _creationDone
+    ? (sub.paymentMode === 'annual' ? 'annuel' : 'mensuel')
+    : 'frais de création';
   const text  = encodeURIComponent('Bonjour GeNext 👋 Je souhaite régler en espèces.\nRestaurant ID : ' + rid + '\nMontant : ' + price + '€ (' + mode + ')\nMerci de me confirmer un lieu et une date à Athènes.');
   const waUrl = 'https://wa.me/306943995696?text=' + text;
   _showAdmConfirm(
