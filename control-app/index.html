@@ -2491,9 +2491,10 @@ function _watchFirstOpen(rid, cmdKey) {
   _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
     if (snap.val() === true && _commandesCache[cmdKey]) {
       const _foTs = Date.now();
+      const _trialEnd = _addMonths(_foTs, 1);
       const _foNext = _foTs + 7 * 24 * 60 * 60 * 1000;
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext });
-      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext });
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext, trialEndAt: _trialEnd });
+      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext, trialEndAt: _trialEnd });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -2726,8 +2727,9 @@ function _trialInfo(d, key) {
   const isSuspended = d.suspendu === true;
   const now = Date.now();
 
-  function _makeResult(startTs, expiredLabel) {
-    const remaining = (startTs + WEEK) - now;
+  // expireTs = timestamp absolu d'expiration (pas startTs + WEEK)
+  function _makeResult(expireTs, expiredLabel, ptype) {
+    const remaining = expireTs - now;
     const isExpired = remaining <= 0;
     let label = '', urgency = 'ok';
     if (!isExpired) {
@@ -2740,38 +2742,45 @@ function _trialInfo(d, key) {
     } else {
       label = expiredLabel; urgency = 'expired';
     }
-    return { isExpired, isSuspended, label, urgency, ts: startTs, noTrial: false };
+    return { isExpired, isSuspended, label, urgency, ts: expireTs, noTrial: false, paymentType: ptype };
   }
 
-  // ── Cycle récurrent (après premier paiement) ──────────────────────────────
+  // ── Phase 3 : Cycles récurrents (après premier abonnement payé) ──────────────
   if (d.paidAt) {
     if (!d.nextReminderAt) {
-      // paidAt présent mais nextReminderAt absent (write partiel) → traiter comme payé, pas de badge
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
+      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'recurring' };
     }
     if (now < d.nextReminderAt) {
-      // Prochain rappel pas encore arrivé — pas de badge
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
+      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'recurring' };
     }
-    return _makeResult(d.nextReminderAt, '⌛ Paiement expiré');
+    return _makeResult(d.nextReminderAt + WEEK, '⌛ Paiement expiré', 'recurring');
   }
 
-  // ── Essai initial (avant premier paiement) ────────────────────────────────
+  // ── Phase 2 : Premier abonnement (frais création payés, fin du mois d'essai) ─
+  if (d.creationFeePaid) {
+    const trialEnd = d.trialEndAt || (d.firstOpenAt ? d.firstOpenAt + 30 * 24 * 60 * 60 * 1000 : 0);
+    if (!trialEnd || now < trialEnd) {
+      // Toujours en période d'essai — aucun paiement dû pour l'instant
+      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'subscription' };
+    }
+    return _makeResult(trialEnd + WEEK, '⌛ Abonnement expiré', 'subscription');
+  }
+
+  // ── Phase 1 : Frais de création (7j depuis le premier accès) ─────────────────
   if (d.firstOpenAt) {
-    // Nouveau comportement : timer depuis le premier accès client
-    return _makeResult(d.firstOpenAt, '⌛ Essai expiré');
+    return _makeResult(d.firstOpenAt + WEEK, '⌛ Frais de création expirés', 'creation');
   }
   if (d.statut === 'traite') {
     // Legacy : commande traitée avant firstOpenAt — fallback sur d.ts
     const legacyTs = Number(d.ts) || parseInt(key) || 0;
     if (legacyTs < 1000000000000) {
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
+      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'creation' };
     }
-    return _makeResult(legacyTs, '⌛ Essai expiré');
+    return _makeResult(legacyTs + WEEK, '⌛ Essai expiré', 'creation');
   }
 
   // Client pas encore activé (jamais ouvert admin/server-app)
-  return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true };
+  return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'creation' };
 }
 
 // ── Trouver la commande d'un slug client ────────────────────────────────────
@@ -2846,20 +2855,50 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
 function _buildPaymentHistoryInlineHTML(cmdKey, d) {
   var paiementsObj = d.paiements || {};
   var payments = Object.values(paiementsObj).filter(function(p) { return p && p.date; }).sort(function(a,b) { return b.date - a.date; });
-  if (payments.length === 0) return '<div class="hist-inline-empty">Aucun paiement enregistré.</div>';
+
+  // Ligne frais de création (statut dédié en tête d'historique)
+  var creationRow = '';
+  if (d.firstOpenAt) {
+    var creationPaid = d.creationFeePaid === true;
+    var creationDate = creationPaid
+      ? new Date(d.firstOpenAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })
+      : '';
+    var creationStatus = creationPaid
+      ? '<span style="color:#4caf84;font-weight:700">✅ Payés</span>'
+      : '<span style="color:#e09050;font-weight:700">⏳ En attente</span>';
+    var creationPriceStr = creationPaid
+      ? ('<span class="hist-inline-amt">' + escapeHtml(String(_getCommandePrice(d))) + ' €</span>')
+      : '';
+    creationRow = '<div class="hist-inline-item" style="border-bottom:1px solid rgba(200,164,78,.15);margin-bottom:4px;padding-bottom:6px">' +
+      '<span class="hist-inline-date" style="color:#c8a44e;font-weight:700">🏷 Frais création</span>' +
+      creationPriceStr +
+      creationStatus +
+    '</div>';
+  }
+
+  if (payments.length === 0) {
+    return creationRow + '<div class="hist-inline-empty">Aucun abonnement enregistré.</div>';
+  }
   var rows = payments.slice(0, 5).map(function(p) {
-    var ds = new Date(p.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
-    var unit = p.mode === 'annual' ? 'an' : 'mois';
-    var amt = p.montant !== undefined ? p.montant : '?';
-    return '<div class="hist-inline-item"><span class="hist-inline-date">'+escapeHtml(ds)+'</span><span class="hist-inline-amt">'+escapeHtml(String(amt))+' €/'+unit+'</span></div>';
+    var ds  = new Date(p.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+    var lbl = p.type === 'creation' ? '🏷 Frais création' : (p.mode === 'annual' ? '📅 Annuel' : '🔁 Mensuel');
+    var unit = (p.mode === 'annual') ? 'an' : (p.mode === 'creation' ? '' : 'mois');
+    var amt  = p.montant !== undefined ? p.montant : '?';
+    var amtStr = unit ? escapeHtml(String(amt)) + ' €/' + unit : escapeHtml(String(amt)) + ' €';
+    return '<div class="hist-inline-item"><span class="hist-inline-date">' + escapeHtml(ds) + ' · ' + lbl + '</span><span class="hist-inline-amt">' + amtStr + '</span></div>';
   }).join('');
-  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
+  return creationRow + rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
 }
 
 function _buildPaymentSectionHTML(cmdKey, d) {
   var trial = _trialInfo(d, cmdKey);
   var pendingHtml = '';
   if (!trial.noTrial) {
+    var isCreation = trial.paymentType === 'creation';
+    var paidBtnLabel = isCreation
+      ? '&#9989; Frais de cr&#233;ation pay&#233;s'
+      : '&#9989; Marquer comme pay&#233;';
+    var typePrefix = isCreation ? 'Frais cr&#233;ation · ' : (trial.paymentType === 'subscription' ? 'Abonnement · ' : '');
     var suspHtml = trial.isExpired
       ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + cmdKey + '\')" style="width:100%;margin-top:6px">' +
           (trial.isSuspended ? '&#9654; R&#233;activer le compte' : '&#9208; Suspendre le compte') +
@@ -2867,8 +2906,8 @@ function _buildPaymentSectionHTML(cmdKey, d) {
       : '';
     pendingHtml =
       '<div class="commande-trial-action" style="margin-bottom:12px">' +
-        '<div style="margin-bottom:8px"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + trial.label + '</span></div>' +
-        '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + cmdKey + '\')">&#9989; Marquer comme pay&#233;</button>' +
+        '<div style="margin-bottom:8px"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + typePrefix + trial.label + '</span></div>' +
+        '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + cmdKey + '\')">' + paidBtnLabel + '</button>' +
         suspHtml +
       '</div>';
   }
@@ -2890,8 +2929,9 @@ function _savePaymentMode(cmdKey, mode) {
   var unitEl = document.getElementById('price-unit-' + cmdKey);
   if (unitEl) unitEl.textContent = '€/' + (mode === 'annual' ? 'an' : 'mois');
   const prev = Object.assign({}, d);
-  const baseTs = d.paidAt || d.firstOpenAt;
-  const newNextReminderAt = baseTs ? _addMonths(baseTs, mode === 'annual' ? 12 : 1) : d.nextReminderAt;
+  const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
+  const baseTs = isInTrial ? null : (d.paidAt || (d.creationFeePaid ? (d.trialEndAt || null) : null) || d.firstOpenAt);
+  const newNextReminderAt = (!isInTrial && baseTs) ? _addMonths(baseTs, mode === 'annual' ? 12 : 1) : d.nextReminderAt;
   _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode, nextReminderAt: newNextReminderAt });
   _rerenderClientBillingSection(cmdKey);
   _rerenderCommandeCard(cmdKey);
@@ -3168,8 +3208,9 @@ function _setActiveCombo(cmdKey, forfait, mode) {
   const comboPrice = _getComboPrice(d, normForfait, normMode);
   const prevMode = d.paymentMode || 'monthly';
   const modeChanged = normMode !== prevMode;
-  const baseTs = d.paidAt || d.firstOpenAt;
-  const newNextReminderAt = (modeChanged && baseTs) ? _addMonths(baseTs, normMode === 'annual' ? 12 : 1) : d.nextReminderAt;
+  const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
+  const baseTs = isInTrial ? null : (d.paidAt || (d.creationFeePaid ? (d.trialEndAt || null) : null) || d.firstOpenAt);
+  const newNextReminderAt = (!isInTrial && modeChanged && baseTs) ? _addMonths(baseTs, normMode === 'annual' ? 12 : 1) : d.nextReminderAt;
   _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice, nextReminderAt: newNextReminderAt });
 
   // Mettre à jour les features si changement de forfait
@@ -3179,12 +3220,12 @@ function _setActiveCombo(cmdKey, forfait, mode) {
     const db = getClientDb(slug);
     db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
     const subUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
-    if (modeChanged && newNextReminderAt) subUpdate.endDate = newNextReminderAt;
+    if (!isInTrial && modeChanged && newNextReminderAt) subUpdate.endDate = newNextReminderAt;
     db.ref('/config/subscription').update(subUpdate);
     _saasDb.ref('restaurants/' + slug + '/config/subscription').update(subUpdate);
   }
   const controlUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
-  if (modeChanged && newNextReminderAt) controlUpdate.nextReminderAt = newNextReminderAt;
+  if (!isInTrial && modeChanged && newNextReminderAt) controlUpdate.nextReminderAt = newNextReminderAt;
   _controlDb.ref('/commandes/' + cmdKey).update(controlUpdate);
 
   _rerenderClientBillingSection(cmdKey);
@@ -3270,55 +3311,82 @@ function _saveFirstOpenAt(key, newTs) {
 function _markPaid(key) {
   const d = _commandesCache[key];
   if (!d) return;
-  const isMonthly = d.paymentMode !== 'annual';
-  const isFirstPayment = !d.paidAt;
-  const priceStr = _getCommandePrice(d) + ' €/' + (isMonthly ? 'mois' : 'an');
-  const nextInfo = isFirstPayment
-    ? (isMonthly ? 'Prochain rappel dans 1 mois (début du 2ème mois).' : 'Prochain rappel dans 12 mois (renouvellement annuel).')
-    : (isMonthly ? 'Prochain rappel dans 1 mois.' : 'Prochain rappel dans 12 mois.');
+  const isCreationFee  = !d.creationFeePaid;                 // Phase 1 : frais de création
+  const isFirstSub     = d.creationFeePaid && !d.paidAt;     // Phase 2 : premier abonnement
+  const isMonthly      = d.paymentMode !== 'annual';
+  const price          = _getCommandePrice(d);
+
+  let confirmTitle, confirmMsg;
+  if (isCreationFee) {
+    confirmTitle = 'Frais de création payés ?';
+    confirmMsg   = 'Enregistrer les frais de création ' + price + ' € pour « ' + escapeHtml(d.restaurant || '') + ' ». Le prochain paiement sera l\'abonnement à la fin du mois d\'essai.';
+  } else {
+    const priceStr  = price + ' €/' + (isMonthly ? 'mois' : 'an');
+    const nextLabel = isMonthly ? 'dans 1 mois' : 'dans 12 mois';
+    confirmTitle = 'Confirmer le paiement ?';
+    confirmMsg   = 'Paiement ' + priceStr + ' enregistré pour « ' + escapeHtml(d.restaurant || '') + ' ». Prochain rappel ' + nextLabel + '.';
+  }
+
   _showCtrlConfirm(
-    'Confirmer le paiement ?',
-    'Paiement ' + priceStr + ' enregistré pour « ' + escapeHtml(d.restaurant || '') + ' ». ' + nextInfo,
+    confirmTitle,
+    confirmMsg,
     '✅ Confirmer',
     function() {
       const now = Date.now();
-      let nextReminderAt;
-      if (isFirstPayment) {
-        nextReminderAt = isMonthly ? _addMonths(now, 1) : _addMonths(now, 12);
+      let update, payEntry;
+
+      if (isCreationFee) {
+        // Phase 1 → frais création payés, prochaine échéance = trialEndAt (fin du mois d'essai)
+        const trialEnd = d.trialEndAt || _addMonths(d.firstOpenAt || now, 1);
+        update = { creationFeePaid: true, nextReminderAt: trialEnd, suspendu: false };
+        payEntry = { date: now, montant: price, mode: 'creation', forfait: d.forfait || 'menu-qr', type: 'creation' };
+      } else if (isFirstSub) {
+        // Phase 2 → premier abonnement, cycles alignés sur trialEndAt
+        const base = d.trialEndAt || d.nextReminderAt || now;
+        const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
+        update = { paidAt: now, nextReminderAt, suspendu: false };
+        payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
+        // Phase 3 → récurrent, base = nextReminderAt courant
         const base = d.nextReminderAt || now;
-        nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
+        const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
+        update = { paidAt: now, nextReminderAt, suspendu: false };
+        payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       }
-      const update = { paidAt: now, nextReminderAt, suspendu: false };
+
       const prev = _commandesCache[key];
       _commandesCache[key] = Object.assign({}, d, update);
       _rerenderCommandeCard(key);
       _doRenderPaiements();
-      const payEntry = { date: now, montant: _getCommandePrice(d), mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr' };
+
       _controlDb.ref('/commandes/' + key).update(update)
         .then(function() {
           _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
-          // emailData.rid est permanent (clientCree est nullifié après firstOpen)
           const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
           if (rid) {
             _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
-            _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: nextReminderAt });
+            const subSync = { endDate: update.nextReminderAt };
+            if (isCreationFee) subSync.creationFeePaid = true;
+            _saasDb.ref('restaurants/' + rid + '/config/subscription').update(subSync);
           }
-          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
-          if (emailAddr) {
-            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                rid: rid || '',
-                email: emailAddr,
-                name: d.restaurant || '',
-                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                amount: _getCommandePrice(d),
-                paymentMode: d.paymentMode || 'monthly',
-                nextDue: nextReminderAt
-              })
-            }).catch(function() {});
+          // Email de confirmation uniquement pour les abonnements (pas pour les frais de création)
+          if (!isCreationFee) {
+            const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+            if (emailAddr) {
+              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  rid: rid || '',
+                  email: emailAddr,
+                  name: d.restaurant || '',
+                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                  amount: price,
+                  paymentMode: d.paymentMode || 'monthly',
+                  nextDue: update.nextReminderAt
+                })
+              }).catch(function() {});
+            }
           }
         })
         .catch(function() {
