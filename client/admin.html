@@ -7349,7 +7349,7 @@ function _renderSubSection(el, t, sub) {
   const payMode  = sub.paymentMode || 'monthly';
   const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   const price    = sub.price != null ? sub.price : defaultPrice;
-  const defaultCreationFee = isCS ? 299 : 149;
+  const defaultCreationFee = 149; // frais de création unifiés (même prix pour les 2 forfaits)
   const creationFeePrice = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : defaultCreationFee;
   const now      = Date.now();
   const trialEndAt   = sub.trialEndAt || 0;
@@ -7456,7 +7456,7 @@ function _subPayCash() {
   const rid  = _RID || '';
   const sub  = _subData || {};
   const _isCS = (sub.forfait || '') === 'commandes-services';
-  const _defCreation = _isCS ? 299 : 149;
+  const _defCreation = 149; // frais de création unifiés
   const _creationFee = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : _defCreation;
   const _creationDone = sub.creationFeePaid === true;
   const _subPrice = sub.price != null ? sub.price : (_isCS ? 99 : 49);

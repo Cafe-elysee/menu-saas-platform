@@ -2500,8 +2500,20 @@ function initFirebase() {
   // Charger les prix globaux depuis Firebase (source de vérité pour la démo et les nouveaux clients)
   _saasDb.ref('globalSettings/pricing').on('value', function(snap) {
     const s = snap.val() || {};
-    if (s.creationFee != null) _GLOBAL_CREATION_FEE = Number(s.creationFee);
-    if (s.prices && typeof s.prices === 'object') _GLOBAL_PLAN_PRICES = Object.assign({}, _GLOBAL_PLAN_PRICES, s.prices);
+    if (s.creationFee != null) {
+      const _fee = Math.max(0, parseInt(Number(s.creationFee), 10) || 0);
+      _GLOBAL_CREATION_FEE = _fee;
+    }
+    if (s.prices && typeof s.prices === 'object') {
+      const _validated = {};
+      ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
+        if (s.prices[k] != null) {
+          const _v = Math.max(0, parseInt(Number(s.prices[k]), 10) || 0);
+          _validated[k] = _v;
+        }
+      });
+      _GLOBAL_PLAN_PRICES = Object.assign({}, _GLOBAL_PLAN_PRICES, _validated);
+    }
     _refreshPricingSettingsUI();
   });
 }
