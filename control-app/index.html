@@ -3323,6 +3323,23 @@ function _toggleSuspend(key) {
     _rerenderCommandeCard(key);
     // Sync Firebase silencieux en arrière-plan
     _controlDb.ref('/commandes/' + key + '/suspendu').set(willSuspend)
+      .then(function() {
+        if (!willSuspend) {
+          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+          if (emailAddr) {
+            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: emailAddr,
+                name: d.restaurant || '',
+                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                type: 'reactivation'
+              })
+            }).catch(function() {});
+          }
+        }
+      })
       .catch(function() {
         // Rollback si Firebase échoue (hors-ligne, règles, etc.)
         _commandesCache[key] = Object.assign({}, _commandesCache[key], { suspendu: !willSuspend });
@@ -3522,8 +3539,8 @@ function _markPaid(key) {
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
-        // Phase 3 → récurrent, base = nextReminderAt courant
-        const base = d.nextReminderAt || now;
+        // Phase 3 → récurrent. Si nextReminderAt est dans le passé (suspension longue), partir de now
+        const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
@@ -3544,10 +3561,23 @@ function _markPaid(key) {
             if (isCreationFee) subSync.creationFeePaid = true;
             _saasDb.ref('restaurants/' + rid + '/config/subscription').update(subSync);
           }
-          // Email de confirmation uniquement pour les abonnements (pas pour les frais de création)
-          if (!isCreationFee) {
-            const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
-            if (emailAddr) {
+          // Email de confirmation paiement — frais création ET abonnements
+          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+          if (emailAddr) {
+            if (isCreationFee) {
+              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  rid: rid || '',
+                  email: emailAddr,
+                  name: d.restaurant || '',
+                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                  type: 'creation',
+                  nextDue: update.nextReminderAt
+                })
+              }).catch(function() {});
+            } else {
               fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
