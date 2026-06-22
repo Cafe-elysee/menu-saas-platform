@@ -688,6 +688,17 @@
     .f4-price-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
     .f4-price-inp:focus { border-color: #c8a44e; }
     .f4-unit { font-size: 0.67rem; color: var(--muted); }
+    .f4-creation-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(200,164,78,0.06); border: 1.5px solid rgba(200,164,78,0.22);
+      border-radius: 12px; padding: 9px 12px; margin-bottom: 10px;
+    }
+    .f4-creation-label { font-size: 0.74rem; font-weight: 700; color: var(--gold); }
+    .f4-creation-tag {
+      font-size: 0.6rem; font-weight: 600; padding: 1px 6px; border-radius: 8px;
+      background: rgba(200,164,78,0.15); color: var(--muted); margin-left: 5px;
+      vertical-align: middle; text-transform: uppercase; letter-spacing: .04em;
+    }
     /* ── Mode paiement (edit inline) ── */
     .commande-paymode-row {
       display: flex; align-items: center; gap: 0.45rem;
@@ -2063,8 +2074,9 @@ const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:
 const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
 const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande:'🛒 Commande' };
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
-const _PRICE_MONTHLY = { 'menu-qr': 49, 'commandes-services': 99 };
-const _PRICE_ANNUAL  = { 'menu-qr': 490, 'commandes-services': 990 };
+const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
+const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
+const _PRICE_CREATION = { 'menu-qr': 149, 'commandes-services': 299 };
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
 const _subSyncActive = {}; // slug → true (évite doublons de listeners)
@@ -2801,6 +2813,33 @@ function _comboKey(forfait, mode) {
   return f + '-' + m;
 }
 
+// ── Prix des frais de création (149€ / 299€ selon forfait, custom possible) ──
+function _getCreationFeePrice(d) {
+  if (d.prices && d.prices['creation'] != null) return d.prices['creation'];
+  return _PRICE_CREATION[d.forfait || 'menu-qr'] || 149;
+}
+
+// ── Sauvegarder un prix de frais de création custom ──────────────────────────
+function _saveCreationFeePrice(key, rawVal) {
+  const price = Math.max(0, parseInt(rawVal, 10) || 0);
+  const d = _commandesCache[key];
+  if (!d) return;
+  const prev = Object.assign({}, d);
+  const prices = Object.assign({}, d.prices || {}, { creation: price });
+  _commandesCache[key] = Object.assign({}, d, { prices });
+  _rerenderClientBillingSection(key);
+  _rerenderCommandeCard(key);
+  _controlDb.ref('/commandes/' + key + '/prices/creation').set(price).catch(function() {
+    _commandesCache[key] = prev;
+    _rerenderClientBillingSection(key);
+    _rerenderCommandeCard(key);
+    showToast('⚠ Erreur de synchronisation');
+  });
+  const slug = _getSlugFromCmdKey(key);
+  if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices/creation').set(price);
+  showToast('💾 Frais de création mis à jour');
+}
+
 // ── Prix pour une combinaison forfait+mode ────────────────────────────────
 function _getComboPrice(d, forfait, mode) {
   var ck = _comboKey(forfait, mode);
@@ -2846,8 +2885,22 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
+  // Ligne frais de création éditables (paiement unique — séparé de l'abonnement)
+  var creationFeePrice = _getCreationFeePrice(d);
+  var creationFeeRow = '<div class="f4-creation-row">' +
+    '<div class="f4-creation-label">🏷 Frais de cr&#233;ation <span class="f4-creation-tag">paiement unique</span></div>' +
+    '<div class="f4-price-wrap">' +
+      '<input class="f4-price-inp" type="number" value="' + creationFeePrice + '" min="0" step="1"' +
+      ' onclick="event.stopPropagation()"' +
+      ' onchange="_saveCreationFeePrice(\'' + cmdKey + '\',this.value)"' +
+      ' onkeydown="if(event.key===\'Enter\'){event.stopPropagation();_saveCreationFeePrice(\'' + cmdKey + '\',this.value);this.blur();}">' +
+      '<span class="f4-unit">&#8364;</span>' +
+    '</div>' +
+  '</div>';
+
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
     '<div class="f4-grid">' + gridHtml + '</div>' +
+    creationFeeRow +
     birthdateRow +
   '</div>';
 }
@@ -2866,9 +2919,8 @@ function _buildPaymentHistoryInlineHTML(cmdKey, d) {
     var creationStatus = creationPaid
       ? '<span style="color:#4caf84;font-weight:700">✅ Payés</span>'
       : '<span style="color:#e09050;font-weight:700">⏳ En attente</span>';
-    var creationPriceStr = creationPaid
-      ? ('<span class="hist-inline-amt">' + escapeHtml(String(_getCommandePrice(d))) + ' €</span>')
-      : '';
+    var creationFeeAmt = _getCreationFeePrice(d);
+    var creationPriceStr = '<span class="hist-inline-amt">' + escapeHtml(String(creationFeeAmt)) + ' €</span>';
     creationRow = '<div class="hist-inline-item" style="border-bottom:1px solid rgba(200,164,78,.15);margin-bottom:4px;padding-bottom:6px">' +
       '<span class="hist-inline-date" style="color:#c8a44e;font-weight:700">🏷 Frais création</span>' +
       creationPriceStr +
@@ -2895,10 +2947,11 @@ function _buildPaymentSectionHTML(cmdKey, d) {
   var pendingHtml = '';
   if (!trial.noTrial) {
     var isCreation = trial.paymentType === 'creation';
+    var creationAmt = isCreation ? (' · ' + _getCreationFeePrice(d) + ' &#8364;') : '';
     var paidBtnLabel = isCreation
-      ? '&#9989; Frais de cr&#233;ation pay&#233;s'
+      ? ('&#9989; Frais de cr&#233;ation pay&#233;s (' + _getCreationFeePrice(d) + ' &#8364;)')
       : '&#9989; Marquer comme pay&#233;';
-    var typePrefix = isCreation ? 'Frais cr&#233;ation · ' : (trial.paymentType === 'subscription' ? 'Abonnement · ' : '');
+    var typePrefix = isCreation ? ('Frais cr&#233;ation' + creationAmt + ' · ') : (trial.paymentType === 'subscription' ? 'Abonnement · ' : '');
     var suspHtml = trial.isExpired
       ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + cmdKey + '\')" style="width:100%;margin-top:6px">' +
           (trial.isSuspended ? '&#9654; R&#233;activer le compte' : '&#9208; Suspendre le compte') +
@@ -3314,7 +3367,7 @@ function _markPaid(key) {
   const isCreationFee  = !d.creationFeePaid;                 // Phase 1 : frais de création
   const isFirstSub     = d.creationFeePaid && !d.paidAt;     // Phase 2 : premier abonnement
   const isMonthly      = d.paymentMode !== 'annual';
-  const price          = _getCommandePrice(d);
+  const price          = isCreationFee ? _getCreationFeePrice(d) : _getCommandePrice(d);
 
   let confirmTitle, confirmMsg;
   if (isCreationFee) {
