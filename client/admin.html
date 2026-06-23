@@ -7350,7 +7350,9 @@ function _renderSubSection(el, t, sub) {
   const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   const price    = sub.price != null ? sub.price : defaultPrice;
   const defaultCreationFee = 149; // frais de création unifiés (même prix pour les 2 forfaits)
-  const creationFeePrice = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : defaultCreationFee;
+  const creationFeePrice = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation']
+    : (sub.creationFee != null) ? sub.creationFee
+    : defaultCreationFee;
   const now      = Date.now();
   const trialEndAt   = sub.trialEndAt || 0;
   const isInTrial    = trialEndAt && now < trialEndAt;
