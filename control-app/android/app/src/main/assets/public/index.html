@@ -1841,6 +1841,7 @@
         <div class="settings-row" style="margin-bottom:18px;align-items:center;">
           <input id="gs-creation-fee" type="number" class="f4-price-inp" style="width:90px;display:inline-block"
             min="0" step="1" value="149"
+            oninput="_debouncePriceInput('gs-creation-fee', _saveGlobalCreationFee)"
             onchange="_saveGlobalCreationFee(this.value)"
             onkeydown="if(event.key==='Enter'){_saveGlobalCreationFee(this.value);this.blur();}">
           <span style="margin-left:8px;color:var(--muted);font-size:0.81rem;">€ &nbsp;·&nbsp; paiement unique, 7 premiers jours</span>
@@ -1853,6 +1854,7 @@
             <div class="f4-price-wrap" style="pointer-events:all">
               <input id="gs-qr-monthly" class="f4-price-inp" type="number" min="0" step="1" value="49"
                 onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-qr-monthly', function(v){_saveGlobalPlanPrice('qr-monthly',v);})"
                 onchange="_saveGlobalPlanPrice('qr-monthly',this.value)"
                 onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-monthly',this.value);this.blur();}">
               <span class="f4-unit">€/mois</span>
@@ -1864,6 +1866,7 @@
             <div class="f4-price-wrap" style="pointer-events:all">
               <input id="gs-qr-annual" class="f4-price-inp" type="number" min="0" step="1" value="490"
                 onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-qr-annual', function(v){_saveGlobalPlanPrice('qr-annual',v);})"
                 onchange="_saveGlobalPlanPrice('qr-annual',this.value)"
                 onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-annual',this.value);this.blur();}">
               <span class="f4-unit">€/an</span>
@@ -1875,6 +1878,7 @@
             <div class="f4-price-wrap" style="pointer-events:all">
               <input id="gs-srv-monthly" class="f4-price-inp" type="number" min="0" step="1" value="99"
                 onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-srv-monthly', function(v){_saveGlobalPlanPrice('srv-monthly',v);})"
                 onchange="_saveGlobalPlanPrice('srv-monthly',this.value)"
                 onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-monthly',this.value);this.blur();}">
               <span class="f4-unit">€/mois</span>
@@ -1886,6 +1890,7 @@
             <div class="f4-price-wrap" style="pointer-events:all">
               <input id="gs-srv-annual" class="f4-price-inp" type="number" min="0" step="1" value="990"
                 onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-srv-annual', function(v){_saveGlobalPlanPrice('srv-annual',v);})"
                 onchange="_saveGlobalPlanPrice('srv-annual',this.value)"
                 onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-annual',this.value);this.blur();}">
               <span class="f4-unit">€/an</span>
@@ -2148,6 +2153,7 @@ const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
 // Frais de création : prix UNIQUE pour les deux forfaits, configurable depuis Réglages
 let _GLOBAL_CREATION_FEE  = 149;
 let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 49, 'qr-annual': 490, 'srv-monthly': 99, 'srv-annual': 990 };
+let _priceInputTimers     = {};
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
 const _subSyncActive = {}; // slug → true (évite doublons de listeners)
@@ -2950,6 +2956,15 @@ function _saveGlobalPlanPrice(key, rawVal) {
   _GLOBAL_PLAN_PRICES[key] = price;
   if (_saasDb) _saasDb.ref('demoPage/pricing/prices/' + key).set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
   showToast('💾 Prix ' + key + ' : ' + price + ' €');
+}
+
+// ── Debounce pour oninput des champs tarification ─────────────────────────────
+function _debouncePriceInput(inputId, saveFn) {
+  clearTimeout(_priceInputTimers[inputId]);
+  _priceInputTimers[inputId] = setTimeout(function() {
+    var el = document.getElementById(inputId);
+    if (el) saveFn(el.value);
+  }, 900);
 }
 
 // ── Sauvegarder un prix de frais de création custom (conservé pour rétrocompatibilité) ──────────────────────────
