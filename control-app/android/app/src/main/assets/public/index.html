@@ -2499,7 +2499,20 @@ function initFirebase() {
   setTimeout(refreshNotifStatus, 2000);
   // Charger les prix globaux depuis Firebase (source de vérité pour la démo et les nouveaux clients)
   _saasDb.ref('demoPage/pricing').on('value', function(snap) {
-    const s = snap.val() || {};
+    const s = snap.val();
+    if (!s) {
+      // Première utilisation — écrire les valeurs par défaut dans Firebase
+      _saasDb.ref('demoPage/pricing').set({
+        creationFee: _GLOBAL_CREATION_FEE,
+        prices: {
+          'qr-monthly':  _GLOBAL_PLAN_PRICES['qr-monthly']  || 49,
+          'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 490,
+          'srv-monthly': _GLOBAL_PLAN_PRICES['srv-monthly'] || 99,
+          'srv-annual':  _GLOBAL_PLAN_PRICES['srv-annual']  || 990
+        }
+      }).catch(function(){});
+      return;
+    }
     if (s.creationFee != null) {
       const _fee = Math.max(0, parseInt(Number(s.creationFee), 10) || 0);
       _GLOBAL_CREATION_FEE = _fee;
@@ -3707,7 +3720,13 @@ function _doRenderPaiements() {
     var created = d.clientCree || _lastCreatedClients[k];
     var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
     var name = d.restaurant || (d.emailData && d.emailData.name) || '—';
-    var price = _getCommandePrice(d), unit = d.paymentMode === 'annual' ? 'an' : 'mois';
+    var isCreationPhase = trial.paymentType === 'creation';
+    var displayPrice = isCreationPhase ? _getCreationFeePrice(d) : _getCommandePrice(d);
+    var displayPhase = isCreationPhase ? 'Frais de cr&#233;ation' : (trial.paymentType === 'subscription' ? '1er abonnement' : 'Abonnement');
+    var displayUnit  = isCreationPhase ? '' : ('/' + (d.paymentMode === 'annual' ? 'an' : 'mois'));
+    var paidBtnLabel = isCreationPhase
+      ? '&#9989; Frais de cr&#233;ation pay&#233;s (' + displayPrice + ' &#8364;)'
+      : '&#9989; Marquer comme pay&#233; (' + displayPrice + ' &#8364;' + displayUnit + ')';
     var suspTag = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
     var paieBadge;
     if (trial.isExpired) {
@@ -3725,13 +3744,13 @@ function _doRenderPaiements() {
     card.innerHTML =
       '<div class="commande-card-header">' +
         '<div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(name)+suspTag+'</div>' +
-        '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+escapeHtml(price+' €/'+unit)+'</div>' +
+        '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+displayPhase+' &middot; '+displayPrice+' &#8364;'+displayUnit+'</div>' +
         '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc + '\')">&#128100; Voir le client</button>' +
       '</div>' +
       '<div class="commande-card-body-padded">' +
         '<div style="margin-bottom:10px">'+paieBadge+'</div>' +
         '<div class="commande-trial-action" style="flex-direction:column;gap:6px">' +
-          '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + k + '\')">&#9989; Marquer comme pay&#233;</button>' +
+          '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + k + '\')">' + paidBtnLabel + '</button>' +
           suspendPaieBtn +
         '</div>' +
       '</div>';
