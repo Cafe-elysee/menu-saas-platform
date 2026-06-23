@@ -2498,7 +2498,7 @@ function initFirebase() {
   _checkControlTokenInFirebase();
   setTimeout(refreshNotifStatus, 2000);
   // Charger les prix globaux depuis Firebase (source de vérité pour la démo et les nouveaux clients)
-  _saasDb.ref('globalSettings/pricing').on('value', function(snap) {
+  _saasDb.ref('demoPage/pricing').on('value', function(snap) {
     const s = snap.val() || {};
     if (s.creationFee != null) {
       const _fee = Math.max(0, parseInt(Number(s.creationFee), 10) || 0);
@@ -2927,7 +2927,7 @@ function _refreshPricingSettingsUI() {
 function _saveGlobalCreationFee(rawVal) {
   const price = Math.max(0, parseInt(rawVal, 10) || 0);
   _GLOBAL_CREATION_FEE = price;
-  if (_saasDb) _saasDb.ref('globalSettings/pricing/creationFee').set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
+  if (_saasDb) _saasDb.ref('demoPage/pricing/creationFee').set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
   showToast('💾 Frais de création : ' + price + ' €');
 }
 
@@ -2935,7 +2935,7 @@ function _saveGlobalCreationFee(rawVal) {
 function _saveGlobalPlanPrice(key, rawVal) {
   const price = Math.max(0, parseInt(rawVal, 10) || 0);
   _GLOBAL_PLAN_PRICES[key] = price;
-  if (_saasDb) _saasDb.ref('globalSettings/pricing/prices/' + key).set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
+  if (_saasDb) _saasDb.ref('demoPage/pricing/prices/' + key).set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
   showToast('💾 Prix ' + key + ' : ' + price + ' €');
 }
 

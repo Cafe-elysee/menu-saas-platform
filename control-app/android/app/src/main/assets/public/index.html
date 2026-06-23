@@ -687,6 +687,8 @@
     .f4-price-inp::-webkit-outer-spin-button,
     .f4-price-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
     .f4-price-inp:focus { border-color: #c8a44e; }
+    .f4-price-inp:disabled { opacity: 0.45; cursor: not-allowed; }
+    .f4-creation-fixed-note { font-size:0.68rem; color:var(--muted); margin-top:3px; font-style:italic; }
     .f4-unit { font-size: 0.67rem; color: var(--muted); }
     .f4-creation-row {
       display: flex; align-items: center; justify-content: space-between;
@@ -1828,6 +1830,73 @@
         </div>
       </div>
 
+      <!-- Section Tarification / Prix publics -->
+      <div class="settings-section" id="settings-pricing">
+        <div class="settings-title">💶 Tarification — Prix publics</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+          Ces prix s'affichent sur la page Démo et sont appliqués par défaut aux nouveaux clients.<br>
+          Le frais de création est le même pour les deux forfaits.
+        </div>
+        <div class="settings-label" style="margin-bottom:6px;font-weight:700;color:var(--gold);">🏷 Frais de création (unique · 7 jours · les deux forfaits)</div>
+        <div class="settings-row" style="margin-bottom:18px;align-items:center;">
+          <input id="gs-creation-fee" type="number" class="f4-price-inp" style="width:90px;display:inline-block"
+            min="0" step="1" value="149"
+            onchange="_saveGlobalCreationFee(this.value)"
+            onkeydown="if(event.key==='Enter'){_saveGlobalCreationFee(this.value);this.blur();}">
+          <span style="margin-left:8px;color:var(--muted);font-size:0.81rem;">€ &nbsp;·&nbsp; paiement unique, 7 premiers jours</span>
+        </div>
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (à partir du 2ème mois)</div>
+        <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
+          <div class="f4-combo">
+            <div class="f4-name">📋 Menu QR</div>
+            <div class="f4-mode">Mensuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-qr-monthly" class="f4-price-inp" type="number" min="0" step="1" value="49"
+                onclick="event.stopPropagation()"
+                onchange="_saveGlobalPlanPrice('qr-monthly',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-monthly',this.value);this.blur();}">
+              <span class="f4-unit">€/mois</span>
+            </div>
+          </div>
+          <div class="f4-combo">
+            <div class="f4-name">📋 Menu QR</div>
+            <div class="f4-mode">Annuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-qr-annual" class="f4-price-inp" type="number" min="0" step="1" value="490"
+                onclick="event.stopPropagation()"
+                onchange="_saveGlobalPlanPrice('qr-annual',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-annual',this.value);this.blur();}">
+              <span class="f4-unit">€/an</span>
+            </div>
+          </div>
+          <div class="f4-combo">
+            <div class="f4-name">🛎 Commandes</div>
+            <div class="f4-mode">Mensuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-srv-monthly" class="f4-price-inp" type="number" min="0" step="1" value="99"
+                onclick="event.stopPropagation()"
+                onchange="_saveGlobalPlanPrice('srv-monthly',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-monthly',this.value);this.blur();}">
+              <span class="f4-unit">€/mois</span>
+            </div>
+          </div>
+          <div class="f4-combo">
+            <div class="f4-name">🛎 Commandes</div>
+            <div class="f4-mode">Annuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-srv-annual" class="f4-price-inp" type="number" min="0" step="1" value="990"
+                onclick="event.stopPropagation()"
+                onchange="_saveGlobalPlanPrice('srv-annual',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-annual',this.value);this.blur();}">
+              <span class="f4-unit">€/an</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:10px;line-height:1.5;">
+          ⚠ Ces prix sont publics (page Démo). Le prix par client reste modifiable depuis la carte client.
+        </div>
+      </div>
+
       <div class="settings-section">
         <div class="settings-title">Sécurité — Mot de passe</div>
         <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
@@ -2076,7 +2145,9 @@ const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
-const _PRICE_CREATION = { 'menu-qr': 149, 'commandes-services': 299 };
+// Frais de création : prix UNIQUE pour les deux forfaits, configurable depuis Réglages
+let _GLOBAL_CREATION_FEE  = 149;
+let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 49, 'qr-annual': 490, 'srv-monthly': 99, 'srv-annual': 990 };
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
 const _subSyncActive = {}; // slug → true (évite doublons de listeners)
@@ -2426,6 +2497,25 @@ function initFirebase() {
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
   _checkControlTokenInFirebase();
   setTimeout(refreshNotifStatus, 2000);
+  // Charger les prix globaux depuis Firebase (source de vérité pour la démo et les nouveaux clients)
+  _saasDb.ref('demoPage/pricing').on('value', function(snap) {
+    const s = snap.val() || {};
+    if (s.creationFee != null) {
+      const _fee = Math.max(0, parseInt(Number(s.creationFee), 10) || 0);
+      _GLOBAL_CREATION_FEE = _fee;
+    }
+    if (s.prices && typeof s.prices === 'object') {
+      const _validated = {};
+      ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
+        if (s.prices[k] != null) {
+          const _v = Math.max(0, parseInt(Number(s.prices[k]), 10) || 0);
+          _validated[k] = _v;
+        }
+      });
+      _GLOBAL_PLAN_PRICES = Object.assign({}, _GLOBAL_PLAN_PRICES, _validated);
+    }
+    _refreshPricingSettingsUI();
+  });
 }
 
 // Charge dynamiquement la liste des restaurants depuis Firebase SaaS
@@ -2505,8 +2595,11 @@ function _watchFirstOpen(rid, cmdKey) {
       const _foTs = Date.now();
       const _trialEnd = _addMonths(_foTs, 1);
       const _foNext = _foTs + 7 * 24 * 60 * 60 * 1000;
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext, trialEndAt: _trialEnd });
-      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext, trialEndAt: _trialEnd });
+      // Fixer le frais de création au prix global du moment (immuable ensuite pour ce client)
+      const _snapFee = _GLOBAL_CREATION_FEE;
+      const _snapPrices = Object.assign({}, (_commandesCache[cmdKey].prices || {}), { creation: _snapFee });
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext, trialEndAt: _trialEnd, prices: _snapPrices });
+      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext, trialEndAt: _trialEnd, prices: _snapPrices });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -2584,12 +2677,13 @@ function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const menuUrl  = 'https://menu-saas-platform.vercel.app/?rid=' + rid + '&table=1';
   const apkUrl   = 'https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk';
   const isCS     = forfait === 'Commandes & Services';
+  const _cf      = _GLOBAL_CREATION_FEE; // Prix frais de création au moment de l'envoi
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
-    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
-    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على GeNext جاهزة.\n\n📋 الخطة: ' + forfait + '\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق GeNext',
-    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n💶 Frais de création : ' + _cf + '€ (à régler dans les 7 premiers jours après votre 1ère connexion)\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n💶 Creation fee: ' + _cf + '€ (to pay within 7 days of your first login)\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n💶 Τέλη δημιουργίας: ' + _cf + '€ (να καταβληθούν εντός 7 ημερών από την 1η σύνδεση)\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على GeNext جاهزة.\n\n📋 الخطة: ' + forfait + '\n💶 رسوم الإنشاء: ' + _cf + '€ (للدفع خلال 7 أيام من أول تسجيل دخول)\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق GeNext',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n💶 Einrichtungsgebühr: ' + _cf + '€ (innerhalb von 7 Tagen nach Ihrer 1. Anmeldung zu bezahlen)\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   const _base = m[lang] || m.fr;
   const _lb = _base.lastIndexOf('\n\n');
@@ -2813,13 +2907,39 @@ function _comboKey(forfait, mode) {
   return f + '-' + m;
 }
 
-// ── Prix des frais de création (149€ / 299€ selon forfait, custom possible) ──
+// ── Prix des frais de création (prix global unique, fixé au moment du firstOpen) ──
 function _getCreationFeePrice(d) {
   if (d.prices && d.prices['creation'] != null) return d.prices['creation'];
-  return _PRICE_CREATION[d.forfait || 'menu-qr'] || 149;
+  return _GLOBAL_CREATION_FEE;
 }
 
-// ── Sauvegarder un prix de frais de création custom ──────────────────────────
+// ── Refresh UI Réglages Tarification ─────────────────────────────────────────
+function _refreshPricingSettingsUI() {
+  var el;
+  el = document.getElementById('gs-creation-fee'); if (el && document.activeElement !== el) el.value = _GLOBAL_CREATION_FEE;
+  el = document.getElementById('gs-qr-monthly');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-monthly']  || 49;
+  el = document.getElementById('gs-qr-annual');    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-annual']   || 490;
+  el = document.getElementById('gs-srv-monthly');  if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-monthly'] || 99;
+  el = document.getElementById('gs-srv-annual');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-annual']  || 990;
+}
+
+// ── Sauvegarder le frais de création global ───────────────────────────────────
+function _saveGlobalCreationFee(rawVal) {
+  const price = Math.max(0, parseInt(rawVal, 10) || 0);
+  _GLOBAL_CREATION_FEE = price;
+  if (_saasDb) _saasDb.ref('demoPage/pricing/creationFee').set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
+  showToast('💾 Frais de création : ' + price + ' €');
+}
+
+// ── Sauvegarder un prix de plan global ───────────────────────────────────────
+function _saveGlobalPlanPrice(key, rawVal) {
+  const price = Math.max(0, parseInt(rawVal, 10) || 0);
+  _GLOBAL_PLAN_PRICES[key] = price;
+  if (_saasDb) _saasDb.ref('demoPage/pricing/prices/' + key).set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
+  showToast('💾 Prix ' + key + ' : ' + price + ' €');
+}
+
+// ── Sauvegarder un prix de frais de création custom (conservé pour rétrocompatibilité) ──────────────────────────
 function _saveCreationFeePrice(key, rawVal) {
   const price = Math.max(0, parseInt(rawVal, 10) || 0);
   const d = _commandesCache[key];
@@ -2846,6 +2966,8 @@ function _getComboPrice(d, forfait, mode) {
   if (d.prices && d.prices[ck] != null) return d.prices[ck];
   // Compatibilité : si la combo active correspond au prix custom actuel
   if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'monthly') && d.price != null) return d.price;
+  // Prix publics depuis globalSettings (configurés dans Réglages)
+  if (_GLOBAL_PLAN_PRICES[ck] != null) return _GLOBAL_PLAN_PRICES[ck];
   return mode === 'annual' ? (_PRICE_ANNUAL[forfait] || 0) : (_PRICE_MONTHLY[forfait] || 0);
 }
 
@@ -2885,15 +3007,15 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
-  // Ligne frais de création éditables (paiement unique — séparé de l'abonnement)
+  // Ligne frais de création — montant fixé au moment du premier usage (non modifiable par client)
   var creationFeePrice = _getCreationFeePrice(d);
+  var creationFeeSet = d.prices && d.prices['creation'] != null;
   var creationFeeRow = '<div class="f4-creation-row">' +
-    '<div class="f4-creation-label">🏷 Frais de cr&#233;ation <span class="f4-creation-tag">paiement unique</span></div>' +
+    '<div class="f4-creation-label">🏷 Frais de cr&#233;ation <span class="f4-creation-tag">paiement unique</span>' +
+    (creationFeeSet ? '' : ' <span class="f4-creation-fixed-note">prix actuel (sera fixé au 1er usage)</span>') +
+    '</div>' +
     '<div class="f4-price-wrap">' +
-      '<input class="f4-price-inp" type="number" value="' + creationFeePrice + '" min="0" step="1"' +
-      ' onclick="event.stopPropagation()"' +
-      ' onchange="_saveCreationFeePrice(\'' + cmdKey + '\',this.value)"' +
-      ' onkeydown="if(event.key===\'Enter\'){event.stopPropagation();_saveCreationFeePrice(\'' + cmdKey + '\',this.value);this.blur();}">' +
+      '<input class="f4-price-inp" type="number" value="' + creationFeePrice + '" min="0" step="1" disabled>' +
       '<span class="f4-unit">&#8364;</span>' +
     '</div>' +
   '</div>';
@@ -3201,6 +3323,32 @@ function _toggleSuspend(key) {
     _rerenderCommandeCard(key);
     // Sync Firebase silencieux en arrière-plan
     _controlDb.ref('/commandes/' + key + '/suspendu').set(willSuspend)
+      .then(function() {
+        // Sync SaaS Firebase active/suspendu (suspension manuelle ET réactivation)
+        const ridSync = (d.emailData && d.emailData.rid) || (d.clientCree && d.clientCree.rid);
+        if (ridSync) {
+          if (willSuspend) {
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: false, suspendu: true });
+          } else {
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false });
+          }
+        }
+        if (!willSuspend) {
+          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+          if (emailAddr) {
+            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: emailAddr,
+                name: d.restaurant || '',
+                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                type: 'reactivation'
+              })
+            }).catch(function() {});
+          }
+        }
+      })
       .catch(function() {
         // Rollback si Firebase échoue (hors-ligne, règles, etc.)
         _commandesCache[key] = Object.assign({}, _commandesCache[key], { suspendu: !willSuspend });
@@ -3400,8 +3548,8 @@ function _markPaid(key) {
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
-        // Phase 3 → récurrent, base = nextReminderAt courant
-        const base = d.nextReminderAt || now;
+        // Phase 3 → récurrent. Si nextReminderAt est dans le passé (suspension longue), partir de now
+        const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
@@ -3422,10 +3570,23 @@ function _markPaid(key) {
             if (isCreationFee) subSync.creationFeePaid = true;
             _saasDb.ref('restaurants/' + rid + '/config/subscription').update(subSync);
           }
-          // Email de confirmation uniquement pour les abonnements (pas pour les frais de création)
-          if (!isCreationFee) {
-            const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
-            if (emailAddr) {
+          // Email de confirmation paiement — frais création ET abonnements
+          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
+          if (emailAddr) {
+            if (isCreationFee) {
+              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  rid: rid || '',
+                  email: emailAddr,
+                  name: d.restaurant || '',
+                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                  type: 'creation',
+                  nextDue: update.nextReminderAt
+                })
+              }).catch(function() {});
+            } else {
               fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
