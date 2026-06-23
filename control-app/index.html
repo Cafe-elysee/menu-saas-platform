@@ -4781,8 +4781,8 @@ async function onLangToggle(slug, lang, checkbox) {
       if (isDefault) roles.push('la langue affichée');
       if (isPrimary) roles.push('la langue admin');
       document.getElementById('modal-msg').innerHTML =
-        '<strong>'+(LANG_LABELS[lang]||lang)+'</strong> est actuellement '+roles.join(' et ')+'.<br>Choisissez une langue de remplacement :';
-      document.getElementById('modal-sel').innerHTML = remaining.map(l => '<option value="'+l+'">'+(LANG_LABELS[l]||l)+'</option>').join('');
+        '<strong>'+escapeHtml(LANG_LABELS[lang]||lang)+'</strong> est actuellement '+roles.join(' et ')+'.<br>Choisissez une langue de remplacement :';
+      document.getElementById('modal-sel').innerHTML = remaining.map(l => '<option value="'+escapeHtml(l)+'">'+(LANG_LABELS[l]||escapeHtml(l))+'</option>').join('');
       document.getElementById('lang-modal').classList.add('open');
       return;
     }

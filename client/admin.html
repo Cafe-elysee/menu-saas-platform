@@ -8171,8 +8171,9 @@ function renderTableURLs(n) {
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const base = location.href.replace(/admin\.html.*$/, 'index.html');
   const rows = [];
+  const _safeRID = encodeURIComponent(_RID);
   for (let i = 1; i <= n; i++) {
-    const url = base + '?rid=' + _RID + '&table=' + i;
+    const url = base + '?rid=' + _safeRID + '&table=' + i;
     rows.push(
       '<div class="table-url-row">' +
         '<div class="table-url-num">' + (t.tblLabel || 'Table') + ' ' + i + '</div>' +
