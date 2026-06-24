@@ -907,6 +907,8 @@
     html[data-menu-theme="genext"].light #nav::before {
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.04) 40%,rgba(200,164,78,0.08) 50%,rgba(200,164,78,0.04) 60%,transparent 100%);
     }
+    /* ── Pas de photo perso sur le hero : le bokeh suffit ── */
+    html[data-menu-theme="genext"] #hero-bg-img { display:none !important; }
     /* ── Cartes produit : glassmorphisme ── */
     html[data-menu-theme="genext"] .card {
       backdrop-filter:blur(18px) saturate(150%);
