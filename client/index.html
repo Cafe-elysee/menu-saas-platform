@@ -919,13 +919,22 @@
       border:1px solid rgba(200,164,78,0.25);
       box-shadow:0 2px 8px rgba(0,0,0,.30);
     }
-    /* ── FABs et bouton + ── */
+    /* ── Prix : position absolue extrémité droite (GeNext + Prestige) ── */
+    html[data-menu-theme="genext"] .c-price,
+    html[data-menu-theme^="prestige"] .c-price {
+      position:absolute; top:12px; right:12px;
+    }
+    html[data-menu-theme="genext"] .c-name-row,
+    html[data-menu-theme^="prestige"] .c-name-row {
+      padding-right:64px;
+    }
+    /* ── FABs circulaires + animation lightFlow ── */
     html[data-menu-theme="genext"] #call-fab,
     html[data-menu-theme="genext"] #cart-fab {
-      animation:none !important; background-size:auto;
-      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));
-      border-radius:10px;
-      box-shadow:0 4px 12px rgba(200,164,78,0.32), inset 0 1.5px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.18);
+      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk),var(--gold),var(--gold-lt));
+      background-size:250% 250%;
+      border-radius:50%;
+      box-shadow:0 4px 14px rgba(200,164,78,0.45), inset 0 1.5px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.18);
     }
     html[data-menu-theme="genext"] .card-qty-ctrl .card-add-btn {
       background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));
@@ -945,9 +954,10 @@
       background:rgba(200,164,78,0.10); border-color:var(--gold);
     }
     html[data-menu-theme="genext"] .cat-pill.on {
-      animation:none; background-size:auto; transform:none;
-      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));
-      border-color:transparent; color:#0c0a08; font-weight:700; opacity:1;
+      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk),var(--gold),var(--gold-lt));
+      background-size:250% 250%;
+      animation:lightFlow 5s ease infinite;
+      border-color:transparent; color:#0c0a08; font-weight:700; opacity:1; transform:none;
       box-shadow:0 4px 12px rgba(200,164,78,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
     }
     html[data-menu-theme="genext"] .cat-pill.on::after { content:none; }
