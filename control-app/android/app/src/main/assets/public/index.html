@@ -134,9 +134,12 @@
     @keyframes ctrlLogoIn { to { opacity:1; } }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
-    /* E-1 fix : halo doré pour faire ressortir le disque sombre du logo sur fond bokeh noir */
+    /* E-1 fix : halo doré pour faire ressortir le logo sur fond bokeh */
     #gn-ctrl-logo-dk {
       filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    #gn-ctrl-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
     }
 
     .login-box {
@@ -741,22 +744,30 @@
     }
     .hist-btn:hover { background:rgba(200,164,78,0.14); border-color:rgba(200,164,78,0.45) !important; }
     /* ── Modal historique paiements ── */
-    #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px; }
-    .hist-box { background:var(--bg1); border:1px solid var(--border); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.5); animation:ctrl-in 0.22s ease; }
+    #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(5,3,2,0.68); align-items:center; justify-content:center; padding:20px; }
+    html.light #hist-modal { background:rgba(195,182,162,0.52); }
+    .hist-box { background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg'); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
+    html.light .hist-box { background-image:linear-gradient(rgba(242,236,224,0.82),rgba(242,236,224,0.82)),url('assets/gn-bg-light.jpg'); border-color:rgba(200,164,78,0.40); }
     .hist-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:1.15rem; font-weight:600; color:var(--gold); letter-spacing:0.04em; margin-bottom:3px; }
-    .hist-sub { font-size:0.75rem; color:var(--muted); margin-bottom:16px; }
-    .hist-empty { font-size:0.8rem; color:var(--muted); text-align:center; padding:24px 0; }
-    .hist-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+    .hist-sub { font-size:0.75rem; color:rgba(244,234,208,0.65); margin-bottom:16px; }
+    html.light .hist-sub { color:rgba(26,18,8,0.62); }
+    .hist-empty { font-size:0.8rem; color:rgba(244,234,208,0.55); text-align:center; padding:24px 0; }
+    html.light .hist-empty { color:rgba(26,18,8,0.55); }
+    .hist-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid rgba(200,164,78,0.15); }
     .hist-item:last-child { border-bottom:none; }
     .hist-item-badge { font-size:1.05rem; flex-shrink:0; margin-top:1px; }
     .hist-item-body { flex:1; }
-    .hist-item-date { font-size:0.82rem; color:var(--text); font-weight:600; }
-    .hist-item-detail { font-size:0.71rem; color:var(--muted); margin-top:2px; }
-    .hist-next { margin-top:14px; padding:10px 12px; background:rgba(200,164,78,0.07); border:1px solid rgba(200,164,78,0.2); border-radius:10px; }
-    .hist-next-label { font-size:0.71rem; color:var(--muted); margin-bottom:3px; }
+    .hist-item-date { font-size:0.82rem; color:#f0e4c8; font-weight:600; }
+    html.light .hist-item-date { color:#1a1208; }
+    .hist-item-detail { font-size:0.71rem; color:rgba(244,234,208,0.62); margin-top:2px; }
+    html.light .hist-item-detail { color:rgba(26,18,8,0.60); }
+    .hist-next { margin-top:14px; padding:10px 12px; background:rgba(200,164,78,0.09); border:1px solid rgba(200,164,78,0.28); border-radius:10px; }
+    .hist-next-label { font-size:0.71rem; color:rgba(244,234,208,0.62); margin-bottom:3px; }
+    html.light .hist-next-label { color:rgba(26,18,8,0.60); }
     .hist-next-val { font-size:0.83rem; color:#c8a44e; font-weight:600; }
-    .hist-close-btn { width:100%; margin-top:16px; padding:10px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.85rem; cursor:pointer; transition:background 0.2s; }
-    .hist-close-btn:hover { background:var(--bg2); }
+    .hist-close-btn { width:100%; margin-top:16px; padding:10px; border-radius:12px; border:1px solid rgba(200,164,78,0.22); background:rgba(200,164,78,0.06); color:rgba(244,234,208,0.85); font-family:'Outfit',sans-serif; font-size:0.85rem; cursor:pointer; transition:background 0.2s; }
+    html.light .hist-close-btn { border-color:rgba(200,164,78,0.32); background:rgba(200,164,78,0.08); color:rgba(26,18,8,0.82); }
+    .hist-close-btn:hover { background:rgba(200,164,78,0.14); }
     .btn-creer-client {
       background: var(--gold-dim); color: var(--gold);
       border: 1px solid rgba(200,164,78,0.3) !important;
@@ -4572,6 +4583,15 @@ async function _saveContact(slug, type, val) {
       await _saasDb.ref('restaurants/'+slug+'/profile/contacts/'+type).set(val);
     } else {
       await _saasDb.ref('restaurants/'+slug+'/profile/contacts/'+type).remove();
+    }
+    // Sync email → Control DB pour que B2/B3/B4 utilisent toujours l'adresse actuelle de la carte client
+    if (type === 'email') {
+      var cmdKey = _findCommandeForClient(slug);
+      if (cmdKey) {
+        var emailSync = val || null;
+        await _controlDb.ref('/commandes/' + cmdKey).update({ email: emailSync });
+        await _controlDb.ref('/commandes/' + cmdKey + '/emailData/email').set(emailSync);
+      }
     }
     showToast('Contact enregistré ✅');
   } catch(e) {

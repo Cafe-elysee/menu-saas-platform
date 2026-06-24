@@ -4584,6 +4584,15 @@ async function _saveContact(slug, type, val) {
     } else {
       await _saasDb.ref('restaurants/'+slug+'/profile/contacts/'+type).remove();
     }
+    // Sync email → Control DB pour que B2/B3/B4 utilisent toujours l'adresse actuelle de la carte client
+    if (type === 'email') {
+      var cmdKey = _findCommandeForClient(slug);
+      if (cmdKey) {
+        var emailSync = val || null;
+        await _controlDb.ref('/commandes/' + cmdKey).update({ email: emailSync });
+        await _controlDb.ref('/commandes/' + cmdKey + '/emailData/email').set(emailSync);
+      }
+    }
     showToast('Contact enregistré ✅');
   } catch(e) {
     showToast('Erreur : ' + e.message);
