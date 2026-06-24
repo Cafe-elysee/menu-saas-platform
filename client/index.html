@@ -965,27 +965,34 @@
     html[data-menu-theme="genext"] .bdg {
       border-radius:20px; text-transform:uppercase; letter-spacing:0.09em; font-weight:600;
     }
-    /* ── Popups : bokeh + glassmorphisme ── */
+    /* ── Popups : overlay + bokeh embarqué dans les cartes ── */
     html[data-menu-theme="genext"] #overlay {
-      background:rgba(5,3,2,0.70);
+      background:rgba(5,3,2,0.62);
     }
+    html[data-menu-theme="genext"].light #overlay {
+      background:rgba(195,182,162,0.48);
+    }
+    /* ── Sheet (détail produit) ── */
     html[data-menu-theme="genext"] #sheet {
-      background:rgba(8,6,4,0.82);
-      border-top:1px solid rgba(200,164,78,0.38);
-      box-shadow:0 -4px 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(200,164,78,0.08);
+      background-image:linear-gradient(rgba(10,7,4,0.82),rgba(10,7,4,0.82)),url('assets/gn-bg-dark.jpg');
+      background-size:cover; background-position:center;
+      border-top:1px solid rgba(200,164,78,0.40);
+      box-shadow:0 -4px 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(200,164,78,0.10);
     }
     html[data-menu-theme="genext"].light #sheet {
-      background:rgba(232,226,214,0.85);
-      border-top:1px solid rgba(200,164,78,0.38);
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-size:cover; background-position:center;
+      border-top:1px solid rgba(200,164,78,0.40);
+      box-shadow:0 -4px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(200,164,78,0.18);
     }
     html[data-menu-theme="genext"] .sh-handle {
-      background:rgba(200,164,78,0.40);
+      background:rgba(200,164,78,0.45);
     }
     html[data-menu-theme="genext"] .sh-img-grad {
-      background:linear-gradient(to bottom,transparent,rgba(8,6,4,0.88));
+      background:linear-gradient(to bottom,transparent,rgba(10,7,4,0.90));
     }
     html[data-menu-theme="genext"].light .sh-img-grad {
-      background:linear-gradient(to bottom,transparent,rgba(232,226,214,0.92));
+      background:linear-gradient(to bottom,transparent,rgba(242,236,224,0.94));
     }
     html[data-menu-theme="genext"] .sh-price {
       background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk),var(--gold),var(--gold-lt));
@@ -996,39 +1003,46 @@
       box-shadow:0 2px 8px rgba(200,164,78,0.28), inset 0 1px 0 rgba(255,255,255,0.22);
     }
     html[data-menu-theme="genext"] .al-tag {
-      background:rgba(200,164,78,0.06);
-      border:1px solid rgba(200,164,78,0.22);
+      background:rgba(200,164,78,0.07);
+      border:1px solid rgba(200,164,78,0.24);
     }
     /* ── Modal appel serveur ── */
     html[data-menu-theme="genext"] #table-modal {
-      background:rgba(5,3,2,0.68);
+      background:rgba(5,3,2,0.62);
+    }
+    html[data-menu-theme="genext"].light #table-modal {
+      background:rgba(195,182,162,0.48);
     }
     html[data-menu-theme="genext"] .table-box {
-      background:rgba(8,6,4,0.88);
-      backdrop-filter:blur(20px) saturate(150%);
-      -webkit-backdrop-filter:blur(20px) saturate(150%);
-      border:1px solid rgba(200,164,78,0.35);
-      box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10);
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-size:cover; background-position:center;
+      border:1px solid rgba(200,164,78,0.38);
+      box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.12);
     }
     html[data-menu-theme="genext"].light .table-box {
-      background:rgba(240,237,230,0.88);
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-size:cover; background-position:center;
+      box-shadow:0 24px 64px rgba(0,0,0,0.12), 0 0 0 1px rgba(200,164,78,0.20);
     }
     html[data-menu-theme="genext"] .table-num-input {
-      background:rgba(200,164,78,0.05);
-      border-color:rgba(200,164,78,0.30);
+      background:rgba(200,164,78,0.06);
+      border-color:rgba(200,164,78,0.32);
     }
     /* ── Modal panier ── */
     html[data-menu-theme="genext"] #cart-modal {
-      background:rgba(5,3,2,0.68);
+      background:rgba(5,3,2,0.62);
+    }
+    html[data-menu-theme="genext"].light #cart-modal {
+      background:rgba(195,182,162,0.48);
     }
     html[data-menu-theme="genext"] #cart-box {
-      background:rgba(8,6,4,0.88);
-      backdrop-filter:blur(20px) saturate(150%);
-      -webkit-backdrop-filter:blur(20px) saturate(150%);
-      border-top:1px solid rgba(200,164,78,0.35);
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-size:cover; background-position:center;
+      border-top:1px solid rgba(200,164,78,0.38);
     }
     html[data-menu-theme="genext"].light #cart-box {
-      background:rgba(240,237,230,0.88);
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-size:cover; background-position:center;
     }
 
     /* ══ VARIANTES DYN-BENTO ══ */
