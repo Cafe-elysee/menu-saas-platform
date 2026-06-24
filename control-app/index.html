@@ -4589,8 +4589,10 @@ async function _saveContact(slug, type, val) {
       var cmdKey = _findCommandeForClient(slug);
       if (cmdKey) {
         var emailSync = val || null;
-        await _controlDb.ref('/commandes/' + cmdKey).update({ email: emailSync });
-        await _controlDb.ref('/commandes/' + cmdKey + '/emailData/email').set(emailSync);
+        await _controlDb.ref('/commandes/' + cmdKey).update({
+          email: emailSync,
+          'emailData/email': emailSync
+        });
       }
     }
     showToast('Contact enregistré ✅');
