@@ -6933,7 +6933,7 @@ let hiddenThemesData = {};
 function loadMenuTheme() {
   renderThemeSelector();
   _rref('menu/menuTheme').on('value', snap => {
-    const t = snap.val() || 'gold-noir';
+    const t = snap.val() || 'genext';
     if (t !== currentMenuTheme) {
       currentMenuTheme = t;
       renderThemeSelector();

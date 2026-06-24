@@ -13,7 +13,7 @@
         var _rid = _p.get('rid') || 'demo';
         var urlDark  = _p.get('demo_dark');
         var cached = localStorage.getItem(_rid + '_admin_data_v1');
-        var themeId = urlTheme || 'gold-noir';
+        var themeId = urlTheme || 'genext';
         if (!urlTheme && cached) { var d = JSON.parse(cached); if (d.menuTheme) themeId = d.menuTheme; }
         document.documentElement.dataset.menuTheme = themeId;
         var LIGHT_DEFAULTS = ['botanical','santorin'];
@@ -6058,14 +6058,14 @@ function _defaultThemeMode(vt) { return _LIGHT_DEFAULT_THEMES.includes(vt) ? 'li
 function _loadThemeMode(themeId) { return localStorage.getItem(_RID + '_theme_mode_' + themeId) || _defaultThemeMode(themeId); }
 function _saveThemeMode(themeId, mode) { localStorage.setItem(_PFX+'theme_mode_' + themeId, mode); }
 
-let _cachedVisualTheme = 'gold-noir';
+let _cachedVisualTheme = 'genext';
 try {
   const _cr = localStorage.getItem(_RID + '_admin_data_v1');
   if (_cr) { const _cc = JSON.parse(_cr); if (_cc.menuTheme) _cachedVisualTheme = _cc.menuTheme; }
 } catch(_) {}
 let theme = _loadThemeMode(_cachedVisualTheme);
 document.documentElement.classList.toggle('light', theme === 'light');
-let menuTheme   = 'gold-noir'; // thème visuel — contrôlé depuis l'admin via Firebase
+let menuTheme   = 'genext'; // thème visuel — contrôlé depuis l'admin via Firebase
 let menuStyle   = 'paper';     // style visuel d'affichage (paper | simple) — contrôlé via admin/Firebase
 let showCallBtn = true;        // contrôlé depuis l'admin (indépendant du style)
 let showPhotos  = true;        // contrôlé depuis l'admin (global)
