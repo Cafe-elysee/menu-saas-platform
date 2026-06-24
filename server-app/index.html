@@ -546,6 +546,13 @@
     html.light #gns-logo-dk { display:none !important; }
     html.light #gns-logo-lt { display:block !important; }
     #gns-logo-lt { display:none; }
+    /* E-1 fix : halo doré sur logos splash dark + light */
+    #gns-logo-dk {
+      filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    #gns-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
+    }
     /* ── Setup screen logo (remplace texte GeNext) ── */
     .gns-setup-logo-wrap {
       display:flex; flex-direction:column; align-items:center; margin-bottom:1.5rem;
@@ -557,6 +564,13 @@
     .gns-setup-logo-lt { display:none; }
     html.light .gns-setup-logo-dk { display:none !important; }
     html.light .gns-setup-logo-lt { display:block !important; }
+    /* E-1 fix : halo doré sur logos setup screen dark + light */
+    .gns-setup-logo-dk {
+      filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    .gns-setup-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
+    }
     html.light #setup-screen {
       background-image:url(assets/gn-bg-light.jpg) !important;
     }

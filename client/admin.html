@@ -100,6 +100,13 @@
     .gna-login-logo-lt { display:none; }
     html.light .gna-login-logo-dk { display:none !important; }
     html.light .gna-login-logo-lt { display:block !important; }
+    /* E-1 fix : halo doré sur logos login dark + light */
+    .gna-login-logo-dk {
+      filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    .gna-login-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
+    }
     .gna-login-subtitle {
       font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:600;
       color:var(--gold); letter-spacing:0.28em; text-transform:uppercase;
@@ -204,6 +211,13 @@
     #gna-logo-lt { display:none; }
     html.light #gna-logo-dk { display:none !important; }
     html.light #gna-logo-lt { display:block !important; }
+    /* E-1 fix : halo doré sur logos splash dark + light */
+    #gna-logo-dk {
+      filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    #gna-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
+    }
     /* ── First-login popups (defaultLang + primaryLang) ── */
     .fl-popup-overlay {
       position:fixed;inset:0;z-index:100000;

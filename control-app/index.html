@@ -134,9 +134,12 @@
     @keyframes ctrlLogoIn { to { opacity:1; } }
     html.light #gn-ctrl-logo-dk { display:none !important; }
     html.light #gn-ctrl-logo-lt { display:block !important; }
-    /* E-1 fix : halo doré pour faire ressortir le disque sombre du logo sur fond bokeh noir */
+    /* E-1 fix : halo doré pour faire ressortir le logo sur fond bokeh */
     #gn-ctrl-logo-dk {
       filter: drop-shadow(0 0 18px rgba(200,164,78,0.45)) drop-shadow(0 0 5px rgba(200,164,78,0.3));
+    }
+    #gn-ctrl-logo-lt {
+      filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
     }
 
     .login-box {
