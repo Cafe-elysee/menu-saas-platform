@@ -831,26 +831,26 @@
     /* ══ GENEXT — Design GeNext menu (bokeh + glassmorphisme) ══ */
     html[data-menu-theme="genext"] {
       --bg:#0a0908; --bg2:#0c0a08;
-      --bg-card:rgba(20,15,8,.72);
+      --bg-card:rgba(10,7,4,.16);
       --bg-nav:rgba(8,6,4,0.88);
       --gold:#c8a44e; --gold-lt:#e2c278; --gold-dk:#9a7a35; --cream:#f0ead8;
       --muted:rgba(240,234,216,0.70);
       --border:rgba(200,164,78,0.28);
       --border2:rgba(200,164,78,0.50);
-      --shadow:0 2px 24px -8px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+      --shadow:0 4px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.07);
       --shadow-h:0 8px 28px rgba(200,164,78,0.25), 0 4px 20px rgba(0,0,0,.5);
       --badge-new:var(--gold); --badge-pop:#e8854a; --badge-veg:#7ebd6a;
       --r-pill:10px;
     }
     html[data-menu-theme="genext"].light {
       --bg:#e8e2d6; --bg2:#f0ede8;
-      --bg-card:rgba(255,255,255,.55);
+      --bg-card:rgba(255,255,255,.22);
       --bg-nav:rgba(245,242,237,0.90);
       --gold:#c8a44e; --gold-lt:#e2c278; --gold-dk:#9a7a35; --cream:#0d0804;
       --muted:rgba(36,27,12,0.70);
       --border:rgba(200,164,78,0.28);
       --border2:rgba(140,110,45,.45);
-      --shadow:0 2px 24px -8px rgba(0,0,0,.09), inset 0 1px 0 rgba(255,255,255,.85);
+      --shadow:0 4px 24px rgba(0,0,0,.07), inset 0 1px 0 rgba(255,255,255,.80);
       --shadow-h:0 8px 28px rgba(200,164,78,0.15), 0 4px 14px rgba(0,0,0,.12);
     }
     /* ── Corps : bokeh pur sans overlay ── */
@@ -909,16 +909,13 @@
     }
     /* ── Cartes produit : glassmorphisme ── */
     html[data-menu-theme="genext"] .card {
-      backdrop-filter:blur(12px) saturate(130%);
-      -webkit-backdrop-filter:blur(12px) saturate(130%);
+      backdrop-filter:blur(18px) saturate(150%);
+      -webkit-backdrop-filter:blur(18px) saturate(150%);
     }
-    html[data-menu-theme="genext"] .card-editorial .edt-thumb { width:110px; }
-    /* ── Prix inline or 3D ── */
-    html[data-menu-theme="genext"] .edt-price {
-      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));
-      color:#0c0a08; font-weight:700;
-      padding:2px 8px; border-radius:8px;
-      box-shadow:0 2px 8px rgba(200,164,78,0.28), inset 0 1px 0 rgba(255,255,255,0.22);
+    /* ── Photo 88×88 : bordure gold subtile ── */
+    html[data-menu-theme="genext"] .c-img-w {
+      border:1px solid rgba(200,164,78,0.25);
+      box-shadow:0 2px 8px rgba(0,0,0,.30);
     }
     /* ── FABs et bouton + ── */
     html[data-menu-theme="genext"] #call-fab,
@@ -2065,19 +2062,13 @@
     /* Badges uppercase */
     html[data-menu-theme^="editorial"] .bdg { text-transform:uppercase; font-size:0.65rem; letter-spacing:0.07em; }
     /* Bouton + éditorial : squircle or semi-transparent collé au coin bas-droit */
-    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl,
-    html[data-menu-theme="genext"] .card-editorial .card-qty-ctrl { bottom:0; right:0; padding:0; width:44px; height:44px; background:color-mix(in srgb, var(--gold) 35%, transparent); border:none; border-radius:16px; box-shadow:none; }
-    html[data-menu-theme^="editorial"] .card-editorial .card-add-btn,
-    html[data-menu-theme="genext"] .card-editorial .card-add-btn { width:44px; height:44px; background:transparent; color:#0c0a08; font-size:1.4rem; border-radius:16px; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl { bottom:0; right:0; padding:0; width:44px; height:44px; background:color-mix(in srgb, var(--gold) 35%, transparent); border:none; border-radius:16px; box-shadow:none; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-add-btn { width:44px; height:44px; background:transparent; color:#0c0a08; font-size:1.4rem; border-radius:16px; }
     /* has-qty : pill sombre [− num] à gauche + squircle qui dépasse en hauteur */
-    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty,
-    html[data-menu-theme="genext"] .card-editorial .card-qty-ctrl.has-qty { width:auto; height:auto; padding:0; background:transparent; border:none; border-radius:0; box-shadow:none; bottom:0; right:0; gap:0; align-items:center; }
-    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-qty-minus,
-    html[data-menu-theme="genext"] .card-editorial .card-qty-ctrl.has-qty .card-qty-minus { display:flex; width:36px; height:36px; background:color-mix(in srgb, var(--gold) 35%, transparent); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-right:none; border-radius:18px 0 0 18px; color:var(--gold); font-size:1rem; }
-    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-qty-num,
-    html[data-menu-theme="genext"] .card-editorial .card-qty-ctrl.has-qty .card-qty-num { display:flex; align-items:center; justify-content:center; width:28px; height:36px; background:color-mix(in srgb, var(--gold) 35%, transparent); border-top:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-bottom:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-right:1px solid color-mix(in srgb, var(--gold) 45%, transparent); padding:0; }
-    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-add-btn,
-    html[data-menu-theme="genext"] .card-editorial .card-qty-ctrl.has-qty .card-add-btn { width:44px; height:44px; background:color-mix(in srgb, var(--gold) 35%, transparent); color:#0c0a08; font-size:1.4rem; border-radius:16px; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty { width:auto; height:auto; padding:0; background:transparent; border:none; border-radius:0; box-shadow:none; bottom:0; right:0; gap:0; align-items:center; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-qty-minus { display:flex; width:36px; height:36px; background:color-mix(in srgb, var(--gold) 35%, transparent); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-right:none; border-radius:18px 0 0 18px; color:var(--gold); font-size:1rem; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-qty-num { display:flex; align-items:center; justify-content:center; width:28px; height:36px; background:color-mix(in srgb, var(--gold) 35%, transparent); border-top:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-bottom:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-right:1px solid color-mix(in srgb, var(--gold) 45%, transparent); padding:0; }
+    html[data-menu-theme^="editorial"] .card-editorial .card-qty-ctrl.has-qty .card-add-btn { width:44px; height:44px; background:color-mix(in srgb, var(--gold) 35%, transparent); color:#0c0a08; font-size:1.4rem; border-radius:16px; }
     /* Espace pour le squircle en mode commande */
     body.option-commande-active[data-style="simple"] .card-editorial .edt-body { padding-bottom:50px; }
 
@@ -9002,7 +8993,7 @@ function createCard(item, idx) {
     case 'carte-ardoise':   card = _cardArdoise(item);    break;
     case 'carte-maroc':     card = _cardMaroc(item);      break;
     case 'editorial':       card = _cardEditorial(item);  break;
-    case 'genext':          card = _cardEditorial(item);  break;
+    case 'genext':          card = _cardPrestige(item);   break;
     default:                card = _cardCinema(item);     break;
   }
   // Contrôle quantité (− qty +) pour Mode Commande
