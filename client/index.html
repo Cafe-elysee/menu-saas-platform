@@ -909,10 +909,10 @@
     }
     /* ── Pas de photo perso sur le hero : le bokeh suffit ── */
     html[data-menu-theme="genext"] #hero-bg-img { display:none !important; }
-    /* ── Cartes produit : glassmorphisme ── */
+    /* ── Cartes produit : léger flou seulement, pas de saturation ── */
     html[data-menu-theme="genext"] .card {
-      backdrop-filter:blur(18px) saturate(150%);
-      -webkit-backdrop-filter:blur(18px) saturate(150%);
+      backdrop-filter:blur(4px);
+      -webkit-backdrop-filter:blur(4px);
     }
     /* ── Photo 88×88 : bordure gold subtile ── */
     html[data-menu-theme="genext"] .c-img-w {
