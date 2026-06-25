@@ -2155,7 +2155,7 @@ const CLIENTS = []; // Chargé dynamiquement depuis Firebase SaaS
 let _clientsLoaded = false; // true après le 1er retour Firebase (même si vide)
 function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', ar:'العربية' };
+const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', es:'Español' };
 const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
 const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande:'🛒 Commande' };
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
@@ -2567,7 +2567,7 @@ function loadClientsFromFirebase() {
       name:     (r.profile && r.profile.name)     || slug,
       slug,
       url:      SAAS_URL,
-      langs:    (r.profile && r.profile.langs)    || ['fr','en','el','de','ar'],
+      langs:    (r.profile && r.profile.langs)    || ['fr','en','el','de','es'],
       noEvents: !!(r.profile && r.profile.noEvents),
       demoPage: !!(r.profile && r.profile.demoPage)
     }));
@@ -2685,7 +2685,7 @@ function buildDeliverySubject(rest, forfait, lang) {
     fr: '🎉 Votre espace GeNext est prêt — ' + rest,
     en: '🎉 Your GeNext space is ready — ' + rest,
     el: '🎉 Ο χώρος GeNext σας είναι έτοιμος — ' + rest,
-    ar: '🎉 مساحتكم على GeNext جاهزة — ' + rest,
+    es: '🎉 Su espacio GeNext está listo — ' + rest,
     de: '🎉 Ihr GeNext Bereich ist bereit — ' + rest
   };
   return s[lang] || s.fr;
@@ -2696,7 +2696,7 @@ function _paySection(lang) {
     fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements (mensuel ou annuel), la même procédure s\'applique.',
     en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming payments (monthly or annual), the same procedure applies.',
     el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες πληρωμές (μηνιαίες ή ετήσιες), εφαρμόζεται η ίδια διαδικασία.',
-    ar: '\n\n— فترة التجربة والدفع —\n⏰ تتمتعون بأسبوع تجريبي كامل يبدأ من أول تسجيل دخول لمساحتكم — وليس من تاريخ استلام هذه الرسالة. خذوا وقتكم لاكتشاف كل شيء قبل الدفع.\n\nيجب إتمام الدفع خلال هذه الفترة:\n\n💳 التحويل البنكي: يجب استلام التحويل خلال الأسبوع، أو أرسلوا لنا إثبات التحويل عبر واتساب / فايبر / بريد إلكتروني قبل نهاية الأسبوع.\n\n💵 نقداً: أرسلوا لنا موقعكم الجغرافي ومعرّفكم (أعلاه) عبر واتساب / فايبر / بريد إلكتروني لتحديد موعد خلال الأسبوع.\n\n📅 للدفعات القادمة (الشهرية أو السنوية)، تطبّق نفس الإجراءات.',
+    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos (mensual o anual), se aplica el mismo procedimiento.',
     de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige Zahlungen (monatlich oder jährlich) gilt dasselbe Verfahren.'
   };
   return s[lang] || s.fr;
@@ -2712,7 +2712,7 @@ function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
     fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n💶 Frais de création : ' + _cf + '€ (à régler dans les 7 premiers jours après votre 1ère connexion)\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
     en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n💶 Creation fee: ' + _cf + '€ (to pay within 7 days of your first login)\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
     el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n💶 Τέλη δημιουργίας: ' + _cf + '€ (να καταβληθούν εντός 7 ημερών από την 1η σύνδεση)\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    ar: 'مرحباً ' + rest + '! 🎉\n\nمساحتكم على GeNext جاهزة.\n\n📋 الخطة: ' + forfait + '\n💶 رسوم الإنشاء: ' + _cf + '€ (للدفع خلال 7 أيام من أول تسجيل دخول)\n\n— لوحة الإدارة —\n🔗 رابط الدخول: ' + adminUrl + '\n🆔 المعرّف: ' + rid + '\n🔑 كلمة المرور: ' + pwd + '\n\nتوجهوا إلى هذا الرابط وأدخلوا بياناتكم للوصول إلى الإدارة.\n\n— قائمتكم الإلكترونية —\n🍽️ رابط القائمة: ' + menuUrl + '\n\nشاركوا هذا الرابط أو اعرضوا رمز QR على الطاولات — يستطيع عملاؤكم تصفح القائمة من هواتفهم مباشرة.' + (isCS ? '\n\nمع خطة الطلبات والخدمات، يمكن للعملاء أيضاً تقديم الطلبات واستدعاء النادل من هواتفهم.\n\n— تطبيق النادل —\n📱 شاركوا هذا الرابط مع نادليكم ليتمكنوا من تحميل التطبيق وتثبيته على هواتف Android الخاصة بهم:\n' + apkUrl + '\n\n⚠️ التطبيق متاح حالياً على Android فقط. نسخة iOS قيد التطوير وستكون متاحة قريباً.' : '') + '\n\nمع التحية،\nفريق GeNext',
+    es: '¡Hola ' + rest + '! 🎉\n\nSu espacio GeNext está listo.\n\n📋 Plan: ' + forfait + '\n💶 Tarifa de creación: ' + _cf + '€ (a pagar en los 7 primeros días tras su 1ª conexión)\n\n— Panel de administración —\n🔗 Enlace de acceso: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Contraseña: ' + pwd + '\n\nVaya a este enlace e inicie sesión para gestionar su restaurante.\n\n— Su menú online —\n🍽️ Enlace del menú: ' + menuUrl + '\n\nComparta este enlace o muestre su código QR en las mesas — sus clientes pueden consultar el menú directamente desde su teléfono.' + (isCS ? '\n\nCon el plan Pedidos y Servicios, sus clientes también pueden realizar pedidos y llamar al camarero desde su teléfono.\n\n— App de camareros —\n📱 Comparta este enlace con sus camareros para que descarguen e instalen la app en su teléfono Android:\n' + apkUrl + '\n\n⚠️ La app está actualmente disponible solo en Android. La versión iOS está en desarrollo y estará disponible pronto.' : '') + '\n\nAtentamente,\nEl equipo GeNext',
     de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n💶 Einrichtungsgebühr: ' + _cf + '€ (innerhalb von 7 Tagen nach Ihrer 1. Anmeldung zu bezahlen)\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   const _base = m[lang] || m.fr;
@@ -3223,7 +3223,7 @@ function buildCommandeCard(key, d) {
   const statut_val   = d.statut || 'nouveau';
   const statusLabel  = { nouveau:'Nouveau', en_cours:'En cours', traite:'Traité' }[statut_val] || statut_val;
   const forfaitLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-  const langLabels   = { fr:'Français', en:'English', el:'Ελληνικά', ar:'العربية', de:'Deutsch' };
+  const langLabels   = { fr:'Français', en:'English', el:'Ελληνικά', es:'Español', de:'Deutsch' };
   const langLabel    = langLabels[d.langue] || d.langue || '—';
   const restaurant   = d.restaurant || '—';
   const langue       = d.langue || 'fr';
@@ -3882,7 +3882,7 @@ async function restoreClient(slug, d) {
     var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     await _saasDb.ref('restaurants/'+rid).set({
-      profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','ar'] }, _restoreContacts),
+      profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] }, _restoreContacts),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -3937,7 +3937,7 @@ function _buildReminderSubject(rest, lang) {
     fr: '⚠️ Rappel de paiement GeNext — ' + rest,
     en: '⚠️ GeNext payment reminder — ' + rest,
     el: '⚠️ Υπενθύμιση πληρωμής GeNext — ' + rest,
-    ar: '⚠️ تذكير بالدفع GeNext — ' + rest,
+    es: '⚠️ Recordatorio de pago GeNext — ' + rest,
     de: '⚠️ Zahlungserinnerung GeNext — ' + rest
   };
   return s[lang] || s.fr;
@@ -3950,14 +3950,14 @@ function _buildPaymentReminderMsg(d, restaurant, lang) {
     fr: isAnnual ? 'annuel' : 'mensuel',
     en: isAnnual ? 'annual' : 'monthly',
     el: isAnnual ? 'ετήσια' : 'μηνιαία',
-    ar: isAnnual ? 'سنوي' : 'شهري',
+    es: isAnnual ? 'Anual' : 'Mensual',
     de: isAnnual ? 'jährlich' : 'monatlich'
   };
   const unitLabels = {
     fr: isAnnual ? 'an' : 'mois',
     en: isAnnual ? 'year' : 'month',
     el: isAnnual ? 'έτος' : 'μήνα',
-    ar: isAnnual ? 'سنة' : 'شهر',
+    es: isAnnual ? 'año' : 'mes',
     de: isAnnual ? 'Jahr' : 'Monat'
   };
   const priceStr = price + ' €/' + (unitLabels[lang] || unitLabels.fr);
@@ -3966,7 +3966,7 @@ function _buildPaymentReminderMsg(d, restaurant, lang) {
     fr: 'Bonjour ' + restaurant + ',\n\nVotre abonnement GeNext (' + mode + ' — ' + priceStr + ') arrive à échéance.\n\nMerci de régulariser dans les 7 jours pour maintenir l\'accès à votre service.\n\n💳 Par virement bancaire : effectuez le virement de ' + priceStr + ' et envoyez-nous la preuve par WhatsApp / Viber / email.\n\n💵 En espèces : envoyez votre localisation par WhatsApp / Viber / email pour convenir d\'un rendez-vous dans la semaine.\n\nCordialement,\nL\'équipe GeNext',
     en: 'Hello ' + restaurant + ',\n\nYour GeNext subscription (' + mode + ' — ' + priceStr + ') is due for renewal.\n\nPlease settle within 7 days to keep your service running.\n\n💳 Bank transfer: send ' + priceStr + ' and share proof of payment via WhatsApp / Viber / email.\n\n💵 Cash: send your location via WhatsApp / Viber / email to arrange a meeting within the week.\n\nBest regards,\nThe GeNext team',
     el: 'Γεια σας ' + restaurant + ',\n\nΗ συνδρομή σας GeNext (' + mode + ' — ' + priceStr + ') λήγει σύντομα.\n\nΠαρακαλούμε τακτοποιήστε εντός 7 ημερών για να διατηρήσετε την πρόσβαση στην υπηρεσία σας.\n\n💳 Τραπεζικό έμβασμα: στείλτε το ποσό ' + priceStr + ' και αποδείξτε την πληρωμή μέσω WhatsApp / Viber / email.\n\n💵 Μετρητά: στείλτε την τοποθεσία σας μέσω WhatsApp / Viber / email για ραντεβού εντός της εβδομάδας.\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    ar: 'مرحباً ' + restaurant + ',\n\nاشتراككم في GeNext (' + mode + ' — ' + priceStr + ') على وشك الانتهاء.\n\nيرجى التسوية خلال 7 أيام للحفاظ على الوصول إلى خدمتكم.\n\n💳 التحويل البنكي: حوّلوا ' + priceStr + ' وأرسلوا إثبات الدفع عبر واتساب / فايبر / بريد إلكتروني.\n\n💵 نقداً: أرسلوا موقعكم عبر واتساب / فايبر / بريد إلكتروني لتحديد موعد خلال الأسبوع.\n\nمع التحية،\nفريق GeNext',
+    es: '¡Hola ' + restaurant + ',\n\nSu suscripción GeNext (' + mode + ' — ' + priceStr + ') está próxima a vencer.\n\nPor favor, regularice el pago en 7 días para mantener el acceso a su espacio.\n\nContacte con nosotros por WhatsApp / Viber / email para cualquier pregunta.\n\nAtentamente,\nEl equipo GeNext',
     de: 'Hallo ' + restaurant + ',\n\nIhr GeNext Abonnement (' + mode + ' — ' + priceStr + ') ist zur Verlängerung fällig.\n\nBitte begleichen Sie innerhalb von 7 Tagen, um Ihren Dienst aufrechtzuerhalten.\n\n💳 Banküberweisung: überweisen Sie ' + priceStr + ' und teilen Sie den Zahlungsnachweis per WhatsApp / Viber / E-Mail mit.\n\n💵 Bar: Senden Sie Ihren Standort per WhatsApp / Viber / E-Mail für einen Termin innerhalb der Woche.\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   return m[lang] || m.fr;
@@ -4100,7 +4100,7 @@ function buildContactSubject(rest, forfait, lang) {
     fr: 'Votre commande GeNext — ' + forfait,
     en: 'Your GeNext order — ' + forfait,
     el: 'Η παραγγελία σας GeNext — ' + forfait,
-    ar: 'طلبكم GeNext — ' + forfait,
+    es: 'Su solicitud GeNext — ' + forfait,
     de: 'Ihre GeNext Bestellung — ' + forfait
   };
   return s[lang] || s.fr;
@@ -4111,7 +4111,7 @@ function buildContactMsg(rest, forfait, lang) {
     fr: 'Bonjour ' + rest + ' ! 👋\n\nNous avons bien reçu votre commande pour le forfait « ' + forfait + ' ».\n\nNous vous contacterons très prochainement pour démarrer la création de votre espace GeNext.\n\nCordialement,\nL\'équipe GeNext',
     en: 'Hello ' + rest + '! 👋\n\nWe have received your order for the « ' + forfait + ' » plan.\n\nWe will contact you very soon to start setting up your GeNext space.\n\nBest regards,\nThe GeNext team',
     el: 'Γεια σας ' + rest + '! 👋\n\nΛάβαμε την παραγγελία σας για το πακέτο « ' + forfait + ' ».\n\nΘα επικοινωνήσουμε μαζί σας πολύ σύντομα.\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    ar: 'مرحباً ' + rest + '! 👋\n\nلقد استلمنا طلبكم للاشتراك في خطة « ' + forfait + ' ».\n\nسنتواصل معكم قريبًا لبدء إنشاء مساحتكم على GeNext.\n\nمع التحية،\nفريق GeNext',
+    es: '¡Hola ' + rest + '! 👋\n\nHemos recibido su solicitud de suscripción al plan « ' + forfait + ' ».\n\nNos pondremos en contacto con usted pronto para iniciar la creación de su espacio GeNext.\n\nAtentamente,\nEl equipo GeNext',
     de: 'Hallo ' + rest + '! 👋\n\nWir haben Ihre Bestellung für das Paket « ' + forfait + ' » erhalten.\n\nWir werden uns sehr bald bei Ihnen melden.\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   return m[lang] || m.fr;
@@ -4139,7 +4139,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).set({
-      profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
+      profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
       config: {
         adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
@@ -4196,7 +4196,7 @@ function recreerClientDepuisCommande(btnEl) {
         const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).set({
-          profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','ar'] }, _profContactsR),
+          profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),
           config: {
             adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
             features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },

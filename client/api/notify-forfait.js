@@ -19,14 +19,14 @@ const PAY_METHODS_F = {
   en: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (add your ID in the details) · 💵 Cash (Athens) · Send proof of payment by email, WhatsApp or Viber with your ID.',
   el: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (αναφέρετε το ID σας στις λεπτομέρειες) · 💵 Μετρητά (Αθήνα) · Αποστολή απόδειξης πληρωμής μέσω email, WhatsApp ή Viber με το ID σας.',
   de: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (ID in den Details angeben) · 💵 Barzahlung (Athen) · Zahlungsnachweis per E-Mail, WhatsApp oder Viber mit Ihrer ID senden.',
-  ar: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (اذكر ID في التفاصيل) · 💵 نقداً (أثينا) · أرسل إيصال الدفع عبر البريد أو WhatsApp أو Viber مع ID.'
+  es: '💳 Revolut: <a href="' + 'https://revolut.me/malekhkk7' + '" style="color:#c8a44e">revolut.me/malekhkk7</a> (indica tu ID en los detalles) · 💵 Efectivo (Atenas) · Envía el comprobante por email, WhatsApp o Viber con tu ID.'
 };
 const WEEK_PAYMENT_F = {
   fr: 'Vous avez <strong>7 jours</strong> pour effectuer votre paiement.',
   en: 'You have <strong>7 days</strong> to complete your payment.',
   el: 'Έχετε <strong>7 ημέρες</strong> για να ολοκληρώσετε την πληρωμή σας.',
   de: 'Sie haben <strong>7 Tage</strong> Zeit, Ihre Zahlung zu leisten.',
-  ar: 'لديك <strong>7 أيام</strong> لإتمام الدفع.'
+  es: 'Tiene <strong>7 días</strong> para completar su pago.'
 };
 
 function escHtml(s) {
@@ -154,21 +154,21 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
     en: { mq: 'Menu QR', cs: 'Orders &amp; Services',    monthly: 'monthly',   annual: 'annual'     },
     el: { mq: 'Menu QR', cs: 'Παραγγελίες &amp; Υπηρεσίες', monthly: 'μηνιαίο', annual: 'ετήσιο'  },
     de: { mq: 'Menu QR', cs: 'Bestellungen &amp; Services',  monthly: 'monatlich', annual: 'jährlich' },
-    ar: { mq: 'Menu QR', cs: 'الطلبات والخدمات',         monthly: 'شهري',      annual: 'سنوي'       }
+    es: { mq: 'Menu QR', cs: 'Pedidos &amp; Servicios',   monthly: 'Mensual',   annual: 'Anual'      }
   }[lang] || { mq: 'Menu QR', cs: 'Commandes &amp; Services', monthly: 'mensuel', annual: 'annuel' };
 
   const newLabel  = isCS ? forfaitLabel.cs : forfaitLabel.mq;
   const modeLabel = paymentMode === 'annual' ? forfaitLabel.annual : forfaitLabel.monthly;
   const priceMap  = paymentMode === 'annual' ? priceObj.annual : priceObj.monthly;
   const price     = priceMap[newForfait] || priceMap['menu-qr'];
-  const isRTL     = lang === 'ar';
+  const isRTL     = false;
 
   const subjects = {
     fr: isUpgrade ? `🚀 Votre forfait a été mis à niveau — ${isCS ? 'Commandes & Services' : 'Menu QR'}` : `ℹ️ Votre forfait a changé — ${isCS ? 'Commandes & Services' : 'Menu QR'}`,
     en: isUpgrade ? `🚀 Your plan has been upgraded — ${isCS ? 'Orders & Services' : 'Menu QR'}` : `ℹ️ Your plan has changed — ${isCS ? 'Orders & Services' : 'Menu QR'}`,
     el: isUpgrade ? `🚀 Η συνδρομή σας αναβαθμίστηκε` : `ℹ️ Η συνδρομή σας άλλαξε`,
     de: isUpgrade ? `🚀 Ihr Plan wurde aktualisiert` : `ℹ️ Ihr Plan hat sich geändert`,
-    ar: isUpgrade ? `🚀 تمت ترقية خطتك` : `ℹ️ تغيّرت خطتك`
+    es: isUpgrade ? `🚀 Su plan ha sido actualizado` : `ℹ️ Su plan ha cambiado`
   };
 
   const T = {
@@ -202,12 +202,12 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
       features: isCS ? `Ihre neuen Funktionen: Online-Bestellungen, Anrufschaltfläche, Tischsystem und QR-Bestellung.` : `Ihr digitales Menü bleibt aktiv. Bestell- und Anruffunktionen wurden deaktiviert.`,
       closing: `Das GeNext Team`
     },
-    ar: {
-      greeting: `مرحباً ${safeName} 👋`,
-      intro: isUpgrade ? `تمت ترقية خطتك إلى <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `تغيّرت خطتك إلى <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
+    es: {
+      greeting: `¡Hola ${safeName} 👋`,
+      intro: isUpgrade ? `Su plan ha sido actualizado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Su plan ha cambiado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
       payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
-      features: isCS ? `مميزاتك الجديدة: الطلب عبر الإنترنت، زر الاستدعاء، نظام الطاولات وطلب QR.` : `قائمتك الرقمية تبقى نشطة. تم تعطيل ميزات الطلب والاستدعاء.`,
-      closing: `فريق GeNext`
+      features: isCS ? `Sus nuevas funciones: pedidos en línea, botón de llamada, sistema de mesas y pedido QR.` : `Su menú digital sigue activo. Las funciones de pedido y llamada han sido desactivadas.`,
+      closing: `El equipo GeNext`
     }
   };
 
@@ -249,7 +249,7 @@ function buildPendingEmail(lang, name, newForfait, paymentMode, priceObj = PRICE
   const safeName = escHtml(name);
   const priceMap = paymentMode === 'annual' ? priceObj.annual : priceObj.monthly;
   const price    = priceMap[newForfait];
-  const isRTL    = lang === 'ar';
+  const isRTL    = false;
 
   const T = {
     fr: {
@@ -276,11 +276,11 @@ function buildPendingEmail(lang, name, newForfait, paymentMode, priceObj = PRICE
       body: `Ihre Anfrage zur Planänderung auf <strong>${isCS ? 'Bestellungen &amp; Services' : 'Menu QR'}</strong> (${price}€) wurde erfasst. Sie wird automatisch am Ende Ihres aktuellen Zeitraums angewendet.`,
       closing: `Das GeNext Team`
     },
-    ar: {
-      subject: `📅 تغيير الخطة المجدول — GeNext`,
-      greeting: `مرحباً ${safeName} 👋`,
-      body: `تم تسجيل طلبك لتغيير خطتك إلى <strong>${isCS ? 'الطلبات والخدمات' : 'Menu QR'}</strong> (${price}€). سيتم تطبيقه تلقائياً في نهاية فترتك الحالية.`,
-      closing: `فريق GeNext`
+    es: {
+      subject: `📅 Cambio de plan programado — GeNext`,
+      greeting: `¡Hola ${safeName} 👋`,
+      body: `Su solicitud de cambio de plan a <strong>${isCS ? 'Pedidos &amp; Servicios' : 'Menu QR'}</strong> (${price}€) ha sido registrada. Se aplicará automáticamente al final de su período actual.`,
+      closing: `El equipo GeNext`
     }
   };
   const t     = T[lang] || T.fr;
@@ -316,7 +316,7 @@ function buildPaymentModeEmail(lang, name, newMode, forfait, priceObj = PRICE) {
   const safeName = escHtml(name);
   const priceMap = newMode === 'annual' ? priceObj.annual : priceObj.monthly;
   const price    = priceMap[forfait] || priceMap['menu-qr'];
-  const isRTL    = lang === 'ar';
+  const isRTL    = false;
 
   const T = {
     fr: {
@@ -351,13 +351,13 @@ function buildPaymentModeEmail(lang, name, newMode, forfait, priceObj = PRICE) {
         : `Ihr Abonnement wird nun <strong>monatlich</strong> abgerechnet (${price}€/Monat).`,
       closing: `Das GeNext Team`
     },
-    ar: {
-      subject: `💳 تم تحديث وضع الدفع — GeNext`,
-      greeting: `مرحباً ${safeName} 👋`,
+    es: {
+      subject: `💳 Modo de pago actualizado — GeNext`,
+      greeting: `¡Hola ${safeName} 👋`,
       body: newMode === 'annual'
-        ? `يتم الآن فوترة اشتراكك <strong>سنوياً</strong> (${price}€/سنة).`
-        : `يتم الآن فوترة اشتراكك <strong>شهرياً</strong> (${price}€/شهر).`,
-      closing: `فريق GeNext`
+        ? `Su suscripción se factura ahora <strong>anualmente</strong> (${price}€/año).`
+        : `Su suscripción se factura ahora <strong>mensualmente</strong> (${price}€/mes).`,
+      closing: `El equipo GeNext`
     }
   };
   const t     = T[lang] || T.fr;
@@ -401,7 +401,7 @@ module.exports = async function handler(req, res) {
   const VALID_FORFAITS = ['menu-qr', 'commandes-services'];
   if (!VALID_FORFAITS.includes(newForfait)) return res.status(400).json({ error: 'Invalid newForfait' });
 
-  const safeLang  = ['fr','en','el','de','ar'].includes(lang) ? lang : 'fr';
+  const safeLang  = ['fr','en','el','de','es'].includes(lang) ? lang : 'fr';
   const safeMode  = paymentMode === 'annual' ? 'annual' : 'monthly';
   const isPending = pending === true || pending === 'true';
   const isUpgrade = newForfait === 'commandes-services' && oldForfait !== 'commandes-services';

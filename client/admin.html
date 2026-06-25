@@ -2208,7 +2208,7 @@
       <button class="llang-btn" data-lang="en" onclick="_ridSelPickLang('en')">🇬🇧</button>
       <button class="llang-btn" data-lang="de" onclick="_ridSelPickLang('de')">🇩🇪</button>
       <button class="llang-btn" data-lang="el" onclick="_ridSelPickLang('el')">🇬🇷</button>
-      <button class="llang-btn" data-lang="ar" onclick="_ridSelPickLang('ar')">🇸🇦</button>
+      <button class="llang-btn" data-lang="es" onclick="_ridSelPickLang('es')">🇪🇸</button>
     </div>
     <div id="rsel-saved-wrap" style="display:none">
       <div id="rsel-saved-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;text-align:left"></div>
@@ -2238,7 +2238,7 @@
       <button class="llang-btn" data-lang="en" onclick="_loginPickLang('en')">🇬🇧</button>
       <button class="llang-btn" data-lang="de" onclick="_loginPickLang('de')">🇩🇪</button>
       <button class="llang-btn" data-lang="el" onclick="_loginPickLang('el')">🇬🇷</button>
-      <button class="llang-btn" data-lang="ar" onclick="_loginPickLang('ar')">🇸🇦</button>
+      <button class="llang-btn" data-lang="es" onclick="_loginPickLang('es')">🇪🇸</button>
     </div>
     <div class="pw-wrap pw-wrap-block">
       <input type="password" class="login-input" id="pwd-input"
@@ -2270,7 +2270,7 @@
         <button data-lang="fr" onclick="window._pickLang('fr')">🇫🇷 Français</button>
         <button data-lang="en" onclick="window._pickLang('en')">🇬🇧 English</button>
         <button data-lang="de" onclick="window._pickLang('de')">🇩🇪 Deutsch</button>
-        <button data-lang="ar" onclick="window._pickLang('ar')">🇸🇦 العربية</button>
+        <button data-lang="es" onclick="window._pickLang('es')">🇪🇸 Español</button>
       </div>
     </div>
     <button class="adm-vis-btn adm-vis-ico" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
@@ -2868,32 +2868,32 @@ window.addEventListener('error', ev => {
 /* ═══════════════════════════════════════════
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
-const LANGS = ['el', 'fr', 'en', 'de', 'ar'];
-const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', ar:'🇸🇦 AR' };
+const LANGS = ['el', 'fr', 'en', 'de', 'es'];
+const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', es:'🇪🇸 ES' };
 
 /* ═══════════════════════════════════════════
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
 ═══════════════════════════════════════════ */
 const DEFAULT_CATS = [
-  { key:'hot',     ico:'ico-coffee',  names:{ el:'Ζεστά Ροφήματα',  fr:'Boissons Chaudes', en:'Hot Drinks',  de:'Heiße Getränke',  ar:'مشروبات ساخنة' } },
-  { key:'cold',    ico:'ico-cold',    names:{ el:'Κρύα Ροφήματα',   fr:'Boissons Froides', en:'Cold Drinks', de:'Kalte Getränke',  ar:'مشروبات باردة' } },
-  { key:'food',    ico:'ico-food',    names:{ el:'Φαγητό',          fr:'Cuisine',          en:'Food',        de:'Speisen',         ar:'الأكل'         } },
-  { key:'sweet',   ico:'ico-cake',    names:{ el:'Γλυκά',           fr:'Sucré',            en:'Sweet',       de:'Süßes',           ar:'حلويات'        } },
-  { key:'morning', ico:'ico-sunrise', names:{ el:'Πρωινό',          fr:'Le Matin',         en:'Breakfast',   de:'Frühstück',       ar:'الصباح'        } },
-  { key:'hookah',  ico:'ico-hookah',  names:{ el:'Ναργιλές',        fr:'Hookah',           en:'Hookah',      de:'Hookah',          ar:'النرجيلة'      } },
+  { key:'hot',     ico:'ico-coffee',  names:{ el:'Ζεστά Ροφήματα',  fr:'Boissons Chaudes', en:'Hot Drinks',  de:'Heiße Getränke',  es:'Bebidas Calientes' } },
+  { key:'cold',    ico:'ico-cold',    names:{ el:'Κρύα Ροφήματα',   fr:'Boissons Froides', en:'Cold Drinks', de:'Kalte Getränke',  es:'Bebidas Frías' } },
+  { key:'food',    ico:'ico-food',    names:{ el:'Φαγητό',          fr:'Cuisine',          en:'Food',        de:'Speisen',         es:'Comida'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ el:'Γλυκά',           fr:'Sucré',            en:'Sweet',       de:'Süßes',           es:'Postres'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ el:'Πρωινό',          fr:'Le Matin',         en:'Breakfast',   de:'Frühstück',       es:'Desayuno'       } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ el:'Ναργιλές',        fr:'Hookah',           en:'Hookah',      de:'Hookah',          es:'Shisha'         } },
 ];
 
 const DEFAULT_INFO = {
-  wifi_name:  { el:'WiFi', fr:'WiFi', en:'WiFi', de:'WLAN', ar:'واي فاي' },
-  wifi_val:   { el:'', fr:'', en:'', de:'', ar:'' },
-  hours_name: { el:'Ωράριο', fr:'Horaires', en:'Hours', de:'Öffnungszeiten', ar:'أوقات العمل' },
-  hours_val:  { el:'', fr:'', en:'', de:'', ar:'' },
-  addr_name:   { el:'Διεύθυνση', fr:'Adresse', en:'Address', de:'Adresse', ar:'العنوان' },
-  addr_val:    { el:'', fr:'', en:'', de:'', ar:'' },
+  wifi_name:  { el:'WiFi', fr:'WiFi', en:'WiFi', de:'WLAN', es:'Wi-Fi' },
+  wifi_val:   { el:'', fr:'', en:'', de:'', es:'' },
+  hours_name: { el:'Ωράριο', fr:'Horaires', en:'Hours', de:'Öffnungszeiten', es:'Horario' },
+  hours_val:  { el:'', fr:'', en:'', de:'', es:'' },
+  addr_name:   { el:'Διεύθυνση', fr:'Adresse', en:'Address', de:'Adresse', es:'Dirección' },
+  addr_val:    { el:'', fr:'', en:'', de:'', es:'' },
   showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
-  noteText:    { el: '', fr: '', en: '', de: '', ar: '' },
+  noteText:    { el: '', fr: '', en: '', de: '', es: '' },
 };
 
 /* ═══════════════════════════════════════════
@@ -3427,136 +3427,136 @@ const ADMIN_UI = {
     btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische',
     btnDelLogo:    'Logo löschen',
   },
-  ar: {
-    admSub:        'إدارة القائمة',
-    btnPreview:    '👁 عرض القائمة',
-    btnViewMenu:   'القائمة',
-    btnLogout:     'تسجيل الخروج',
-    secInfo:       'معلومات',
-    secCats:       'الفئات',
-    secProds:      'المنتجات',
-    btnAddCat:     '＋ إضافة فئة',
-    btnSaveCats:   'حفظ الفئات',
-    btnAddProd:    '＋ إضافة منتج',
-    btnSaveProd:   'حفظ هذا المنتج',
-    btnDelProd:    'حذف',
-    lblCatName:    'الاسم',
-    lblPrice:      'السعر',
-    lblBadges:     'الشارات',
-    lblPhoto:      'الصورة',
-    lblFromDevice: 'من الجهاز',
-    lblOrUnsplash: 'أو الصق رابط صورة (unsplash.com)',
-    lblPhotoHelp:  'ارفع مباشرة من جهازك أو الصق رابطاً من <a href="https://unsplash.com" target="_blank">unsplash.com</a>.',
-    lblName:       'الاسم',
-    lblShortDesc:  'وصف مختصر',
-    lblFullDesc:   'التفاصيل',
-    lblAllergens:  'المواد المسببة للحساسية — مفصولة بفواصل',
-    phName:        'اسم المنتج',
-    phShortDesc:   'وصف قصير يظهر تحت اسم المنتج',
-    phFullDesc:    'النص الكامل عند النقر على المنتج',
-    phAllergens:   'مثال: حليب، غلوتين، بيض',
+  es: {
+    admSub:        'Gestión del menú',
+    btnPreview:    '👁 Ver el menú',
+    btnViewMenu:   'El menú',
+    btnLogout:     'Cerrar sesión',
+    secInfo:       'Información',
+    secCats:       'Categorías',
+    secProds:      'Productos',
+    btnAddCat:     '＋ Añadir categoría',
+    btnSaveCats:   'Guardar categorías',
+    btnAddProd:    '＋ Añadir producto',
+    btnSaveProd:   'Guardar este producto',
+    btnDelProd:    'Eliminar',
+    lblCatName:    'Nombre',
+    lblPrice:      'Precio',
+    lblBadges:     'Badges',
+    lblPhoto:      'Foto',
+    lblFromDevice: 'Desde el dispositivo',
+    lblOrUnsplash: 'O pegue un enlace de imagen (unsplash.com)',
+    lblPhotoHelp:  'Suba directamente desde su dispositivo o pegue un enlace de <a href="https://unsplash.com" target="_blank">unsplash.com</a>.',
+    lblName:       'Nombre',
+    lblShortDesc:  'Descripción corta',
+    lblFullDesc:   'Detalles',
+    lblAllergens:  'Alérgenos — separados por comas',
+    phName:        'Nombre del producto',
+    phShortDesc:   'Descripción corta que aparece bajo el nombre del producto',
+    phFullDesc:    'Texto completo al hacer clic en el producto',
+    phAllergens:   'Ejemplo: leche, gluten, huevos',
     phPrice:       '4.50',
-    produits:      'منتج(ات)',
-    toastSaved:    '✓ تم حفظ التغييرات بنجاح',
-    toastProd:     '✓ تم تحديث المنتج',
-    fabTitle:      'حفظ الكل',
-    fabTooltip:    'حفظ الكل',
-    infoWifiName:  'اسم الواي فاي',
-    infoWifiVal:   'كلمة مرور الواي فاي',
-    infoHoursName: 'تسمية (مثال: "أوقات العمل")',
-    infoHoursVal:  'المواعيد (مثال: "الاثنين–الجمعة 9ص–10م")',
-    infoAddrName:  'تسمية (مثال: "الموقع")',
-    infoAddrVal:   'العنوان الكامل',
-    badgeType:     '— النوع —',
-    badgeTemp:     '— الحرارة —',
-    bdgBoisson:'🥤 مشروب', bdgCuisine:'🍽 أكل', bdgSucre:'🧁 حلو', bdgHookah:'💨 شيشة',
-    bdgChaud:'🔥 ساخن', bdgFroid:'❄ بارد', bdgGlace:'🧊 مثلج',
-    badgeMorning:  '☀ الصباح',
-    badgeVegan:    '🌱 نباتي',
-    badgeLimited:  '⏳ عرض محدود',
-    badgeNew:      '✨ جديد',
-    badgePopular:  '🔥 الأكثر طلباً',
-    progressCats:  'الفئات…',
-    progressProds: 'المنتجات…',
-    progressInfo:  'معلومات المقهى…',
-    txOk:          'مترجم',
-    txErr:         'أخطاء',
-    txDone:        'حقل(حقول) تُرجمت تلقائياً',
-    errTransFailed:'⚠ فشلت الترجمة. تم حفظ النصوص باليونانية — يمكنك تصحيحها يدوياً.',
-    skipTx:        '— حُفظ بدون ترجمة (الترجمة التلقائية تعمل فقط من اليونانية)',
-    confirmDelete: 'حذف هذا المنتج؟',
-    deleteTitle:'حذف المنتج', deleteCatTitle:'حذف الفئة', deleteCatMsg:'ستُحذف جميع منتجاتها نهائياً.', deleteBtn:'حذف', cancelBtn:'إلغاء',
-    newProd:       'منتج جديد',
-    secHero:       'الصورة',
-    badgeHero:     'الصورة الرئيسية',
-    secNote:       'ملاحظة',
-    badgeNote:     'إعلان',
-    badgeFooter:   'تذييل الصفحة',
-    btnChoosePhoto:'اختيار صورة',
-    btnDelPhoto:   'حذف',
-    heroHint:      'مستحسن: عمودي، 900×1600 بكسل على الأقل',
-    noteShown:     'ظاهر في القائمة',
-    noteHidden:    'مخفي في القائمة',
-    notePh:        'ملاحظة بـ {L} — مثال: مرحباً! تراسنا مفتوح هذا الأسبوع.',
-    noteHint:      'يظهر النص أسفل فئات القائمة — 300 حرف كحد أقصى لكل لغة.',
-    visBtnCall:    'زر النادل',
-    visBtnPhotos:  'الصور',
-    visBtnOrder:   'وضع الطلب',
-    visBtnNote:    'ملاحظة العملاء',
-    secEvents:'الاحتفال النشط', badgeEventsNone:'لا شيء',
-    secTables:'الطاولات ورموز QR', taglineLabel:'شعار (تحت الاسم)',
-    secTheme:'تصميم', badgeTheme:'Design',
-    secOrders:'الطلبات',
-    scDesign:'🎨 تصميم', scHero:'🖼️ الصورة', scInfos:'ℹ️ معلومات',
-    scNote:'📢 ملاحظة', scCats:'📂 الفئات', scProds:'🍽️ المنتجات', scOrders:'🧾 الطلبات', scTables:'🪑 الطاولات & QR',
-    modePaper:'📄 وضع الورق', modePhoto:'🖼️ وضع الصور', modeSonet:'🔔 وضع النادل', modeOrder:'🛒 وضع الطلب',
-    modePaperShort:'ورق', modePhotoShort:'صور', modeSonetShort:'نادل', modeOrderShort:'طلب',
-    catPhotosLabel:'📄 وضع الورق',
-    ordTable:'طاولة', ordTakeaway:'للأخذ', ordTotal:'المجموع',
-    ordPending:'مستلمة', ordProgress:'قيد التنفيذ', ordDone:'منتهية',
-    ordEmpty:'لا توجد طلبات حالياً',
-    today:'اليوم', yesterday:'أمس',
-    fabNotif:      'إرسال إشعار',
-    notifTitle:    'إشعار النادلين',
-    notifSub:      'سيُرسل الرسالة كإشعار فوري إلى جميع الأجهزة المتصلة.',
-    notifCancel:   'إلغاء',
-    notifSend:     'إرسال',
-    notifSending:  'جارٍ الإرسال…',
-    notifOk:       '✓ تم الإرسال إلى {n} جهاز(أجهزة)',
-    notifNoToken:  '⚠ لا توجد أجهزة متصلة',
-    notifSaved:    '✓ تم حفظ الرسالة — ستظهر عند الإطلاق التالي',
-    notifErrSrv:   '✗ خطأ في الخادم: {e}',
-    notifErrNet:   '✗ خطأ في الشبكة: {e}',
-    showInMenu:    'عرض في القائمة',
-    btnMove:       'نقل',
-    changeCat:     '— تغيير الفئة —',
-    newCat:        'فئة جديدة',
-    delIcon:       '✕ إزالة الأيقونة',
-    noneIco:       '— لا شيء —',
-    noPhoto:       'لا توجد صورة',
-    btnLogo:       'الشعار (اختياري)',
-    logoGreenTitle:'خلفية الشعار',
-    logoGreenMsg:  'إذا كنت تريد إزالة خلفية شعارك (شفافة)، جهّز صورتك بخلفية <strong style="color:var(--gold)">خضراء</strong>. ستتم إزالتها تلقائياً. وإلا، سيظهر الشعار كما هو مع خلفيته.',
-    logoGreenOk:   'اختيار الشعار',
-    logoGreenCancel:'إلغاء',
-    tabDisplay:'🎨 عرض القائمة', tabOrders:'🧾 الطلبات والنداءات', tabSettings:'⚙️ الإعدادات',
-    settingsIdentity:'الوصول والمطعم', settingsLangSection:'إعدادات اللغة',
-    settingsName:'الاسم', settingsLangs:'اللغات المتاحة', settingsLangParams:'اللغات — الإعدادات',
-    settingsPwd:'كلمة مرور الدخول', settingsSave:'تحديث', settingsSaved:'✅ تم الحفظ', settingsErr:'❌ خطأ',
-    ridSelSaved:'المعرّفات المحفوظة', ridSelNew:'أدخل معرّفاً آخر', ridSelPlaceholder:'مثال: cafe-paris', ridSelConnect:'تسجيل الدخول', ridSelContinue:'متابعة', ridSelErr:'رمز غير صالح: استخدم فقط أحرفاً صغيرة وأرقاماً وشرطات، بدون مسافات.',
-    pwdConfirmTitle:'تغيير كلمة المرور', pwdConfirmMsg:'هذا التغيير سيُسجّل خروجك من جميع الأجهزة. ستحتاج إلى تسجيل الدخول مجدداً بكلمة المرور الجديدة.', pwdConfirmOk:'تأكيد', pwdConfirmCancel:'إلغاء', pwdChangedLogout:'✅ تم تغيير كلمة المرور — سجّل الدخول مجدداً',
-    changeIdBtn:'تسجيل الخروج', changeIdConfirmTitle:'تسجيل الخروج', changeIdConfirmMsg:'ستنتقل إلى شاشة تسجيل الدخول. جلستك محفوظة — عُد هنا دون إدخال كلمة المرور مجدداً.', changeIdConfirmOk:'تأكيد', changeIdConfirmCancel:'إلغاء',
-    subTitle:'اشتراكي', subForfaitMenuQR:'Menu QR', subForfaitCS:'الطلبات والخدمات', subMonthly:'شهري', subAnnual:'سنوي', subUpgradeBtn:'الترقية إلى الطلبات والخدمات', subDowngradeBtn:'العودة إلى Menu QR', subUpgradeTitle:'الترقية إلى الطلبات والخدمات؟', subUpgradeMsg:'ستتغير خطتك إلى الطلبات والخدمات. لديك 7 أيام لإتمام الدفع.', subDowngradeTitle:'العودة إلى Menu QR؟', subDowngradeMsg:'ستتغير خطتك إلى Menu QR. ستُعطَّل ميزات الطلب والاستدعاء.', subConfirmOk:'تأكيد', subConfirmCancel:'إلغاء', subChanged:'✅ تم تحديث الخطة', subChanging:'جارٍ التحديث…', subAnnualNotice:'⚠️ الاشتراك السنوي غير قابل للاسترداد — تستفيد من سعر مخفض لكامل العام.', subAnnualWarnTitle:'تغيير الخطة السنوية', subAnnualWarnMsg:'دفعت اشتراكك السنوي مسبقًا بسعر مخفض. نوصيك بالاستفادة من خطتك الحالية حتى النهاية وإجراء التغيير عند دفعتك القادمة.', subAnnualWarnKeep:'✓ الاحتفاظ حتى النهاية', subAnnualWarnNow:'التغيير الآن', subSpamTitle:'تم التغيير مسبقًا', subSpamMsg:'لقد غيّرت خطتك هذا الشهر بالفعل. لأي تغيير إضافي يرجى التواصل معنا.', subSpamContact:'تواصل معنا', subSpamClose:'إغلاق', subEndDate:'تنتهي في', subPendingNotice:'📅 تغيير مجدول في نهاية الفترة ←', subPendingCancel:'إلغاء التغيير المجدول', subChangeModeToAnnual:'التبديل إلى الدفع السنوي', subChangeModeToMonthly:'العودة إلى الدفع الشهري', subModeUpgradeTitle:'التبديل إلى الدفع السنوي؟', subModeUpgradeMsg:'سينتقل اشتراكك إلى الفوترة السنوية بسعر تفضيلي.', subModeAnnualWarnTitle:'تغيير وضع الدفع السنوي', subModeAnnualWarnMsg:'تم دفع اشتراكك السنوي مسبقاً بسعر تفضيلي. نوصي بالاستفادة من خطتك الحالية حتى النهاية قبل العودة إلى الدفع الشهري.', subModeAnnualWarnKeep:'✓ الاحتفاظ حتى النهاية', subModeAnnualWarnNow:'تغيير الآن', subModeChanged:'✅ تم تحديث وضع الدفع', subCustomPrice:'السعر لهذا العميل', subPayBtn:'💳 إجراء الدفع', subPayRevolut:'تحويل Revolut', subPayCash:'الدفع نقداً (أثينا)', subPayRevolutMsg:'افتح Revolut وقم بالتحويل. <strong>تذكر إدراج معرّف مطعمك في تفاصيل المعاملة.</strong>', subPayCashMsg:'أرسل لنا رسالة WhatsApp مع <strong>معرّف مطعمك</strong> و<strong>التاريخ المفضل</strong> و<strong>موقعك</strong> لترتيب موعد في أثينا.', subPayPopupTitle:'💳 تذكير بالدفع', subPayPopupMsg:'لديك دفعة معلقة. انتقل إلى قسم <strong>اشتراكي</strong> للدفع عبر Revolut أو نقداً.', subPayPopupClose:'فهمت', subCreationFeeLabel:'رسوم الإنشاء', subTrialActive:'فترة التجربة نشطة', subContactBtn:'💬 تواصل معنا', subContactDesc:'سؤال أو طلب؟',
-    settingsDefaultLang:'اللغة المعروضة للعملاء (افتراضي)', settingsPrimaryLang:'لغة الموظفين والإدارة',
-    emptyMenuTitle:'قائمتك فارغة', emptyMenuSub:'ابدأ بإنشاء أول فئة لإضافة المنتجات.',
-    phPassword:'كلمة المرور', phPasswordNew:'كلمة مرور جديدة', phRestaurantName:'اسم المطعم',
-    analyticsTitle:'فترة التحليل',
-    filterToday:'اليوم', filter7d:'٧ أيام', filter30d:'٣٠ يوماً', filter12m:'١٢ شهراً', filterCustom:'مخصص',
-    chartOrdersTitle:'الطلبات حسب الطاولة', chartCallsTitle:'النداءات حسب الطاولة',
-    chartProductsTitle:'أفضل المنتجات', chartEmpty:'لا توجد بيانات لهذه الفترة', chartTopN:'top 10',
-    scAnalytics:'📊 إحصائيات', statsSectionTitle:'إحصائيات',
-    btnGenerate:'إنشاء', tblLabel:'طاولة', tblCopy:'نسخ', tblCopied:'تم النسخ!', tblUnit:'طاولات',
-    btnDelLogo:    'حذف الشعار',
+    produits:      'producto(s)',
+    toastSaved:    '✓ Cambios guardados con éxito',
+    toastProd:     '✓ Producto actualizado',
+    fabTitle:      'Guardar todo',
+    fabTooltip:    'Guardar todo',
+    infoWifiName:  'Nombre del Wi-Fi',
+    infoWifiVal:   'Contraseña del Wi-Fi',
+    infoHoursName: 'Etiqueta (ej: "Horario")',
+    infoHoursVal:  'Horario (ej: "Lunes–Viernes 9h–22h")',
+    infoAddrName:  'Etiqueta (ej: "Ubicación")',
+    infoAddrVal:   'Dirección completa',
+    badgeType:     '— Tipo —',
+    badgeTemp:     '— Temperatura —',
+    bdgBoisson:'🥤 Bebida', bdgCuisine:'🍽 Cocina', bdgSucre:'🧁 Dulce', bdgHookah:'💨 Shisha',
+    bdgChaud:'🔥 Caliente', bdgFroid:'❄ Frío', bdgGlace:'🧊 Helado',
+    badgeMorning:  '☀ Mañana',
+    badgeVegan:    '🌱 Vegano',
+    badgeLimited:  '⏳ Oferta limitada',
+    badgeNew:      '✨ Nuevo',
+    badgePopular:  '🔥 Más pedido',
+    progressCats:  'Categorías…',
+    progressProds: 'Productos…',
+    progressInfo:  'Información del café…',
+    txOk:          'Traducido',
+    txErr:         'Errores',
+    txDone:        'Campo(s) traducido(s) automáticamente',
+    errTransFailed:'⚠ Traducción fallida. Textos guardados en griego — puede corregirlos manualmente.',
+    skipTx:        '— Guardado sin traducir (la traducción automática solo funciona desde el griego)',
+    confirmDelete: '¿Eliminar este producto?',
+    deleteTitle:'Eliminar producto', deleteCatTitle:'Eliminar categoría', deleteCatMsg:'Todos sus productos serán eliminados definitivamente.', deleteBtn:'Eliminar', cancelBtn:'Cancelar',
+    newProd:       'Nuevo producto',
+    secHero:       'Imagen principal',
+    badgeHero:     'Imagen principal',
+    secNote:       'Nota',
+    badgeNote:     'Anuncio',
+    badgeFooter:   'Pie de página',
+    btnChoosePhoto:'Elegir imagen',
+    btnDelPhoto:   'Eliminar',
+    heroHint:      'Recomendado: vertical, mínimo 900×1600 px',
+    noteShown:     'Visible en el menú',
+    noteHidden:    'Oculto en el menú',
+    notePh:        'Nota en {L} — ejemplo: ¡Bienvenidos! Nuestra terraza está abierta esta semana.',
+    noteHint:      'El texto aparece bajo las categorías del menú — máx. 300 caracteres por idioma.',
+    visBtnCall:    'Botón camarero',
+    visBtnPhotos:  'Fotos',
+    visBtnOrder:   'Modo pedido',
+    visBtnNote:    'Nota clientes',
+    secEvents:'Evento activo', badgeEventsNone:'Ninguno',
+    secTables:'Mesas y códigos QR', taglineLabel:'Lema (bajo el nombre)',
+    secTheme:'Diseño', badgeTheme:'Design',
+    secOrders:'Pedidos',
+    scDesign:'🎨 Diseño', scHero:'🖼️ Imagen', scInfos:'ℹ️ Información',
+    scNote:'📢 Nota', scCats:'📂 Categorías', scProds:'🍽️ Productos', scOrders:'🧾 Pedidos', scTables:'🪑 Mesas & QR',
+    modePaper:'📄 Modo Páginas', modePhoto:'🖼️ Modo Fotos', modeSonet:'🔔 Modo Camarero', modeOrder:'🛒 Modo Pedido',
+    modePaperShort:'Páginas', modePhotoShort:'Fotos', modeSonetShort:'Camarero', modeOrderShort:'Pedido',
+    catPhotosLabel:'📄 Modo Páginas',
+    ordTable:'Mesa', ordTakeaway:'Para llevar', ordTotal:'Total',
+    ordPending:'Recibido', ordProgress:'En preparación', ordDone:'Hecho',
+    ordEmpty:'No hay pedidos actualmente',
+    today:'Hoy', yesterday:'Ayer',
+    fabNotif:      'Enviar notificación',
+    notifTitle:    'Notificación a camareros',
+    notifSub:      'El mensaje se enviará como notificación push a todos los dispositivos conectados.',
+    notifCancel:   'Cancelar',
+    notifSend:     'Enviar',
+    notifSending:  'Enviando…',
+    notifOk:       '✓ Enviado a {n} dispositivo(s)',
+    notifNoToken:  '⚠ No hay dispositivos conectados',
+    notifSaved:    '✓ Mensaje guardado — aparecerá en el próximo inicio',
+    notifErrSrv:   '✗ Error del servidor: {e}',
+    notifErrNet:   '✗ Error de red: {e}',
+    showInMenu:    'Mostrar en el menú',
+    btnMove:       'Mover',
+    changeCat:     '— Cambiar categoría —',
+    newCat:        'Nueva categoría',
+    delIcon:       '✕ Quitar icono',
+    noneIco:       '— Ninguno —',
+    noPhoto:       'Sin imagen',
+    btnLogo:       'Logo (opcional)',
+    logoGreenTitle:'Fondo del logo',
+    logoGreenMsg:  'Si desea eliminar el fondo de su logo (transparente), prepare la imagen con fondo <strong style="color:var(--gold)">verde</strong>. Se eliminará automáticamente. De lo contrario, el logo se mostrará tal cual.',
+    logoGreenOk:   'Elegir logo',
+    logoGreenCancel:'Cancelar',
+    tabDisplay:'🎨 Visualización del menú', tabOrders:'🧾 Pedidos y llamadas', tabSettings:'⚙️ Ajustes',
+    settingsIdentity:'Acceso y restaurante', settingsLangSection:'Configuración de idioma',
+    settingsName:'Nombre', settingsLangs:'Idiomas disponibles', settingsLangParams:'Idiomas — configuración',
+    settingsPwd:'Contraseña de acceso', settingsSave:'Actualizar', settingsSaved:'✅ Guardado', settingsErr:'❌ Error',
+    ridSelSaved:'IDs guardados', ridSelNew:'Introducir otro ID', ridSelPlaceholder:'Ejemplo: cafe-paris', ridSelConnect:'Iniciar sesión', ridSelContinue:'Continuar', ridSelErr:'Código inválido: use solo minúsculas, números y guiones, sin espacios.',
+    pwdConfirmTitle:'Cambiar contraseña', pwdConfirmMsg:'Este cambio cerrará su sesión en todos los dispositivos. Deberá iniciar sesión de nuevo con la nueva contraseña.', pwdConfirmOk:'Confirmar', pwdConfirmCancel:'Cancelar', pwdChangedLogout:'✅ Contraseña cambiada — inicie sesión de nuevo',
+    changeIdBtn:'Cerrar sesión', changeIdConfirmTitle:'Cerrar sesión', changeIdConfirmMsg:'Irá a la pantalla de inicio de sesión. Su sesión está guardada — vuelva aquí sin introducir la contraseña de nuevo.', changeIdConfirmOk:'Confirmar', changeIdConfirmCancel:'Cancelar',
+    subTitle:'Mi suscripción', subForfaitMenuQR:'Menu QR', subForfaitCS:'Pedidos y Servicios', subMonthly:'Mensual', subAnnual:'Anual', subUpgradeBtn:'Actualizar a Pedidos y Servicios', subDowngradeBtn:'Volver a Menu QR', subUpgradeTitle:'¿Actualizar a Pedidos y Servicios?', subUpgradeMsg:'Su plan cambiará a Pedidos y Servicios. Tiene 7 días para completar el pago.', subDowngradeTitle:'¿Volver a Menu QR?', subDowngradeMsg:'Su plan cambiará a Menu QR. Las funciones de pedido y llamada serán desactivadas.', subConfirmOk:'Confirmar', subConfirmCancel:'Cancelar', subChanged:'✅ Plan actualizado', subChanging:'Actualizando…', subAnnualNotice:'⚠️ La suscripción anual no es reembolsable — se beneficia de un precio reducido por el año completo.', subAnnualWarnTitle:'Cambio de plan anual', subAnnualWarnMsg:'Ha pagado su suscripción anual por adelantado a precio reducido. Le recomendamos aprovechar su plan actual hasta el final y realizar el cambio en su próximo pago.', subAnnualWarnKeep:'✓ Mantener hasta el final', subAnnualWarnNow:'Cambiar ahora', subSpamTitle:'Ya se ha cambiado', subSpamMsg:'Ya ha cambiado su plan este mes. Para cualquier cambio adicional, contáctenos.', subSpamContact:'Contáctenos', subSpamClose:'Cerrar', subEndDate:'Finaliza el', subPendingNotice:'📅 Cambio programado al final del período ←', subPendingCancel:'Cancelar cambio programado', subChangeModeToAnnual:'Cambiar a pago anual', subChangeModeToMonthly:'Volver a pago mensual', subModeUpgradeTitle:'¿Cambiar a pago anual?', subModeUpgradeMsg:'Su suscripción pasará a facturación anual a precio preferencial.', subModeAnnualWarnTitle:'Cambio de modo de pago anual', subModeAnnualWarnMsg:'Su suscripción anual fue pagada por adelantado a precio preferencial. Recomendamos aprovechar el plan actual hasta el final antes de volver al pago mensual.', subModeAnnualWarnKeep:'✓ Mantener hasta el final', subModeAnnualWarnNow:'Cambiar ahora', subModeChanged:'✅ Modo de pago actualizado', subCustomPrice:'Precio para este cliente', subPayBtn:'💳 Realizar el pago', subPayRevolut:'Transferencia Revolut', subPayCash:'Pago en efectivo (Atenas)', subPayRevolutMsg:'Abra Revolut y realice la transferencia. <strong>Recuerde incluir el ID de su restaurante en los detalles de la transacción.</strong>', subPayCashMsg:'Envíenos un WhatsApp con <strong>el ID de su restaurante</strong>, <strong>la fecha preferida</strong> y <strong>su ubicación</strong> para concertar una cita en Atenas.', subPayPopupTitle:'💳 Recordatorio de pago', subPayPopupMsg:'Tiene un pago pendiente. Vaya a la sección <strong>Mi suscripción</strong> para pagar por Revolut o en efectivo.', subPayPopupClose:'Entendido', subCreationFeeLabel:'Tarifa de creación', subTrialActive:'Período de prueba activo', subContactBtn:'💬 Contáctenos', subContactDesc:'¿Una pregunta o solicitud?',
+    settingsDefaultLang:'Idioma mostrado a los clientes (predeterminado)', settingsPrimaryLang:'Idioma del personal y administración',
+    emptyMenuTitle:'Su menú está vacío', emptyMenuSub:'Comience creando la primera categoría para añadir productos.',
+    phPassword:'Contraseña', phPasswordNew:'Nueva contraseña', phRestaurantName:'Nombre del restaurante',
+    analyticsTitle:'Período de análisis',
+    filterToday:'Hoy', filter7d:'7 días', filter30d:'30 días', filter12m:'12 meses', filterCustom:'Personalizado',
+    chartOrdersTitle:'Pedidos por mesa', chartCallsTitle:'Llamadas por mesa',
+    chartProductsTitle:'Mejores productos', chartEmpty:'No hay datos para este período', chartTopN:'top 10',
+    scAnalytics:'📊 Estadísticas', statsSectionTitle:'Estadísticas',
+    btnGenerate:'Generar', tblLabel:'Mesa', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas',
+    btnDelLogo:    'Eliminar logo',
   },
 };
 
@@ -3568,7 +3568,7 @@ const HERO_TEXTS = {
   fr: { tagline:'Une expérience culinaire raffinée',       sub:["Cafés d'exception",'Plats gourmets','Ambiance élégante'],      explore:'Menu' },
   en: { tagline:'A refined culinary experience',           sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],    explore:'Menu' },
   de: { tagline:'Ein raffiniertes kulinarisches Erlebnis', sub:['Erstklassige Kaffeespezialitäten','Gourmet-Gerichte','Elegante Atmosphäre'], explore:'Menü' },
-  ar: { tagline:'',                                        sub:[],                                                               explore:'القائمة' },
+  es: { tagline:'Una experiencia gastronómica de calidad', sub:['Cafés de excepción','Platos gourmet','Ambiente elegante'],       explore:'Menú' },
 };
 
 function updateMockupText() {
@@ -3622,7 +3622,7 @@ function _removeSavedId(rid) {
 ═══════════════════════════════════════════ */
 function _showRidSelector() {
   _hideAdmLoadingScreen();
-  const _VALID_LANGS = ['fr','en','el','de','ar'];
+  const _VALID_LANGS = ['fr','en','el','de','es'];
   const _l = _VALID_LANGS.includes(localStorage.getItem('saas_ui_lang')) ? localStorage.getItem('saas_ui_lang') : 'fr';
   const t = (ADMIN_UI[_l] || ADMIN_UI.fr);
 
@@ -3694,7 +3694,7 @@ function _ridSelRemove(rid) {
 }
 
 function _ridSelConfirm() {
-  const _VALID_LANGS = ['fr','en','el','de','ar'];
+  const _VALID_LANGS = ['fr','en','el','de','es'];
   const _l = _VALID_LANGS.includes(localStorage.getItem('saas_ui_lang')) ? localStorage.getItem('saas_ui_lang') : 'fr';
   const t = (ADMIN_UI[_l] || ADMIN_UI.fr);
   const val = (document.getElementById('rsel-rid-input').value || '').trim().toLowerCase();
@@ -3935,7 +3935,7 @@ const _LOGIN_UI = {
   en: { pwd:'Password',       btn:'Sign in',   sub:'Administration' },
   de: { pwd:'Passwort',       btn:'Anmelden',  sub:'Verwaltung' },
   el: { pwd:'Κωδικός',        btn:'Σύνδεση',   sub:'Διαχείριση' },
-  ar: { pwd:'كلمة المرور',     btn:'دخول',      sub:'الإدارة' }
+  es: { pwd:'Contraseña',      btn:'Entrar',    sub:'Administración' }
 };
 
 // Appliquer la langue mémorisée sur les écrans de login au chargement
@@ -5291,12 +5291,12 @@ const ICON_LABELS = {
     'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
   },
   ar: {
-    'ico-coffee':'☕ ساخن', 'ico-cold':'🧊 بارد', 'ico-food':'🍽 طعام', 'ico-cake':'🍰 حلويات',
-    'ico-sunrise':'🌅 صباح', 'ico-hookah':'💨 شيشة', 'ico-star':'⭐ مميز', 'ico-bell':'🔔 جرس',
-    'ico-clock':'🕐 أوقات', 'ico-diamond':'💎 بريميوم', 'ico-wifi':'📶 واي فاي', 'ico-pin':'📍 موقع',
-    'ico-glass':'🥤 عصير', 'ico-pizza':'🍕 بيتزا', 'ico-burger':'🍔 برغر', 'ico-salad':'🥗 سلطة',
-    'ico-heart':'❤️ مفضلة', 'ico-fire':'🔥 رائج', 'ico-leaf':'🌿 نباتي', 'ico-crown':'👑 VIP',
-    'ico-gift':'🎁 عروض', 'ico-cocktail':'🍹 كوكتيل',
+    'ico-coffee':'☕ Caliente', 'ico-cold':'🧊 Frío', 'ico-food':'🍽 Comida', 'ico-cake':'🍰 Dulce',
+    'ico-sunrise':'🌅 Mañana', 'ico-hookah':'💨 Shisha', 'ico-star':'⭐ Especial', 'ico-bell':'🔔 Timbre',
+    'ico-clock':'🕐 Horario', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 Wi-Fi', 'ico-pin':'📍 Ubicación',
+    'ico-glass':'🥤 Zumo', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Ensalada',
+    'ico-heart':'❤️ Favorito', 'ico-fire':'🔥 Tendencia', 'ico-leaf':'🌿 Vegano', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Ofertas', 'ico-cocktail':'🍹 Cóctel',
   },
 };
 function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
@@ -6245,171 +6245,171 @@ function getDefaultItems() {
   {
     id:1, cat:0, price:'€3.50', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
-    name:{ fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
-    desc:{ fr:'Café court et intense — pur, concentré, servi chaud.', en:'Short and intense coffee — pure, concentrated, served hot.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، تُقدَّم ساخنة.' },
-    full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', ar:'يُستخلص إسبريسونا على ضغط مثالي 9 بار، ليكشف نكهات عميقة من البندق والشوكولاتة الداكنة. يُقدَّم في كوب مسخَّن مسبقاً للحفاظ على كل نكهاته.' },
+    name:{ fr:'Espresso', en:'Espresso', es:'Espresso' },
+    desc:{ fr:'Café court et intense — pur, concentré, servi chaud.', en:'Short and intense coffee — pure, concentrated, served hot.', es:'Short and intense coffee — pure, concentrated, served hot.' },
+    full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', es:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:2, cat:0, price:'€4.00', photo:'photo-1565031491910-e57fac031c41',
     badges:[],
-    name:{ fr:'Doppio', en:'Doppio', ar:'دوبيو' },
-    desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', ar:'إسبريسو مزدوج قوي — لعشاق القهوة الحقيقيين.' },
-    full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', ar:'استخلاصان من الإسبريسو مجمعتان في كوب واحد. قهوة سخية وقوية ومليئة بالطابع، مثالية بعد الظهر أو بعد الأكل.' },
+    name:{ fr:'Doppio', en:'Doppio', es:'Doppio' },
+    desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', es:'Powerful double espresso — for true lovers of strong coffee.' },
+    full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', es:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:3, cat:0, price:'€5.50', photo:'photo-1572442388796-11668a67e53d',
     badges:['popular'],
-    name:{ fr:'Cappuccino', en:'Cappuccino', ar:'كابتشينو' },
-    desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', ar:'إسبريسو وحليب مسخَّن وزبد مخملي — التوازن المثالي.' },
-    full:{ fr:'Notre cappuccino est préparé avec un espresso maison et un lait entier texturé à la vapeur à 65°C pour une mousse soyeuse et homogène. Un classique indémodable.', en:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.', ar:'يُحضَّر كابتشينو بإسبريسو البيت وحليب كامل الدسم مبخَّر على 65°C لزبد حريري ومتجانس. كلاسيكي لا يمل.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Cappuccino', en:'Cappuccino', es:'Cappuccino' },
+    desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', es:'Espresso, steamed milk and velvety foam — the perfect balance.' },
+    full:{ fr:'Notre cappuccino est préparé avec un espresso maison et un lait entier texturé à la vapeur à 65°C pour une mousse soyeuse et homogène. Un classique indémodable.', en:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.', es:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:4, cat:0, price:'€6.00', photo:'photo-1561882468-9110e03e0f78',
     badges:['popular'],
-    name:{ fr:'Café Latte', en:'Café Latte', ar:'كافيه لاتيه' },
-    desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', ar:'إسبريسو على سرير من الحليب الحريري، ناعم وكريمي.' },
-    full:{ fr:'Le café latte associe un espresso intense à une grande quantité de lait micro-moussé pour une boisson douce, longue et réconfortante. Parfait pour un moment de détente.', en:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.', ar:'يجمع الكافيه لاتيه بين إسبريسو قوي وكمية كبيرة من الحليب المرغي لمشروب ناعم وطويل ومريح. مثالي للاسترخاء.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Café Latte', en:'Café Latte', es:'Café Latte' },
+    desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', es:'Espresso on a bed of silky milk, soft and creamy.' },
+    full:{ fr:'Le café latte associe un espresso intense à une grande quantité de lait micro-moussé pour une boisson douce, longue et réconfortante. Parfait pour un moment de détente.', en:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.', es:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:5, cat:0, price:'€5.00', photo:'photo-1514432324607-a09d9b4aefdd',
     badges:[],
-    name:{ fr:'Café Noisette', en:'Hazelnut Coffee', ar:'قهوة بالبندق' },
-    desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', ar:'إسبريسو مع قليل من الحليب بنكهة البندق.' },
-    full:{ fr:'Un espresso doux agrémenté d\'un soupçon de lait chaud et d\'un arôme de noisette. La douceur d\'un latte avec le caractère d\'un espresso.', en:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.', ar:'إسبريسو ناعم مع لمسة من الحليب الساخن ورائحة البندق. حلاوة اللاتيه مع طابع الإسبريسو.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Café Noisette', en:'Hazelnut Coffee', es:'Hazelnut Coffee' },
+    desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', es:'Espresso with a cloud of hazelnut-scented milk.' },
+    full:{ fr:'Un espresso doux agrémenté d\'un soupçon de lait chaud et d\'un arôme de noisette. La douceur d\'un latte avec le caractère d\'un espresso.', en:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.', es:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:6, cat:0, price:'€4.50', photo:'photo-1496318447583-f524534e9ce1',
     badges:[],
-    name:{ fr:'Americano', en:'Americano', ar:'أمريكانو' },
-    desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', ar:'إسبريسو ممدود بالماء الساخن — قهوة طويلة ومتوازنة.' },
-    full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', ar:'الأمريكانو هو إسبريسو مخفف بالماء الساخن للحصول على قهوة طويلة بطعم كامل لكن أقل حدة. مثالي لمن يفضلون قهوة أكثر نعومة.' },
+    name:{ fr:'Americano', en:'Americano', es:'Americano' },
+    desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', es:'Espresso extended with hot water — long and balanced coffee.' },
+    full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', es:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:7, cat:0, price:'€3.00', photo:'photo-1544787219-7f47ccb76574',
     badges:[],
-    name:{ fr:'Thé Nature', en:'Plain Tea', ar:'شاي طبيعي' },
-    desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', ar:'شاي أسود أو أخضر حسب اختيارك — دافئ ومريح.' },
-    full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', ar:'شاي محضَّر بعناية، يُقدَّم في إبريق أنيق مع السكر والليمون. اختر بين الشاي الأسود سيلاني والشاي الأخضر.' },
+    name:{ fr:'Thé Nature', en:'Plain Tea', es:'Plain Tea' },
+    desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', es:'Black or green tea of your choice — warm and comforting.' },
+    full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', es:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:8, cat:0, price:'€4.00', photo:'photo-1556679343-c7306c1976bc',
     badges:['popular'],
-    name:{ fr:'Thé à la Menthe', en:'Mint Tea', ar:'شاي بالنعناع' },
-    desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', ar:'شاي أخضر طازج منقوع بالنعناع الطازج — تقليدي ومنعش.' },
-    full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', ar:'يُحضَّر شاي النعناع بالطريقة التقليدية مع نعناع طازج وشاي أخضر عالي الجودة ولمسة من السكر. كلاسيكي خالد.' },
+    name:{ fr:'Thé à la Menthe', en:'Mint Tea', es:'Mint Tea' },
+    desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', es:'Fresh green tea infused with fresh mint — traditional and refreshing.' },
+    full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', es:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:9, cat:0, price:'€7.00', photo:'photo-1542990253-a781e904e62f',
     badges:[],
-    name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', ar:'شوكولاتة ساخنة' },
-    desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', ar:'شوكولاتة ناعمة وكريمية — راحة مضمونة.' },
-    full:{ fr:'Un chocolat chaud préparé avec du vrai cacao en poudre et du lait entier, couronné d\'une généreuse touche de chantilly. Le petit plaisir par excellence.', en:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.', ar:'شوكولاتة ساخنة محضرة بمسحوق الكاكاو الحقيقي والحليب الكامل، مزيَّنة بالكريمة المخفوقة. المتعة الصغيرة بامتياز.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', es:'Hot Chocolate' },
+    desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', es:'Smooth and creamy chocolate — guaranteed comfort.' },
+    full:{ fr:'Un chocolat chaud préparé avec du vrai cacao en poudre et du lait entier, couronné d\'une généreuse touche de chantilly. Le petit plaisir par excellence.', en:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.', es:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
 
   /* ---- CAT 1: Boissons Froides ---- */
   {
     id:10, cat:1, price:'€12.00', photo:'photo-1514362545857-3bc16c4c7d1b',
     badges:['popular'],
-    name:{ fr:'Mojito Classique', en:'Classic Mojito', ar:'موهيتو كلاسيك' },
-    desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', ar:'نعناع طازج وليمون أخضر وسكر قصب ومياه فوارة — الأصلي.' },
-    full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', ar:'موهيتو الكلاسيك يُحضَّر لحظياً بالنعناع الطازج المهروس وعصير الليمون الأخضر الطازج وسكر القصب والمياه الفوارة. بدون كحول، 100% نكهة.' },
+    name:{ fr:'Mojito Classique', en:'Classic Mojito', es:'Classic Mojito' },
+    desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', es:'Fresh mint, lime, cane sugar and sparkling water — the original.' },
+    full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', es:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:11, cat:1, price:'€12.00', photo:'photo-1544145945-f90425340c7e',
     badges:['popular'],
-    name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', ar:'موهيتو فراولة' },
-    desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', ar:'فراولة طازجة ونعناع وليمون أخضر ومياه فوارة — فاكهي ومنعش.' },
-    full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', ar:'نسخة شهية من موهيتونا مع فراولة طازجة مهروسة ونعناع مسحوق ومياه فوارة باردة جداً. جميل بصرياً ولذيذ.' },
+    name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', es:'Strawberry Mojito' },
+    desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', es:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.' },
+    full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', es:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:12, cat:1, price:'€13.00', photo:'photo-1553361371-9b22f78e8b1d',
     badges:[],
-    name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', ar:'سموثي فواكه حمراء' },
-    desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', ar:'فراولة وتوت أحمر وتوت أزرق — ناعم ومليء بالفيتامينات.' },
-    full:{ fr:'Un mélange généreux de fruits rouges frais ou surgelés, mixés avec du lait ou du jus de pomme pour une texture épaisse et onctueuse. Riche en antioxydants.', en:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.', ar:'مزيج سخي من الفواكه الحمراء الطازجة أو المجمدة، مخلوطة بالحليب أو عصير التفاح لقوام كثيف وناعم. غني بمضادات الأكسدة.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', es:'Red Fruits Smoothie' },
+    desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', es:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.' },
+    full:{ fr:'Un mélange généreux de fruits rouges frais ou surgelés, mixés avec du lait ou du jus de pomme pour une texture épaisse et onctueuse. Riche en antioxydants.', en:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.', es:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:13, cat:1, price:'€13.00', photo:'photo-1490645935967-10de6ba17061',
     badges:[],
-    name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', ar:'سموثي مانجو وموز' },
-    desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', ar:'مانجو وموز مهروسان — استوائي، حلو ومغذٍّ.' },
-    full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', ar:'مانجو عصيرية وموز كريمي مخلوطان معاً لسموثي كثيف محلى طبيعياً وممتلئ بالطاقة. شحنة كاملة من الفيتامينات الاستوائية.' },
+    name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', es:'Mango Banana Smoothie' },
+    desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', es:'Blended mango and banana — tropical, sweet and nourishing.' },
+    full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', es:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:14, cat:1, price:'€8.00', photo:'photo-1621506289937-a8e4df240d0b',
     badges:[],
-    name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', ar:'عصير برتقال طازج' },
-    desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', ar:'برتقال طازج معصور عند الطلب — نقي وطبيعي.' },
-    full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', ar:'برتقال طازج مختار بعناية، معصور أمامك لضمان عصير نقي بدون إضافات أو مواد حافظة. طعم الطبيعة.' },
+    name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', es:'Fresh Orange Juice' },
+    desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', es:'Fresh oranges pressed on demand — pure and natural.' },
+    full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', es:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:15, cat:1, price:'€8.00', photo:'photo-1589733955941-5eeaf752f6dd',
     badges:[],
-    name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', ar:'عصير بطيخ' },
-    desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', ar:'بطيخ طازج مهروس — خفيف وحلو ومنعش للغاية.' },
-    full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', ar:'بطيخ أحمر ناضج مهروس مع لمسة من النعناع والليمون لعصير صيفي منعش. يُقدَّم بارداً جداً.' },
+    name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', es:'Watermelon Juice' },
+    desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', es:'Blended fresh watermelon — light, sweet and ultra-refreshing.' },
+    full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', es:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:16, cat:1, price:'€9.00', photo:'photo-1461023058943-07fcbe16d735',
     badges:['popular'],
-    name:{ fr:'Ice Latte', en:'Ice Latte', ar:'آيس لاتيه' },
-    desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', ar:'إسبريسو على الثلج مع حليب بارد — قهوة مثلجة مخملية.' },
-    full:{ fr:'Un espresso double versé sur des glaçons avec du lait entier froid pour une boisson rafraîchissante qui allie la puissance du café à la douceur du lait. À siroter lentement.', en:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.', ar:'إسبريسو مزدوج يُسكب على الثلج مع حليب كامل الدسم بارد لمشروب منعش يجمع قوة القهوة مع حلاوة الحليب. اشربه ببطء.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Ice Latte', en:'Ice Latte', es:'Ice Latte' },
+    desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', es:'Espresso over ice with cold milk — velvety iced coffee.' },
+    full:{ fr:'Un espresso double versé sur des glaçons avec du lait entier froid pour une boisson rafraîchissante qui allie la puissance du café à la douceur du lait. À siroter lentement.', en:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.', es:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:17, cat:1, price:'€8.00', photo:'photo-1600718374662-0483d2b9da44',
     badges:[],
-    name:{ fr:'Ice Coffee', en:'Ice Coffee', ar:'قهوة مثلجة' },
-    desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', ar:'قهوة باردة محضَّرة، محلاة ومقدَّمة على الثلج — بسيطة ولذيذة.' },
-    full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', ar:'يُحضَّر آيس كوفي من قهوة قوية مبرَّدة، محلاة قليلاً في كوب كبير على الثلج. مثالي للأيام الحارة.' },
+    name:{ fr:'Ice Coffee', en:'Ice Coffee', es:'Ice Coffee' },
+    desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', es:'Prepared cold coffee, sweetened and served over ice — simple and delicious.' },
+    full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', es:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:18, cat:1, price:'€13.00', photo:'photo-1568901346375-23c9450c58cd',
     badges:[],
-    name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', ar:'ميلك شيك شوكولاتة' },
-    desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', ar:'حليب وآيس كريم شوكولاتة وشراب — كثيف وغني وشهي.' },
-    full:{ fr:'Notre milkshake au chocolat est mixé avec de la glace artisanale au chocolat, du lait entier et un généreux filet de sirop de chocolat. Couronné de chantilly et d\'éclats de chocolat.', en:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.', ar:'ميلك شيك الشوكولاتة مخلوط بآيس كريم شوكولاتة حرفي وحليب كامل الدسم وشراب شوكولاتة سخي. مزيَّن بالكريمة المخفوقة وشظايا الشوكولاتة.' },
-    allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], ar:['الحليب','الغلوتين'] }
+    name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', es:'Chocolate Milkshake' },
+    desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', es:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.' },
+    full:{ fr:'Notre milkshake au chocolat est mixé avec de la glace artisanale au chocolat, du lait entier et un généreux filet de sirop de chocolat. Couronné de chantilly et d\'éclats de chocolat.', en:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.', es:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.' },
+    allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], es:['Milk','Gluten'] }
   },
   {
     id:19, cat:1, price:'€13.00', photo:'photo-1614086138868-51ab4f45f84c',
     badges:['popular'],
-    name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', ar:'ميلك شيك فراولة' },
-    desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', ar:'فراولة طازجة وآيس كريم فانيلا وحليب — فاكهي وكريمي.' },
-    full:{ fr:'Des fraises fraîches mixées avec de la glace à la vanille et du lait pour un shake fruité et crémeux. Une douceur irrésistible à toute heure.', en:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.', ar:'فراولة طازجة مخلوطة مع آيس كريم الفانيلا والحليب لميلك شيك فاكهي وكريمي. متعة لا تقاوم في أي وقت.' },
-    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+    name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', es:'Strawberry Milkshake' },
+    desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', es:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.' },
+    full:{ fr:'Des fraises fraîches mixées avec de la glace à la vanille et du lait pour un shake fruité et crémeux. Une douceur irrésistible à toute heure.', en:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.', es:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.' },
+    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
   },
   {
     id:20, cat:1, price:'€14.00', photo:'photo-1551024709-8f23befc6f87',
     badges:['new'],
-    name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', ar:'كوكتيل استوائي' },
-    desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', ar:'أناناس ومانجو وفاكهة العاطفة والليمون الأخضر — رحلة استوائية.' },
-    full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', ar:'كوكتيل بدون كحول بنكهات استوائية، محضَّر بعصير الأناناس وبيوريه المانجو وفاكهة العاطفة ولمسة من الليمون الأخضر. غريب الطابع ومروٍّ للعطش.' },
+    name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', es:'Tropical Cocktail' },
+    desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', es:'Pineapple, mango, passion fruit and lime — a tropical journey.' },
+    full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', es:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:21, cat:1, price:'€11.00', photo:'photo-1543362906-acfc16c67564',
     badges:[],
-    name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', ar:'ديتوكس ليمون وزنجبيل' },
-    desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', ar:'ماء منقوع بالليمون والزنجبيل والنعناع — منقٍّ وغني بالفيتامينات.' },
-    full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', ar:'ديتوكس محضَّر بماء بارد منقوع بالليمون الطازج والزنجبيل المبشور والنعناع الطازج. مشروب صحي وخفيف ومنشط.' },
+    name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', es:'Lemon Ginger Detox' },
+    desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', es:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.' },
+    full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', es:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
 
@@ -6417,223 +6417,223 @@ function getDefaultItems() {
   {
     id:22, cat:2, price:'€17.00', photo:'photo-1512621776951-a57141f2eefd',
     badges:[],
-    name:{ fr:'Salade César', en:'Caesar Salad', ar:'سالاد سيزار' },
-    desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', ar:'خس روماني ودجاج مشوي وخبز محمص وبارميزان وصلصة سيزار البيت.' },
-    full:{ fr:'Notre salade César est préparée avec de la laitue romaine croquante, du poulet grillé mariné aux herbes, des croûtons dorés maison, des copeaux de parmesan et notre sauce César crémeuse préparée chaque jour.', en:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.', ar:'سالاد سيزار يُحضَّر بالخس الروماني المقرمش والدجاج المشوي المتبَّل بالأعشاب والخبز المحمص المنزلي وشرائح البارميزان وصلصة سيزار الكريمية اليومية.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Salade César', en:'Caesar Salad', es:'Caesar Salad' },
+    desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', es:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.' },
+    full:{ fr:'Notre salade César est préparée avec de la laitue romaine croquante, du poulet grillé mariné aux herbes, des croûtons dorés maison, des copeaux de parmesan et notre sauce César crémeuse préparée chaque jour.', en:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.', es:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:23, cat:2, price:'€16.00', photo:'photo-1540420773420-3366772f4999',
     badges:[],
-    name:{ fr:'Salade Thon', en:'Tuna Salad', ar:'سالاد تونة' },
-    desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', ar:'تونة وطماطم وزيتون وبيض مسلوق وذرة وخل البيت.' },
-    full:{ fr:'Une salade fraîche et nourrissante avec du thon de qualité, des légumes croquants, des olives et une vinaigrette légère préparée chaque jour. Idéale pour un repas léger.', en:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.', ar:'سالاد طازج ومغذٍّ مع تونة عالية الجودة وخضروات مقرمشة وزيتون وخل خفيف يُحضَّر يومياً. مثالي لوجبة خفيفة.' },
-    allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], ar:['البيض','السمك'] }
+    name:{ fr:'Salade Thon', en:'Tuna Salad', es:'Tuna Salad' },
+    desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', es:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.' },
+    full:{ fr:'Une salade fraîche et nourrissante avec du thon de qualité, des légumes croquants, des olives et une vinaigrette légère préparée chaque jour. Idéale pour un repas léger.', en:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.', es:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.' },
+    allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], es:['Eggs','Fish'] }
   },
   {
     id:24, cat:2, price:'€24.00', photo:'photo-1563379926898-05f4575a45d8',
     badges:['popular'],
-    name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', ar:'باستا كاربونارا' },
-    desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', ar:'معكرونة كريمية ولحم مقدد وصفار بيض وبارميزان — كلاسيكي إيطالي.' },
-    full:{ fr:'Notre carbonara est préparée avec des pâtes fraîches cuites al dente, une crème de parmesan onctueuse et du bacon fumé. Saupoudrée de poivre noir fraîchement moulu.', en:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.', ar:'كاربونارا محضَّرة بمعكرونة طازجة مطبوخة al dente وكريمة البارميزان الناعمة واللحم المقدد المدخن. مرشوشة بالفلفل الأسود الطازج.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', es:'Pasta Carbonara' },
+    desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', es:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.' },
+    full:{ fr:'Notre carbonara est préparée avec des pâtes fraîches cuites al dente, une crème de parmesan onctueuse et du bacon fumé. Saupoudrée de poivre noir fraîchement moulu.', en:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.', es:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:25, cat:2, price:'€24.00', photo:'photo-1621996346565-e3dbc646d9a9',
     badges:[],
-    name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', ar:'باستا بولونيز' },
-    desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', ar:'معكرونة مع صلصة طماطم اللحم المفروم، مطهوة ببطء.' },
-    full:{ fr:'Notre bolognaise est préparée avec de la viande hachée de bœuf, des tomates concassées, des oignons et des herbes aromatiques, mijotée pendant plusieurs heures pour un goût riche et profond.', en:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.', ar:'بولونيز محضَّرة من اللحم المفروم والطماطم المجروشة والبصل والأعشاب العطرية، مطهوة لساعات لطعم غني وعميق.' },
-    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+    name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', es:'Pasta Bolognese' },
+    desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', es:'Pasta with minced meat tomato sauce, slow-simmered.' },
+    full:{ fr:'Notre bolognaise est préparée avec de la viande hachée de bœuf, des tomates concassées, des oignons et des herbes aromatiques, mijotée pendant plusieurs heures pour un goût riche et profond.', en:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.', es:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], es:['Gluten'] }
   },
   {
     id:26, cat:2, price:'€26.00', photo:'photo-1586190848861-99aa4a171e90',
     badges:['popular'],
-    name:{ fr:'Hamburger Classic', en:'Classic Burger', ar:'هامبرغر كلاسيك' },
-    desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', ar:'لحم مفروم وشيدر مذاب وخس وطماطم وصلصة البيت.' },
-    full:{ fr:'Notre burger est composé d\'un steak haché de bœuf juteux, d\'une tranche de cheddar fondu, de salade fraîche, de tomate et de notre sauce secrète maison. Servi avec des frites ou une salade.', en:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.', ar:'يتكون هامبرغر من لحم بقري عصيري وشريحة شيدر مذوبة وخس طازج وطماطم وصلصتنا السرية. يُقدَّم مع البطاطس أو السالاد.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Hamburger Classic', en:'Classic Burger', es:'Classic Burger' },
+    desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', es:'Beef patty, melted cheddar, lettuce, tomato and house sauce.' },
+    full:{ fr:'Notre burger est composé d\'un steak haché de bœuf juteux, d\'une tranche de cheddar fondu, de salade fraîche, de tomate et de notre sauce secrète maison. Servi avec des frites ou une salade.', en:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.', es:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:27, cat:2, price:'€26.00', photo:'photo-1568901346375-23c9450c58cd',
     badges:['new'],
-    name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', ar:'بيرغر دجاج كريسبي' },
-    desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', ar:'دجاج مقلي مقرمش وكول سلو ومخللات وصلصة رانش.' },
-    full:{ fr:'Un filet de poulet croustillant pané et frit, posé sur un pain brioché avec du coleslaw maison, des pickles croquants et une sauce ranch crémeuse. Savoureux et généreux.', en:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.', ar:'فيليه دجاج مقرمش مُقلَّى على خبز برييوش مع كول سلو منزلي ومخللات مقرمشة وصلصة رانش كريمية. لذيذ وسخي.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', es:'Crispy Chicken Burger' },
+    desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', es:'Crispy fried chicken, coleslaw, pickles and ranch sauce.' },
+    full:{ fr:'Un filet de poulet croustillant pané et frit, posé sur un pain brioché avec du coleslaw maison, des pickles croquants et une sauce ranch crémeuse. Savoureux et généreux.', en:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.', es:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:28, cat:2, price:'€22.00', photo:'photo-1552332386-f8dd00dc2f85',
     badges:['popular'],
-    name:{ fr:'Tacos Poulet', en:'Chicken Tacos', ar:'تاكوس دجاج' },
-    desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', ar:'خبز ناعم ودجاج مشوي وجبن مذاب وخس وصلصة.' },
-    full:{ fr:'Nos tacos sont préparés dans une galette moelleuse avec du poulet mariné grillé, du fromage fondu, de la salade fraîche, des tomates et une sauce crémeuse épicée.', en:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.', ar:'تاكوس محضَّرة في خبز ناعم مع دجاج مشوي متبَّل وجبن مذاب وخس طازج وطماطم وصلصة كريمية حارة.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+    name:{ fr:'Tacos Poulet', en:'Chicken Tacos', es:'Chicken Tacos' },
+    desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', es:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.' },
+    full:{ fr:'Nos tacos sont préparés dans une galette moelleuse avec du poulet mariné grillé, du fromage fondu, de la salade fraîche, des tomates et une sauce crémeuse épicée.', en:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.', es:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
   },
   {
     id:29, cat:2, price:'€20.00', photo:'photo-1528735602780-2552fd46c7af',
     badges:[],
-    name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', ar:'شياباتا تونة وجبن' },
-    desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', ar:'خبز شياباتا مشوي وتونة وجبن مذاب وطماطم وجرجير.' },
-    full:{ fr:'Une ciabatta croustillante garnie de thon à l\'huile d\'olive, de fromage fondu, de tomates fraîches et de roquette. Grillée à point pour un résultat chaud et savoureux.', en:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.', ar:'شياباتا مقرمشة محشوة بالتونة بزيت الزيتون والجبن المذاب والطماطم الطازجة والجرجير. مشوية بشكل مثالي لنتيجة دافئة ولذيذة.' },
-    allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], ar:['الغلوتين','الحليب','السمك'] }
+    name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', es:'Tuna Cheese Ciabatta' },
+    desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', es:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.' },
+    full:{ fr:'Une ciabatta croustillante garnie de thon à l\'huile d\'olive, de fromage fondu, de tomates fraîches et de roquette. Grillée à point pour un résultat chaud et savoureux.', en:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.', es:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.' },
+    allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], es:['Gluten','Milk','Fish'] }
   },
   {
     id:30, cat:2, price:'€18.00', photo:'photo-1565299507177-b0ac66763828',
     badges:[],
-    name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', ar:'ساندويش لبناني دجاج' },
-    desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', ar:'خبز بيتا ودجاج مشوي بالتوابل وثوم وملفوف وطماطم.' },
-    full:{ fr:'Un sandwich généreux dans un pain pita chaud avec du poulet mariné aux épices orientales, de la sauce toum à l\'ail, du chou blanc et des tomates fraîches. Un goût authentique.', en:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.', ar:'ساندويش سخي في خبز بيتا دافئ مع دجاج متبَّل بالتوابل الشرقية وصلصة الثوم (التومة) والملفوف الأبيض والطماطم الطازجة. طعم أصيل.' },
-    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+    name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', es:'Lebanese Chicken Sandwich' },
+    desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', es:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.' },
+    full:{ fr:'Un sandwich généreux dans un pain pita chaud avec du poulet mariné aux épices orientales, de la sauce toum à l\'ail, du chou blanc et des tomates fraîches. Un goût authentique.', en:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.', es:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], es:['Gluten'] }
   },
   {
     id:31, cat:2, price:'€16.00', photo:'photo-1519676867240-f03562e64548',
     badges:[],
-    name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', ar:'كريب دجاج وجبن' },
-    desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', ar:'كريب رفيع مملح ودجاج مشوي وجبن مذاب وأعشاب طازجة.' },
-    full:{ fr:'Une crêpe salée fine et dorée garnie de poulet grillé émincé, de fromage fondu crémeux et de fines herbes fraîches. Pliée et servie chaude.', en:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.', ar:'كريب مملح رفيع وذهبي محشو بشرائح الدجاج المشوي والجبن المذاب الكريمي والأعشاب الطازجة. مطوي ومقدَّم ساخناً.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', es:'Chicken Cheese Crêpe' },
+    desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', es:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.' },
+    full:{ fr:'Une crêpe salée fine et dorée garnie de poulet grillé émincé, de fromage fondu crémeux et de fines herbes fraîches. Pliée et servie chaude.', en:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.', es:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:32, cat:2, price:'€16.00', photo:'photo-1528735602780-2552fd46c7af',
     badges:[],
-    name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', ar:'باني موزاريلا وطماطم' },
-    desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', ar:'خبز باني مشوي وموزاريلا ذائبة وطماطم طازجة وريحان.' },
-    full:{ fr:'Un panini grillé croustillant garni de mozzarella fondante, de tomates fraîches tranchées et de feuilles de basilic frais. Un délice simple et savoureux.', en:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.', ar:'باني مشوي مقرمش محشو بالموزاريلا الذائبة والطماطم الطازجة المقطعة وأوراق الريحان الطازج. متعة بسيطة ولذيذة.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+    name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', es:'Mozzarella Tomato Panini' },
+    desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', es:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.' },
+    full:{ fr:'Un panini grillé croustillant garni de mozzarella fondante, de tomates fraîches tranchées et de feuilles de basilic frais. Un délice simple et savoureux.', en:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.', es:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
   },
   {
     id:33, cat:2, price:'€14.00', photo:'photo-1525351484163-7529414344d8',
     badges:[],
-    name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', ar:'أومليت بالجبن' },
-    desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', ar:'ثلاث بيضات طازجة وجبن مذاب وأعشاب عطرية — بسيط وسخي.' },
-    full:{ fr:'Notre omlette est préparée avec trois œufs frais battus, du fromage fondu généreusement et des fines herbes fraîches. Moelleuse à l\'intérieur, légèrement dorée à l\'extérieur.', en:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.', ar:'أومليت محضَّرة من ثلاث بيضات طازجة مخفوقة وجبن مذاب بسخاء وأعشاب طازجة. طرية من الداخل، ذهبية خفيفة من الخارج.' },
-    allergens:{ fr:['Œufs','Lait'], en:['Eggs','Milk'], ar:['البيض','الحليب'] }
+    name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', es:'Cheese Omelette' },
+    desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', es:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.' },
+    full:{ fr:'Notre omlette est préparée avec trois œufs frais battus, du fromage fondu généreusement et des fines herbes fraîches. Moelleuse à l\'intérieur, légèrement dorée à l\'extérieur.', en:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.', es:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.' },
+    allergens:{ fr:['Œufs','Lait'], en:['Eggs','Milk'], es:['Eggs','Milk'] }
   },
 
   /* ---- CAT 3: Sucré ---- */
   {
     id:34, cat:3, price:'€10.00', photo:'photo-1519676867240-f03562e64548',
     badges:['popular'],
-    name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', ar:'كريب نوتيلا' },
-    desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', ar:'كريب رفيع محشو بسخاء بالنوتيلا — كلاسيكي خالد.' },
-    full:{ fr:'Une crêpe fine et dorée nappée d\'une couche généreuse de Nutella fondant. Simple, gourmand et inégalable. À déguster chaud pour un maximum de plaisir.', en:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.', ar:'كريب رفيع ذهبي مطلي بطبقة سخية من النوتيلا الذائبة. بسيط وشهي ولا يُضاهى. الأفضل تناوله ساخناً للحصول على أقصى متعة.' },
-    allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], ar:['الغلوتين','الحليب','المكسرات'] }
+    name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', es:'Nutella Crêpe' },
+    desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', es:'Fine sweet crêpe generously filled with Nutella — a timeless classic.' },
+    full:{ fr:'Une crêpe fine et dorée nappée d\'une couche généreuse de Nutella fondant. Simple, gourmand et inégalable. À déguster chaud pour un maximum de plaisir.', en:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.', es:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.' },
+    allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], es:['Gluten','Milk','Tree nuts'] }
   },
   {
     id:35, cat:3, price:'€11.00', photo:'photo-1605288558240-e2d0fa15c1d4',
     badges:[],
-    name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', ar:'كريب فراولة وكريمة' },
-    desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', ar:'كريب حلو مع فراولة طازجة وكريمة شانتيه البيت.' },
-    full:{ fr:'Une crêpe légère garnie de fraises fraîches tranchées et d\'une généreuse rosette de chantilly maison. Un dessert frais et élégant.', en:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.', ar:'كريب خفيف محشو بشرائح الفراولة الطازجة وزهرة سخية من كريمة شانتيه البيت. حلوى طازجة وأنيقة.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', es:'Strawberry Cream Crêpe' },
+    desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', es:'Sweet crêpe with fresh strawberries and house whipped cream.' },
+    full:{ fr:'Une crêpe légère garnie de fraises fraîches tranchées et d\'une généreuse rosette de chantilly maison. Un dessert frais et élégant.', en:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.', es:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:36, cat:3, price:'€11.00', photo:'photo-1562376552-0d160a2f238a',
     badges:[],
-    name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', ar:'غوفر شوكولاتة' },
-    desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', ar:'غوفر مقرمش وصلصة شوكولاتة ساخنة وكريمة مخفوقة.' },
-    full:{ fr:'Notre gaufre est croustillante à l\'extérieur et moelleuse à l\'intérieur, nappée d\'une sauce au chocolat chaude et couronnée d\'une généreuse chantilly. Un régal à partager.', en:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.', ar:'غوفر مقرمشة من الخارج وطرية من الداخل، مغطاة بصلصة شوكولاتة ساخنة ومزيَّنة بكريمة مخفوقة سخية. متعة للمشاركة.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', es:'Chocolate Waffle' },
+    desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', es:'Crispy waffle, warm chocolate sauce and whipped cream.' },
+    full:{ fr:'Notre gaufre est croustillante à l\'extérieur et moelleuse à l\'intérieur, nappée d\'une sauce au chocolat chaude et couronnée d\'une généreuse chantilly. Un régal à partager.', en:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.', es:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:37, cat:3, price:'€13.00', photo:'photo-1567620832903-9fc6debc209f',
     badges:['new','popular'],
-    name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', ar:'غوفر لوتس' },
-    desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', ar:'غوفر ذهبي وكريمة بسكويت لوتس وفتات سبيكولوس.' },
-    full:{ fr:'Notre gaufre Lotus est notre création signature. Une gaufre dorée et croustillante généreusement nappée de crème de biscuit Lotus fondu, parsemée d\'éclats de Speculoos caramélisés.', en:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.', ar:'غوفر لوتس هو إبداعنا المميز. غوفر ذهبي ومقرمش مغطى بسخاء بكريمة بسكويت لوتس المذاب، مرشوش بفتات سبيكولوس المكرمل.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+    name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', es:'Lotus Waffle' },
+    desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', es:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.' },
+    full:{ fr:'Notre gaufre Lotus est notre création signature. Une gaufre dorée et croustillante généreusement nappée de crème de biscuit Lotus fondu, parsemée d\'éclats de Speculoos caramélisés.', en:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.', es:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
   },
   {
     id:38, cat:3, price:'€12.00', photo:'photo-1530373239216-42518e6b4063',
     badges:['popular'],
-    name:{ fr:'Tiramisu Maison', en:'House Tiramisu', ar:'تيراميسو البيت' },
-    desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', ar:'ماسكاربوني وبسكويت منقوع بالقهوة وكاكاو — وصفة إيطالية منزلية.' },
-    full:{ fr:'Notre tiramisu est préparé chaque jour selon la recette italienne traditionnelle : mascarpone crémeux, biscuits savoiardi imbibés de café fort et saupoudrés de cacao pur. Un dessert inoubliable.', en:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.', ar:'يُحضَّر تيراميسو يومياً وفق الوصفة الإيطالية التقليدية: ماسكاربوني كريمي وبسكويت سافواردي منقوع في قهوة قوية ومرشوش بالكاكاو الخالص. حلوى لا تُنسى.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Tiramisu Maison', en:'House Tiramisu', es:'House Tiramisu' },
+    desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', es:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.' },
+    full:{ fr:'Notre tiramisu est préparé chaque jour selon la recette italienne traditionnelle : mascarpone crémeux, biscuits savoiardi imbibés de café fort et saupoudrés de cacao pur. Un dessert inoubliable.', en:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.', es:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:39, cat:3, price:'€12.00', photo:'photo-1533134242443-d4fd215305ad',
     badges:[],
-    name:{ fr:'Cheesecake', en:'Cheesecake', ar:'تشيز كيك' },
-    desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', ar:'قاعدة هشة وكريمة جبن ناعمة وصلصة فواكه حمراء.' },
-    full:{ fr:'Notre cheesecake est préparé avec une base de biscuits émiettés beurrés, une crème de fromage Philadelphia onctueuse et un coulis de fruits rouges maison. Fraîcheur et gourmandise.', en:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.', ar:'تشيز كيك يتميز بقاعدة بسكويت مجروش بالزبدة وحشوة جبن فيلادلفيا ناعمة وصلصة فواكه حمراء منزلية. نضارة وشهوة.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Cheesecake', en:'Cheesecake', es:'Cheesecake' },
+    desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', es:'Buttery base, smooth cream cheese and red fruit coulis.' },
+    full:{ fr:'Notre cheesecake est préparé avec une base de biscuits émiettés beurrés, une crème de fromage Philadelphia onctueuse et un coulis de fruits rouges maison. Fraîcheur et gourmandise.', en:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.', es:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:40, cat:3, price:'€10.00', photo:'photo-1606312619070-d48b5b7a1b96',
     badges:[],
-    name:{ fr:'Brownie Chaud', en:'Warm Brownie', ar:'براوني ساخن' },
-    desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', ar:'براوني شوكولاتة ذائب، مقدَّم ساخناً مع آيس كريم فانيلا.' },
-    full:{ fr:'Un brownie dense et fondant, riche en chocolat et noix, servi chaud et accompagné d\'une boule de glace à la vanille. Le contraste chaud-froid est irrésistible.', en:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.', ar:'براوني كثيف وذائب، غني بالشوكولاتة والمكسرات، مقدَّم ساخناً مع كرة آيس كريم فانيلا. التناقض بين الحار والبارد لا يقاوم.' },
-    allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], ar:['الغلوتين','الحليب','البيض','المكسرات'] }
+    name:{ fr:'Brownie Chaud', en:'Warm Brownie', es:'Warm Brownie' },
+    desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', es:'Melting chocolate brownie, served warm with vanilla ice cream.' },
+    full:{ fr:'Un brownie dense et fondant, riche en chocolat et noix, servi chaud et accompagné d\'une boule de glace à la vanille. Le contraste chaud-froid est irrésistible.', en:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.', es:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.' },
+    allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], es:['Gluten','Milk','Eggs','Tree nuts'] }
   },
   {
     id:41, cat:3, price:'€13.00', photo:'photo-1564355808539-22fda35bed7e',
     badges:['popular'],
-    name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', ar:'كولان شوكولاتة' },
-    desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', ar:'كيك طري بقلب شوكولاتة ساخنة ذائبة — الحلوى المميزة.' },
-    full:{ fr:'Notre coulant est cuit à la commande pour garantir un cœur coulant parfait. Servi avec une boule de glace à la vanille, il révèle un chocolat noir intense à la première cuillère.', en:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.', ar:'يُخبز الكولان عند الطلب لضمان قلب ذائب مثالي. مقدَّم مع كرة آيس كريم فانيلا، يكشف شوكولاتة داكنة مكثفة عند أول ملعقة.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', es:'Chocolate Lava Cake' },
+    desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', es:'Soft cake with a flowing hot chocolate centre — the signature dessert.' },
+    full:{ fr:'Notre coulant est cuit à la commande pour garantir un cœur coulant parfait. Servi avec une boule de glace à la vanille, il révèle un chocolat noir intense à la première cuillère.', en:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.', es:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
 
   /* ---- CAT 4: Le Matin ---- */
   {
     id:42, cat:4, price:'€18.00', photo:'photo-1504754524776-8f4f37790ca0',
     badges:[],
-    name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', ar:'فطور كلاسيك' },
-    desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', ar:'قهوة أو شاي وخبز بالزبدة والمربى وعصير برتقال وجبن طازج.' },
-    full:{ fr:'Notre petit-déjeuner classique comprend une boisson chaude au choix, des tranches de pain frais avec beurre et confiture, un jus d\'orange pressé et un fromage frais. Le démarrage parfait.', en:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.', ar:'فطور كلاسيك يشمل مشروباً ساخناً حسب الاختيار وشرائح خبز طازج مع الزبدة والمربى وعصير برتقال معصور وجبناً طازجاً. البداية المثالية.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+    name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', es:'Classic Breakfast' },
+    desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', es:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.' },
+    full:{ fr:'Notre petit-déjeuner classique comprend une boisson chaude au choix, des tranches de pain frais avec beurre et confiture, un jus d\'orange pressé et un fromage frais. Le démarrage parfait.', en:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.', es:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
   },
   {
     id:43, cat:4, price:'€24.00', photo:'photo-1533089860892-a7c6f0a88666',
     badges:['popular'],
-    name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', ar:'فطور كامل' },
-    desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', ar:'بيض مخفوق وجبن وخبز محمص وعصير وقهوة ويوغرت وفواكه طازجة.' },
-    full:{ fr:'Un petit-déjeuner généreux avec des œufs brouillés crémeux, du fromage, des toasts grillés, un jus de fruits pressé, un café maison, un yaourt et une assiette de fruits de saison.', en:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.', ar:'فطور سخي مع بيض مخفوق كريمي وجبن وخبز مشوي وعصير فواكه طازج وقهوة البيت ويوغرت وصحن فواكه موسمية.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', es:'Full Breakfast' },
+    desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', es:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.' },
+    full:{ fr:'Un petit-déjeuner généreux avec des œufs brouillés crémeux, du fromage, des toasts grillés, un jus de fruits pressé, un café maison, un yaourt et une assiette de fruits de saison.', en:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.', es:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
   {
     id:44, cat:4, price:'€26.00', photo:'photo-1484723091739-30990009462f',
     badges:['new'],
-    name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', ar:'فطور أمريكي' },
-    desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', ar:'بانكيك وبيض مقلي ولحم مقدد وشراب القيقب وعصير فواكه.' },
-    full:{ fr:'Trois pancakes moelleux accompagnés d\'œufs au plat, de bacon croustillant, d\'un sirop d\'érable et d\'un grand verre de jus de fruits frais. Le brunch américain par excellence.', en:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.', ar:'ثلاثة بانكيك طري مع بيض مقلي ولحم مقدد مقرمش وشراب القيقب وكوب كبير من عصير الفواكه الطازج. الفطور الأمريكي بامتياز.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+    name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', es:'American Breakfast' },
+    desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', es:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.' },
+    full:{ fr:'Trois pancakes moelleux accompagnés d\'œufs au plat, de bacon croustillant, d\'un sirop d\'érable et d\'un grand verre de jus de fruits frais. Le brunch américain par excellence.', en:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.', es:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
   },
 
   /* ---- CAT 5: Hookah ---- */
   {
     id:45, cat:5, price:'€35.00', photo:'photo-1584302179602-e4c3d3fd629d',
     badges:['popular'],
-    name:{ fr:'Chicha Simple', en:'Single Hookah', ar:'شيشة سيمبل' },
-    desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', ar:'شيشة بريميوم بنكهة حسب اختيارك — استرخاء مضمون.' },
-    full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', ar:'استمتع بشيشة ذات جودة بريميوم مع مجموعة واسعة من النكهات: تفاح ونعناع وفواكه استوائية وتفاح مزدوج والمزيد. فحم طبيعي وتحضير دقيق.' },
+    name:{ fr:'Chicha Simple', en:'Single Hookah', es:'Single Hookah' },
+    desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', es:'Premium hookah with your choice of flavour — relaxation guaranteed.' },
+    full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', es:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:46, cat:5, price:'€40.00', photo:'photo-1584302179602-e4c3d3fd629d',
     badges:[],
-    name:{ fr:'Chicha Double', en:'Double Hookah', ar:'شيشة دابل' },
-    desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', ar:'شيشة دابل بنكهتين مدمجتين — تجربة مُثرَاة.' },
-    full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', ar:'شيشة دابل مع مزيج من نكهتين حسب الاختيار لتجربة عطرية فريدة. مثالية لعشاق الشيشة الذين يريدون نكهة أكثر تعقيداً.' },
+    name:{ fr:'Chicha Double', en:'Double Hookah', es:'Double Hookah' },
+    desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', es:'Double hookah with two combined flavours — enriched experience.' },
+    full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', es:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:47, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
     badges:[],
-    name:{ fr:'Supplément Glace', en:'Ice Supplement', ar:'إضافة ثلج' },
-    desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', ar:'أضف ثلجاً إلى إناء الشيشة للحصول على دخان أبرد وأكثر نعومة.' },
-    full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', ar:'إضافة الثلج إلى الإناء يبرد الدخان قبل الاستنشاق، مما يوفر إحساساً أكثر برودة وتجربة أكثر نعومة وإمتاعاً.' },
+    name:{ fr:'Supplément Glace', en:'Ice Supplement', es:'Ice Supplement' },
+    desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', es:'Add ice to your hookah vase for a cooler, smoother smoke.' },
+    full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', es:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.' },
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
     id:48, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
     badges:[],
-    name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', ar:'إضافة حليب جوز الهند' },
-    desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', ar:'استبدل الماء بحليب جوز الهند للحصول على دخان كريمي واستوائي.' },
-    full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', ar:'باستبدال ماء الإناء بحليب جوز الهند، يكتسب الدخان نعومة كريمية وعطراً استوائياً خفياً يحوِّل تجربة الشيشة كلياً.' },
+    name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', es:'Coconut Milk Supplement' },
+    desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', es:'Replace water with coconut milk for a creamy, exotic smoke.' },
+    full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', es:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.' },
     allergens:{ fr:[], en:[], ar:[] }
   }
   ];
@@ -6710,41 +6710,41 @@ function _parsePriceParts(str) {
 ═══════════════════════════════════════════ */
 const THEMES_DATA = [
   // 11 thèmes disponibles Paper + Simple
-  { id:'gold-noir',     styles:['paper','simple'], names:{el:'Χρυσό Μαύρο',  fr:'Gold Noir',         en:'Gold Noir',         de:'Gold Noir',              ar:'أسود ذهبي'},    dark:'#0c0a08', accent:'#c8a44e' },
-  { id:'neon-tokyo',    styles:['paper','simple'], names:{el:'Νέον Παλμός',   fr:'Neon Pulse',        en:'Neon Pulse',        de:'Neon Puls',              ar:'نبض النيون'},   dark:'#030010', accent:'#00f5d4' },
-  { id:'botanical',     styles:['paper','simple'], names:{el:'Βοτανικό Δάσος', fr:'Botanical Forest',  en:'Botanical Forest',  de:'Botanischer Wald',       ar:'غابة نباتية'}, dark:'#060e06', accent:'#7acc5a' },
-  { id:'rose-parisien', styles:['paper','simple'], names:{el:'Παρισινό Ρόδο', fr:'Rose Parisien',     en:'Parisian Rose',     de:'Pariser Rose',           ar:'وردة باريسية'}, dark:'#140a0e', accent:'#e890b0' },
-  { id:'midnight-luxe', styles:['paper','simple'], names:{el:'Ταμπέλα',       fr:'Enseigne',          en:'Signboard',         de:'Schild',                 ar:'لافتة'},       dark:'#03041a', accent:'#f0d060' },
-  { id:'velvet-luxe',   styles:['paper','simple'], names:{el:'Βελούδινη Πολυτέλεια', fr:'Velvet Luxe', en:'Velvet Luxe',      de:'Samt-Luxus',             ar:'فخامة مخملية'}, dark:'#0d0006', accent:'#d4af37' },
-  { id:'prestige',      styles:['paper','simple'], names:{el:'Κύρος',         fr:'Prestige',          en:'Prestige',          de:'Prestige',               ar:'برستيج'},      dark:'#0c0a08', accent:'#c8a44e' },
-  { id:'santorin',      styles:['paper','simple'], names:{el:'Σαντορίνη',     fr:'Santorini',         en:'Santorini',         de:'Santorini',              ar:'سانتوريني'},     dark:'#04090f', accent:'#4db8ff' },
+  { id:'gold-noir',     styles:['paper','simple'], names:{el:'Χρυσό Μαύρο',  fr:'Gold Noir',         en:'Gold Noir',         de:'Gold Noir',              es:'Gold Noir'},    dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'neon-tokyo',    styles:['paper','simple'], names:{el:'Νέον Παλμός',   fr:'Neon Pulse',        en:'Neon Pulse',        de:'Neon Puls',              es:'Neon Pulse'},   dark:'#030010', accent:'#00f5d4' },
+  { id:'botanical',     styles:['paper','simple'], names:{el:'Βοτανικό Δάσος', fr:'Botanical Forest',  en:'Botanical Forest',  de:'Botanischer Wald',       es:'Botanical Forest'}, dark:'#060e06', accent:'#7acc5a' },
+  { id:'rose-parisien', styles:['paper','simple'], names:{el:'Παρισινό Ρόδο', fr:'Rose Parisien',     en:'Parisian Rose',     de:'Pariser Rose',           es:'Parisian Rose'}, dark:'#140a0e', accent:'#e890b0' },
+  { id:'midnight-luxe', styles:['paper','simple'], names:{el:'Ταμπέλα',       fr:'Enseigne',          en:'Signboard',         de:'Schild',                 es:'Signboard'},       dark:'#03041a', accent:'#f0d060' },
+  { id:'velvet-luxe',   styles:['paper','simple'], names:{el:'Βελούδινη Πολυτέλεια', fr:'Velvet Luxe', en:'Velvet Luxe',      de:'Samt-Luxus',             es:'Velvet Luxe'}, dark:'#0d0006', accent:'#d4af37' },
+  { id:'prestige',      styles:['paper','simple'], names:{el:'Κύρος',         fr:'Prestige',          en:'Prestige',          de:'Prestige',               es:'Prestige'},      dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'santorin',      styles:['paper','simple'], names:{el:'Σαντορίνη',     fr:'Santorini',         en:'Santorini',         de:'Santorini',              es:'Santorini'},     dark:'#04090f', accent:'#4db8ff' },
   // 2 thèmes Paper exclusifs (Carte Classique + Livre d'Or)
-  { id:'carte-classique', styles:['simple'],        names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       ar:'قائمة كلاسيكية'}, dark:'#0f0e0c', accent:'#d4b896' },
-  { id:'paper-elegant', styles:['paper'],          names:{el:'Χρυσό Βιβλίο',         fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch',          ar:'كتاب الذهب'},       dark:'#1a1a1a', accent:'#e8e0d0' },
+  { id:'carte-classique', styles:['simple'],        names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       es:'Classic Menu'}, dark:'#0f0e0c', accent:'#d4b896' },
+  { id:'paper-elegant', styles:['paper'],          names:{el:'Χρυσό Βιβλίο',         fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch',          es:'Book of Gold'},       dark:'#1a1a1a', accent:'#e8e0d0' },
   // 9 nouveaux thèmes Carte
-  { id:'carte-sommelier',  styles:['simple'], names:{el:'Σομελιέ',        fr:'Sommelier',          en:'Sommelier',          de:'Sommelier',             ar:'سومولييه'},       dark:'#120816', accent:'#b8a8c8' },
-  { id:'carte-bento',      styles:['simple'], names:{el:'Μπέντο',         fr:'Bento Moderne',      en:'Modern Bento',       de:'Modernes Bento',        ar:'بينتو عصري'},     dark:'#050d14', accent:'#00c8d8' },
-  { id:'carte-telegraphe', styles:['simple'], names:{el:'Τηλεγράφος',     fr:'Télégraphe',         en:'Telegraph',          de:'Telegraf',              ar:'تلغراف'},         dark:'#100e08', accent:'#c8a070' },
-  { id:'carte-couture',    styles:['simple'], names:{el:'Ωτ Κουτύρ',      fr:'Haute Couture',      en:'Haute Couture',      de:'Haute Couture',         ar:'أوت كوتور'},      dark:'#040404', accent:'#d8d8d8' },
-  { id:'carte-journal',    styles:['simple'], names:{el:'Βιτρίνα',         fr:'Devanture',          en:'Showcase',           de:'Schaufenster',          ar:'واجهة العرض'},    dark:'#0c0c0a', accent:'#c0baa8' },
-  { id:'carte-voyage',     styles:['simple'], names:{el:'Ταξίδι',         fr:'Carnet de Voyage',   en:'Travel Journal',     de:'Reisetagebuch',         ar:'دفتر السفر'},     dark:'#100c04', accent:'#d44040' },
-  { id:'carte-artisan',    styles:['simple'], names:{el:'Τεχνίτης',       fr:"L'Atelier",         en:'The Workshop',       de:'Die Werkstatt',         ar:'الورشة'},         dark:'#080a06', accent:'#c08040' },
-  { id:'carte-ardoise',    styles:['simple'], names:{el:'Πλακάκι',        fr:'Ardoise Bistrot',    en:'Bistro Slate',       de:'Bistro-Tafel',          ar:'لوح البيسترو'},   dark:'#111010', accent:'#e8e4dc' },
-  { id:'carte-maroc',      styles:['simple'], names:{el:'Μαροκινό',       fr:'Maroc & Épices',     en:'Morocco & Spice',    de:'Marokko & Gewürze',     ar:'المغرب والتوابل'},dark:'#0e0a04', accent:'#d4902c' },
+  { id:'carte-sommelier',  styles:['simple'], names:{el:'Σομελιέ',        fr:'Sommelier',          en:'Sommelier',          de:'Sommelier',             es:'Sommelier'},       dark:'#120816', accent:'#b8a8c8' },
+  { id:'carte-bento',      styles:['simple'], names:{el:'Μπέντο',         fr:'Bento Moderne',      en:'Modern Bento',       de:'Modernes Bento',        es:'Modern Bento'},     dark:'#050d14', accent:'#00c8d8' },
+  { id:'carte-telegraphe', styles:['simple'], names:{el:'Τηλεγράφος',     fr:'Télégraphe',         en:'Telegraph',          de:'Telegraf',              es:'Telegraph'},         dark:'#100e08', accent:'#c8a070' },
+  { id:'carte-couture',    styles:['simple'], names:{el:'Ωτ Κουτύρ',      fr:'Haute Couture',      en:'Haute Couture',      de:'Haute Couture',         es:'Haute Couture'},      dark:'#040404', accent:'#d8d8d8' },
+  { id:'carte-journal',    styles:['simple'], names:{el:'Βιτρίνα',         fr:'Devanture',          en:'Showcase',           de:'Schaufenster',          es:'Showcase'},    dark:'#0c0c0a', accent:'#c0baa8' },
+  { id:'carte-voyage',     styles:['simple'], names:{el:'Ταξίδι',         fr:'Carnet de Voyage',   en:'Travel Journal',     de:'Reisetagebuch',         es:'Travel Journal'},     dark:'#100c04', accent:'#d44040' },
+  { id:'carte-artisan',    styles:['simple'], names:{el:'Τεχνίτης',       fr:"L'Atelier",         en:'The Workshop',       de:'Die Werkstatt',         es:'The Workshop'},         dark:'#080a06', accent:'#c08040' },
+  { id:'carte-ardoise',    styles:['simple'], names:{el:'Πλακάκι',        fr:'Ardoise Bistrot',    en:'Bistro Slate',       de:'Bistro-Tafel',          es:'Bistro Slate'},   dark:'#111010', accent:'#e8e4dc' },
+  { id:'carte-maroc',      styles:['simple'], names:{el:'Μαροκινό',       fr:'Maroc & Épices',     en:'Morocco & Spice',    de:'Marokko & Gewürze',     es:'Morocco & Spice'},dark:'#0e0a04', accent:'#d4902c' },
   // 9 nouveaux thèmes Livre
-  { id:'livre-noir',       styles:['paper'],  names:{el:'Μαύρο Βιβλίο',   fr:'Livre Noir',         en:'Black Book',         de:'Schwarzes Buch',        ar:'الكتاب الأسود'},  dark:'#080808', accent:'#c0c0cc' },
-  { id:'livre-botanique',  styles:['paper'],  names:{el:'Βοτανικό',       fr:'Livre Botanique',    en:'Botanical Book',     de:'Botanisches Buch',      ar:'كتاب النباتات'}, dark:'#060c06', accent:'#7ec878' },
-  { id:'livre-azure',      styles:['paper'],  names:{el:'Γαλάζιο Βιβλίο', fr:'Livre Azur',         en:'Azure Book',         de:'Azurbuch',              ar:'الكتاب الأزرق'}, dark:'#040c18', accent:'#40a8d8' },
-  { id:'livre-rose',       styles:['paper'],  names:{el:'Ρόζ Βιβλίο',    fr:'Livre Rose',         en:'Rose Book',          de:'Rosenbuch',             ar:'الكتاب الوردي'}, dark:'#180810', accent:'#e880b0' },
-  { id:'livre-antique',    styles:['paper'],  names:{el:'Αντίκα',         fr:'Livre Antique',      en:'Antique Book',       de:'Antikes Buch',          ar:'الكتاب العتيق'}, dark:'#140e06', accent:'#d4b870' },
-  { id:'livre-epure',      styles:['paper'],  names:{el:'Καθαρό',         fr:'Livre Épuré',        en:'Pure Book',          de:'Pures Buch',            ar:'الكتاب النقي'},  dark:'#0c0c0e', accent:'#d0d0d8' },
-  { id:'livre-cerise',     styles:['paper'],  names:{el:'Κεράσι',         fr:'Livre Cerise',       en:'Cherry Book',        de:'Kirschbuch',            ar:'الكتاب الكرزي'},dark:'#150404', accent:'#e83040' },
-  { id:'livre-indigo',     styles:['paper'],  names:{el:'Ινδιγό',         fr:'Livre Indigo',       en:'Indigo Book',        de:'Indigobuch',            ar:'الكتاب النيلي'}, dark:'#080818', accent:'#8080e8' },
-  { id:'livre-foret',      styles:['paper'],  names:{el:'Δάσος',          fr:'Livre Forêt',        en:'Forest Book',        de:'Waldbuch',              ar:'كتاب الغابة'},   dark:'#060e08', accent:'#c0b060' },
+  { id:'livre-noir',       styles:['paper'],  names:{el:'Μαύρο Βιβλίο',   fr:'Livre Noir',         en:'Black Book',         de:'Schwarzes Buch',        es:'Black Book'},  dark:'#080808', accent:'#c0c0cc' },
+  { id:'livre-botanique',  styles:['paper'],  names:{el:'Βοτανικό',       fr:'Livre Botanique',    en:'Botanical Book',     de:'Botanisches Buch',      es:'Botanical Book'}, dark:'#060c06', accent:'#7ec878' },
+  { id:'livre-azure',      styles:['paper'],  names:{el:'Γαλάζιο Βιβλίο', fr:'Livre Azur',         en:'Azure Book',         de:'Azurbuch',              es:'Azure Book'}, dark:'#040c18', accent:'#40a8d8' },
+  { id:'livre-rose',       styles:['paper'],  names:{el:'Ρόζ Βιβλίο',    fr:'Livre Rose',         en:'Rose Book',          de:'Rosenbuch',             es:'Rose Book'}, dark:'#180810', accent:'#e880b0' },
+  { id:'livre-antique',    styles:['paper'],  names:{el:'Αντίκα',         fr:'Livre Antique',      en:'Antique Book',       de:'Antikes Buch',          es:'Antique Book'}, dark:'#140e06', accent:'#d4b870' },
+  { id:'livre-epure',      styles:['paper'],  names:{el:'Καθαρό',         fr:'Livre Épuré',        en:'Pure Book',          de:'Pures Buch',            es:'Pure Book'},  dark:'#0c0c0e', accent:'#d0d0d8' },
+  { id:'livre-cerise',     styles:['paper'],  names:{el:'Κεράσι',         fr:'Livre Cerise',       en:'Cherry Book',        de:'Kirschbuch',            es:'Cherry Book'},dark:'#150404', accent:'#e83040' },
+  { id:'livre-indigo',     styles:['paper'],  names:{el:'Ινδιγό',         fr:'Livre Indigo',       en:'Indigo Book',        de:'Indigobuch',            es:'Indigo Book'}, dark:'#080818', accent:'#8080e8' },
+  { id:'livre-foret',      styles:['paper'],  names:{el:'Δάσος',          fr:'Livre Forêt',        en:'Forest Book',        de:'Waldbuch',              es:'Forest Book'},   dark:'#060e08', accent:'#c0b060' },
   // 1 thème Simple + Paper
-  { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        ar:'لوحة Bento'},    dark:'#121212', accent:'#ffffff' },
+  { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        es:'Bento Board'},    dark:'#121212', accent:'#ffffff' },
   // Nouveaux thèmes premium
-  { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 ar:'أورورا'},         dark:'#0c0d14', accent:'#9070f8' },
+  { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 es:'Aurora'},         dark:'#0c0d14', accent:'#9070f8' },
   // Thème GeNext (design admin/demo)
   { id:'genext',        styles:['simple'],         names:{el:'GeNext',             fr:'GeNext',             en:'GeNext',             de:'GeNext',                 ar:'GeNext'},         dark:'#080604', accent:'#c8a44e' },
 ];
@@ -6752,7 +6752,7 @@ const THEMES_DATA = [
 
 const LAYOUTS_DATA = [
   {
-    family: 'gold-noir', names: { el: 'Χρυσό Μαύρο', fr: 'Gold Noir', en: 'Gold Noir', de: 'Gold Noir', ar: 'أسود ذهبي' },
+    family: 'gold-noir', names: { el: 'Χρυσό Μαύρο', fr: 'Gold Noir', en: 'Gold Noir', de: 'Gold Noir', es: 'Gold Noir' },
     variants: [
       { id: 'gold-noir',  accent: '#c8a44e' },
       { id: 'midnight',   accent: '#a67cff' },
@@ -6763,7 +6763,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'neon-tokyo', names: { el: 'Νέον Παλμός', fr: 'Neon Pulse', en: 'Neon Pulse', de: 'Neon Puls', ar: 'نبض النيون' },
+    family: 'neon-tokyo', names: { el: 'Νέον Παλμός', fr: 'Neon Pulse', en: 'Neon Pulse', de: 'Neon Puls', es: 'Neon Pulse' },
     variants: [
       { id: 'neon-tokyo',  accent: '#00f5d4' },
       { id: 'neon-pink',   accent: '#ff0080' },
@@ -6774,7 +6774,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'botanical', names: { el: 'Βοτανικό Δάσος', fr: 'Botanical Forest', en: 'Botanical Forest', de: 'Botanischer Wald', ar: 'غابة نباتية' },
+    family: 'botanical', names: { el: 'Βοτανικό Δάσος', fr: 'Botanical Forest', en: 'Botanical Forest', de: 'Botanischer Wald', es: 'Botanical Forest' },
     variants: [
       { id: 'botanical',        accent: '#7acc5a' },
       { id: 'botanical-autumn', accent: '#d08c38' },
@@ -6785,7 +6785,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'rose-parisien', names: { el: 'Παρισινό Ρόδο', fr: 'Rose Parisien', en: 'Parisian Rose', de: 'Pariser Rose', ar: 'وردة باريسية' },
+    family: 'rose-parisien', names: { el: 'Παρισινό Ρόδο', fr: 'Rose Parisien', en: 'Parisian Rose', de: 'Pariser Rose', es: 'Parisian Rose' },
     variants: [
       { id: 'rose-parisien', accent: '#e890b0' },
       { id: 'rose-blue',     accent: '#80ccff' },
@@ -6796,7 +6796,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'midnight-luxe', names: { el: 'Ταμπέλα', fr: 'Enseigne', en: 'Signboard', de: 'Schild', ar: 'لافتة' },
+    family: 'midnight-luxe', names: { el: 'Ταμπέλα', fr: 'Enseigne', en: 'Signboard', de: 'Schild', es: 'Signboard' },
     variants: [
       { id: 'midnight-luxe',     accent: '#f0d060' },
       { id: 'enseigne-silver',   accent: '#c0c0c0' },
@@ -6807,7 +6807,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'velvet-luxe', names: { el: 'Βελούδινη Πολυτέλεια', fr: 'Velvet Luxe', en: 'Velvet Luxe', de: 'Samt-Luxus', ar: 'فخامة مخملية' },
+    family: 'velvet-luxe', names: { el: 'Βελούδινη Πολυτέλεια', fr: 'Velvet Luxe', en: 'Velvet Luxe', de: 'Samt-Luxus', es: 'Velvet Luxe' },
     variants: [
       { id: 'velvet-luxe',   accent: '#d4af37' },
       { id: 'velvet-red',    accent: '#c0102a' },
@@ -6818,7 +6818,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'prestige', names: { el: 'Κύρος', fr: 'Prestige', en: 'Prestige', de: 'Prestige', ar: 'برستيج' },
+    family: 'prestige', names: { el: 'Κύρος', fr: 'Prestige', en: 'Prestige', de: 'Prestige', es: 'Prestige' },
     variants: [
       { id: 'prestige',          accent: '#c8a44e' },
       { id: 'prestige-silver',   accent: '#c0c0c0' },
@@ -6829,7 +6829,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'santorin', names: { el: 'Σαντορίνη', fr: 'Santorini', en: 'Santorini', de: 'Santorini', ar: 'سانتوريني' },
+    family: 'santorin', names: { el: 'Σαντορίνη', fr: 'Santorini', en: 'Santorini', de: 'Santorini', es: 'Santorini' },
     variants: [
       { id: 'santorin',        accent: '#4db8ff' },
       { id: 'santorin-sunset', accent: '#ff9944' },
@@ -6840,7 +6840,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'editorial', names: { fr: 'Éditorial', en: 'Editorial', de: 'Editorial', el: 'Εκδοτικό', ar: 'إديتوريال' },
+    family: 'editorial', names: { fr: 'Éditorial', en: 'Editorial', de: 'Editorial', el: 'Εκδοτικό', es: 'Editorial' },
     variants: [
       { id: 'editorial',            accent: '#c0ccd8' },
       { id: 'editorial-azure',      accent: '#4a90d9' },
@@ -6851,7 +6851,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'dyn-bento', names: { el: 'Ταμπλό Bento', fr: 'Dashboard Bento', en: 'Bento Board', de: 'Dashboard Bento', ar: 'لوحة Bento' },
+    family: 'dyn-bento', names: { el: 'Ταμπλό Bento', fr: 'Dashboard Bento', en: 'Bento Board', de: 'Dashboard Bento', es: 'Bento Board' },
     variants: [
       { id: 'dyn-bento',       accent: '#ffffff' },
       { id: 'dyn-bento-gold',  accent: '#c8a44e' },
@@ -6862,7 +6862,7 @@ const LAYOUTS_DATA = [
     ]
   },
   {
-    family: 'aurora', names: { el: 'Αυρόρα', fr: 'Aurora', en: 'Aurora', de: 'Aurora', ar: 'أورورا' },
+    family: 'aurora', names: { el: 'Αυρόρα', fr: 'Aurora', en: 'Aurora', de: 'Aurora', es: 'Aurora' },
     variants: [
       { id: 'aurora',        accent: '#9070f8' },
       { id: 'aurora-brume',  accent: '#40c8e0' },
@@ -6966,15 +6966,15 @@ function saveMenuTheme(themeId) {
    FÊTE ACTIVE (overlay hero indépendant du thème)
 ══════════════════════════════════════════ */
 const EVENTS_CHIPS = [
-  { id:'',             ico:'✕', label:{ fr:'Aucune',        en:'None',         de:'Keine',         el:'Καμία',        ar:'لا شيء' } },
-  { id:'christmas',    ico:'⭐', label:{ fr:'Noël',          en:'Christmas',    de:'Weihnachten',   el:'Χριστούγεννα', ar:'عيد الميلاد' } },
-  { id:'easter',       ico:'✝', label:{ fr:'Pâques',        en:'Easter',       de:'Ostern',        el:'Πάσχα',        ar:'الفصح' } },
-  { id:'newyear',      ico:'🎊', label:{ fr:'Nouvel An',    en:'New Year',     de:'Neujahr',       el:'Πρωτοχρονιά',  ar:'رأس السنة' } },
-  { id:'independence', ico:'✙', label:{ fr:'25 Mars',       en:'March 25',     de:'25. März',      el:'25η Μαρτίου',  ar:'٢٥ مارس' } },
-  { id:'oxi',          ico:'🛡', label:{ fr:'28 Octobre',   en:'October 28',   de:'28. Oktober',   el:'28η Οκτωβρίου',ar:'٢٨ أكتوبر' } },
-  { id:'epiphany',     ico:'💧', label:{ fr:'Épiphanie',    en:'Epiphany',     de:'Theophanie',    el:'Θεοφάνεια',    ar:'الغطاس' } },
-  { id:'assumption',   ico:'🌸', label:{ fr:'15 Août',      en:'Aug 15',       de:'15. August',    el:'15 Αυγούστου', ar:'١٥ أغسطس' } },
-  { id:'carnival',     ico:'🎭', label:{ fr:'Carnaval',     en:'Carnival',     de:'Karneval',      el:'Αποκριές',     ar:'كرنفال' } }
+  { id:'',             ico:'✕', label:{ fr:'Aucune',        en:'None',         de:'Keine',         el:'Καμία',        es:'None' } },
+  { id:'christmas',    ico:'⭐', label:{ fr:'Noël',          en:'Christmas',    de:'Weihnachten',   el:'Χριστούγεννα', es:'Christmas' } },
+  { id:'easter',       ico:'✝', label:{ fr:'Pâques',        en:'Easter',       de:'Ostern',        el:'Πάσχα',        es:'Easter' } },
+  { id:'newyear',      ico:'🎊', label:{ fr:'Nouvel An',    en:'New Year',     de:'Neujahr',       el:'Πρωτοχρονιά',  es:'New Year' } },
+  { id:'independence', ico:'✙', label:{ fr:'25 Mars',       en:'March 25',     de:'25. März',      el:'25η Μαρτίου',  es:'March 25' } },
+  { id:'oxi',          ico:'🛡', label:{ fr:'28 Octobre',   en:'October 28',   de:'28. Oktober',   el:'28η Οκτωβρίου',es:'October 28' } },
+  { id:'epiphany',     ico:'💧', label:{ fr:'Épiphanie',    en:'Epiphany',     de:'Theophanie',    el:'Θεοφάνεια',    es:'Epiphany' } },
+  { id:'assumption',   ico:'🌸', label:{ fr:'15 Août',      en:'Aug 15',       de:'15. August',    el:'15 Αυγούστου', es:'Aug 15' } },
+  { id:'carnival',     ico:'🎭', label:{ fr:'Carnaval',     en:'Carnival',     de:'Karneval',      el:'Αποκριές',     es:'Carnival' } }
 ];
 
 let currentActiveEvent = '';
@@ -7060,7 +7060,7 @@ function renderThemeSelector() {
   const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id) && !GENEXT_IDS.has(t.id));
 
   if (carteThemes.length > 0) {
-    const lbl = currentLang==='en'?'Basic':currentLang==='de'?'Einfach':currentLang==='ar'?'بطاقة':'Carte';
+    const lbl = currentLang==='en'?'Basic':currentLang==='de'?'Einfach':currentLang==='es'?'Carta':'Carte';
     grid.appendChild(makeSep(lbl));
     carteThemes.forEach(th => {
       const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
@@ -7069,7 +7069,7 @@ function renderThemeSelector() {
   }
 
   if (livreThemes.length > 0) {
-    const lbl = currentLang==='en'?'Book':currentLang==='de'?'Buch':currentLang==='ar'?'كتاب':'Livre';
+    const lbl = currentLang==='en'?'Book':currentLang==='de'?'Buch':currentLang==='es'?'Libro':'Livre';
     grid.appendChild(makeSep(lbl));
     livreThemes.forEach(th => {
       const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
@@ -7079,7 +7079,7 @@ function renderThemeSelector() {
 
   const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenData[l.family]);
   if (visibleLayouts.length > 0) {
-    const lbl = currentLang==='en'?'Elegant':currentLang==='de'?'Elegant':currentLang==='ar'?'أنيق':'Élégant';
+    const lbl = currentLang==='en'?'Elegant':currentLang==='de'?'Elegant':currentLang==='es'?'Elegante':'Élégant';
     grid.appendChild(makeSep(lbl));
     visibleLayouts.forEach(layout => {
       const isActive = layout.variants.some(v => v.id === currentMenuTheme);
@@ -7375,7 +7375,7 @@ function _renderSubSection(el, t, sub) {
   const annualNotice = (!isInTrial && payMode === 'annual')
     ? `<div style="font-size:0.77rem;color:var(--muted);background:rgba(200,164,78,.08);border:1px solid rgba(200,164,78,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.55">${t.subAnnualNotice || '⚠️ Abonnement annuel non remboursable.'}</div>`
     : '';
-  const _endDateLocale = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-MA', de:'de-DE' };
+  const _endDateLocale = { fr:'fr-FR', en:'en-GB', el:'el-GR', es:'es-ES', de:'de-DE' };
 
   // Période d'essai active — afficher la date de fin
   const trialBanner = isInTrial
@@ -7411,8 +7411,8 @@ function _renderSubSection(el, t, sub) {
        </div>`
     : '';
 
-  const _perMonth = { fr:'/mois', en:'/month', el:'/μήνα', ar:'/شهر', de:'/Mon.' };
-  const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', ar:'/سنة',  de:'/Jahr' };
+  const _perMonth = { fr:'/mois', en:'/month', el:'/μήνα', es:'/month', de:'/Mon.' };
+  const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', es:'/year',  de:'/Jahr' };
   const _subOpts = [];
   for (const _f of ['menu-qr','commandes-services']) {
     for (const _m of ['monthly','annual']) {
@@ -8331,21 +8331,21 @@ const _FL_T = {
     btn3:'Ενημέρωση', skip3:'Αργότερα',
     err3short:'Ελάχιστο 6 χαρακτήρες.', err3match:'Οι κωδικοί δεν ταιριάζουν.'
   },
-  ar: {
-    step1:'الخطوة 1 من 2', step2:'الخطوة 2 من 2',
-    title1:'لغة القائمة',
-    desc1:'اختر اللغة التي سيرى بها عملاؤك قائمة الطعام.',
-    hint1:'💡 يمكن التغيير في أي وقت من ⚙️ الإعدادات ← إعدادات اللغة.',
-    title2:'لغة الموظفين',
-    desc2:'اختر لغة تطبيق الخدمة والإدارة لفريقك.',
-    hint2:'💡 يمكن التغيير في أي وقت من ⚙️ الإعدادات ← إعدادات اللغة.',
-    btn:'تأكيد',
-    step3:'اختياري',
-    title3:'اختر كلمة المرور',
-    desc3:'تم إنشاء كلمة مرور مؤقتة تلقائيًا. يمكنك تخصيصها الآن أو لاحقًا في ⚙️ الإعدادات.',
-    ph3a:'كلمة المرور الجديدة', ph3b:'تأكيد كلمة المرور',
-    btn3:'تحديث', skip3:'لاحقاً',
-    err3short:'6 أحرف على الأقل.', err3match:'كلمتا المرور غير متطابقتين.'
+  es: {
+    step1:'Paso 1 de 2', step2:'Paso 2 de 2',
+    title1:'Idioma del menú',
+    desc1:'Elija el idioma en que sus clientes verán el menú.',
+    hint1:'💡 Se puede cambiar en cualquier momento en ⚙️ Ajustes ← Configuración de idioma.',
+    title2:'Idioma del personal',
+    desc2:'Elija el idioma de la app de servicio y administración para su equipo.',
+    hint2:'💡 Se puede cambiar en cualquier momento en ⚙️ Ajustes ← Configuración de idioma.',
+    btn:'Confirmar',
+    step3:'Opcional',
+    title3:'Elija su contraseña',
+    desc3:'Se ha creado automáticamente una contraseña temporal. Puede personalizarla ahora o más tarde en ⚙️ Ajustes.',
+    ph3a:'Nueva contraseña', ph3b:'Confirmar contraseña',
+    btn3:'Actualizar', skip3:'Más tarde',
+    err3short:'Mínimo 6 caracteres.', err3match:'Las contraseñas no coinciden.'
   }
 };
 

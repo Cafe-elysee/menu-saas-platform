@@ -5751,12 +5751,12 @@
 ================================================ */
 
 const CATS = [
-  { key:'hot',     ico:'ico-coffee',  sub:{ el:'ροφήματα',  fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
-  { key:'cold',    ico:'ico-cold',    sub:{ el:'ροφήματα',  fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
-  { key:'food',    ico:'ico-food',    sub:{ el:'πιάτα',     fr:'plats',     en:'dishes',   ar:'أطباق'   } },
-  { key:'sweet',   ico:'ico-cake',    sub:{ el:'γλυκά',     fr:'desserts',  en:'desserts', ar:'حلويات'  } },
-  { key:'morning', ico:'ico-sunrise', sub:{ el:'πρωινό',    fr:'formules',  en:'formulas', ar:'وجبات'   } },
-  { key:'hookah',  ico:'ico-hookah',  sub:{ el:'ναργιλέδες',fr:'chichas',   en:'hookahs',  ar:'شيشة'    } },
+  { key:'hot',     ico:'ico-coffee',  sub:{ el:'ροφήματα',  fr:'boissons',  en:'drinks',   es:'drinks' } },
+  { key:'cold',    ico:'ico-cold',    sub:{ el:'ροφήματα',  fr:'boissons',  en:'drinks',   es:'drinks' } },
+  { key:'food',    ico:'ico-food',    sub:{ el:'πιάτα',     fr:'plats',     en:'dishes',   es:'platos'  } },
+  { key:'sweet',   ico:'ico-cake',    sub:{ el:'γλυκά',     fr:'desserts',  en:'desserts', es:'postres' } },
+  { key:'morning', ico:'ico-sunrise', sub:{ el:'πρωινό',    fr:'formules',  en:'formulas', es:'menús'   } },
+  { key:'hookah',  ico:'ico-hookah',  sub:{ el:'ναργιλέδες',fr:'chichas',   en:'hookahs',  es:'shishas' } },
 ];
 
 const UI = {
@@ -5859,38 +5859,38 @@ const UI = {
     tblInfo:'The server receives an instant notification on their phone.',
     cartInfo:'Your order appears immediately on the server\'s app.',
   },
-  ar: {
-    tagline:'تجربة طهي راقية',
+  es: {
+    tagline:'Una experiencia gastronómica de calidad',
     sub:[],
     preTag:'GeNext',
-    explore:'القائمة',
-    search:'ابحث في القائمة…',
-    all:'الكل',
-    cats:['مشروبات ساخنة','مشروبات باردة','الأكل','حلويات','الصباح','النرجيلة'],
-    badgeN:'جديد', badgeP:'الأكثر طلباً', badgeV:'نباتي', badgeL:'عرض محدود', badgeM:'الصباح',
-    bdgBoisson:'مشروب', bdgCuisine:'أكل', bdgSucre:'حلو', bdgHookah:'نرجيلة',
-    bdgChaud:'ساخن', bdgFroid:'بارد', bdgGlace:'مثلج',
-    callBtn:'استدعاء النادل',
-    notified:'تم إخطار النادل ✓',
-    notifiedTable:'تم إخطار النادل · طاولة {n} ✓',
-    tableTitle:'استدعاء النادل',
-    tableDesc:'أدخل رقم طاولتك',
-    callConfirmQR:'استدعاء النادل؟',
-    tableConfirm:'تأكيد',
-    tableCancel:'إلغاء',
-    alLabel:'التفاصيل',
-    noRes:'لا توجد نتائج لبحثك',
-    wifiN:'واي فاي ', wifiV:'',
-    hoursN:'أوقات العمل ', hoursV:'',
-    addrN:'العنوان ', addrV:'',
-    cartTitle:'طلبك', cartTotal:'المجموع', cartSend:'إرسال الطلب', cartCancel:'إلغاء',
-    destTakeaway:'🥡 للخارج', destTable:'🪑 على الطاولة', destTableNum:'رقم الطاولة (1–99)',
-    histTitle:'طلباتي', histEmpty:'لا توجد طلبات مسجلة', histClose:'إغلاق',
-    histPending:'في الانتظار', histProgress:'قيد التنفيذ', histDone:'منتهي', histTakeaway:'للخارج', histTable:'طاولة',
-    histReorder:'اطلب مرة أخرى', addBtn:'أضف إلى السلة',
-    cartEmpty:'سلة التسوق فارغة', cartSending:'جارٍ الإرسال…', cartSent:'تم إرسال الطلب!',
-    tblInfo:'يتلقى النادل إشعارًا فوريًا على هاتفه.',
-    cartInfo:'يظهر طلبك فورًا في تطبيق النادل.',
+    explore:'Menú',
+    search:'Buscar en el menú…',
+    all:'Todo',
+    cats:['Bebidas calientes','Bebidas frías','Comida','Postres','Desayuno','Shisha'],
+    badgeN:'Nuevo', badgeP:'Más pedido', badgeV:'Vegetariano', badgeL:'Oferta limitada', badgeM:'Mañana',
+    bdgBoisson:'Bebida', bdgCuisine:'Cocina', bdgSucre:'Dulce', bdgHookah:'Shisha',
+    bdgChaud:'Caliente', bdgFroid:'Frío', bdgGlace:'Helado',
+    callBtn:'Llamar al camarero',
+    notified:'Camarero avisado ✓',
+    notifiedTable:'Camarero avisado · Mesa {n} ✓',
+    tableTitle:'Llamar al camarero',
+    tableDesc:'Introduzca su número de mesa',
+    callConfirmQR:'¿Llamar al camarero?',
+    tableConfirm:'Confirmar',
+    tableCancel:'Cancelar',
+    alLabel:'Detalles',
+    noRes:'No hay resultados para su búsqueda',
+    wifiN:'Wi-Fi ', wifiV:'',
+    hoursN:'Horario ', hoursV:'',
+    addrN:'Dirección ', addrV:'',
+    cartTitle:'Su pedido', cartTotal:'Total', cartSend:'Enviar pedido', cartCancel:'Cancelar',
+    destTakeaway:'🥡 Para llevar', destTable:'🪑 En la mesa', destTableNum:'Número de mesa (1–99)',
+    histTitle:'Mis pedidos', histEmpty:'No hay pedidos registrados', histClose:'Cerrar',
+    histPending:'En espera', histProgress:'En preparación', histDone:'Finalizado', histTakeaway:'Para llevar', histTable:'Mesa',
+    histReorder:'Volver a pedir', addBtn:'Añadir al carrito',
+    cartEmpty:'El carrito está vacío', cartSending:'Enviando…', cartSent:'¡Pedido enviado!',
+    tblInfo:'El camarero recibe una notificación instantánea en su teléfono.',
+    cartInfo:'Su pedido aparece inmediatamente en la app del camarero.',
   },
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
@@ -5932,103 +5932,103 @@ const ITEMS = [
   {
     id:1, cat:0, price:'€2.50', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
-    name:{ el:'Espresso', fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
-    desc:{ el:'Μικρός και δυνατός — καθαρός, συμπυκνωμένος, κλασικός.', fr:'Court et intense — pur, concentré, classique.', en:'Short and intense — pure, concentrated, classic.', ar:'قصير وكثيف — نقي ومركّز وكلاسيكي.' },
-    full:{ el:'Ο εσπρέσο μας εκχυλίζεται στην ιδανική πίεση 9 bar, αποκαλύπτοντας βαθιά αρώματα φουντουκιού και μαύρης σοκολάτας. Σερβίρεται σε προθερμασμένο φλιτζάνι.', fr:'Notre espresso est extrait à 9 bars, révélant des arômes de noisette et de chocolat noir. Servi dans une tasse préchauffée.', en:'Our espresso is extracted at 9 bars, revealing hazelnut and dark chocolate aromas. Served in a preheated cup.', ar:'إسبريسونا يُستخلص على ضغط 9 بار، يكشف نكهات البندق والشوكولاتة الداكنة. يُقدَّم في كوب مسخَّن.' },
-    allergens:{ el:[], fr:[], en:[], ar:[] }
+    name:{ el:'Espresso', fr:'Espresso', en:'Espresso', es:'Espresso' },
+    desc:{ el:'Μικρός και δυνατός — καθαρός, συμπυκνωμένος, κλασικός.', fr:'Court et intense — pur, concentré, classique.', en:'Short and intense — pure, concentrated, classic.', es:'Short and intense — pure, concentrated, classic.' },
+    full:{ el:'Ο εσπρέσο μας εκχυλίζεται στην ιδανική πίεση 9 bar, αποκαλύπτοντας βαθιά αρώματα φουντουκιού και μαύρης σοκολάτας. Σερβίρεται σε προθερμασμένο φλιτζάνι.', fr:'Notre espresso est extrait à 9 bars, révélant des arômes de noisette et de chocolat noir. Servi dans une tasse préchauffée.', en:'Our espresso is extracted at 9 bars, revealing hazelnut and dark chocolate aromas. Served in a preheated cup.', es:'Our espresso is extracted at 9 bars, revealing hazelnut and dark chocolate aromas. Served in a preheated cup.' },
+    allergens:{ el:[], fr:[], en:[], es:[] }
   },
   {
     id:2, cat:0, price:'€3.50', photo:'photo-1541167760496-1628856ab772',
     badges:[],
-    name:{ el:'Cappuccino', fr:'Cappuccino', en:'Cappuccino', ar:'كابتشينو' },
-    desc:{ el:'Εσπρέσο με αφρόγαλα — βελούδινο και ισορροπημένο.', fr:'Espresso avec lait mousseux — velouté et équilibré.', en:'Espresso with steamed milk foam — velvety and balanced.', ar:'إسبريسو مع رغوة الحليب — ناعم ومتوازن.' },
-    full:{ el:'Ένα τρίτο εσπρέσο, ένα τρίτο ζεστό γάλα και ένα τρίτο αφρός γάλακτος. Η ιδανική ισορροπία για μια τέλεια στιγμή καφέ.', fr:"Un tiers d'espresso, un tiers de lait chaud et un tiers de mousse. L'équilibre parfait pour un moment café.", en:'One third espresso, one third hot milk and one third milk foam. The perfect balance for a great coffee moment.', ar:'ثلث إسبريسو وثلث حليب ساخن وثلث رغوة. التوازن المثالي للاستمتاع بقهوة رائعة.' },
-    allergens:{ el:['Γάλα'], fr:['Lait'], en:['Milk'], ar:['حليب'] }
+    name:{ el:'Cappuccino', fr:'Cappuccino', en:'Cappuccino', es:'Cappuccino' },
+    desc:{ el:'Εσπρέσο με αφρόγαλα — βελούδινο και ισορροπημένο.', fr:'Espresso avec lait mousseux — velouté et équilibré.', en:'Espresso with steamed milk foam — velvety and balanced.', es:'Espresso with steamed milk foam — velvety and balanced.' },
+    full:{ el:'Ένα τρίτο εσπρέσο, ένα τρίτο ζεστό γάλα και ένα τρίτο αφρός γάλακτος. Η ιδανική ισορροπία για μια τέλεια στιγμή καφέ.', fr:"Un tiers d'espresso, un tiers de lait chaud et un tiers de mousse. L'équilibre parfait pour un moment café.", en:'One third espresso, one third hot milk and one third milk foam. The perfect balance for a great coffee moment.', es:'One third espresso, one third hot milk and one third milk foam. The perfect balance for a great coffee moment.' },
+    allergens:{ el:['Γάλα'], fr:['Lait'], en:['Milk'], es:['Leche'] }
   },
   /* ---- CAT 1: Κρύα Ροφήματα / Boissons Froides ---- */
   {
     id:3, cat:1, price:'€3.00', photo:'photo-1461023058943-07fcbe16d735',
     badges:['popular'],
-    name:{ el:'Frappé', fr:'Frappé', en:'Frappé', ar:'فرابيه' },
-    desc:{ el:'Παγωμένος στιγμιαίος καφές με αφρό — η ελληνική κλασική συνταγή.', fr:'Café instantané glacé avec mousse — la recette grecque classique.', en:'Iced instant coffee with foam — the classic Greek recipe.', ar:'قهوة فورية مثلجة مع رغوة — الوصفة اليونانية الكلاسيكية.' },
-    full:{ el:'Ο αυθεντικός ελληνικός φραπέ: στιγμιαίος καφές χτυπημένος με νερό και ζάχαρη, σερβιρισμένος με παγάκια. Δροσιστικός και ξεχωριστός.', fr:"Le vrai frappé grec : café instantané battu avec eau et sucre, servi avec des glaçons. Rafraîchissant et unique.", en:'The authentic Greek frappé: instant coffee shaken with water and sugar, served with ice. Refreshing and unique.', ar:'الفرابيه اليوناني الأصيل: قهوة فورية مخفوقة مع الماء والسكر، تُقدَّم مع مكعبات الثلج. منعش وفريد.' },
-    allergens:{ el:[], fr:[], en:[], ar:[] }
+    name:{ el:'Frappé', fr:'Frappé', en:'Frappé', es:'Frappé' },
+    desc:{ el:'Παγωμένος στιγμιαίος καφές με αφρό — η ελληνική κλασική συνταγή.', fr:'Café instantané glacé avec mousse — la recette grecque classique.', en:'Iced instant coffee with foam — the classic Greek recipe.', es:'Café instantáneo helado con espuma — la receta griega clásica.' },
+    full:{ el:'Ο αυθεντικός ελληνικός φραπέ: στιγμιαίος καφές χτυπημένος με νερό και ζάχαρη, σερβιρισμένος με παγάκια. Δροσιστικός και ξεχωριστός.', fr:"Le vrai frappé grec : café instantané battu avec eau et sucre, servi avec des glaçons. Rafraîchissant et unique.", en:'The authentic Greek frappé: instant coffee shaken with water and sugar, served with ice. Refreshing and unique.', es:'The authentic Greek frappé: instant coffee shaken with water and sugar, served with ice. Refreshing and unique.' },
+    allergens:{ el:[], fr:[], en:[], es:[] }
   },
   {
     id:4, cat:1, price:'€4.50', photo:'photo-1600271886742-f049cd451bba',
     badges:[],
-    name:{ el:'Φρέσκος χυμός πορτοκαλιού', fr:"Jus d'orange frais", en:'Fresh orange juice', ar:'عصير البرتقال الطازج' },
-    desc:{ el:'Φρεσκοστυμμένος χυμός — φυσικός και βιταμινούχος.', fr:'Jus fraîchement pressé — naturel et vitaminé.', en:'Freshly squeezed juice — natural and vitamin-rich.', ar:'عصير طازج معصور — طبيعي وغني بالفيتامينات.' },
-    full:{ el:'Φρεσκοστυμμένος μπροστά σας από βιολογικά πορτοκάλια. Πλούσιος σε βιταμίνη C, ιδανικός για ενέργεια και ανανέωση.', fr:"Fraîchement pressé devant vous à partir d'oranges biologiques. Riche en vitamine C, idéal pour l'énergie.", en:'Freshly squeezed in front of you from organic oranges. Rich in vitamin C, ideal for energy and refreshment.', ar:'معصور أمامكم من برتقال عضوي. غني بفيتامين C، مثالي للطاقة والانتعاش.' },
-    allergens:{ el:[], fr:[], en:[], ar:[] }
+    name:{ el:'Φρέσκος χυμός πορτοκαλιού', fr:"Jus d'orange frais", en:'Fresh orange juice', es:'Zumo de naranja fresco' },
+    desc:{ el:'Φρεσκοστυμμένος χυμός — φυσικός και βιταμινούχος.', fr:'Jus fraîchement pressé — naturel et vitaminé.', en:'Freshly squeezed juice — natural and vitamin-rich.', es:'Zumo recién exprimido — natural y rico en vitaminas.' },
+    full:{ el:'Φρεσκοστυμμένος μπροστά σας από βιολογικά πορτοκάλια. Πλούσιος σε βιταμίνη C, ιδανικός για ενέργεια και ανανέωση.', fr:"Fraîchement pressé devant vous à partir d'oranges biologiques. Riche en vitamine C, idéal pour l'énergie.", en:'Freshly squeezed in front of you from organic oranges. Rich in vitamin C, ideal for energy and refreshment.', es:'Freshly squeezed in front of you from organic oranges. Rich in vitamin C, ideal for energy and refreshment.' },
+    allergens:{ el:[], fr:[], en:[], es:[] }
   },
   /* ---- CAT 2: Φαγητό / Cuisine ---- */
   {
     id:5, cat:2, price:'€8.50', photo:'photo-1528736235302-52922df5c122',
     badges:[],
-    name:{ el:'Club Sandwich', fr:'Club Sandwich', en:'Club Sandwich', ar:'كلوب ساندويتش' },
-    desc:{ el:'Τριπλό σάντουιτς με κοτόπουλο, μπέικον, τυρί και λαχανικά.', fr:'Triple sandwich au poulet, bacon, fromage et légumes frais.', en:'Triple sandwich with chicken, bacon, cheese and fresh vegetables.', ar:'ساندويتش ثلاثي بالدجاج والبيكون والجبن والخضروات الطازجة.' },
-    full:{ el:'Τριγωνικό σάντουιτς με ψητό κοτόπουλο, τραγανό μπέικον, τυρί cheddar, τομάτα, μαρούλι και μαγιονέζα σε τοστ ψωμί. Σερβίρεται με πατατάκια.', fr:'Sandwich triangulaire avec poulet grillé, bacon croustillant, cheddar, tomate, laitue et mayonnaise sur pain grillé. Servi avec chips.', en:'Triangular sandwich with grilled chicken, crispy bacon, cheddar, tomato, lettuce and mayo on toasted bread. Served with chips.', ar:'ساندويتش مثلث بدجاج مشوي وبيكون مقرمش وجبن شيدر وطماطم وخس ومايونيز على خبز محمص. يُقدَّم مع رقائق البطاطس.' },
-    allergens:{ el:['Γλουτένη','Γαλακτοκομικά','Αυγά'], fr:['Gluten','Produits laitiers','Œufs'], en:['Gluten','Dairy','Eggs'], ar:['غلوتين','منتجات الألبان','بيض'] }
+    name:{ el:'Club Sandwich', fr:'Club Sandwich', en:'Club Sandwich', es:'Club Sandwich' },
+    desc:{ el:'Τριπλό σάντουιτς με κοτόπουλο, μπέικον, τυρί και λαχανικά.', fr:'Triple sandwich au poulet, bacon, fromage et légumes frais.', en:'Triple sandwich with chicken, bacon, cheese and fresh vegetables.', es:'Triple sandwich with chicken, bacon, cheese and fresh vegetables.' },
+    full:{ el:'Τριγωνικό σάντουιτς με ψητό κοτόπουλο, τραγανό μπέικον, τυρί cheddar, τομάτα, μαρούλι και μαγιονέζα σε τοστ ψωμί. Σερβίρεται με πατατάκια.', fr:'Sandwich triangulaire avec poulet grillé, bacon croustillant, cheddar, tomate, laitue et mayonnaise sur pain grillé. Servi avec chips.', en:'Triangular sandwich with grilled chicken, crispy bacon, cheddar, tomato, lettuce and mayo on toasted bread. Served with chips.', es:'Triangular sandwich with grilled chicken, crispy bacon, cheddar, tomato, lettuce and mayo on toasted bread. Served with chips.' },
+    allergens:{ el:['Γλουτένη','Γαλακτοκομικά','Αυγά'], fr:['Gluten','Produits laitiers','Œufs'], en:['Gluten','Dairy','Eggs'], es:['Gluten','Lácteos','Huevos'] }
   },
   {
     id:6, cat:2, price:'€9.50', photo:'photo-1555949258-eb67b1ef0ceb',
     badges:['new'],
-    name:{ el:'Ζυμαρικά Carbonara', fr:'Pâtes Carbonara', en:'Pasta Carbonara', ar:'معكرونة كاربونارا' },
-    desc:{ el:'Μακαρόνια με αυθεντική σάλτσα carbonara, γκουανσιάλε και pecorino.', fr:'Pâtes avec sauce carbonara authentique, guanciale et pecorino.', en:'Pasta with authentic carbonara sauce, guanciale and pecorino.', ar:'معكرونة بصلصة كاربونارا الأصيلة مع الغوانشيالي والبيكورينو.' },
-    full:{ el:'Αυθεντική ιταλική carbonara χωρίς κρέμα: αυγά, pecorino romano, γκουανσιάλε και φρέσκο πιπέρι. Μια κλασική συνταγή παρασκευασμένη με σεβασμό στην παράδοση.', fr:'Authentique carbonara italienne sans crème : œufs, pecorino romano, guanciale et poivre frais. Recette traditionnelle respectée.', en:'Authentic Italian carbonara without cream: eggs, pecorino romano, guanciale and fresh pepper. A traditional recipe made with respect for tradition.', ar:'كاربونارا إيطالية أصيلة بدون كريمة: بيض وبيكورينو رومانو وغوانشيالي وفلفل طازج. وصفة تقليدية.' },
-    allergens:{ el:['Γλουτένη','Αυγά','Γαλακτοκομικά'], fr:['Gluten','Œufs','Produits laitiers'], en:['Gluten','Eggs','Dairy'], ar:['غلوتين','بيض','منتجات الألبان'] }
+    name:{ el:'Ζυμαρικά Carbonara', fr:'Pâtes Carbonara', en:'Pasta Carbonara', es:'Pasta Carbonara' },
+    desc:{ el:'Μακαρόνια με αυθεντική σάλτσα carbonara, γκουανσιάλε και pecorino.', fr:'Pâtes avec sauce carbonara authentique, guanciale et pecorino.', en:'Pasta with authentic carbonara sauce, guanciale and pecorino.', es:'Pasta with authentic carbonara sauce, guanciale and pecorino.' },
+    full:{ el:'Αυθεντική ιταλική carbonara χωρίς κρέμα: αυγά, pecorino romano, γκουανσιάλε και φρέσκο πιπέρι. Μια κλασική συνταγή παρασκευασμένη με σεβασμό στην παράδοση.', fr:'Authentique carbonara italienne sans crème : œufs, pecorino romano, guanciale et poivre frais. Recette traditionnelle respectée.', en:'Authentic Italian carbonara without cream: eggs, pecorino romano, guanciale and fresh pepper. A traditional recipe made with respect for tradition.', es:'Authentic Italian carbonara without cream: eggs, pecorino romano, guanciale and fresh pepper. A traditional recipe made with respect for tradition.' },
+    allergens:{ el:['Γλουτένη','Αυγά','Γαλακτοκομικά'], fr:['Gluten','Œufs','Produits laitiers'], en:['Gluten','Eggs','Dairy'], es:['Gluten','Huevos','Lácteos'] }
   },
   /* ---- CAT 3: Γλυκά / Sucré ---- */
   {
     id:7, cat:3, price:'€2.00', photo:'photo-1558961363-fa8fdf82db35',
     badges:[],
-    name:{ el:'Κρουασάν βουτύρου', fr:'Croissant au beurre', en:'Butter croissant', ar:'كرواسون بالزبدة' },
-    desc:{ el:'Τραγανό από έξω, μαλακό από μέσα — φτιαγμένο κάθε πρωί.', fr:'Croustillant dehors, moelleux dedans — fait chaque matin.', en:'Crispy outside, soft inside — made every morning.', ar:'مقرمش من الخارج وطري من الداخل — يُصنع كل صباح.' },
-    full:{ el:'Το κλασικό γαλλικό κρουασάν από ζύμη σφολιάτας με βούτυρο Βρετάνης. Ψήνεται φρέσκο κάθε πρωί για μια τέλεια γευστική εμπειρία.', fr:'Le classique croissant français en pâte feuilletée au beurre de Bretagne. Cuit frais chaque matin pour une expérience gustative parfaite.', en:'The classic French croissant made with Breton butter puff pastry. Baked fresh every morning for a perfect tasting experience.', ar:'الكرواسون الفرنسي الكلاسيكي من عجينة المليفوي بزبدة بريتون. يُخبز طازجاً كل صباح لتجربة مذاق مثالية.' },
-    allergens:{ el:['Γλουτένη','Γαλακτοκομικά'], fr:['Gluten','Produits laitiers'], en:['Gluten','Dairy'], ar:['غلوتين','منتجات الألبان'] }
+    name:{ el:'Κρουασάν βουτύρου', fr:'Croissant au beurre', en:'Butter croissant', es:'Croissant de mantequilla' },
+    desc:{ el:'Τραγανό από έξω, μαλακό από μέσα — φτιαγμένο κάθε πρωί.', fr:'Croustillant dehors, moelleux dedans — fait chaque matin.', en:'Crispy outside, soft inside — made every morning.', es:'Crispy outside, soft inside — made every morning.' },
+    full:{ el:'Το κλασικό γαλλικό κρουασάν από ζύμη σφολιάτας με βούτυρο Βρετάνης. Ψήνεται φρέσκο κάθε πρωί για μια τέλεια γευστική εμπειρία.', fr:'Le classique croissant français en pâte feuilletée au beurre de Bretagne. Cuit frais chaque matin pour une expérience gustative parfaite.', en:'The classic French croissant made with Breton butter puff pastry. Baked fresh every morning for a perfect tasting experience.', es:'The classic French croissant made with Breton butter puff pastry. Baked fresh every morning for a perfect tasting experience.' },
+    allergens:{ el:['Γλουτένη','Γαλακτοκομικά'], fr:['Gluten','Produits laitiers'], en:['Gluten','Dairy'], es:['Gluten','Lácteos'] }
   },
   {
     id:8, cat:3, price:'€5.50', photo:'photo-1571877227200-a0d98ea607e9',
     badges:['popular'],
-    name:{ el:'Τιραμισού', fr:'Tiramisu', en:'Tiramisu', ar:'تيراميسو' },
-    desc:{ el:'Το αγαπημένο ιταλικό γλυκό με μασκαρπόνε και καφέ.', fr:'Le dessert italien préféré au mascarpone et café.', en:'The beloved Italian dessert with mascarpone and coffee.', ar:'الحلوى الإيطالية المحبوبة بجبن الماسكاربوني والقهوة.' },
-    full:{ el:'Παραδοσιακό τιραμισού με savoiardi μπισκότα εμποτισμένα σε εσπρέσο, κρέμα μασκαρπόνε, αυγά και κακάο. Ένα αριστούργημα της ιταλικής ζαχαροπλαστικής.', fr:"Tiramisu traditionnel avec biscuits savoiardi trempés dans l'espresso, crème mascarpone, œufs et cacao. Chef-d'œuvre de la pâtisserie italienne.", en:'Traditional tiramisu with savoiardi biscuits soaked in espresso, mascarpone cream, eggs and cocoa. A masterpiece of Italian pastry.', ar:'تيراميسو تقليدي مع بسكويت مغموس في الإسبريسو وكريمة ماسكاربوني وبيض وكاكاو.' },
-    allergens:{ el:['Γλουτένη','Αυγά','Γαλακτοκομικά'], fr:['Gluten','Œufs','Produits laitiers'], en:['Gluten','Eggs','Dairy'], ar:['غلوتين','بيض','منتجات الألبان'] }
+    name:{ el:'Τιραμισού', fr:'Tiramisu', en:'Tiramisu', es:'Tiramisu' },
+    desc:{ el:'Το αγαπημένο ιταλικό γλυκό με μασκαρπόνε και καφέ.', fr:'Le dessert italien préféré au mascarpone et café.', en:'The beloved Italian dessert with mascarpone and coffee.', es:'The beloved Italian dessert with mascarpone and coffee.' },
+    full:{ el:'Παραδοσιακό τιραμισού με savoiardi μπισκότα εμποτισμένα σε εσπρέσο, κρέμα μασκαρπόνε, αυγά και κακάο. Ένα αριστούργημα της ιταλικής ζαχαροπλαστικής.', fr:"Tiramisu traditionnel avec biscuits savoiardi trempés dans l'espresso, crème mascarpone, œufs et cacao. Chef-d'œuvre de la pâtisserie italienne.", en:'Traditional tiramisu with savoiardi biscuits soaked in espresso, mascarpone cream, eggs and cocoa. A masterpiece of Italian pastry.', es:'Traditional tiramisu with savoiardi biscuits soaked in espresso, mascarpone cream, eggs and cocoa. A masterpiece of Italian pastry.' },
+    allergens:{ el:['Γλουτένη','Αυγά','Γαλακτοκομικά'], fr:['Gluten','Œufs','Produits laitiers'], en:['Gluten','Eggs','Dairy'], es:['Gluten','Huevos','Lácteos'] }
   },
   /* ---- CAT 4: Πρωινό / Le Matin ---- */
   {
     id:9, cat:4, price:'€6.50', photo:'photo-1533089860892-a7c6f0a88666',
     badges:['popular'],
-    name:{ el:'Σετ πρωινού', fr:'Formule petit-déjeuner', en:'Breakfast set', ar:'وجبة الفطور' },
-    desc:{ el:'Καφές ή τσάι, κρουασάν, χυμός πορτοκαλιού και φρούτα.', fr:"Café ou thé, croissant, jus d'orange et fruits.", en:'Coffee or tea, croissant, orange juice and fruits.', ar:'قهوة أو شاي وكرواسون وعصير برتقال وفواكه.' },
-    full:{ el:'Το ιδανικό πρωινό: επιλογή καφέ ή τσαγιού, φρέσκο κρουασάν βουτύρου, φρεσκοστυμμένος χυμός πορτοκαλιού και εποχιακά φρούτα. Τέλεια έναρξη για κάθε μέρα.', fr:"Le petit-déjeuner idéal : choix de café ou thé, croissant au beurre frais, jus d'orange fraîchement pressé et fruits de saison.", en:'The ideal breakfast: choice of coffee or tea, fresh butter croissant, freshly squeezed orange juice and seasonal fruits. A perfect start to every day.', ar:'الفطور المثالي: اختيار قهوة أو شاي، كرواسون زبدة طازج، عصير برتقال طازج، وفواكه موسمية.' },
-    allergens:{ el:['Γλουτένη','Γαλακτοκομικά'], fr:['Gluten','Produits laitiers'], en:['Gluten','Dairy'], ar:['غلوتين','منتجات الألبان'] }
+    name:{ el:'Σετ πρωινού', fr:'Formule petit-déjeuner', en:'Breakfast set', es:'Desayuno completo' },
+    desc:{ el:'Καφές ή τσάι, κρουασάν, χυμός πορτοκαλιού και φρούτα.', fr:"Café ou thé, croissant, jus d'orange et fruits.", en:'Coffee or tea, croissant, orange juice and fruits.', es:'Café o té, croissant, zumo de naranja y frutas.' },
+    full:{ el:'Το ιδανικό πρωινό: επιλογή καφέ ή τσαγιού, φρέσκο κρουασάν βουτύρου, φρεσκοστυμμένος χυμός πορτοκαλιού και εποχιακά φρούτα. Τέλεια έναρξη για κάθε μέρα.', fr:"Le petit-déjeuner idéal : choix de café ou thé, croissant au beurre frais, jus d'orange fraîchement pressé et fruits de saison.", en:'The ideal breakfast: choice of coffee or tea, fresh butter croissant, freshly squeezed orange juice and seasonal fruits. A perfect start to every day.', es:'The ideal breakfast: choice of coffee or tea, fresh butter croissant, freshly squeezed orange juice and seasonal fruits. A perfect start to every day.' },
+    allergens:{ el:['Γλουτένη','Γαλακτοκομικά'], fr:['Gluten','Produits laitiers'], en:['Gluten','Dairy'], es:['Gluten','Lácteos'] }
   },
   {
     id:10, cat:4, price:'€4.50', photo:'photo-1495214783159-3503fd1b572d',
     badges:['vegan'],
-    name:{ el:'Γιαούρτι & Granola', fr:'Yaourt & Granola', en:'Yogurt & Granola', ar:'زبادي وغرانولا' },
-    desc:{ el:'Γιαούρτι Σαντορίνης με granola, μέλι και εποχιακά φρούτα.', fr:'Yaourt de Santorin avec granola, miel et fruits de saison.', en:'Santorini yogurt with granola, honey and seasonal fruits.', ar:'زبادي سانتوريني مع الغرانولا والعسل والفواكه الموسمية.' },
-    full:{ el:'Κρεμώδες γιαούρτι από τη Σαντορίνη με τραγανή granola βρώμης, θυμαρίσιο μέλι Κρήτης και φρέσκα εποχιακά φρούτα. Ελαφρύ, θρεπτικό και απολαυστικό.', fr:"Yaourt crémeux de Santorin avec granola croustillante à l'avoine, miel de thym de Crète et fruits frais de saison. Léger, nutritif et délicieux.", en:'Creamy Santorini yogurt with crunchy oat granola, Cretan thyme honey and fresh seasonal fruits. Light, nutritious and delicious.', ar:'زبادي سانتوريني الكريمي مع غرانولا الشوفان المقرمشة وعسل الزعتر الكريتي وفواكه موسمية طازجة.' },
-    allergens:{ el:['Γαλακτοκομικά','Βρώμη'], fr:['Produits laitiers','Avoine'], en:['Dairy','Oats'], ar:['منتجات الألبان','شوفان'] }
+    name:{ el:'Γιαούρτι & Granola', fr:'Yaourt & Granola', en:'Yogurt & Granola', es:'Yogur y Granola' },
+    desc:{ el:'Γιαούρτι Σαντορίνης με granola, μέλι και εποχιακά φρούτα.', fr:'Yaourt de Santorin avec granola, miel et fruits de saison.', en:'Santorini yogurt with granola, honey and seasonal fruits.', es:'Santorini yogurt with granola, honey and seasonal fruits.' },
+    full:{ el:'Κρεμώδες γιαούρτι από τη Σαντορίνη με τραγανή granola βρώμης, θυμαρίσιο μέλι Κρήτης και φρέσκα εποχιακά φρούτα. Ελαφρύ, θρεπτικό και απολαυστικό.', fr:"Yaourt crémeux de Santorin avec granola croustillante à l'avoine, miel de thym de Crète et fruits frais de saison. Léger, nutritif et délicieux.", en:'Creamy Santorini yogurt with crunchy oat granola, Cretan thyme honey and fresh seasonal fruits. Light, nutritious and delicious.', es:'Creamy Santorini yogurt with crunchy oat granola, Cretan thyme honey and fresh seasonal fruits. Light, nutritious and delicious.' },
+    allergens:{ el:['Γαλακτοκομικά','Βρώμη'], fr:['Produits laitiers','Avoine'], en:['Dairy','Oats'], es:['Lácteos','Avena'] }
   },
   /* ---- CAT 5: Ναργιλές / Hookah ---- */
   {
     id:11, cat:5, price:'€12.00', photo:'photo-1574169208507-84376144848b',
     badges:['popular'],
-    name:{ el:'Μήλο & Μέντα', fr:'Pomme & Menthe', en:'Apple & Mint', ar:'تفاح ونعناع' },
-    desc:{ el:'Κλασικός συνδυασμός μήλου και δυόσμου — φρέσκος και ήπιος.', fr:'Classique combinaison pomme et menthe — frais et léger.', en:'Classic apple and mint combination — fresh and mild.', ar:'توليفة كلاسيكية من التفاح والنعناع — منعشة وخفيفة.' },
-    full:{ el:'Ο πιο δημοφιλής συνδυασμός: φρέσκο μήλο με δυόσμο για μια ήπια και δροσιστική εμπειρία. Ιδανικός για αρχάριους και έμπειρους.', fr:'La combinaison la plus populaire : pomme fraîche et menthe pour une expérience douce et rafraîchissante.', en:'The most popular combination: fresh apple and mint for a mild and refreshing experience. Ideal for beginners and experienced alike.', ar:'أكثر التوليفات شعبية: تفاح طازج ونعناع لتجربة خفيفة ومنعشة.' },
-    allergens:{ el:[], fr:[], en:[], ar:[] }
+    name:{ el:'Μήλο & Μέντα', fr:'Pomme & Menthe', en:'Apple & Mint', es:'Manzana y Menta' },
+    desc:{ el:'Κλασικός συνδυασμός μήλου και δυόσμου — φρέσκος και ήπιος.', fr:'Classique combinaison pomme et menthe — frais et léger.', en:'Classic apple and mint combination — fresh and mild.', es:'Classic apple and mint combination — fresh and mild.' },
+    full:{ el:'Ο πιο δημοφιλής συνδυασμός: φρέσκο μήλο με δυόσμο για μια ήπια και δροσιστική εμπειρία. Ιδανικός για αρχάριους και έμπειρους.', fr:'La combinaison la plus populaire : pomme fraîche et menthe pour une expérience douce et rafraîchissante.', en:'The most popular combination: fresh apple and mint for a mild and refreshing experience. Ideal for beginners and experienced alike.', es:'The most popular combination: fresh apple and mint for a mild and refreshing experience. Ideal for beginners and experienced alike.' },
+    allergens:{ el:[], fr:[], en:[], es:[] }
   },
   {
     id:12, cat:5, price:'€14.00', photo:'photo-1544441893-675973e31985',
     badges:[],
-    name:{ el:'Φρούτα του δάσους', fr:'Fruits rouges', en:'Mixed berries', ar:'فواكه حمراء مشكّلة' },
-    desc:{ el:'Μύρτιλα, φράουλα και βατόμουρο — φρουτώδης και αρωματικός.', fr:'Myrtilles, fraise et mûre — fruité et aromatique.', en:'Blueberry, strawberry and blackberry — fruity and aromatic.', ar:'توت أزرق وفراولة وتوت أسود — فاكهي وعطري.' },
-    full:{ el:'Πλούσιος συνδυασμός φρούτων του δάσους που δίνει μια ζωντανή και αρωματική εμπειρία. Ιδανικός για όσους αγαπούν τα φρουτώδη αρώματα.', fr:'Riche combinaison de fruits rouges offrant une expérience vivante et aromatique. Idéal pour les amateurs de saveurs fruitées.', en:'Rich combination of mixed berries offering a vibrant and aromatic experience. Ideal for lovers of fruity flavours.', ar:'توليفة غنية من الفواكه الحمراء تمنحك تجربة نابضة وعطرة.' },
-    allergens:{ el:[], fr:[], en:[], ar:[] }
+    name:{ el:'Φρούτα του δάσους', fr:'Fruits rouges', en:'Mixed berries', es:'Frutas rojas mixtas' },
+    desc:{ el:'Μύρτιλα, φράουλα και βατόμουρο — φρουτώδης και αρωματικός.', fr:'Myrtilles, fraise et mûre — fruité et aromatique.', en:'Blueberry, strawberry and blackberry — fruity and aromatic.', es:'Arándanos, fresa y mora — afrutado y aromático.' },
+    full:{ el:'Πλούσιος συνδυασμός φρούτων του δάσους που δίνει μια ζωντανή και αρωματική εμπειρία. Ιδανικός για όσους αγαπούν τα φρουτώδη αρώματα.', fr:'Riche combinaison de fruits rouges offrant une expérience vivante et aromatique. Idéal pour les amateurs de saveurs fruitées.', en:'Rich combination of mixed berries offering a vibrant and aromatic experience. Ideal for lovers of fruity flavours.', es:'Rich combination of mixed berries offering a vibrant and aromatic experience. Ideal for lovers of fruity flavours.' },
+    allergens:{ el:[], fr:[], en:[], es:[] }
   }
 ]
 
@@ -6042,7 +6042,7 @@ let _defaultLangFromFirebase = null;
 // Appliquer immédiatement la direction et la langue au chargement
 // (évite la différence d'affichage entre premier chargement et changement de langue)
 (function _initLangDir() {
-  const isRTL = lang === 'ar';
+  const isRTL = false;
   document.documentElement.lang = lang;
   document.documentElement.dir  = isRTL ? 'rtl' : 'ltr';
   const searchEl = document.getElementById('search');
@@ -6128,9 +6128,9 @@ function updateNoteBar() {
   nb.classList.toggle('visible', _adminInfo.showNote === true && text !== '');
 }
 let sheetItem = null;
-const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', ar:'🇸🇦' };
-const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', de:'ltr', ar:'rtl' };
-const LANG_LABELS = { el:'ΕΛ', fr:'FR', en:'EN', de:'DE', ar:'عر' };
+const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', es:'🇪🇸' };
+const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', de:'ltr', es:'ltr' };
+const LANG_LABELS = { el:'ΕΛ', fr:'FR', en:'EN', de:'DE', es:'ES' };
 let enabledLangs = {};
 
 /* ================================================
@@ -6210,13 +6210,13 @@ function loadAdminData() {
         en: { title:'Menu paused',      msg:'Your menu is currently paused.<br>Please contact the administrator to reactivate it.' },
         el: { title:'Μενού σε παύση',   msg:'Το μενού σας είναι προσωρινά σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.' },
         de: { title:'Menü pausiert',    msg:'Ihr Menü ist vorübergehend pausiert.<br>Bitte kontaktieren Sie den Administrator.' },
-        ar: { title:'القائمة متوقفة',   msg:'قائمتك متوقفة مؤقتاً.<br>يرجى التواصل مع المسؤول لإعادة تفعيلها.' }
+        es: { title:'Menú en pausa',    msg:'Su menú está momentáneamente en pausa.<br>Contacte al administrador para reactivarlo.' }
       };
       const p = _PAUSE[lang] || _PAUSE.fr;
       document.getElementById('pause-title').textContent = p.title;
       document.getElementById('pause-msg').innerHTML = p.msg;
       screen.style.display = 'flex';
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.dir = 'ltr';
     } else {
       screen.style.display = 'none';
     }
@@ -6318,43 +6318,43 @@ function loadAdminData() {
 ══════════════════════════════════════════════════════ */
 var EVENTS_CONFIG = {
   'christmas': {
-    text: { fr:'Joyeux Noël !', en:'Merry Christmas!', de:'Frohe Weihnachten!', el:'Καλά Χριστούγεννα!', ar:'عيد ميلاد مجيد!' },
-    date: { fr:'25 Décembre', en:'25 December', de:'25. Dezember', el:'25 Δεκεμβρίου', ar:'٢٥ ديسمبر' },
+    text: { fr:'Joyeux Noël !', en:'Merry Christmas!', de:'Frohe Weihnachten!', el:'Καλά Χριστούγεννα!', es:'¡Feliz Navidad!' },
+    date: { fr:'25 Décembre', en:'25 December', de:'25. Dezember', el:'25 Δεκεμβρίου', es:'25 Diciembre' },
     svg: '<svg viewBox="0 0 24 24" fill="var(--gold)" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.09 6.26L20.18 6l-4.09 5.73 4.18 5.09-6.27-1.82L12 22l-2-7-6.27 1.82 4.18-5.09L3.82 6l6.09 2.26z"/></svg>'
   },
   'easter': {
-    text: { fr:'Joyeuses Pâques !', en:'Happy Easter!', de:'Frohe Ostern!', el:'Χριστός Ανέστη!', ar:'عيد فصح مجيد!' },
-    date: { fr:'Pâques Orthodoxe', en:'Orthodox Easter', de:'Orthodoxes Ostern', el:'Ιερά Νύχτα του Πάσχα', ar:'عيد الفصح الأرثوذكسي' },
+    text: { fr:'Joyeuses Pâques !', en:'Happy Easter!', de:'Frohe Ostern!', el:'Χριστός Ανέστη!', es:'¡Felices Pascuas!' },
+    date: { fr:'Pâques Orthodoxe', en:'Orthodox Easter', de:'Orthodoxes Ostern', el:'Ιερά Νύχτα του Πάσχα', es:'Pascua Ortodoxa' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="2" x2="12" y2="22"/><line x1="4.5" y1="8" x2="19.5" y2="8"/><line x1="3" y1="13" x2="21" y2="13"/></svg>'
   },
   'newyear': {
-    text: { fr:'Bonne Année !', en:'Happy New Year!', de:'Frohes Neues Jahr!', el:'Καλή Χρονιά!', ar:'سنة سعيدة!' },
-    date: { fr:'1er Janvier', en:'January 1st', de:'1. Januar', el:'1η Ιανουαρίου', ar:'١ يناير' },
+    text: { fr:'Bonne Année !', en:'Happy New Year!', de:'Frohes Neues Jahr!', el:'Καλή Χρονιά!', es:'¡Feliz Año Nuevo!' },
+    date: { fr:'1er Janvier', en:'January 1st', de:'1. Januar', el:'1η Ιανουαρίου', es:'1 Enero' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="14" r="6"/><path d="M10 8.5c0-1.1.9-2 2-2s2 .9 2 2"/><line x1="8.5" y1="8.5" x2="15.5" y2="8.5"/><line x1="12" y1="6.5" x2="12" y2="8.5"/><circle cx="10" cy="13" r="1" fill="var(--gold)" stroke="none"/><circle cx="14" cy="15" r="1" fill="var(--gold)" stroke="none"/><circle cx="12" cy="12" r="0.8" fill="var(--gold)" stroke="none"/></svg>'
   },
   'independence': {
-    text: { fr:'Fête Nationale Grecque', en:'Greek Independence Day', de:'Griechischer Unabhängigkeitstag', el:'25η Μαρτίου 1821', ar:'يوم الاستقلال اليوناني' },
-    date: { fr:'25 Mars · Révolution 1821', en:'March 25 · Revolution 1821', de:'25. März · Revolution 1821', el:'Ελληνική Επανάσταση', ar:'٢٥ مارس · ثورة ١٨٢١' },
+    text: { fr:'Fête Nationale Grecque', en:'Greek Independence Day', de:'Griechischer Unabhängigkeitstag', el:'25η Μαρτίου 1821', es:'Día de la Independencia Griega' },
+    date: { fr:'25 Mars · Révolution 1821', en:'March 25 · Revolution 1821', de:'25. März · Revolution 1821', el:'Ελληνική Επανάσταση', es:'25 Marzo · Revolución 1821' },
     svg: '<svg viewBox="0 0 24 24" fill="var(--gold)" xmlns="http://www.w3.org/2000/svg"><path d="M10 2h4v8h8v4h-8v8h-4v-8H2v-4h8z"/></svg>'
   },
   'oxi': {
-    text: { fr:'Jour du NON', en:'OXI Day', de:'OXI-Tag', el:'28η Οκτωβρίου 1940', ar:'يوم لا — OXI' },
-    date: { fr:'28 Octobre · Ημέρα του ΟΧΙ', en:'October 28 · OXI Day', de:'28. Oktober · OXI', el:'Ημέρα του ΟΧΙ', ar:'٢٨ أكتوبر' },
+    text: { fr:'Jour du NON', en:'OXI Day', de:'OXI-Tag', el:'28η Οκτωβρίου 1940', es:'Día del NO — OXI' },
+    date: { fr:'28 Octobre · Ημέρα του ΟΧΙ', en:'October 28 · OXI Day', de:'28. Oktober · OXI', el:'Ημέρα του ΟΧΙ', es:'28 Octubre' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L4 7v5c0 5.25 3.4 10.15 8 11.5 4.6-1.35 8-6.25 8-11.5V7z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="12" y1="9" x2="12" y2="15"/></svg>'
   },
   'epiphany': {
-    text: { fr:'Bonne Épiphanie !', en:'Happy Epiphany!', de:'Frohe Heilige Drei Könige!', el:'Καλά Θεοφάνεια!', ar:'عيد الغطاس!' },
-    date: { fr:'6 Janvier · Théophanie', en:'January 6 · Theophany', de:'6. Januar · Theophanie', el:'6 Ιανουαρίου', ar:'٦ يناير' },
+    text: { fr:'Bonne Épiphanie !', en:'Happy Epiphany!', de:'Frohe Heilige Drei Könige!', el:'Καλά Θεοφάνεια!', es:'¡Feliz Epifanía!' },
+    date: { fr:'6 Janvier · Théophanie', en:'January 6 · Theophany', de:'6. Januar · Theophanie', el:'6 Ιανουαρίου', es:'6 Enero' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="2" x2="12" y2="17"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="7" y1="5" x2="17" y2="5"/><circle cx="8" cy="21" r="1.5" fill="var(--gold)" stroke="none"/><circle cx="12" cy="22.5" r="1" fill="var(--gold)" stroke="none"/><circle cx="16" cy="21" r="1.5" fill="var(--gold)" stroke="none"/></svg>'
   },
   'assumption': {
-    text: { fr:'Dormition de la Vierge', en:'Assumption of Mary', de:'Mariä Himmelfahrt', el:'Κοίμηση Θεοτόκου', ar:'عيد انتقال العذراء' },
-    date: { fr:'15 Août', en:'August 15', de:'15. August', el:'15 Αυγούστου', ar:'١٥ أغسطس' },
+    text: { fr:'Dormition de la Vierge', en:'Assumption of Mary', de:'Mariä Himmelfahrt', el:'Κοίμηση Θεοτόκου', es:'Asunción de la Virgen' },
+    date: { fr:'15 Août', en:'August 15', de:'15. August', el:'15 Αυγούστου', es:'15 Agosto' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 22v-9"/><path d="M12 13c0 0-3-3.5-3-6a3 3 0 0 1 6 0c0 2.5-3 6-3 6z"/><path d="M12 13c0 0-3.5-.8-5-3.2a3 3 0 0 1 3.5-4.3C12 6.2 12 13 12 13z"/><path d="M12 13c0 0 3.5-.8 5-3.2a3 3 0 0 0-3.5-4.3C12 6.2 12 13 12 13z"/></svg>'
   },
   'carnival': {
-    text: { fr:'Joyeux Carnaval !', en:'Happy Carnival!', de:'Frohes Karneval!', el:'Καλές Αποκριές!', ar:'كرنفال سعيد!' },
-    date: { fr:'Esprit du Carnaval', en:'Carnival Spirit', de:'Karnevalsgeist', el:'Αποκριάτικο Πνεύμα', ar:'روح الكرنفال' },
+    text: { fr:'Joyeux Carnaval !', en:'Happy Carnival!', de:'Frohes Karneval!', el:'Καλές Αποκριές!', es:'¡Feliz Carnaval!' },
+    date: { fr:'Esprit du Carnaval', en:'Carnival Spirit', de:'Karnevalsgeist', el:'Αποκριάτικο Πνεύμα', es:'Espíritu de Carnaval' },
     svg: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M2 12c0-5.52 4.48-10 10-10s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z"/><path d="M9 10l1 1M14 10l1-1"/><path d="M8.5 15s1.5 2 3.5 2 3.5-2 3.5-2"/><path d="M2 12h3M19 12h3"/></svg>'
   }
 };
@@ -6680,10 +6680,10 @@ function applyAdminData(data) {
           type:      item.type  || '',
           temp:      item.temp  || '',
           badges:    Array.isArray(item.badges) ? item.badges : [],
-          name:      { el: n.el||n.fr||'', fr: n.fr||n.el||'', en: n.en||n.el||n.fr||'', de: n.de||n.en||n.fr||'', ar: n.ar||n.el||n.fr||'' },
-          desc:      { el: d.el||d.fr||'', fr: d.fr||d.el||'', en: d.en||d.el||d.fr||'', de: d.de||d.en||d.fr||'', ar: d.ar||d.el||d.fr||'' },
-          full:      { el: f.el||f.fr||'', fr: f.fr||f.el||'', en: f.en||f.el||f.fr||'', de: f.de||f.en||f.fr||'', ar: f.ar||f.el||f.fr||'' },
-          allergens: { el: al.el||al.fr||[], fr: al.fr||al.el||[], en: al.en||al.el||al.fr||[], de: al.de||al.en||al.fr||[], ar: al.ar||al.el||al.fr||[] },
+          name:      { el: n.el||n.fr||'', fr: n.fr||n.el||'', en: n.en||n.el||n.fr||'', de: n.de||n.en||n.fr||'', es: n.es||n.en||n.fr||'' },
+          desc:      { el: d.el||d.fr||'', fr: d.fr||d.el||'', en: d.en||d.el||d.fr||'', de: d.de||d.en||d.fr||'', es: d.es||d.en||d.fr||'' },
+          full:      { el: f.el||f.fr||'', fr: f.fr||f.el||'', en: f.en||f.el||f.fr||'', de: f.de||f.en||f.fr||'', es: f.es||f.en||f.fr||'' },
+          allergens: { el: al.el||al.fr||[], fr: al.fr||al.el||[], en: al.en||al.el||al.fr||[], de: al.de||al.en||al.fr||[], es: al.es||al.en||al.fr||[] },
         };
         ITEMS.push(safe);
       });
@@ -6751,11 +6751,11 @@ function _esc(s) {
 }
 
 const _ARIA_LABELS = {
-  qty:        { fr:'Quantité',          en:'Quantity',          de:'Menge',              el:'Ποσότητα',              ar:'الكمية'         },
-  add:        { fr:'Ajouter',           en:'Add',               de:'Hinzufügen',         el:'Προσθήκη',              ar:'إضافة'          },
-  remove:     { fr:'Retirer',           en:'Remove',            de:'Entfernen',          el:'Αφαίρεση',              ar:'إزالة'          },
-  addCart:    { fr:'Ajouter au panier', en:'Add to cart',       de:'In den Warenkorb',   el:'Προσθήκη στο καλάθι',   ar:'أضف إلى السلة'  },
-  removeCart: { fr:'Retirer du panier', en:'Remove from cart',  de:'Aus dem Warenkorb',  el:'Αφαίρεση από το καλάθι',ar:'إزالة من السلة' },
+  qty:        { fr:'Quantité',          en:'Quantity',          de:'Menge',              el:'Ποσότητα',              es:'Quantity'         },
+  add:        { fr:'Ajouter',           en:'Add',               de:'Hinzufügen',         el:'Προσθήκη',              es:'Add'          },
+  remove:     { fr:'Retirer',           en:'Remove',            de:'Entfernen',          el:'Αφαίρεση',              es:'Remove'          },
+  addCart:    { fr:'Ajouter au panier', en:'Add to cart',       de:'In den Warenkorb',   el:'Προσθήκη στο καλάθι',   es:'Add to cart'  },
+  removeCart: { fr:'Retirer du panier', en:'Remove from cart',  de:'Aus dem Warenkorb',  el:'Αφαίρεση από το καλάθι',es:'Remove from cart' },
 };
 function _aria(key) { const m=_ARIA_LABELS[key]||{}; return m[lang]||m.fr||''; }
 
@@ -6852,7 +6852,7 @@ function buildFlipBook() {
   const wifiVal = u.wifiV || '';
   const wifiLbl = (u.wifiN || 'WiFi').trim();
 
-  const isAr = lang === 'ar';
+  const isAr = false;
 
   const hero = document.createElement('div');
   hero.className = 'flip-page fp-hero';
@@ -6931,7 +6931,7 @@ function buildFlipBook() {
       ${photosHtml}
       <div class="fp-cat-header">
         <div class="fp-cat-name">${_esc(catName)}</div>
-        <div class="fp-cat-count">${catItems.length} ${catItems.length > 1 ? (lang === 'fr' ? 'articles' : lang === 'en' ? 'items' : lang === 'ar' ? 'عناصر' : lang === 'de' ? 'Artikel' : 'είδη') : (lang === 'fr' ? 'article' : lang === 'en' ? 'item' : lang === 'ar' ? 'عنصر' : lang === 'de' ? 'Artikel' : 'είδος')}</div>
+        <div class="fp-cat-count">${catItems.length} ${catItems.length > 1 ? (lang === 'fr' ? 'articles' : lang === 'en' ? 'items' : lang === 'es' ? 'artículos' : lang === 'de' ? 'Artikel' : 'είδη') : (lang === 'fr' ? 'article' : lang === 'en' ? 'item' : lang === 'es' ? 'artículo' : lang === 'de' ? 'Artikel' : 'είδος')}</div>
       </div>
       <div class="fp-deco"><div class="fp-deco-line"></div><div class="fp-deco-ico">◆</div><div class="fp-deco-line"></div></div>
       <div class="fp-items-list">${itemsHtml}</div>`;
@@ -7003,7 +7003,7 @@ function _applyFlipTranslate(animate) {
   if (!track) return;
   const vw = window.innerWidth;
   // Arabic: DOM is reversed (hero rightmost), so physIdx = N-1-logicalPage
-  const physIdx = (lang === 'ar') ? (_flipPages - 1 - flipCurrentPage) : flipCurrentPage;
+  const physIdx = flipCurrentPage;
   track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.4,0,0.2,1)' : 'none';
   track.style.transform  = `translateX(${-physIdx * vw}px)`;
 }
@@ -7029,8 +7029,8 @@ function _updatePaperNav() {
   const prevBtn = document.getElementById('paper-prev-btn');
   const nextBtn = document.getElementById('paper-next-btn');
   // Arabic: left (<) navigates toward categories (page+1), right (>) toward hero (page-1)
-  if (prevBtn) prevBtn.disabled = (lang === 'ar') ? flipCurrentPage === _flipPages - 1 : flipCurrentPage === 0;
-  if (nextBtn) nextBtn.disabled = (lang === 'ar') ? flipCurrentPage === 0 : flipCurrentPage === _flipPages - 1;
+  if (prevBtn) prevBtn.disabled = flipCurrentPage === 0;
+  if (nextBtn) nextBtn.disabled = flipCurrentPage === _flipPages - 1;
 }
 
 function flipToPage(newIdx) {
@@ -7046,7 +7046,7 @@ function flipToPage(newIdx) {
   if (_fpDeco)  _fpDeco.style.display  = _onHero ? '' : 'none';
   // Reset scroll to top on the destination page
   const pages = document.querySelectorAll('.fp-cat-page');
-  const domIdx = (lang === 'ar') ? (_flipPages - 1 - flipCurrentPage) : (flipCurrentPage - 1);
+  const domIdx = (flipCurrentPage - 1);
   const dest = pages[domIdx];
   if (dest) dest.scrollTop = 1;
   _paperHideBar();
@@ -7093,7 +7093,7 @@ function _setupPaperSwipe() {
     const catPages = document.querySelectorAll('.fp-cat-page');
     // Arabic: DOM reversed, catPages[0] = last cat, catPages[N-2] = first cat
     // logical page i → DOM index (_flipPages - 1 - i) for Arabic, (i - 1) for LTR
-    const domIdx = (lang === 'ar') ? (_flipPages - 1 - flipCurrentPage) : (flipCurrentPage - 1);
+    const domIdx = (flipCurrentPage - 1);
     const pg = catPages[domIdx];
     return !pg || pg.scrollTop <= 2;
   }
@@ -7164,7 +7164,7 @@ function _setupPaperSwipe() {
         _applyFlipTranslate(true);
       } else {
         // En arabe : swipe droite = page suivante, swipe gauche = page précédente
-        const goNext = (lang === 'ar') ? dx > 0 : dx < 0;
+        const goNext = dx < 0;
         if (goNext) flipToPage(Math.min(startPage + 1, _flipPages - 1));
         else        flipToPage(Math.max(startPage - 1, 0));
       }
@@ -7203,9 +7203,9 @@ window.addEventListener('resize', () => {
 document.getElementById('paper-home-btn')?.addEventListener('click', () => flipToPage(0));
 // Arabic: DOM is reversed, so left arrow (<) goes to higher page (categories left), right (>) goes back
 document.getElementById('paper-prev-btn')?.addEventListener('click', () =>
-  flipToPage(lang === 'ar' ? flipCurrentPage + 1 : flipCurrentPage - 1));
+  flipToPage(flipCurrentPage - 1));
 document.getElementById('paper-next-btn')?.addEventListener('click', () =>
-  flipToPage(lang === 'ar' ? flipCurrentPage - 1 : flipCurrentPage + 1));
+  flipToPage(flipCurrentPage + 1));
 
 // (scroll guard removed — was blocking pull-to-refresh)
 
@@ -7692,7 +7692,7 @@ function renderHistModal(orders) {
   }
 
   // Locale date/heure selon la langue choisie
-  const localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-SA' };
+  const localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', es:'es-ES' };
   const locale = localeMap[lang] || 'fr-FR';
 
   list.innerHTML = orders.map(o => {
