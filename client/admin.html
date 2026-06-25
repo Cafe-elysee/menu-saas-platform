@@ -2063,6 +2063,9 @@
   .adm-modal-box { animation:admModalIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .adm-modal-box.out { animation:admModalOut 0.18s ease forwards; }
   html.light .adm-modal-box { background-color:#f5f0e8!important; background-image:url(assets/gn-bg-light.jpg)!important; border-color:rgba(200,164,78,0.22)!important; }
+  html.light #pay-modal > div { background-color:#f5f0e8!important; background-image:url(assets/gn-bg-light.jpg)!important; }
+  html.light #pay-modal-details { background:rgba(200,164,78,0.07)!important; }
+  html.light #pay-modal-details-body, html.light #pay-modal-close-btn { color:var(--muted)!important; }
 
   /* ── STAGGER ENTRANCE — catégories ── */
   @keyframes rowStagger {
@@ -2653,6 +2656,25 @@
   </div>
 </div>
 
+<!-- ── MODAL PAIEMENT ── -->
+<div id="pay-modal" style="display:none;position:fixed;inset:0;z-index:10006;background:rgba(0,0,0,0.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:360px;background-color:#120e0a;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;border:1px solid rgba(200,164,78,0.3);border-radius:22px;padding:28px 22px 22px;box-shadow:0 0 0 1px rgba(200,164,78,0.1),0 24px 64px rgba(0,0,0,0.6)">
+    <div id="pay-modal-badge" style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#c8a44e;margin-bottom:8px;opacity:0.7"></div>
+    <div id="pay-modal-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:#c8a44e;margin-bottom:6px"></div>
+    <div id="pay-modal-amount" style="font-size:1.6rem;font-weight:700;color:#fff;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px;margin-bottom:18px">
+      <button id="pay-btn-virement" onclick="_paySelectVirement()" style="flex:1;padding:12px 8px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.5);background:rgba(200,164,78,0.12);color:#c8a44e;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.18s"></button>
+      <button id="pay-btn-cash" onclick="_paySelectCash()" style="flex:1;padding:12px 8px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--cream);font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.18s"></button>
+    </div>
+    <div id="pay-modal-details" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(200,164,78,0.18);border-radius:14px;padding:16px;margin-bottom:16px">
+      <div id="pay-modal-details-title" style="font-size:0.82rem;font-weight:700;color:#c8a44e;margin-bottom:8px"></div>
+      <div id="pay-modal-details-body" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:12px"></div>
+      <div id="pay-modal-details-btns" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <button onclick="_closePayModal()" id="pay-modal-close-btn" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);font-family:inherit;font-size:0.84rem;cursor:pointer"></button>
+  </div>
+</div>
+
 <!-- ── ADMIN CONFIRM MODAL (changement mot de passe) ── -->
 <div id="adm-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
   <div class="adm-modal-box" style="width:100%;max-width:320px;background-color:#120e0a;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 0 0 1px rgba(200,164,78,0.12),0 24px 64px rgba(0,0,0,0.55);">
@@ -3033,7 +3055,8 @@ const ADMIN_UI = {
     scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
     btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια',
     btnDelLogo:    'Διαγραφή λογοτύπου',
-    loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.',
+    loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.'
+    subPayBadge:'Πληρωμή σε εκκρεμότητα', subPayBtn:'Πληρωμή',,
     loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη 30 δευτερόλεπτα.',
     loginErrIncorrect:'Λανθασμένος κωδικός',
     pdfDownloaded: '✅ PDF ληφθέν',
@@ -3168,7 +3191,8 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
     btnGenerate:'Générer', tblLabel:'Table', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables',
     btnDelLogo:    'Supprimer le logo',
-    loginErrSuspended:'Ce compte est suspendu ou introuvable.',
+    loginErrSuspended:'Ce compte est suspendu ou introuvable.'
+    subPayBadge:'Paiement en attente', subPayBtn:'Payer',,
     loginErrBlocked:'Trop de tentatives — accès bloqué 30 secondes.',
     loginErrIncorrect:'Mot de passe incorrect',
     pdfDownloaded: '✅ PDF téléchargé',
@@ -3303,7 +3327,8 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
     btnGenerate:'Generate', tblLabel:'Table', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables',
     btnDelLogo:    'Delete logo',
-    loginErrSuspended:'This account is suspended or does not exist.',
+    loginErrSuspended:'This account is suspended or does not exist.'
+    subPayBadge:'Payment pending', subPayBtn:'Pay now',,
     loginErrBlocked:'Too many attempts — access blocked for 30 seconds.',
     loginErrIncorrect:'Incorrect password',
     pdfDownloaded: '✅ PDF downloaded',
@@ -3438,7 +3463,8 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
     btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische',
     btnDelLogo:    'Logo löschen',
-    loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.',
+    loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.'
+    subPayBadge:'Zahlung ausstehend', subPayBtn:'Zahlen',,
     loginErrBlocked:'Zu viele Versuche — Zugang für 30 Sekunden gesperrt.',
     loginErrIncorrect:'Falsches Passwort',
     pdfDownloaded: '✅ PDF heruntergeladen',
@@ -3573,7 +3599,8 @@ const ADMIN_UI = {
     scAnalytics:'📊 Estadísticas', statsSectionTitle:'Estadísticas',
     btnGenerate:'Generar', tblLabel:'Mesa', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas',
     btnDelLogo:    'Eliminar logo',
-    loginErrSuspended:'Esta cuenta está suspendida o no existe.',
+    loginErrSuspended:'Esta cuenta está suspendida o no existe.'
+    subPayBadge:'Pago pendiente', subPayBtn:'Pagar',,
     loginErrBlocked:'Demasiados intentos — acceso bloqueado 30 segundos.',
     loginErrIncorrect:'Contraseña incorrecta',
     pdfDownloaded: '✅ PDF descargado',
@@ -7416,18 +7443,18 @@ function _renderSubSection(el, t, sub) {
        </div>`
     : '';
 
-  // Bouton "Payer" visible si paiement en attente (endDate dans ≤4j ou déjà passé)
+  // Bouton "Payer" visible dès qu'un paiement est en attente
   const endTs = sub.endDate || 0;
-  const payDue = endTs && (now >= endTs - 4 * 24 * 60 * 60 * 1000);
+  const payDue = !creationDone || (endTs && now >= endTs - 7 * 24 * 60 * 60 * 1000);
   const payAmountDue = !creationDone ? creationFeePrice : price;
+  const payLabel = !creationDone ? (t.subCreationFeeLabel || 'Frais de création') : (t.subMonthly || 'Abonnement');
   const payBtn = payDue
-    ? `<div style="background:rgba(200,164,78,.10);border:1px solid rgba(200,164,78,.35);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-        <div style="font-size:0.82rem;font-weight:700;color:#c8a44e;margin-bottom:6px">${t.subPayBtn || '💳 Effectuer mon paiement'}</div>
-        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">${!creationDone ? (t.subCreationFeeLabel || 'Frais de création') : (t.subMonthly || 'Abonnement')} — <strong style="color:var(--text)">${payAmountDue}€</strong></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="_subPayRevolut()" style="flex:1;min-width:130px;padding:10px 12px;border-radius:9px;border:1.5px solid #c8a44e;background:rgba(200,164,78,.15);color:#c8a44e;font-size:0.82rem;font-weight:600;cursor:pointer">💳 ${t.subPayRevolut || 'Virement Revolut'}</button>
-          <button onclick="_subPayCash()" style="flex:1;min-width:130px;padding:10px 12px;border-radius:9px;border:1.5px solid rgba(200,164,78,.4);background:rgba(200,164,78,.07);color:var(--text);font-size:0.82rem;font-weight:600;cursor:pointer">💵 ${t.subPayCash || 'Espèces (Athènes)'}</button>
+    ? `<div style="background:rgba(200,164,78,.10);border:1.5px solid rgba(200,164,78,.4);border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#c8a44e;opacity:0.8;margin-bottom:3px">${t.subPayBadge || 'Paiement en attente'}</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--text)">${payAmountDue}€ <span style="font-size:0.78rem;color:var(--muted);font-weight:400">— ${payLabel}</span></div>
         </div>
+        <button onclick="_openPayModal(${payAmountDue},'${payLabel}')" style="padding:11px 20px;border-radius:11px;border:none;background:linear-gradient(135deg,#d4a94e,#c8a44e,#a8842e);color:#0c0a08;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;white-space:nowrap">💳 ${t.subPayBtn || 'Payer'}</button>
        </div>`
     : '';
 
@@ -7512,6 +7539,89 @@ function _subPayCash() {
   );
 }
 
+// ── Modal paiement dédié ──────────────────────────────────────────────────────
+const _PAY_T = {
+  fr: { badge:'Paiement en attente', title:'Effectuer mon paiement', close:'Fermer',
+    virement:'💳 Virement bancaire', cash:'💵 Espèces',
+    virTitle:'Virement bancaire', virInstr:'Effectuez le virement en indiquant votre <strong>ID restaurant</strong> dans le libellé. Envoyez-nous ensuite le justificatif par WhatsApp ou email.',
+    virBtn:'🔗 Accéder au lien de virement',
+    cashTitle:'Paiement en espèces', cashInstr:'Envoyez-nous votre <strong>ID restaurant</strong>, votre <strong>adresse complète</strong>, ainsi qu\'une <strong>date et heure</strong> souhaitée. Notre agent passera recevoir le paiement chez vous.',
+    cashWa:'📱 WhatsApp', cashEmail:'✉️ Email' },
+  en: { badge:'Payment pending', title:'Make my payment', close:'Close',
+    virement:'💳 Bank transfer', cash:'💵 Cash',
+    virTitle:'Bank transfer', virInstr:'Make the transfer with your <strong>restaurant ID</strong> as the reference. Then send us the proof of payment via WhatsApp or email.',
+    virBtn:'🔗 Open transfer link',
+    cashTitle:'Cash payment', cashInstr:'Send us your <strong>restaurant ID</strong>, your <strong>full address</strong>, and a preferred <strong>date and time</strong>. Our agent will come to collect the payment.',
+    cashWa:'📱 WhatsApp', cashEmail:'✉️ Email' },
+  el: { badge:'Πληρωμή σε εκκρεμότητα', title:'Πραγματοποιήστε την πληρωμή σας', close:'Κλείσιμο',
+    virement:'💳 Τραπεζικό έμβασμα', cash:'💵 Μετρητά',
+    virTitle:'Τραπεζικό έμβασμα', virInstr:'Πραγματοποιήστε το έμβασμα αναφέροντας το <strong>ID εστιατορίου</strong> σας στην αιτιολογία. Στη συνέχεια στείλτε μας το αποδεικτικό μέσω WhatsApp ή email.',
+    virBtn:'🔗 Σύνδεσμος εμβάσματος',
+    cashTitle:'Πληρωμή σε μετρητά', cashInstr:'Στείλτε μας το <strong>ID εστιατορίου</strong> σας, την <strong>πλήρη διεύθυνσή</strong> σας και μια επιθυμητή <strong>ημερομηνία και ώρα</strong>. Ο αντιπρόσωπός μας θα έρθει να παραλάβει την πληρωμή.',
+    cashWa:'📱 WhatsApp', cashEmail:'✉️ Email' },
+  es: { badge:'Pago pendiente', title:'Realizar mi pago', close:'Cerrar',
+    virement:'💳 Transferencia bancaria', cash:'💵 Efectivo',
+    virTitle:'Transferencia bancaria', virInstr:'Realice la transferencia indicando su <strong>ID de restaurante</strong> en el concepto. Luego envíenos el comprobante por WhatsApp o email.',
+    virBtn:'🔗 Abrir enlace de transferencia',
+    cashTitle:'Pago en efectivo', cashInstr:'Envíenos su <strong>ID de restaurante</strong>, su <strong>dirección completa</strong> y una <strong>fecha y hora</strong> preferida. Nuestro agente pasará a recoger el pago.',
+    cashWa:'📱 WhatsApp', cashEmail:'✉️ Email' },
+  de: { badge:'Zahlung ausstehend', title:'Zahlung durchführen', close:'Schließen',
+    virement:'💳 Banküberweisung', cash:'💵 Barzahlung',
+    virTitle:'Banküberweisung', virInstr:'Führen Sie die Überweisung mit Ihrer <strong>Restaurant-ID</strong> als Verwendungszweck durch. Senden Sie uns dann den Zahlungsnachweis per WhatsApp oder E-Mail.',
+    virBtn:'🔗 Überweisungslink öffnen',
+    cashTitle:'Barzahlung', cashInstr:'Senden Sie uns Ihre <strong>Restaurant-ID</strong>, Ihre <strong>vollständige Adresse</strong> sowie Ihr bevorzugtes <strong>Datum und Uhrzeit</strong>. Unser Agent kommt zur Abholung.',
+    cashWa:'📱 WhatsApp', cashEmail:'✉️ Email' }
+};
+const REVOLUT_LINK = 'https://revolut.me/malekhkk7';
+const WA_PHONE    = '306943995696';
+
+function _openPayModal(amount, amountLabel) {
+  const t   = _PAY_T[currentLang] || _PAY_T.fr;
+  const rid = _RID || '';
+  document.getElementById('pay-modal-badge').textContent  = t.badge;
+  document.getElementById('pay-modal-title').textContent  = t.title;
+  document.getElementById('pay-modal-amount').textContent = (amountLabel || '') + ' ' + (amount || '') + '€';
+  document.getElementById('pay-btn-virement').textContent = t.virement;
+  document.getElementById('pay-btn-cash').textContent     = t.cash;
+  document.getElementById('pay-modal-close-btn').textContent = t.close;
+  document.getElementById('pay-modal-details').style.display = 'none';
+  const mo = document.getElementById('pay-modal');
+  mo.style.display = 'flex';
+  requestAnimationFrame(() => mo.style.opacity = '1');
+  // Stocker pour les sous-fonctions
+  mo._rid = rid; mo._amount = amount; mo._t = t;
+}
+function _closePayModal() {
+  document.getElementById('pay-modal').style.display = 'none';
+}
+function _paySelectVirement() {
+  const mo  = document.getElementById('pay-modal');
+  const t   = mo._t || (_PAY_T[currentLang] || _PAY_T.fr);
+  const rid = mo._rid || _RID || '';
+  document.getElementById('pay-btn-virement').style.background = 'rgba(200,164,78,0.25)';
+  document.getElementById('pay-btn-cash').style.background     = 'rgba(255,255,255,0.05)';
+  document.getElementById('pay-modal-details-title').textContent = t.virTitle;
+  document.getElementById('pay-modal-details-body').innerHTML   = t.virInstr + (rid ? ' <strong style="color:#c8a44e">(' + rid + ')</strong>' : '');
+  document.getElementById('pay-modal-details-btns').innerHTML   =
+    `<a href="${REVOLUT_LINK}" onclick="window.open(this.href,'_system');return false;" style="display:block;text-align:center;padding:12px;border-radius:11px;background:linear-gradient(135deg,#d4a94e,#c8a44e,#a8842e);color:#0c0a08;text-decoration:none;font-weight:700;font-size:0.88rem">${t.virBtn}</a>`;
+  document.getElementById('pay-modal-details').style.display = 'block';
+}
+function _paySelectCash() {
+  const mo  = document.getElementById('pay-modal');
+  const t   = mo._t || (_PAY_T[currentLang] || _PAY_T.fr);
+  const rid = mo._rid || _RID || '';
+  const amt = mo._amount || '';
+  document.getElementById('pay-btn-cash').style.background     = 'rgba(255,255,255,0.12)';
+  document.getElementById('pay-btn-virement').style.background = 'rgba(200,164,78,0.12)';
+  document.getElementById('pay-modal-details-title').textContent = t.cashTitle;
+  document.getElementById('pay-modal-details-body').innerHTML   = t.cashInstr;
+  const waText = encodeURIComponent('Bonjour GeNext 👋\nID restaurant : ' + rid + '\nMontant : ' + amt + '€\nAdresse : \nDate et heure souhaitée : ');
+  document.getElementById('pay-modal-details-btns').innerHTML   =
+    `<a href="https://wa.me/${WA_PHONE}?text=${waText}" onclick="window.open(this.href,'_system');return false;" style="display:block;text-align:center;padding:11px;border-radius:11px;background:#25d366;color:#fff;text-decoration:none;font-weight:700;font-size:0.88rem">${t.cashWa}</a>
+     <a href="mailto:gennextcontact@gmail.com?subject=Paiement+especes+${encodeURIComponent(rid)}&body=${waText}" style="display:block;text-align:center;padding:11px;border-radius:11px;border:1px solid rgba(200,164,78,0.3);background:rgba(200,164,78,0.07);color:#c8a44e;text-decoration:none;font-weight:700;font-size:0.88rem;margin-top:0">${t.cashEmail}</a>`;
+  document.getElementById('pay-modal-details').style.display = 'block';
+}
+
 // ── Popup rappel paiement (1× par session) ────────────────────────────────────
 function _checkPaymentReminderPopup(sub, t) {
   const now    = Date.now();
@@ -7527,13 +7637,13 @@ function _checkPaymentReminderPopup(sub, t) {
 
 function _showPaymentReminderPopup(sub, t) {
   if (!t) t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  _showAdmConfirm(
-    t.subPayPopupTitle || '💳 Rappel de paiement',
-    t.subPayPopupMsg   || 'Vous avez un paiement en attente. Rendez-vous dans <strong>Mon abonnement</strong> pour régler.',
-    '',
-    t.subPayPopupClose || 'J\'ai compris',
-    null
-  );
+  const isCS = (sub.forfait || '') === 'commandes-services';
+  const cf = (sub.prices && sub.prices['creation'] != null) ? sub.prices['creation'] : (sub.creationFee != null ? sub.creationFee : 149);
+  const pr = sub.price != null ? sub.price : (isCS ? 99 : 49);
+  const creationDone = sub.creationFeePaid === true;
+  const amt = !creationDone ? cf : pr;
+  const lbl = !creationDone ? (t.subCreationFeeLabel || 'Frais de création') : (t.subMonthly || 'Abonnement');
+  _openPayModal(amt, lbl);
 }
 
 async function _changeSubscription(newForfait, newMode) {
