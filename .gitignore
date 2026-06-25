@@ -31,3 +31,5 @@ server-app/android/
 .DS_Store
 Thumbs.db
 demo-page/
+
+.vercel
