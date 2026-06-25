@@ -2123,21 +2123,21 @@ function _startApp(confirmed) {
   if (confirmed && _RID && _RID !== 'demo') {
     try { (firebase.database()).ref('restaurants/' + _RID + '/firstOpen').set(true); } catch(e) {}
   }
-  // Premier setup : appliquer la langue choisie localement (defaultLang/primaryLang gérés par l'admin)
+  // Premier setup : appliquer la langue choisie localement
+  // La langue d'affichage (primaryLang) contrôle uniquement le menu client — pas le serveur
   var _fsl = localStorage.getItem('_srv_setup_lang');
   if (_fsl) {
     localStorage.removeItem('_srv_setup_lang');
     lang = _fsl;
     localStorage.setItem('saas_ui_lang', _fsl);
+    localStorage.setItem(_PFX+'app_lang', _fsl); // verrouille la langue choisie dans le setup
   }
   _hideSrvLoading();
   _rref('/config/primaryLang').on('value', function(snap) {
     var val = snap.val();
     if (val) {
       localStorage.setItem(_PFX+'app_lang_cache', val);
-      if (!localStorage.getItem(_PFX+'app_lang') && lang !== val) {
-        lang = val; applyLang(); buildLangBtns();
-      }
+      // server-app conserve sa propre langue — ne jamais écraser le choix du serveur
     }
   });
   _rref('/config/enabledLangs').on('value', function(snap) {

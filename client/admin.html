@@ -4093,6 +4093,7 @@ function showAdmin() {
     }
   }).catch(() => {});
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
+  setTimeout(() => { _hideAdmLoadingScreen(); }, 10000); // failsafe si Firebase ne répond pas
   loadData();
   loadMenuTheme();
   loadMenuMode();
@@ -4193,6 +4194,8 @@ function loadData() {
     renderAll();
     applyAdminUI(currentLang);
     updateMockupText();
+    _hideAdmLoadingScreen();
+    _revealAdmWrap();
   });
 
   // Premier chargement immédiat (once) pour initialiser sans attendre
@@ -4201,7 +4204,10 @@ function loadData() {
     applyMenuSnapshot(snapshot.val());
     autoTranslateToEl();
     setTimeout(() => { _lastLocalSave = 0; }, 500);
-  }).catch(() => {});
+  }).catch(() => {
+    _hideAdmLoadingScreen();
+    _revealAdmWrap();
+  });
 }
 
 function migrateToEl(data) {
