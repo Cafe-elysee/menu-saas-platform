@@ -2860,6 +2860,7 @@ function _doRenderCommandes() {
 
 function _trialInfo(d, key) {
   const WEEK = 7 * 24 * 60 * 60 * 1000;
+  if (d.clientDeleted) return { isExpired: false, isSuspended: false, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'none' };
   const isSuspended = d.suspendu === true;
   const now = Date.now();
 
@@ -4411,6 +4412,10 @@ async function confirmDeleteClient() {
     });
     btn.textContent = 'Suppression…';
     await _saasDb.ref('restaurants/' + slug).remove();
+    // Supprimer le paiement en attente de la commande liée
+    if (_dCk) {
+      _controlDb.ref('/commandes/' + _dCk).update({ clientDeleted: true }).catch(function() {});
+    }
     closeDelModal();
     // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
     const cardEl = document.getElementById('card-' + slug.replace(/-/g,'_'));
