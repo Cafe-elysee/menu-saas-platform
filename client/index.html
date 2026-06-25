@@ -1086,6 +1086,51 @@
       background-size:cover; background-position:center;
     }
 
+    /* ── Modal Dose & Sucre ── */
+    #dose-modal {
+      position:fixed; inset:0; z-index:9990;
+      background:rgba(0,0,0,0.72);
+      display:flex; align-items:flex-end; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity 0.3s;
+    }
+    #dose-modal.show { opacity:1; pointer-events:auto; }
+    html[data-menu-theme="genext"] #dose-modal { background:rgba(5,3,2,0.62); }
+    html[data-menu-theme="genext"].light #dose-modal { background:rgba(195,182,162,0.48); }
+    #dose-box {
+      width:100%; max-width:460px; border-radius:22px 22px 0 0;
+      padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 18px); box-sizing:border-box;
+      background:var(--bg2); border-top:1px solid var(--border);
+      box-shadow:0 -4px 40px rgba(0,0,0,0.50);
+      transform:translateY(100%); transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
+    }
+    #dose-modal.show #dose-box { transform:translateY(0); }
+    html[data-menu-theme="genext"] #dose-box {
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-color:#120e0a; background-size:cover; background-position:center;
+      border-top:1px solid rgba(200,164,78,0.38);
+    }
+    html[data-menu-theme="genext"].light #dose-box {
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-color:#f5f0e8; background-size:cover; background-position:center;
+    }
+    .dose-handle { width:40px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 16px; }
+    .dose-item-name { font-family:'Cormorant',Georgia,serif; font-size:1.1rem; font-weight:700; color:var(--cream); margin-bottom:3px; }
+    .dose-subtitle { font-size:0.75rem; color:var(--muted); margin-bottom:18px; letter-spacing:0.04em; }
+    .dose-label { font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; opacity:0.85; }
+    .dose-btns { display:flex; gap:8px; margin-bottom:16px; }
+    .dose-opt-btn {
+      flex:1; padding:13px 8px; border-radius:12px;
+      border:1.5px solid rgba(200,164,78,0.28); background:rgba(200,164,78,0.07);
+      color:var(--cream); font-family:inherit; font-size:0.9rem; cursor:pointer;
+      transition:background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .dose-opt-btn.sel { background:var(--gold); color:#0c0a08; font-weight:700; border-color:var(--gold); }
+    .dose-cancel-btn {
+      width:100%; padding:11px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.1); background:transparent;
+      color:var(--muted); font-family:inherit; font-size:0.85rem; cursor:pointer; margin-top:4px;
+    }
+
     /* ══ VARIANTES DYN-BENTO ══ */
 
     /* ── DYN-BENTO GOLD ── */
@@ -5745,6 +5790,19 @@
   </div>
 </div>
 
+<div id="dose-modal" role="dialog" aria-modal="true" aria-label="Personnaliser">
+  <div id="dose-box">
+    <div class="dose-handle"></div>
+    <div class="dose-item-name" id="dose-item-name"></div>
+    <div class="dose-subtitle" id="dose-subtitle"></div>
+    <div class="dose-label" id="dose-lbl-dose"></div>
+    <div class="dose-btns" id="dose-btns-dose"></div>
+    <div class="dose-label" id="dose-lbl-sugar"></div>
+    <div class="dose-btns" id="dose-btns-sugar"></div>
+    <button class="dose-cancel-btn" id="dose-cancel-btn"></button>
+  </div>
+</div>
+
 <script>
 /* ================================================
    DATA: TRANSLATIONS & MENU
@@ -5792,6 +5850,7 @@ const UI = {
     cartEmpty:'Το καλάθι είναι άδειο', cartSending:'Αποστολή…', cartSent:'Η παραγγελία εστάλη!',
     tblInfo:'Ο σερβιτόρος λαμβάνει αμέσως ειδοποίηση στο τηλέφωνό του.',
     cartInfo:'Η παραγγελία σας εμφανίζεται αμέσως στην εφαρμογή του σερβιτόρου.',
+    doseSingle:'Single', doseDouble:'Double', sugarNone:'Χωρίς ζάχαρη', sugarMedium:'Μέτρια', sugarSweet:'Γλυκό', dosePopupTitle:'Προσαρμογή παραγγελίας', doseLabel:'Δόση', sugarLabel:'Ζάχαρη', doseCancel:'Ακύρωση',
   },
   fr: {
     tagline:'Une expérience culinaire raffinée',
@@ -5825,6 +5884,7 @@ const UI = {
     cartEmpty:'Votre panier est vide', cartSending:'Envoi en cours…', cartSent:'Commande envoyée !',
     tblInfo:'Le serveur reçoit une notification instantanée sur son téléphone.',
     cartInfo:'Votre commande apparaît immédiatement sur l\'application du serveur.',
+    doseSingle:'Single', doseDouble:'Double', sugarNone:'Sans sucre', sugarMedium:'Sucre moyen', sugarSweet:'Sucré', dosePopupTitle:'Personnaliser votre commande', doseLabel:'Dose', sugarLabel:'Sucre', doseCancel:'Annuler',
   },
   en: {
     tagline:'A refined culinary experience',
@@ -5858,6 +5918,7 @@ const UI = {
     cartEmpty:'Your cart is empty', cartSending:'Sending…', cartSent:'Order sent!',
     tblInfo:'The server receives an instant notification on their phone.',
     cartInfo:'Your order appears immediately on the server\'s app.',
+    doseSingle:'Single', doseDouble:'Double', sugarNone:'No sugar', sugarMedium:'Medium', sugarSweet:'Sweet', dosePopupTitle:'Customize your order', doseLabel:'Dose', sugarLabel:'Sugar', doseCancel:'Cancel',
   },
   es: {
     tagline:'Una experiencia gastronómica de calidad',
@@ -5891,6 +5952,7 @@ const UI = {
     cartEmpty:'El carrito está vacío', cartSending:'Enviando…', cartSent:'¡Pedido enviado!',
     tblInfo:'El camarero recibe una notificación instantánea en su teléfono.',
     cartInfo:'Su pedido aparece inmediatamente en la app del camarero.',
+    doseSingle:'Simple', doseDouble:'Doble', sugarNone:'Sin azúcar', sugarMedium:'Medio', sugarSweet:'Azucarado', dosePopupTitle:'Personalizar su pedido', doseLabel:'Dosis', sugarLabel:'Azúcar', doseCancel:'Cancelar',
   },
   de: {
     tagline:'Ein raffiniertes kulinarisches Erlebnis',
@@ -5924,6 +5986,7 @@ const UI = {
     cartEmpty:'Ihr Warenkorb ist leer', cartSending:'Wird gesendet…', cartSent:'Bestellung gesendet!',
     tblInfo:'Der Kellner erhält sofort eine Benachrichtigung auf sein Telefon.',
     cartInfo:'Ihre Bestellung erscheint sofort in der Kellner-App.',
+    doseSingle:'Single', doseDouble:'Doppelt', sugarNone:'Ohne Zucker', sugarMedium:'Mittel', sugarSweet:'Süß', dosePopupTitle:'Bestellung anpassen', doseLabel:'Dosis', sugarLabel:'Zucker', doseCancel:'Abbrechen',
   },
 };
 
@@ -7275,28 +7338,118 @@ function parsePrice(priceStr) {
   return parseFloat(String(priceStr).replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
 }
 
-function addToCart(item) {
+function addToCart(item, dose, sugar) {
   if (navigator.vibrate) navigator.vibrate(60);
-  const existing = cartItems.find(c => c.id === item.id);
+  if (item.doseOption && dose === undefined) {
+    _showDosePopup(item, function(d, s) { _doAddToCart(item, d, s); });
+    return;
+  }
+  _doAddToCart(item, dose, sugar);
+}
+
+function _doAddToCart(item, dose, sugar) {
+  const hasDose  = dose  !== undefined && dose  !== '';
+  const hasSugar = sugar !== undefined && sugar !== '';
+  const existing = cartItems.find(function(ci) {
+    return ci.id === item.id && (ci.dose||'') === (hasDose?dose:'') && (ci.sugar||'') === (hasSugar?sugar:'');
+  });
   if (existing) {
     existing.qty++;
   } else {
-    cartItems.push({ id: item.id, nameObj: item.name, price: item.price, priceNum: parsePrice(item.price), qty: 1 });
+    const entry = { id: item.id, nameObj: item.name, price: item.price, priceNum: parsePrice(item.price), qty: 1 };
+    if (hasDose)  entry.dose  = dose;
+    if (hasSugar) entry.sugar = sugar;
+    cartItems.push(entry);
   }
   saveCart();
   updateCartBar();
   updateCardBadges();
-  // Feedback visuel : flash sur le bouton
   const btn = document.querySelector(`.card[data-item="${item.id}"] .card-add-btn`);
-  if (btn) {
-    btn.textContent = '✓';
-    setTimeout(() => { btn.textContent = '+'; }, 700);
-  }
+  if (btn) { btn.textContent = '✓'; setTimeout(() => { btn.textContent = '+'; }, 700); }
 }
 
-function removeFromCart(itemId) {
+function _showDosePopup(item, onConfirm) {
+  const t = UI[lang] || UI.fr;
+  const itemName = item.name ? (item.name[lang] || item.name.fr || Object.values(item.name)[0] || '') : '';
+  const modal = document.getElementById('dose-modal');
+  if (!modal) return;
+
+  document.getElementById('dose-item-name').textContent = itemName;
+  document.getElementById('dose-subtitle').textContent  = t.dosePopupTitle || 'Personnaliser votre commande';
+  document.getElementById('dose-lbl-dose').textContent  = t.doseLabel  || 'Dose';
+  document.getElementById('dose-lbl-sugar').textContent = t.sugarLabel || 'Sucre';
+  document.getElementById('dose-cancel-btn').textContent = t.doseCancel || 'Annuler';
+
+  // Boutons dose
+  const doseOpts = [
+    { val:'single', lbl: t.doseSingle || 'Single' },
+    { val:'double', lbl: t.doseDouble || 'Double' }
+  ];
+  const sugarOpts = [
+    { val:'none',   lbl: t.sugarNone   || 'Sans sucre'  },
+    { val:'medium', lbl: t.sugarMedium || 'Sucre moyen' },
+    { val:'sweet',  lbl: t.sugarSweet  || 'Sucré'       }
+  ];
+
+  const doseContainer  = document.getElementById('dose-btns-dose');
+  const sugarContainer = document.getElementById('dose-btns-sugar');
+  doseContainer.innerHTML  = doseOpts.map(o  => `<button class="dose-opt-btn" data-val="${o.val}">${o.lbl}</button>`).join('');
+  sugarContainer.innerHTML = sugarOpts.map(o => `<button class="dose-opt-btn" data-val="${o.val}">${o.lbl}</button>`).join('');
+
+  let selDose = null, selSugar = null, _closed = false;
+
+  const close = (confirm) => {
+    if (_closed) return;
+    _closed = true;
+    modal.classList.remove('show');
+    if (confirm && selDose && selSugar) onConfirm(selDose, selSugar);
+  };
+
+  doseContainer.querySelectorAll('.dose-opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selDose = btn.dataset.val;
+      doseContainer.querySelectorAll('.dose-opt-btn').forEach(b => b.classList.toggle('sel', b === btn));
+      if (selDose && selSugar) setTimeout(() => close(true), 200);
+    });
+  });
+  sugarContainer.querySelectorAll('.dose-opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selSugar = btn.dataset.val;
+      sugarContainer.querySelectorAll('.dose-opt-btn').forEach(b => b.classList.toggle('sel', b === btn));
+      if (selDose && selSugar) setTimeout(() => close(true), 200);
+    });
+  });
+
+  document.getElementById('dose-cancel-btn').onclick = () => close(false);
+  modal.onclick = (e) => { if (e.target === modal) close(false); };
+
+  // Reset sélection
+  doseContainer.querySelectorAll('.dose-opt-btn').forEach(b => b.classList.remove('sel'));
+  sugarContainer.querySelectorAll('.dose-opt-btn').forEach(b => b.classList.remove('sel'));
+
+  // Show
+  modal.classList.add('show');
+  history.pushState({ doseModal: true }, '');
+
+  const onPop = () => { if (!_closed) { _closed = true; modal.classList.remove('show'); } };
+  window.addEventListener('popstate', onPop, { once: true });
+}
+
+function _cartAddCombo(id, dose, sugar) {
+  const item = ITEMS.find(it => it.id === id);
+  if (!item) return;
+  _doAddToCart(item, dose || undefined, sugar || undefined);
+  renderCartModal();
+}
+
+function removeFromCart(itemId, dose, sugar) {
   if (navigator.vibrate) navigator.vibrate(60);
-  const idx = cartItems.findIndex(c => c.id === itemId);
+  let idx;
+  if (dose !== undefined || sugar !== undefined) {
+    idx = cartItems.findIndex(ci => ci.id === itemId && (ci.dose||'') === (dose||'') && (ci.sugar||'') === (sugar||''));
+  } else {
+    idx = cartItems.findIndex(ci => ci.id === itemId);
+  }
   if (idx === -1) return;
   if (cartItems[idx].qty > 1) cartItems[idx].qty--;
   else cartItems.splice(idx, 1);
@@ -7312,9 +7465,8 @@ function getCartTotal() {
 
 function updateCardBadges() {
   document.querySelectorAll('.card-qty-num').forEach(numEl => {
-    const id   = parseInt(numEl.dataset.badgeId);
-    const c    = cartItems.find(ci => ci.id === id);
-    const qty  = c ? c.qty : 0;
+    const id  = parseInt(numEl.dataset.badgeId);
+    const qty = cartItems.filter(ci => ci.id === id).reduce((s, ci) => s + ci.qty, 0);
     numEl.textContent = qty;
     const ctrl = numEl.closest('.card-qty-ctrl');
     const card = numEl.closest('.card');
@@ -7322,14 +7474,12 @@ function updateCardBadges() {
     if (ctrl) ctrl.classList.toggle('has-qty', hasQty);
     if (card) card.classList.toggle('card-has-qty', hasQty);
   });
-  // Synchronise les compteurs des items en style papier (flipbook)
-  document.querySelectorAll('.fp-item-qty').forEach(qty => {
-    const id = parseInt(qty.dataset.fpQty);
-    const c  = cartItems.find(ci => ci.id === id);
-    const n  = c ? c.qty : 0;
-    const num = qty.querySelector('.fp-qty-num');
+  document.querySelectorAll('.fp-item-qty').forEach(qEl => {
+    const id = parseInt(qEl.dataset.fpQty);
+    const n  = cartItems.filter(ci => ci.id === id).reduce((s, ci) => s + ci.qty, 0);
+    const num = qEl.querySelector('.fp-qty-num');
     if (num) num.textContent = n;
-    qty.classList.toggle('has-qty', n > 0);
+    qEl.classList.toggle('has-qty', n > 0);
   });
   updateSheetQty();
 }
@@ -7345,8 +7495,7 @@ window._fpRemove = function(id) {
 
 function updateSheetQty() {
   if (!sheetItem) return;
-  const c = cartItems.find(ci => ci.id === sheetItem.id);
-  const qty = c ? c.qty : 0;
+  const qty = cartItems.filter(ci => ci.id === sheetItem.id).reduce((s, ci) => s + ci.qty, 0);
   const qtyEl = document.getElementById('sh-qty-num');
   if (qtyEl) qtyEl.textContent = qty;
 }
@@ -7406,20 +7555,24 @@ function renderCartModal() {
   const tot  = document.getElementById('cart-total-val');
   const t    = UI[lang];
   if (!list) return;
-
   if (cartItems.length === 0) {
     list.innerHTML = `<div class="cart-empty-msg">${t.cartEmpty || 'Votre panier est vide'}</div>`;
     if (tot) tot.textContent = '0.00 €';
     return;
   }
-  list.innerHTML = cartItems.map(c => {
+  list.innerHTML = cartItems.map(function(c) {
     const displayName = c.nameObj ? (c.nameObj[lang] || c.nameObj.fr || Object.values(c.nameObj)[0] || '') : (c.name || '');
+    const extras = [];
+    if (c.dose)  extras.push(c.dose === 'double' ? (t.doseDouble||'Double') : (t.doseSingle||'Single'));
+    if (c.sugar) extras.push(c.sugar === 'none' ? (t.sugarNone||'Sans sucre') : c.sugar === 'medium' ? (t.sugarMedium||'Sucre moyen') : (t.sugarSweet||'Sucré'));
+    const sub = extras.length ? `<span style="display:block;font-size:0.72rem;color:var(--muted);margin-top:1px">${_esc(extras.join(' · '))}</span>` : '';
+    const d = c.dose||'', s = c.sugar||'';
     return `<div class="cart-item">
-      <span class="cart-item-name">${_esc(displayName)}</span>
+      <div style="flex:1;min-width:0"><span class="cart-item-name">${_esc(displayName)}</span>${sub}</div>
       <div class="cart-item-qty-wrap">
-        <button class="cart-qty-btn" aria-label="${_aria('removeCart')}" onclick="removeFromCart(${c.id})">−</button>
+        <button class="cart-qty-btn" aria-label="${_aria('removeCart')}" onclick="removeFromCart(${c.id},'${d}','${s}')">−</button>
         <span class="cart-qty">${c.qty}</span>
-        <button class="cart-qty-btn" aria-label="${_aria('addCart')}" onclick="addToCartById(${c.id})">+</button>
+        <button class="cart-qty-btn" aria-label="${_aria('addCart')}" onclick="_cartAddCombo(${c.id},'${d}','${s}')">+</button>
       </div>
       <span class="cart-item-price">${(c.priceNum * c.qty).toFixed(2)} €</span>
     </div>`;
@@ -7533,11 +7686,16 @@ async function confirmOrder() {
 
   const ts      = Date.now();
   const orderId = ts + '_' + Math.random().toString(36).slice(2, 7);
-  const items   = cartItems.map(c => ({
-    id: c.id,
-    name: c.nameObj ? (c.nameObj.fr || c.nameObj[lang] || Object.values(c.nameObj)[0] || '') : (c.name || ''),
-    price: c.price, qty: c.qty
-  }));
+  const items   = cartItems.map(function(ci) {
+    const it = {
+      id: ci.id,
+      name: ci.nameObj ? (ci.nameObj.fr || ci.nameObj[lang] || Object.values(ci.nameObj)[0] || '') : (ci.name || ''),
+      price: ci.price, qty: ci.qty
+    };
+    if (ci.dose)  it.dose  = ci.dose;
+    if (ci.sugar) it.sugar = ci.sugar;
+    return it;
+  });
   const total   = getCartTotal().toFixed(2) + ' €';
   const order   = { tableNum, table: isTakeaway ? 'takeaway' : String(tableNum), ts, items, total, status: 'pending', createdAt: ts };
 
@@ -7668,9 +7826,16 @@ function reorderItems(orderId) {
   order.items.forEach(it => {
     const item = ITEMS.find(i => i.id === it.id);
     if (!item) return;
-    const existing = cartItems.find(c => c.id === it.id);
+    const dose  = it.dose  || undefined;
+    const sugar = it.sugar || undefined;
+    const existing = cartItems.find(ci => ci.id === it.id && (ci.dose||undefined) === dose && (ci.sugar||undefined) === sugar);
     if (existing) existing.qty += it.qty;
-    else cartItems.push({ id: item.id, nameObj: item.name, price: item.price, priceNum: parsePrice(item.price), qty: it.qty });
+    else {
+      const entry = { id: item.id, nameObj: item.name, price: item.price, priceNum: parsePrice(item.price), qty: it.qty };
+      if (dose)  entry.dose  = dose;
+      if (sugar) entry.sugar = sugar;
+      cartItems.push(entry);
+    }
   });
   saveCart();
   updateCartBar();
@@ -7716,7 +7881,10 @@ function renderHistModal(orders) {
       const name = liveItem
         ? (liveItem.name[lang] || liveItem.name.fr || Object.values(liveItem.name)[0] || it.name)
         : it.name;
-      return `${it.qty}× ${_esc(name)}`;
+      const ex = [];
+      if (it.dose)  ex.push(it.dose === 'double' ? (t.doseDouble||'Double') : (t.doseSingle||'Single'));
+      if (it.sugar) ex.push(it.sugar === 'none' ? (t.sugarNone||'Sans sucre') : it.sugar === 'medium' ? (t.sugarMedium||'Sucre moyen') : (t.sugarSweet||'Sucré'));
+      return `${it.qty}× ${_esc(name)}` + (ex.length ? ' (' + ex.join(', ') + ')' : '');
     }).join(' · ');
 
     const reorderBtn = o.status === 'done'

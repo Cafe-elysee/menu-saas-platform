@@ -3026,6 +3026,7 @@ const ADMIN_UI = {
     notifErrSrv:   '✗ Σφάλμα διακομιστή: {e}',
     notifErrNet:   '✗ Σφάλμα δικτύου: {e}',
     showInMenu:    'Εμφάνιση στο μενού',
+    doseOptionLabel: 'Επιλογή Δόσης & Ζάχαρης',
     btnMove:       'Μετακίνηση',
     changeCat:     '— Αλλαγή κατηγορίας —',
     newCat:        'Νέα κατηγορία',
@@ -3163,6 +3164,7 @@ const ADMIN_UI = {
     notifErrSrv:   '✗ Erreur serveur : {e}',
     notifErrNet:   '✗ Erreur réseau : {e}',
     showInMenu:    'Afficher dans le menu',
+    doseOptionLabel: 'Option Dose & Sucre',
     btnMove:       'Déplacer',
     changeCat:     '— Changer de catégorie —',
     newCat:        'Nouvelle catégorie',
@@ -3300,6 +3302,7 @@ const ADMIN_UI = {
     notifErrSrv:   '✗ Server error: {e}',
     notifErrNet:   '✗ Network error: {e}',
     showInMenu:    'Show in menu',
+    doseOptionLabel: 'Dose & Sugar option',
     btnMove:       'Move',
     changeCat:     '— Change category —',
     newCat:        'New category',
@@ -3437,6 +3440,7 @@ const ADMIN_UI = {
     notifErrSrv:   '✗ Serverfehler: {e}',
     notifErrNet:   '✗ Netzwerkfehler: {e}',
     showInMenu:    'Im Menü anzeigen',
+    doseOptionLabel: 'Dose & Zucker Option',
     btnMove:       'Verschieben',
     changeCat:     '— Kategorie wechseln —',
     newCat:        'Neue Kategorie',
@@ -3574,6 +3578,7 @@ const ADMIN_UI = {
     notifErrSrv:   '✗ Error del servidor: {e}',
     notifErrNet:   '✗ Error de red: {e}',
     showInMenu:    'Mostrar en el menú',
+    doseOptionLabel: 'Opción Dosis & Azúcar',
     btnMove:       'Mover',
     changeCat:     '— Cambiar categoría —',
     newCat:        'Nueva categoría',
@@ -5964,6 +5969,10 @@ function buildProdForm(item) {
           <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
           ${t1.showInMenu}
         </label>
+        <label class="photo-show-row" style="margin-top:8px">
+          <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
+          <span data-uitxt="doseOptionLabel">${t1.doseOptionLabel || 'Option Dose & Sucre'}</span>
+        </label>
       </div>
 
     </div>
@@ -6004,6 +6013,8 @@ function collectProdForm(card, item) {
   // Visibilité de la photo
   const showChk = card.querySelector('.photo-show-chk');
   if (showChk) item.showPhoto = showChk.checked;
+  const doseChk = card.querySelector('.dose-option-chk');
+  if (doseChk) { if (doseChk.checked) item.doseOption = true; else delete item.doseOption; }
 
   // Badges — dropdowns
   const typeEl = card.querySelector('[data-bdg-select="type"]');
