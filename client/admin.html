@@ -8214,7 +8214,7 @@ function copyTableURL(btn, url) {
    CUSTOM SELECTS (langue + mode)
 ═══════════════════════════════════════════ */
 (function setupCustomSelects() {
-  const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', ar:'🇸🇦' };
+  const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', es:'🇪🇸' };
 
   // ── Lang select ──
   const langBtn   = document.getElementById('lang-sel-btn');
@@ -8354,7 +8354,7 @@ let _flDefault = 'fr', _flPrimary = 'fr';
 function _buildFlFlags(containerId, selectedLang, pickFnName) {
   const FLAGS = [
     { l:'fr',f:'🇫🇷' },{ l:'en',f:'🇬🇧' },{ l:'de',f:'🇩🇪' },
-    { l:'el',f:'🇬🇷' },{ l:'ar',f:'🇸🇦' }
+    { l:'el',f:'🇬🇷' },{ l:'es',f:'🇪🇸' }
   ];
   const c = document.getElementById(containerId);
   if (!c) return;
