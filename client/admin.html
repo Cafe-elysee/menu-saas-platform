@@ -3056,7 +3056,8 @@ const ADMIN_UI = {
     btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια',
     btnDelLogo:    'Διαγραφή λογοτύπου',
     loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.'
-    subPayBadge:'Πληρωμή σε εκκρεμότητα', subPayBtn:'Πληρωμή',,
+    subPayBadge:'Πληρωμή σε εκκρεμότητα', subPayBtn:'Πληρωμή',
+    payReminderTitle:'💳 Πληρωμή σε εκκρεμότητα', payReminderMsg:'Έχετε μια εκκρεμή πληρωμή. Μεταβείτε στις <strong>Ρυθμίσεις → Η συνδρομή μου</strong>.', payReminderAccueil:'Αρχική', payReminderPayNow:'Πληρωμή Τώρα',,
     loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη 30 δευτερόλεπτα.',
     loginErrIncorrect:'Λανθασμένος κωδικός',
     pdfDownloaded: '✅ PDF ληφθέν',
@@ -3192,7 +3193,8 @@ const ADMIN_UI = {
     btnGenerate:'Générer', tblLabel:'Table', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables',
     btnDelLogo:    'Supprimer le logo',
     loginErrSuspended:'Ce compte est suspendu ou introuvable.'
-    subPayBadge:'Paiement en attente', subPayBtn:'Payer',,
+    subPayBadge:'Paiement en attente', subPayBtn:'Payer',
+    payReminderTitle:'💳 Paiement en attente', payReminderMsg:'Vous avez un paiement en attente. Réglez-le depuis la section <strong>Réglages → Mon abonnement</strong>.', payReminderAccueil:'Accueil', payReminderPayNow:'Payer Maintenant',,
     loginErrBlocked:'Trop de tentatives — accès bloqué 30 secondes.',
     loginErrIncorrect:'Mot de passe incorrect',
     pdfDownloaded: '✅ PDF téléchargé',
@@ -3328,7 +3330,8 @@ const ADMIN_UI = {
     btnGenerate:'Generate', tblLabel:'Table', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables',
     btnDelLogo:    'Delete logo',
     loginErrSuspended:'This account is suspended or does not exist.'
-    subPayBadge:'Payment pending', subPayBtn:'Pay now',,
+    subPayBadge:'Payment pending', subPayBtn:'Pay now',
+    payReminderTitle:'💳 Payment pending', payReminderMsg:'You have a pending payment. Go to <strong>Settings → My subscription</strong> to complete it.', payReminderAccueil:'Home', payReminderPayNow:'Pay Now',,
     loginErrBlocked:'Too many attempts — access blocked for 30 seconds.',
     loginErrIncorrect:'Incorrect password',
     pdfDownloaded: '✅ PDF downloaded',
@@ -3464,7 +3467,8 @@ const ADMIN_UI = {
     btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische',
     btnDelLogo:    'Logo löschen',
     loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.'
-    subPayBadge:'Zahlung ausstehend', subPayBtn:'Zahlen',,
+    subPayBadge:'Zahlung ausstehend', subPayBtn:'Zahlen',
+    payReminderTitle:'💳 Zahlung ausstehend', payReminderMsg:'Sie haben eine ausstehende Zahlung. Gehen Sie zu <strong>Einstellungen → Mein Abonnement</strong>.', payReminderAccueil:'Startseite', payReminderPayNow:'Jetzt zahlen',,
     loginErrBlocked:'Zu viele Versuche — Zugang für 30 Sekunden gesperrt.',
     loginErrIncorrect:'Falsches Passwort',
     pdfDownloaded: '✅ PDF heruntergeladen',
@@ -3600,7 +3604,8 @@ const ADMIN_UI = {
     btnGenerate:'Generar', tblLabel:'Mesa', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas',
     btnDelLogo:    'Eliminar logo',
     loginErrSuspended:'Esta cuenta está suspendida o no existe.'
-    subPayBadge:'Pago pendiente', subPayBtn:'Pagar',,
+    subPayBadge:'Pago pendiente', subPayBtn:'Pagar',
+    payReminderTitle:'💳 Pago pendiente', payReminderMsg:'Tiene un pago pendiente. Vaya a <strong>Ajustes → Mi suscripción</strong> para completarlo.', payReminderAccueil:'Inicio', payReminderPayNow:'Pagar Ahora',,
     loginErrBlocked:'Demasiados intentos — acceso bloqueado 30 segundos.',
     loginErrIncorrect:'Contraseña incorrecta',
     pdfDownloaded: '✅ PDF descargado',
@@ -7624,14 +7629,14 @@ function _paySelectCash() {
 
 // ── Popup rappel paiement (1× par session) ────────────────────────────────────
 function _checkPaymentReminderPopup(sub, t) {
-  const now    = Date.now();
-  const endTs  = sub.endDate || 0;
-  const payDue = endTs && (now >= endTs - 4 * 24 * 60 * 60 * 1000);
+  const now   = Date.now();
+  const endTs = sub.endDate || 0;
+  const creationDone = sub.creationFeePaid === true;
+  const payDue = !creationDone || (endTs && now >= endTs - 7 * 24 * 60 * 60 * 1000);
   if (!payDue) return;
   const key = 'pay_popup_' + (_RID || '');
   if (sessionStorage.getItem(key)) return;
   sessionStorage.setItem(key, '1');
-  // Délai court pour que la page soit visible avant le popup
   setTimeout(function() { _showPaymentReminderPopup(sub, t); }, 800);
 }
 
@@ -7643,7 +7648,17 @@ function _showPaymentReminderPopup(sub, t) {
   const creationDone = sub.creationFeePaid === true;
   const amt = !creationDone ? cf : pr;
   const lbl = !creationDone ? (t.subCreationFeeLabel || 'Frais de création') : (t.subMonthly || 'Abonnement');
-  _openPayModal(amt, lbl);
+  const title = t.payReminderTitle || '💳 Paiement en attente';
+  const msg   = t.payReminderMsg   || 'Vous avez un paiement en attente de <strong style="color:#c8a44e">' + amt + '€</strong> (' + lbl + '). Réglez-le depuis la section <strong>Réglages → Mon abonnement</strong>.';
+  const accueil = t.payReminderAccueil || 'Accueil';
+  const payNow  = t.payReminderPayNow  || 'Payer Maintenant';
+  _showAdmConfirm(title, msg, payNow, accueil, function() {
+    if (_adminCurrentTab !== 'settings') switchAdminTab('settings');
+    setTimeout(function() {
+      const el = document.getElementById('sec-subscription');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  });
 }
 
 async function _changeSubscription(newForfait, newMode) {
