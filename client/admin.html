@@ -3033,6 +3033,10 @@ const ADMIN_UI = {
     scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
     btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια',
     btnDelLogo:    'Διαγραφή λογοτύπου',
+    loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.',
+    loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη 30 δευτερόλεπτα.',
+    loginErrIncorrect:'Λανθασμένος κωδικός',
+    pdfDownloaded: '✅ PDF ληφθέν',
   },
   fr: {
     admSub:        'Administration du menu',
@@ -3164,6 +3168,10 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
     btnGenerate:'Générer', tblLabel:'Table', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables',
     btnDelLogo:    'Supprimer le logo',
+    loginErrSuspended:'Ce compte est suspendu ou introuvable.',
+    loginErrBlocked:'Trop de tentatives — accès bloqué 30 secondes.',
+    loginErrIncorrect:'Mot de passe incorrect',
+    pdfDownloaded: '✅ PDF téléchargé',
   },
   en: {
     admSub:        'Menu administration',
@@ -3295,6 +3303,10 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
     btnGenerate:'Generate', tblLabel:'Table', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables',
     btnDelLogo:    'Delete logo',
+    loginErrSuspended:'This account is suspended or does not exist.',
+    loginErrBlocked:'Too many attempts — access blocked for 30 seconds.',
+    loginErrIncorrect:'Incorrect password',
+    pdfDownloaded: '✅ PDF downloaded',
   },
   de: {
     admSub:        'Menüverwaltung',
@@ -3426,6 +3438,10 @@ const ADMIN_UI = {
     scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
     btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische',
     btnDelLogo:    'Logo löschen',
+    loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.',
+    loginErrBlocked:'Zu viele Versuche — Zugang für 30 Sekunden gesperrt.',
+    loginErrIncorrect:'Falsches Passwort',
+    pdfDownloaded: '✅ PDF heruntergeladen',
   },
   es: {
     admSub:        'Gestión del menú',
@@ -3557,6 +3573,10 @@ const ADMIN_UI = {
     scAnalytics:'📊 Estadísticas', statsSectionTitle:'Estadísticas',
     btnGenerate:'Generar', tblLabel:'Mesa', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas',
     btnDelLogo:    'Eliminar logo',
+    loginErrSuspended:'Esta cuenta está suspendida o no existe.',
+    loginErrBlocked:'Demasiados intentos — acceso bloqueado 30 segundos.',
+    loginErrIncorrect:'Contraseña incorrecta',
+    pdfDownloaded: '✅ PDF descargado',
   },
 };
 
@@ -3977,7 +3997,7 @@ async function doLogin() {
     try {
       const actSnap = await _rref('/config/active').once('value');
       if (actSnap.val() === false || actSnap.val() === null) {
-        errEl.textContent = 'Ce compte est suspendu ou introuvable.';
+        errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrSuspended;
         document.getElementById('pwd-input').value = '';
         document.getElementById('pwd-input').focus();
         return;
@@ -3991,9 +4011,9 @@ async function doLogin() {
     if (_loginAttempts >= 5) {
       _loginBlockUntil = Date.now() + 30000;
       _loginAttempts = 0;
-      errEl.textContent = 'Trop de tentatives — accès bloqué 30 secondes.';
+      errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrBlocked;
     } else {
-      errEl.textContent = `Mot de passe incorrect (${_loginAttempts}/5).`;
+      errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrIncorrect + ` (${_loginAttempts}/5).`;
     }
     document.getElementById('pwd-input').value = '';
     document.getElementById('pwd-input').focus();
@@ -4235,10 +4255,10 @@ function sanitizeItems(items) {
     type:      item.type  || '',
     temp:      item.temp  || '',
     badges:    Array.isArray(item.badges) ? item.badges : [],
-    name:      item.name      || { fr:'', en:'', ar:'' },
-    desc:      item.desc      || { fr:'', en:'', ar:'' },
-    full:      item.full      || { fr:'', en:'', ar:'' },
-    allergens: item.allergens || { fr:[], en:[], ar:[] },
+    name:      item.name      || { fr:'', en:'', es: '' },
+    desc:      item.desc      || { fr:'', en:'', es: '' },
+    full:      item.full      || { fr:'', en:'', es: '' },
+    allergens: item.allergens || { fr:[], en:[], es: [] },
   }));
 }
 
@@ -4370,7 +4390,7 @@ function renderNoteSection() {
   if (!card) return;
 
   const info = adminData.info || {};
-  const noteText = info.noteText || { fr: '', en: '', ar: '' };
+  const noteText = info.noteText || { fr: '', en: '', es: '' };
   const isOn = info.showNote === true;
 
   const nt = ADMIN_UI[currentLang] || ADMIN_UI.el;
@@ -5290,7 +5310,7 @@ const ICON_LABELS = {
     'ico-heart':'❤️ Favorites', 'ico-fire':'🔥 Trending', 'ico-leaf':'🌿 Vegetar.', 'ico-crown':'👑 VIP',
     'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
   },
-  ar: {
+  es: {
     'ico-coffee':'☕ Caliente', 'ico-cold':'🧊 Frío', 'ico-food':'🍽 Comida', 'ico-cake':'🍰 Dulce',
     'ico-sunrise':'🌅 Mañana', 'ico-hookah':'💨 Shisha', 'ico-star':'⭐ Especial', 'ico-bell':'🔔 Timbre',
     'ico-clock':'🕐 Horario', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 Wi-Fi', 'ico-pin':'📍 Ubicación',
@@ -6248,7 +6268,7 @@ function getDefaultItems() {
     name:{ fr:'Espresso', en:'Espresso', es:'Espresso' },
     desc:{ fr:'Café court et intense — pur, concentré, servi chaud.', en:'Short and intense coffee — pure, concentrated, served hot.', es:'Short and intense coffee — pure, concentrated, served hot.' },
     full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', es:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:2, cat:0, price:'€4.00', photo:'photo-1565031491910-e57fac031c41',
@@ -6256,7 +6276,7 @@ function getDefaultItems() {
     name:{ fr:'Doppio', en:'Doppio', es:'Doppio' },
     desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', es:'Powerful double espresso — for true lovers of strong coffee.' },
     full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', es:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:3, cat:0, price:'€5.50', photo:'photo-1572442388796-11668a67e53d',
@@ -6288,7 +6308,7 @@ function getDefaultItems() {
     name:{ fr:'Americano', en:'Americano', es:'Americano' },
     desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', es:'Espresso extended with hot water — long and balanced coffee.' },
     full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', es:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:7, cat:0, price:'€3.00', photo:'photo-1544787219-7f47ccb76574',
@@ -6296,7 +6316,7 @@ function getDefaultItems() {
     name:{ fr:'Thé Nature', en:'Plain Tea', es:'Plain Tea' },
     desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', es:'Black or green tea of your choice — warm and comforting.' },
     full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', es:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:8, cat:0, price:'€4.00', photo:'photo-1556679343-c7306c1976bc',
@@ -6304,7 +6324,7 @@ function getDefaultItems() {
     name:{ fr:'Thé à la Menthe', en:'Mint Tea', es:'Mint Tea' },
     desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', es:'Fresh green tea infused with fresh mint — traditional and refreshing.' },
     full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', es:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:9, cat:0, price:'€7.00', photo:'photo-1542990253-a781e904e62f',
@@ -6322,7 +6342,7 @@ function getDefaultItems() {
     name:{ fr:'Mojito Classique', en:'Classic Mojito', es:'Classic Mojito' },
     desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', es:'Fresh mint, lime, cane sugar and sparkling water — the original.' },
     full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', es:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:11, cat:1, price:'€12.00', photo:'photo-1544145945-f90425340c7e',
@@ -6330,7 +6350,7 @@ function getDefaultItems() {
     name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', es:'Strawberry Mojito' },
     desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', es:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.' },
     full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', es:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:12, cat:1, price:'€13.00', photo:'photo-1553361371-9b22f78e8b1d',
@@ -6346,7 +6366,7 @@ function getDefaultItems() {
     name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', es:'Mango Banana Smoothie' },
     desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', es:'Blended mango and banana — tropical, sweet and nourishing.' },
     full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', es:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:14, cat:1, price:'€8.00', photo:'photo-1621506289937-a8e4df240d0b',
@@ -6354,7 +6374,7 @@ function getDefaultItems() {
     name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', es:'Fresh Orange Juice' },
     desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', es:'Fresh oranges pressed on demand — pure and natural.' },
     full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', es:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:15, cat:1, price:'€8.00', photo:'photo-1589733955941-5eeaf752f6dd',
@@ -6362,7 +6382,7 @@ function getDefaultItems() {
     name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', es:'Watermelon Juice' },
     desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', es:'Blended fresh watermelon — light, sweet and ultra-refreshing.' },
     full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', es:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:16, cat:1, price:'€9.00', photo:'photo-1461023058943-07fcbe16d735',
@@ -6378,7 +6398,7 @@ function getDefaultItems() {
     name:{ fr:'Ice Coffee', en:'Ice Coffee', es:'Ice Coffee' },
     desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', es:'Prepared cold coffee, sweetened and served over ice — simple and delicious.' },
     full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', es:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:18, cat:1, price:'€13.00', photo:'photo-1568901346375-23c9450c58cd',
@@ -6402,7 +6422,7 @@ function getDefaultItems() {
     name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', es:'Tropical Cocktail' },
     desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', es:'Pineapple, mango, passion fruit and lime — a tropical journey.' },
     full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', es:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:21, cat:1, price:'€11.00', photo:'photo-1543362906-acfc16c67564',
@@ -6410,7 +6430,7 @@ function getDefaultItems() {
     name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', es:'Lemon Ginger Detox' },
     desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', es:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.' },
     full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', es:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
 
   /* ---- CAT 2: Cuisine ---- */
@@ -6610,7 +6630,7 @@ function getDefaultItems() {
     name:{ fr:'Chicha Simple', en:'Single Hookah', es:'Single Hookah' },
     desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', es:'Premium hookah with your choice of flavour — relaxation guaranteed.' },
     full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', es:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:46, cat:5, price:'€40.00', photo:'photo-1584302179602-e4c3d3fd629d',
@@ -6618,7 +6638,7 @@ function getDefaultItems() {
     name:{ fr:'Chicha Double', en:'Double Hookah', es:'Double Hookah' },
     desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', es:'Double hookah with two combined flavours — enriched experience.' },
     full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', es:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:47, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
@@ -6626,7 +6646,7 @@ function getDefaultItems() {
     name:{ fr:'Supplément Glace', en:'Ice Supplement', es:'Ice Supplement' },
     desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', es:'Add ice to your hookah vase for a cooler, smoother smoke.' },
     full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', es:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   },
   {
     id:48, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
@@ -6634,7 +6654,7 @@ function getDefaultItems() {
     name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', es:'Coconut Milk Supplement' },
     desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', es:'Replace water with coconut milk for a creamy, exotic smoke.' },
     full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', es:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.' },
-    allergens:{ fr:[], en:[], ar:[] }
+    allergens:{ fr:[], en:[], es: [] }
   }
   ];
 }
@@ -6746,7 +6766,7 @@ const THEMES_DATA = [
   // Nouveaux thèmes premium
   { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 es:'Aurora'},         dark:'#0c0d14', accent:'#9070f8' },
   // Thème GeNext (design admin/demo)
-  { id:'genext',        styles:['simple'],         names:{el:'GeNext',             fr:'GeNext',             en:'GeNext',             de:'GeNext',                 ar:'GeNext'},         dark:'#080604', accent:'#c8a44e' },
+  { id:'genext',        styles:['simple'],         names:{el:'GeNext',             fr:'GeNext',             en:'GeNext',             de:'GeNext',                 es:'GeNext'},         dark:'#080604', accent:'#c8a44e' },
 ];
 
 
@@ -8086,7 +8106,7 @@ function renderOrdersAdmin(orders) {
     list.innerHTML = `<div class="orders-empty">${t.ordEmpty || 'Aucune commande pour le moment'}</div>`;
     return;
   }
-  const localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', de:'de-DE', ar:'ar-SA' };
+  const localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', de:'de-DE', es:'es-ES' };
   const locale = localeMap[currentLang] || 'fr-FR';
   // Préserver les IDs des cartes déjà ouvertes avant le re-render
   const expanded = new Set();
@@ -8729,7 +8749,7 @@ function applyCustomDateRange() {
 
 /* ── Flatpickr — mapping locale ── */
 function _fpLocale(lang) {
-  const map = { fr:'fr', en:'default', de:'de', el:'gr', ar:'ar' };
+  const map = { fr:'fr', en:'default', de:'de', el:'gr', es:'es' };
   const key = map[lang] || 'default';
   return (typeof flatpickr !== 'undefined') ? (flatpickr.l10ns[key] || flatpickr.l10ns.default) : null;
 }
@@ -9559,7 +9579,7 @@ async function qrDownloadPDF() {
   const _fname = (adminData?.info?.name || 'QR').replace(/[^a-zA-Z0-9À-ɏ _-]/g,'').trim() || 'QR';
   doc.save(_fname + '-Tables.pdf');
   btns.forEach(b => { b.disabled=false; b.innerHTML='📥 Télécharger PDF'; });
-  sts.forEach(s => { s.textContent='✅ PDF téléchargé !'; s.className='qr-dl-st ok'; });
+  sts.forEach(s => { s.textContent=(ADMIN_UI[currentLang]||ADMIN_UI.fr).pdfDownloaded; s.className='qr-dl-st ok'; });
   setTimeout(() => sts.forEach(s => { s.textContent=''; s.className='qr-dl-st'; }), 4000);
 }
 
