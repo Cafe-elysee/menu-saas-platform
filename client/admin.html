@@ -7817,7 +7817,8 @@ async function _doChangeSubscription(newForfait, newMode, t) {
       body: JSON.stringify({
         rid: _RID, name: restName,
         oldForfait: _subData?.forfait || 'menu-qr', newForfait,
-        email: _subData?.email || null, lang: currentLang, paymentMode: newMode
+        email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
+        isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt)
       })
     }).catch(() => {});
     if (_subData) _subData.lastForfaitChange = now; // anti-spam immédiat (avant rechargement)
@@ -7900,7 +7901,8 @@ async function _doChangeForfait(newForfait, t) {
       body: JSON.stringify({
         rid: _RID, name: restName,
         oldForfait: _subData?.forfait || 'menu-qr', newForfait,
-        email: _subData?.email || null, lang: currentLang, paymentMode: payMode
+        email: _subData?.email || null, lang: currentLang, paymentMode: payMode,
+        isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt)
       })
     }).catch(() => {});
     if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subChanged || '✅ Forfait mis à jour'; }

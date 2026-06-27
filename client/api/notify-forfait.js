@@ -143,7 +143,7 @@ async function fetchSaasPricing() {
   } catch(e) { return null; }
 }
 
-function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymentMode, priceObj = PRICE) {
+function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymentMode, priceObj = PRICE, isTrial = false) {
   const isCS    = newForfait === 'commandes-services';
   const safeName = escHtml(name);
   const payM = PAY_METHODS_F[lang] || PAY_METHODS_F.fr;
@@ -176,35 +176,35 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
       intro: isUpgrade
         ? `Votre forfait a été mis à niveau vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`
         : `Votre forfait a été modifié vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Vos nouvelles fonctionnalités : prise de commandes en ligne, bouton d'appel, système de tables et QR ordering.` : `Votre menu digital reste actif. Les fonctionnalités de commande et d'appel ont été désactivées.`,
       closing: `L'équipe GeNext`
     },
     en: {
       greeting: `Hello ${safeName} 👋`,
       intro: isUpgrade ? `Your plan has been upgraded to <strong>${newLabel}</strong> (${modeLabel} — €${price}).` : `Your plan has been changed to <strong>${newLabel}</strong> (${modeLabel} — €${price}).`,
-      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Your new features: online ordering, call button, table system and QR ordering.` : `Your digital menu remains active. Ordering and call features have been disabled.`,
       closing: `The GeNext Team`
     },
     el: {
       greeting: `Γεια σας ${safeName} 👋`,
       intro: isUpgrade ? `Η συνδρομή σας αναβαθμίστηκε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Η συνδρομή σας άλλαξε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Νέες λειτουργίες: online παραγγελίες, κουμπί κλήσης, σύστημα τραπεζιών και QR παραγγελία.` : `Το ψηφιακό σας μενού παραμένει ενεργό. Οι λειτουργίες παραγγελίας και κλήσης έχουν απενεργοποιηθεί.`,
       closing: `Η ομάδα GeNext`
     },
     de: {
       greeting: `Guten Tag ${safeName} 👋`,
       intro: isUpgrade ? `Ihr Plan wurde auf <strong>${newLabel}</strong> aktualisiert (${modeLabel} — ${price}€).` : `Ihr Plan wurde auf <strong>${newLabel}</strong> geändert (${modeLabel} — ${price}€).`,
-      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Ihre neuen Funktionen: Online-Bestellungen, Anrufschaltfläche, Tischsystem und QR-Bestellung.` : `Ihr digitales Menü bleibt aktiv. Bestell- und Anruffunktionen wurden deaktiviert.`,
       closing: `Das GeNext Team`
     },
     es: {
       greeting: `¡Hola ${safeName} 👋`,
       intro: isUpgrade ? `Su plan ha sido actualizado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Su plan ha cambiado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
       features: isCS ? `Sus nuevas funciones: pedidos en línea, botón de llamada, sistema de mesas y pedido QR.` : `Su menú digital sigue activo. Las funciones de pedido y llamada han sido desactivadas.`,
       closing: `El equipo GeNext`
     }
@@ -394,7 +394,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode } = req.body || {};
+  const { rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode, isTrial } = req.body || {};
   if (!rid || !newForfait) return res.status(400).json({ error: 'Missing rid or newForfait' });
 
   const VALID_FORFAITS = ['menu-qr', 'commandes-services'];
@@ -509,7 +509,7 @@ module.exports = async function handler(req, res) {
     // ── Mode immédiat : email + sync commande + FCM ─────────────────────────────
     if (email) {
       try {
-        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, priceObj);
+        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, priceObj, !!isTrial);
         await createTransport().sendMail({
           from: `"GeNext" <${process.env.GMAIL_USER}>`,
           to: email, subject, html,
