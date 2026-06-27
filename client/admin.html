@@ -4638,8 +4638,7 @@ function renderLogoSection() {
             const fd = new FormData();
             fd.append('file', blob);
             fd.append('upload_preset', CLOUDINARY_PRESET);
-            fd.append('public_id', _RID + '/logo');
-            fd.append('invalidate', 'true'); // purge CDN cache Cloudinary
+            fd.append('folder', _RID);
             fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
               .then(r => r.json()).then(json => {
                 if (!json.secure_url) throw new Error('Upload failed');
