@@ -32,9 +32,19 @@ function httpsPostJson(url, body) {
       }
     };
     const req = https.request(opts, res => {
-      // Apps Script renvoie des redirections (302) — suivre manuellement
+      // Apps Script renvoie un 302 → suivre en GET (comportement HTTP standard pour 302)
+      // Le POST a déjà été traité côté Google ; le redirect délivre la réponse via GET
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return httpsPostJson(res.headers.location, body).then(resolve).catch(reject);
+        const loc = new URL(res.headers.location);
+        const getOpts = { hostname: loc.hostname, path: loc.pathname + loc.search, method: 'GET' };
+        const getReq = https.request(getOpts, getRes => {
+          const chunks = [];
+          getRes.on('data', c => chunks.push(c));
+          getRes.on('end', () => resolve({ status: getRes.statusCode, body: Buffer.concat(chunks).toString() }));
+        });
+        getReq.on('error', reject);
+        getReq.end();
+        return;
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -90,22 +100,24 @@ module.exports = async function handler(req, res) {
       return res.status(502).json({ error: 'Logo download failed' });
     }
 
-    let driveSuccess = false;
+    let driveSuccess  = false;
+    const driveConfigured = !!(process.env.DRIVE_SCRIPT_URL && process.env.DRIVE_SCRIPT_SECRET);
 
     // 2. Envoyer vers Apps Script (Google Drive gratuit) — si configuré
-    const scriptUrl    = process.env.DRIVE_SCRIPT_URL;
-    const scriptSecret = process.env.DRIVE_SCRIPT_SECRET;
-
-    if (scriptUrl && scriptSecret) {
+    if (driveConfigured) {
+      const scriptUrl    = process.env.DRIVE_SCRIPT_URL;
+      const scriptSecret = process.env.DRIVE_SCRIPT_SECRET;
       try {
         const scriptRes = await httpsPostJson(scriptUrl, {
           secret:      scriptSecret,
           filename,
           imageBase64: imgBuffer.toString('base64')
         });
-        const parsed = JSON.parse(scriptRes.body);
+        let parsed = {};
+        try { parsed = JSON.parse(scriptRes.body); }
+        catch(_) { console.error('[logo-notify] Apps Script response not JSON:', scriptRes.body.slice(0, 200)); }
         driveSuccess = parsed.ok === true;
-        if (!driveSuccess) console.error('[logo-notify] Apps Script error:', scriptRes.body.slice(0, 200));
+        if (!driveSuccess) console.error('[logo-notify] Apps Script returned error:', scriptRes.body.slice(0, 200));
       } catch (e) {
         console.error('[logo-notify] Apps Script call failed:', e.message);
         // Ne pas bloquer — email sera quand même envoyé
@@ -118,7 +130,9 @@ module.exports = async function handler(req, res) {
     const adminEmail = process.env.ADMIN_EMAIL || 'gennextcontact@gmail.com';
     const driveNote  = driveSuccess
       ? `<p style="margin:8px 0;font-size:0.85rem;color:#4caf84">✅ Logo enregistré dans Google Drive → dossier <strong>Logos Clients / Nouveau</strong> (fichier : ${filename})</p>`
-      : `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Drive non configuré — logo disponible ci-dessous uniquement</p>`;
+      : driveConfigured
+        ? `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Erreur lors de l'envoi vers Drive — logo disponible ci-dessous uniquement</p>`
+        : `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Drive non configuré — logo disponible ci-dessous uniquement</p>`;
 
     const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#1a1409;font-family:Georgia,serif">
 <div style="max-width:560px;margin:0 auto;padding:32px 16px">
