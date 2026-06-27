@@ -934,8 +934,6 @@
     }
     /* ── DESKTOP : bokeh à l'échelle exacte du background logo email ── */
     @media(min-width:1024px){
-      html[data-menu-theme="genext"] body,html[data-menu-theme="genext"].light body{background-size:640px 640px;background-repeat:repeat;background-position:center center}
-      html[data-menu-theme="genext"] #hero,html[data-menu-theme="genext"].light #hero{background-size:640px 640px!important;background-repeat:repeat!important;background-position:center center!important}
       html[data-menu-theme="genext"] #nav{background-image:none!important;background-color:rgba(8,6,4,0.72)!important;backdrop-filter:blur(14px) saturate(1.3)!important;-webkit-backdrop-filter:blur(14px) saturate(1.3)!important}
       html[data-menu-theme="genext"].light #nav{background-image:none!important;background-color:rgba(245,242,237,0.88)!important}
     }
@@ -9783,41 +9781,53 @@ document.addEventListener('DOMContentLoaded', init);
 </script>
 
 <script>
-/* Fix #146 — desktop bokeh seamless via mirror-tile canvas (genext theme) */
+/* Fix #146b — desktop bokeh procédural plein-écran, zéro tuile, zéro raccord (genext) */
 (function(){
-  var _T=640,_U=_T*2,_c={};
-  function _mk(url,cb){
-    if(_c[url]){cb(_c[url]);return;}
-    var img=new Image();
-    img.onload=function(){
-      try{
-        var cv=document.createElement('canvas');
-        cv.width=_U;cv.height=_U;
-        var ctx=cv.getContext('2d');
-        ctx.drawImage(img,0,0,_T,_T);
-        ctx.save();ctx.translate(_U,0);ctx.scale(-1,1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
-        ctx.save();ctx.translate(0,_U);ctx.scale(1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
-        ctx.save();ctx.translate(_U,_U);ctx.scale(-1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
-        _c[url]=cv.toDataURL('image/jpeg',0.88);cb(_c[url]);
-      }catch(e){}
-    };
-    img.src=url;
+  var _C={};
+  function _bokeh(W,H,dark){
+    var key=(dark?'d':'l')+W+'x'+H;
+    if(_C[key])return _C[key];
+    var cv=document.createElement('canvas');
+    cv.width=W;cv.height=H;
+    var ctx=cv.getContext('2d');
+    ctx.fillStyle=dark?'#080604':'#e8e2d6';
+    ctx.fillRect(0,0,W,H);
+    var s=0x8675309;
+    var rnd=function(){s^=s<<13;s^=s>>17;s^=s<<5;return(s>>>0)/4294967295;};
+    var pal=dark?[[200,164,78],[225,180,85],[185,145,60],[245,205,110],[210,170,72],[170,130,50],[155,185,248]]
+               :[[200,164,78],[220,178,82],[240,200,100],[225,185,88],[190,155,65],[175,195,245]];
+    var aB=dark?1.0:0.72;
+    for(var i=0;i<110;i++){
+      var x=rnd()*W,y=rnd()*H,sz=rnd();
+      var r=sz<0.62?12+rnd()*38:sz<0.88?50+rnd()*55:105+rnd()*65;
+      var ci=Math.floor(rnd()*pal.length),isAccent=(ci===pal.length-1);
+      var a=(isAccent?0.06+rnd()*0.09:0.38+rnd()*0.52)*aB;
+      var co=pal[ci];
+      var gr=ctx.createRadialGradient(x,y,0,x,y,r);
+      gr.addColorStop(0,'rgba('+co[0]+','+co[1]+','+co[2]+','+a+')');
+      gr.addColorStop(0.35,'rgba('+co[0]+','+co[1]+','+co[2]+','+(a*0.55)+')');
+      gr.addColorStop(0.75,'rgba('+co[0]+','+co[1]+','+co[2]+','+(a*0.1)+')');
+      gr.addColorStop(1,'rgba('+co[0]+','+co[1]+','+co[2]+',0)');
+      ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r,0,6.28318);ctx.fill();
+    }
+    _C[key]=cv.toDataURL('image/jpeg',0.83);
+    return _C[key];
   }
   function _isL(){return document.documentElement.classList.contains('light');}
-  function _img(){return'assets/gn-bg-'+(_isL()?'light':'dark')+'.jpg';}
   function _run(){
     if(window.innerWidth<1024)return;
     if(document.documentElement.dataset.menuTheme!=='genext')return;
-    _mk(_img(),function(d){
-      document.body.style.backgroundImage='url('+d+')';
-      document.body.style.backgroundSize=_U+'px '+_U+'px';
-      document.body.style.backgroundRepeat='repeat';
-    });
+    var dark=!_isL();
+    var W=Math.min(window.screen.width||1920,2560),H=Math.min(window.screen.height||1080,1440);
+    var d=_bokeh(W,H,dark);
+    document.body.style.backgroundImage='url('+d+')';
+    document.body.style.backgroundSize='cover';
+    document.body.style.backgroundPosition='center';
+    document.body.style.backgroundRepeat='no-repeat';
   }
   function _clr(){
-    document.body.style.backgroundImage='';
-    document.body.style.backgroundSize='';
-    document.body.style.backgroundRepeat='';
+    document.body.style.backgroundImage='';document.body.style.backgroundSize='';
+    document.body.style.backgroundPosition='';document.body.style.backgroundRepeat='';
   }
   new MutationObserver(function(muts){
     if(window.innerWidth<1024)return;
