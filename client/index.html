@@ -9781,5 +9781,56 @@ window.scrollTo(0, 0);
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+
+<script>
+/* Fix #146 — desktop bokeh seamless via mirror-tile canvas (genext theme) */
+(function(){
+  var _T=640,_U=_T*2,_c={};
+  function _mk(url,cb){
+    if(_c[url]){cb(_c[url]);return;}
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var cv=document.createElement('canvas');
+        cv.width=_U;cv.height=_U;
+        var ctx=cv.getContext('2d');
+        ctx.drawImage(img,0,0,_T,_T);
+        ctx.save();ctx.translate(_U,0);ctx.scale(-1,1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        ctx.save();ctx.translate(0,_U);ctx.scale(1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        ctx.save();ctx.translate(_U,_U);ctx.scale(-1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        _c[url]=cv.toDataURL('image/jpeg',0.88);cb(_c[url]);
+      }catch(e){}
+    };
+    img.src=url;
+  }
+  function _isL(){return document.documentElement.classList.contains('light');}
+  function _img(){return'assets/gn-bg-'+(_isL()?'light':'dark')+'.jpg';}
+  function _run(){
+    if(window.innerWidth<1024)return;
+    if(document.documentElement.dataset.menuTheme!=='genext')return;
+    _mk(_img(),function(d){
+      document.body.style.backgroundImage='url('+d+')';
+      document.body.style.backgroundSize=_U+'px '+_U+'px';
+      document.body.style.backgroundRepeat='repeat';
+    });
+  }
+  function _clr(){
+    document.body.style.backgroundImage='';
+    document.body.style.backgroundSize='';
+    document.body.style.backgroundRepeat='';
+  }
+  new MutationObserver(function(muts){
+    if(window.innerWidth<1024)return;
+    for(var i=0;i<muts.length;i++){
+      if(muts[i].attributeName==='data-menu-theme'){
+        document.documentElement.dataset.menuTheme==='genext'?_run():_clr();return;
+      }
+    }
+    if(document.documentElement.dataset.menuTheme==='genext')_run();
+  }).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-menu-theme']});
+  window.addEventListener('resize',function(){window.innerWidth<1024?_clr():_run();},{passive:true});
+  _run();
+})();
+</script>
 </body>
 </html>

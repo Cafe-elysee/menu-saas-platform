@@ -2899,7 +2899,7 @@ window.addEventListener('error', ev => {
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
 const LANGS = ['el', 'fr', 'en', 'de', 'es'];
-const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', es:'🇪🇸 ES' };
+const LANG_LABELS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', es:'🇪🇸' };
 
 /* ═══════════════════════════════════════════
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
@@ -9808,7 +9808,60 @@ async function qrDownloadPDF() {
   </div>
 </div>
 
-
+<script>
+/* Fix #146 — desktop bokeh seamless via mirror-tile canvas (continuité parfaite, zéro raccord) */
+(function(){
+  var _T=640,_U=_T*2,_c={};
+  function _mk(url,cb){
+    if(_c[url]){cb(_c[url]);return;}
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var cv=document.createElement('canvas');
+        cv.width=_U;cv.height=_U;
+        var ctx=cv.getContext('2d');
+        ctx.drawImage(img,0,0,_T,_T);
+        ctx.save();ctx.translate(_U,0);ctx.scale(-1,1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        ctx.save();ctx.translate(0,_U);ctx.scale(1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        ctx.save();ctx.translate(_U,_U);ctx.scale(-1,-1);ctx.drawImage(img,0,0,_T,_T);ctx.restore();
+        _c[url]=cv.toDataURL('image/jpeg',0.88);cb(_c[url]);
+      }catch(e){}
+    };
+    img.src=url;
+  }
+  function _apply(els,url){
+    _mk(url,function(d){
+      els.forEach(function(el){
+        if(!el)return;
+        el.style.backgroundImage='url('+d+')';
+        el.style.backgroundSize=_U+'px '+_U+'px';
+        el.style.backgroundRepeat='repeat';
+      });
+    });
+  }
+  function _isL(){return document.documentElement.classList.contains('light');}
+  function _img(){return'assets/gn-bg-'+(_isL()?'light':'dark')+'.jpg';}
+  function _run(){
+    if(window.innerWidth<1024)return;
+    _apply([
+      document.body,
+      document.getElementById('login-screen'),
+      document.getElementById('rid-sel-screen'),
+      document.getElementById('adm-loading-screen')
+    ],_img());
+  }
+  function _clr(){
+    [document.body,document.getElementById('login-screen'),document.getElementById('rid-sel-screen'),document.getElementById('adm-loading-screen')].forEach(function(el){
+      if(!el)return;
+      el.style.backgroundImage='';el.style.backgroundSize='';el.style.backgroundRepeat='';
+    });
+  }
+  new MutationObserver(function(){if(window.innerWidth>=1024)_run();})
+    .observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('resize',function(){window.innerWidth<1024?_clr():_run();},{passive:true});
+  _run();
+})();
+</script>
 
 </body>
 </html>
