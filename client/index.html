@@ -5542,6 +5542,20 @@
   </div>
 </div>
 
+<div id="not-found-screen" style="display:none;position:fixed;inset:0;z-index:9999;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;background-attachment:fixed;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <style>html.light #not-found-screen{background-image:linear-gradient(rgba(245,236,220,0.52),rgba(245,236,220,0.52)),url(assets/gn-bg-dark.jpg)}</style>
+  <div style="max-width:360px;width:100%;background:rgba(18,14,10,0.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(200,164,78,0.22);border-radius:24px;padding:44px 32px 36px;box-shadow:0 8px 48px rgba(0,0,0,0.45)">
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(200,164,78,0.10);border:1.5px solid rgba(200,164,78,0.28);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 26px">🔍</div>
+    <div id="nf-title" style="font-family:'Crimson Pro',serif;font-size:1.55rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:14px;line-height:1.3">Établissement introuvable</div>
+    <div id="nf-msg" style="font-size:0.85rem;color:rgba(245,240,230,0.62);line-height:1.85">Ce lien ne correspond à aucun restaurant actif.</div>
+    <div style="margin-top:36px;display:flex;align-items:center;gap:8px;justify-content:center;opacity:0.28">
+      <div style="height:1px;width:30px;background:#c8a44e"></div>
+      <div style="font-size:0.6rem;letter-spacing:0.22em;color:#c8a44e;text-transform:uppercase">GeNext</div>
+      <div style="height:1px;width:30px;background:#c8a44e"></div>
+    </div>
+  </div>
+</div>
+
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
   <defs>
     <filter id="gnm-sand-f" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
@@ -6245,6 +6259,22 @@ function loadAdminData() {
       if (ftCr) ftCr.textContent = '© ' + new Date().getFullYear() + ' ' + cached;
     }
   })();
+  // Restaurant not found → 404 bokeh screen
+  _rref('profile').once('value').then(snap => {
+    if (!snap.val() && _RID !== 'demo') {
+      const _nfL = (['fr','en','el','de','es'].includes((navigator.language||'').slice(0,2))) ? (navigator.language||'').slice(0,2) : 'en';
+      const _nfD = {
+        fr:['Établissement introuvable','Ce lien ne correspond à aucun restaurant actif.'],
+        en:['Establishment not found','This link doesn\'t match any active restaurant.'],
+        el:['Κατάστημα δεν βρέθηκε','Ο σύνδεσμος δεν αντιστοιχεί σε ενεργό εστιατόριο.'],
+        de:['Einrichtung nicht gefunden','Dieser Link führt zu keinem aktiven Restaurant.'],
+        es:['Establecimiento no encontrado','Este enlace no corresponde a ningún restaurante activo.']
+      }[_nfL];
+      const _nfEl = document.getElementById('not-found-screen');
+      if (_nfEl) { document.getElementById('nf-title').textContent = _nfD[0]; document.getElementById('nf-msg').textContent = _nfD[1]; _nfEl.style.display = 'flex'; }
+    }
+  }).catch(()=>{});
+
   _rref('profile/name').once('value').then(snap => {
     const name = snap.val() || '';
     if (name) {
