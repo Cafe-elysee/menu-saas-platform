@@ -1,13 +1,8 @@
 'use strict';
-const crypto     = require('crypto');
 const https      = require('https');
 const nodemailer = require('nodemailer');
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function base64url(buf) {
-  return Buffer.from(buf).toString('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-}
 
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
@@ -23,69 +18,32 @@ function httpsGet(url) {
   });
 }
 
-function httpsRequest(opts, body) {
+function httpsPostJson(url, body) {
   return new Promise((resolve, reject) => {
+    const bodyStr = JSON.stringify(body);
+    const u = new URL(url);
+    const opts = {
+      hostname: u.hostname,
+      path: u.pathname + u.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(bodyStr)
+      }
+    };
     const req = https.request(opts, res => {
+      // Apps Script renvoie des redirections (302) — suivre manuellement
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return httpsPostJson(res.headers.location, body).then(resolve).catch(reject);
+      }
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString() }));
     });
     req.on('error', reject);
-    if (body) req.write(body);
+    req.write(bodyStr);
     req.end();
   });
-}
-
-// ─── Google Drive JWT auth (scope = drive.file) ───────────────────────────────
-
-async function getDriveToken(sa) {
-  const now = Math.floor(Date.now() / 1000);
-  const hdr = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const pay = base64url(JSON.stringify({
-    iss: sa.client_email, sub: sa.client_email,
-    aud: 'https://oauth2.googleapis.com/token',
-    iat: now, exp: now + 3600,
-    scope: 'https://www.googleapis.com/auth/drive.file'
-  }));
-  const sign = crypto.createSign('RSA-SHA256');
-  sign.update(hdr + '.' + pay);
-  const sig = base64url(sign.sign(sa.private_key));
-  const jwt = hdr + '.' + pay + '.' + sig;
-  const bodyStr = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`;
-  const res = await httpsRequest({
-    hostname: 'oauth2.googleapis.com', path: '/token', method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(bodyStr) }
-  }, bodyStr);
-  const parsed = JSON.parse(res.body);
-  if (!parsed.access_token) throw new Error('Drive token error: ' + res.body);
-  return parsed.access_token;
-}
-
-// ─── Upload multipart vers Google Drive ────────────────────────────────────────
-
-async function uploadToDrive(token, folderId, filename, imgBuffer) {
-  const boundary = 'gn_boundary_' + Date.now();
-  const meta = JSON.stringify({ name: filename, parents: [folderId] });
-  const metaPart = Buffer.from(
-    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n`
-  );
-  const imgPart = Buffer.from(
-    `--${boundary}\r\nContent-Type: image/png\r\n\r\n`
-  );
-  const closing = Buffer.from(`\r\n--${boundary}--`);
-  const body = Buffer.concat([metaPart, imgPart, imgBuffer, closing]);
-
-  const opts = {
-    hostname: 'www.googleapis.com',
-    path: '/upload/drive/v3/files?uploadType=multipart',
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': `multipart/related; boundary=${boundary}`,
-      'Content-Length': body.length
-    }
-  };
-  return httpsRequest(opts, body);
 }
 
 // ─── Nodemailer transport ─────────────────────────────────────────────────────
@@ -119,10 +77,9 @@ module.exports = async function handler(req, res) {
         !logoUrl.startsWith('https://res.cloudinary.com/dowi189l9/'))
       return res.status(400).json({ error: 'Invalid logoUrl' });
 
-    const safeRid  = rid;
     const safeName = sanitizeName(restaurantName);
     const dateStr  = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const filename = `${safeRid}_${dateStr}.png`;
+    const filename = `${rid}_${dateStr}.png`;
 
     // 1. Télécharger le logo depuis Cloudinary
     let imgBuffer;
@@ -134,37 +91,34 @@ module.exports = async function handler(req, res) {
     }
 
     let driveSuccess = false;
-    let driveFileId  = null;
 
-    // 2. Upload vers Google Drive (optionnel — si env vars présentes)
-    const saKey      = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-    const folderId   = process.env.DRIVE_NOUVEAU_FOLDER_ID;
+    // 2. Envoyer vers Apps Script (Google Drive gratuit) — si configuré
+    const scriptUrl    = process.env.DRIVE_SCRIPT_URL;
+    const scriptSecret = process.env.DRIVE_SCRIPT_SECRET;
 
-    if (saKey && folderId) {
+    if (scriptUrl && scriptSecret) {
       try {
-        const sa    = JSON.parse(saKey);
-        const token = await getDriveToken(sa);
-        const upRes = await uploadToDrive(token, folderId, filename, imgBuffer);
-        if (upRes.status === 200 || upRes.status === 201) {
-          const parsed = JSON.parse(upRes.body);
-          driveFileId  = parsed.id || null;
-          driveSuccess = true;
-        } else {
-          console.error('[logo-notify] Drive upload status:', upRes.status, upRes.body.slice(0, 200));
-        }
+        const scriptRes = await httpsPostJson(scriptUrl, {
+          secret:      scriptSecret,
+          filename,
+          imageBase64: imgBuffer.toString('base64')
+        });
+        const parsed = JSON.parse(scriptRes.body);
+        driveSuccess = parsed.ok === true;
+        if (!driveSuccess) console.error('[logo-notify] Apps Script error:', scriptRes.body.slice(0, 200));
       } catch (e) {
-        console.error('[logo-notify] Drive upload error:', e.message);
+        console.error('[logo-notify] Apps Script call failed:', e.message);
         // Ne pas bloquer — email sera quand même envoyé
       }
     } else {
-      console.log('[logo-notify] Drive env vars absentes — Drive upload ignoré');
+      console.log('[logo-notify] DRIVE_SCRIPT_URL absent — Drive ignoré');
     }
 
     // 3. Email à l'admin avec logo en pièce jointe inline
     const adminEmail = process.env.ADMIN_EMAIL || 'malekjalel1989@gmail.com';
     const driveNote  = driveSuccess
       ? `<p style="margin:8px 0;font-size:0.85rem;color:#4caf84">✅ Logo enregistré dans Google Drive → dossier <strong>Logos Clients / Nouveau</strong> (fichier : ${filename})</p>`
-      : `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Google Drive non configuré — logo ci-dessous uniquement</p>`;
+      : `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Drive non configuré — logo disponible ci-dessous uniquement</p>`;
 
     const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#1a1409;font-family:Georgia,serif">
 <div style="max-width:560px;margin:0 auto;padding:32px 16px">
@@ -178,7 +132,7 @@ module.exports = async function handler(req, res) {
       <tr><td style="color:rgba(245,240,230,0.50);font-size:0.80rem;padding:4px 0;width:40%">Restaurant</td>
           <td style="color:#c8a44e;font-size:0.90rem;font-weight:600">${safeName}</td></tr>
       <tr><td style="color:rgba(245,240,230,0.50);font-size:0.80rem;padding:4px 0">ID client</td>
-          <td style="color:rgba(245,240,230,0.80);font-size:0.85rem;font-family:monospace">${safeRid}</td></tr>
+          <td style="color:rgba(245,240,230,0.80);font-size:0.85rem;font-family:monospace">${rid}</td></tr>
       <tr><td style="color:rgba(245,240,230,0.50);font-size:0.80rem;padding:4px 0">Fichier</td>
           <td style="color:rgba(245,240,230,0.80);font-size:0.85rem;font-family:monospace">${filename}</td></tr>
     </table>
@@ -193,7 +147,7 @@ module.exports = async function handler(req, res) {
   </div>
 </div></body></html>`;
 
-    // Chercher le logo GeNext pour l'email (même chemin que notify-forfait)
+    // Logo GeNext pour l'en-tête email
     let gnLogoBuf = null;
     try {
       const logoPath = require('path').join(process.cwd(), 'client', 'assets', 'gn-logo-dark.png');
@@ -226,12 +180,12 @@ module.exports = async function handler(req, res) {
     await createTransport().sendMail({
       from: `"GeNext" <${process.env.GMAIL_USER}>`,
       to: adminEmail,
-      subject: `📸 Nouveau logo — ${safeName} (${safeRid})`,
+      subject: `📸 Nouveau logo — ${safeName} (${rid})`,
       html,
       attachments
     });
 
-    return res.status(200).json({ ok: true, drive: driveSuccess, fileId: driveFileId });
+    return res.status(200).json({ ok: true, drive: driveSuccess });
 
   } catch (err) {
     console.error('[logo-notify] Error:', err);
