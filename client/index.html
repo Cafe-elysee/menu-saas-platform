@@ -853,25 +853,23 @@
       --shadow:0 4px 24px rgba(0,0,0,.07), inset 0 1px 0 rgba(255,255,255,.80);
       --shadow-h:0 8px 28px rgba(200,164,78,0.15), 0 4px 14px rgba(0,0,0,.12);
     }
-    /* ── Corps : bokeh pur sans overlay ── */
+    /* ── Corps : bokeh via gn-bg-layer (zoom-out desktop) ── */
     html[data-menu-theme="genext"] body {
       background-color:#080604;
-      background-image:url('assets/gn-bg-dark.jpg');
-      background-size:cover; background-position:center; background-attachment:fixed;
     }
     html[data-menu-theme="genext"].light body {
       background-color:#e8e2d6;
-      background-image:url('assets/gn-bg-light.jpg');
-      background-size:cover; background-position:center; background-attachment:fixed;
     }
-    /* ── Hero : bokeh + overlay chaud ── */
+    /* ── Bokeh zoom-out layer ── */
+    html[data-menu-theme="genext"] .gn-bg-layer{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+    html[data-menu-theme="genext"] .gn-bg-layer::before{content:'';position:absolute;inset:-35%;background:url('assets/gn-bg-dark.jpg') center/cover no-repeat}
+    html[data-menu-theme="genext"].light .gn-bg-layer::before{background:url('assets/gn-bg-light.jpg') center/cover no-repeat}
+    /* ── Hero : bokeh visible via body layer ── */
     html[data-menu-theme="genext"] #hero {
-      background-image:url('assets/gn-bg-dark.jpg');
-      background-size:cover; background-position:center;
+      background-image:none;
     }
     html[data-menu-theme="genext"].light #hero {
-      background-image:url('assets/gn-bg-light.jpg');
-      background-size:cover; background-position:center;
+      background-image:none;
     }
     html[data-menu-theme="genext"] .hero-overlay {
       background:linear-gradient(to bottom,rgba(8,6,4,0.28) 0%,rgba(8,6,4,0.55) 40%,rgba(8,6,4,0.90) 70%,rgba(8,6,4,1) 100%);
@@ -5331,6 +5329,7 @@
   </script>
 </head>
 <body>
+<div class="gn-bg-layer" aria-hidden="true"></div>
 <script>
 (function(){
   var el=document.createElement('div');
