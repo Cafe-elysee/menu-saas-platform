@@ -6782,8 +6782,8 @@ function applyAdminData(data) {
       });
     }
 
-    // Logo
-    applyLogoUrl(data.logoUrl || '');
+    // Logo — masqué si en cours d'intégration manuelle (logoStatus:'pending')
+    applyLogoUrl(data.logoStatus === 'pending' ? '' : (data.logoUrl || ''));
 
     // Photo d'accueil hero (fallback → image Unsplash si rien dans Firebase)
     applyHeroImage(data.heroImage || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=85');
