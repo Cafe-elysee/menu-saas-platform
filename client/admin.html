@@ -169,6 +169,14 @@
       color:var(--cream); font-family:'Outfit','Noto Sans',sans-serif; font-weight:300; min-height:100vh;
     }
     html.light body { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); }
+    /* ── DESKTOP : bokeh à l'échelle exacte du background logo email ── */
+    @media(min-width:1024px){
+      body{background-size:640px 640px;background-repeat:repeat;background-position:center center}
+      .adm-header{background-image:none!important;background-color:rgba(8,6,4,0.72)!important;backdrop-filter:blur(14px) saturate(1.3)!important;-webkit-backdrop-filter:blur(14px) saturate(1.3)!important}
+      html.light .adm-header{background-image:none!important;background-color:rgba(242,234,218,0.78)!important}
+      #login-screen,#rid-sel-screen{background-size:640px 640px!important;background-repeat:repeat!important;background-position:center center!important}
+      #adm-loading-screen{background-size:640px 640px!important;background-repeat:repeat!important;background-position:center center!important}
+    }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }

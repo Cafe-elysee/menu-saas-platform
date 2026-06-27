@@ -932,6 +932,13 @@
     html[data-menu-theme="genext"].light #nav::before {
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.04) 40%,rgba(200,164,78,0.08) 50%,rgba(200,164,78,0.04) 60%,transparent 100%);
     }
+    /* ── DESKTOP : bokeh à l'échelle exacte du background logo email ── */
+    @media(min-width:1024px){
+      html[data-menu-theme="genext"] body,html[data-menu-theme="genext"].light body{background-size:640px 640px;background-repeat:repeat;background-position:center center}
+      html[data-menu-theme="genext"] #hero,html[data-menu-theme="genext"].light #hero{background-size:640px 640px!important;background-repeat:repeat!important;background-position:center center!important}
+      html[data-menu-theme="genext"] #nav{background-image:none!important;background-color:rgba(8,6,4,0.72)!important;backdrop-filter:blur(14px) saturate(1.3)!important;-webkit-backdrop-filter:blur(14px) saturate(1.3)!important}
+      html[data-menu-theme="genext"].light #nav{background-image:none!important;background-color:rgba(245,242,237,0.88)!important}
+    }
     /* ── Pas de photo perso sur le hero : le bokeh suffit ── */
     html[data-menu-theme="genext"] #hero-bg-img { display:none !important; }
     /* ── Cartes produit : léger flou seulement, pas de saturation ── */
