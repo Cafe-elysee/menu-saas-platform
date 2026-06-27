@@ -118,7 +118,14 @@ module.exports = async (req, res) => {
       restaurants_found: restaurants,
       server_fcm_tokens_per_restaurant: serverTokens,
       fcm_test_server: fcmTestResults,
-      fcm_test_control: ctrlFcmResults
+      fcm_test_control: ctrlFcmResults,
+      drive_env: {
+        DRIVE_SCRIPT_URL_set:    !!(process.env.DRIVE_SCRIPT_URL),
+        DRIVE_SCRIPT_SECRET_set: !!(process.env.DRIVE_SCRIPT_SECRET),
+        ADMIN_EMAIL_set:         !!(process.env.ADMIN_EMAIL),
+        GMAIL_USER_set:          !!(process.env.GMAIL_USER),
+        GMAIL_PASS_set:          !!(process.env.GMAIL_PASS)
+      }
     });
   } catch(err) {
     res.status(200).json({ error: err.message });
