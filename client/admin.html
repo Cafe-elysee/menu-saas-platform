@@ -68,7 +68,7 @@
     html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
     /* Popups et cards */
     html.light .ico-modal-box { background-color:#f5f0e8; background-image:linear-gradient(rgba(245,236,220,0.58),rgba(245,236,220,0.58)),url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center; border-color:rgba(200,164,78,0.22); }
-    html.light .ico-modal-hd { background:rgba(245,236,220,0.08); border-color:rgba(200,164,78,0.15); }
+    html.light .ico-modal-hd { background:rgba(245,236,220,0.04); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border-color:rgba(200,164,78,0.15); }
     html.light .ico-modal-title { color:var(--cream); }
     html.light .ico-modal-item { color:var(--cream); }
     html.light .ico-modal-close { background:var(--bg3); }
@@ -1029,7 +1029,7 @@
     .ico-modal-hd {
       display:flex; align-items:center; justify-content:space-between;
       padding:16px 0 14px;
-      position:sticky; top:0; background:rgba(18,14,10,0.10);
+      position:sticky; top:0; background:rgba(18,14,10,0.04); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
       border-bottom:1px solid var(--border); margin-bottom:14px;
     }
     .ico-modal-title { font-size:0.88rem; font-weight:600; color:var(--gold); }
