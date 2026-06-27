@@ -115,7 +115,7 @@ module.exports = async function handler(req, res) {
     }
 
     // 3. Email à l'admin avec logo en pièce jointe inline
-    const adminEmail = process.env.ADMIN_EMAIL || 'malekjalel1989@gmail.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'gennextcontact@gmail.com';
     const driveNote  = driveSuccess
       ? `<p style="margin:8px 0;font-size:0.85rem;color:#4caf84">✅ Logo enregistré dans Google Drive → dossier <strong>Logos Clients / Nouveau</strong> (fichier : ${filename})</p>`
       : `<p style="margin:8px 0;font-size:0.85rem;color:#e07b39">⚠️ Drive non configuré — logo disponible ci-dessous uniquement</p>`;
