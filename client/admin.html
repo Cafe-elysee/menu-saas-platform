@@ -48,9 +48,7 @@
     }
     html.light body { background-color:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-image:none;
-      background-size: cover !important;
-      background-position: center top !important;
+      background-color: rgba(245,240,228,0.76) !important;
       border-bottom-color:rgba(200,164,78,0.28) !important;
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05) !important;
     }
@@ -83,13 +81,14 @@
     }
     /* Input visible sur fond bokeh — surpasse la règle light transparent */
     html.light .login-box .login-input { background:rgba(255,255,255,0.50) !important; }
-    /* Admin login screens — bokeh background */
+    /* Admin login screens */
     #login-screen, #rid-sel-screen {
-      background-image:none;
-      background-size:cover !important; background-position:center !important;
+      background-color: rgba(8,6,4,0.92);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     html.light #login-screen, html.light #rid-sel-screen {
-      background-image:none;
+      background-color: rgba(245,240,228,0.95);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     /* Admin login logo */
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
@@ -318,9 +317,7 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      
-      background-size: cover;
-      background-position: center top;
+      background-color: rgba(8,6,4,0.76);
       border-top:1px solid rgba(200,164,78,0.10); border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
@@ -1670,8 +1667,7 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background-size: cover;
-    background-position: center bottom;
+    background-color: rgba(8,6,4,0.76);
     border-top:1px solid rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
@@ -1684,9 +1680,7 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    
-    background-size: cover;
-    background-position: center bottom;
+    background-color: rgba(245,240,228,0.76);
     border-top-color:rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
   }

@@ -108,9 +108,7 @@
     .app-header {
       flex-shrink:0;
       height:var(--hdr-h);
-      
-      background-size: cover;
-      background-position: center top;
+      background-color: rgba(8,6,4,0.76);
       border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 6px 28px rgba(0,0,0,0.32);
       padding:0 18px;
@@ -123,9 +121,7 @@
       animation:gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      
-      background-size: cover;
-      background-position: center top;
+      background-color: rgba(245,240,228,0.76);
       border-bottom-color:rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 18px rgba(0,0,0,0.05);
     }
@@ -428,9 +424,7 @@
     .bottom-nav {
       flex-shrink:0;
       height:var(--nav-h);
-      
-      background-size: cover;
-      background-position: center bottom;
+      background-color: rgba(8,6,4,0.76);
       border-top:1px solid rgba(200,164,78,0.28);
       box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
       display:flex; align-items:stretch;
@@ -443,9 +437,7 @@
       animation:gnBarFlow 9s ease-in-out infinite reverse;
     }
     html.light .bottom-nav {
-      
-      background-size: cover;
-      background-position: center bottom;
+      background-color: rgba(245,240,228,0.76);
       border-top-color:rgba(200,164,78,0.28);
       box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
     }
@@ -574,28 +566,20 @@
     html.light #setup-screen {
       
     }
-    /* Setup card: fond bokeh pour intégration logo sans décalage */
+    /* Setup card */
     #setup-screen > div {
       --card: rgba(0,0,0,0.38);
-      
-      background-size: cover !important; background-position: center !important;
-      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
       border-color: rgba(200,164,78,0.28) !important;
     }
     html.light #setup-screen > div {
       --card: rgba(255,255,255,0.50);
-      
-      background-size: cover !important; background-position: center !important;
-      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
     }
-    /* Pause/Forfait screens: fond bokeh */
+    /* Pause/Forfait screens */
     #srv-pause-screen, #srv-forfait-screen {
-      
-      background-size: cover !important; background-position: center !important;
-      background-color: transparent !important;
+      background-color: rgba(8,6,4,0.92) !important;
     }
     html.light #srv-pause-screen, html.light #srv-forfait-screen {
-      
+      background-color: rgba(245,240,228,0.95) !important;
     }
     .gns-setup-subtitle {
       font-family:'Crimson Pro',Georgia,serif; font-size:0.62rem;

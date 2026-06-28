@@ -2505,6 +2505,7 @@ function initFirebase() {
       _GLOBAL_PLAN_PRICES = Object.assign({}, _GLOBAL_PLAN_PRICES, _validated);
     }
     _refreshPricingSettingsUI();
+    _rerenderAllBillingSections();
   });
 }
 
@@ -2928,23 +2929,21 @@ function _getComboPrice(d, forfait, mode) {
   var ck = _comboKey(forfait, mode);
   if (d.prices && d.prices[ck] != null) return d.prices[ck];
   // Compatibilité : si la combo active correspond au prix custom actuel
-  if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'monthly') && d.price != null) return d.price;
+  if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'annual') && d.price != null) return d.price;
   // Prix publics depuis globalSettings (configurés dans Réglages)
   if (_GLOBAL_PLAN_PRICES[ck] != null) return _GLOBAL_PLAN_PRICES[ck];
   return mode === 'annual' ? (_PRICE_ANNUAL[forfait] || 0) : (_PRICE_MONTHLY[forfait] || 0);
 }
 
-// ── Construire le HTML de la section facturation (grille 4 formules) ─────
+// ── Construire le HTML de la section facturation (grille 2 formules annuelles) ──
 function _buildClientBillingSectionHTML(cmdKey, d) {
   if (d.paymentMode == null) return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '"></div>';
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode = d.paymentMode || 'monthly';
+  var activeMode = d.paymentMode || 'annual';
 
   var combos = [
-    { forfait: 'menu-qr',            mode: 'monthly', label: '&#128203; Menu QR',       modeLabel: 'Mensuel', unit: '&#8364;/mois' },
-    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',       modeLabel: 'Annuel',  unit: '&#8364;/an'   },
-    { forfait: 'commandes-services', mode: 'monthly', label: '&#128717; Commandes',     modeLabel: 'Mensuel', unit: '&#8364;/mois' },
-    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes',     modeLabel: 'Annuel',  unit: '&#8364;/an'   }
+    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',   modeLabel: 'Annuel', unit: '&#8364;/an' },
+    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes', modeLabel: 'Annuel', unit: '&#8364;/an' }
   ];
 
   var gridHtml = combos.map(function(c) {
@@ -3053,6 +3052,13 @@ function _savePaymentMode(cmdKey, mode) {
     }
   }
   showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
+}
+
+// ── Re-render toutes les sections facturation ouvertes (ex: changement prix global) ──
+function _rerenderAllBillingSections() {
+  Object.keys(_commandesCache).forEach(function(k) {
+    _rerenderClientBillingSection(k);
+  });
 }
 
 // ── Re-render la section facturation dans la carte client ────────────────────
@@ -3731,8 +3737,8 @@ async function restoreClient(slug, d) {
     var pwd = _buildPwdDefault(d.name||slug);
     var hash = await ncHashPwd(pwd);
     var isCS = d.forfait === 'commandes-services';
-    var paymentMode = d.paymentMode === 'annual' ? 'annual' : 'monthly';
-    var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
+    var paymentMode = 'annual';
+    var price = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     await _saasDb.ref('restaurants/'+rid).set({
       profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] }, _restoreContacts),
@@ -3987,9 +3993,9 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const cmdData = _commandesCache[commandeKey] || {};
     const isCS = cmdData.forfait === 'commandes-services';
 
-    const _subPayMode2 = cmdData.paymentMode || 'monthly';
+    const _subPayMode2 = 'annual';
     const _subEmail2   = cmdData.email || null;
-    const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
+    const _subPrice2   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).set({
       profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
@@ -4044,9 +4050,9 @@ function recreerClientDepuisCommande(btnEl) {
         const ts   = Date.now();
         const cmdData = _commandesCache[commandeKey] || {};
         const isCS = cmdData.forfait === 'commandes-services';
-        const _subPayModeR = cmdData.paymentMode || 'monthly';
+        const _subPayModeR = 'annual';
         const _subEmailR   = cmdData.email || null;
-        const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
+        const _subPriceR   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).set({
           profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),
@@ -4695,7 +4701,7 @@ window.toggleThemeVis = function(slug, themeId, isChecked) {
   if (!isChecked) {
     db.ref('menu').once('value').then(snap => {
       const data   = snap.val() || {};
-      const active = data.menuTheme || 'gold-noir';
+      const active = data.menuTheme || 'carte-classique';
       const hidden = data.hiddenThemes || {};
       if (active === themeId) {
         _pendingThemeDisable = { slug, themeId, db };

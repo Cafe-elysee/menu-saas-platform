@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0908">
   <title>GeNext Control</title>
   <style>html{background:#080604}html.light{background:#f0ede8}</style>
-  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}window._splashT0=Date.now();})()</script>
+  <script>(function(){try{var t=localStorage.getItem('ctrl_theme');if(t!=='dark')document.documentElement.classList.add('light');}catch(e){}window._splashT0=Date.now();})()</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -19,6 +19,7 @@
     body {
       display: flex; flex-direction: column;
       background-color: #080604;
+      
       background-size: cover;
       background-position: center center;
       color: #e8e0d0;
@@ -27,6 +28,7 @@
     }
     html.light body {
       background-color: #e8e2d6;
+      
       color: #1a140a;
     }
 
@@ -57,7 +59,7 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background-image:none;
+      
       background-size: cover !important;
       background-position: center bottom !important;
       border-top-color: rgba(200,164,78,0.28) !important;
@@ -104,11 +106,13 @@
       position:fixed;inset:0;z-index:9999;
       display:flex;align-items:center;justify-content:center;
       background-color:#080604;
+      
       background-size:cover;background-position:center;
       overflow:hidden;
     }
     html.light #ctrl-loading-screen {
       background-color:#f0ede8;
+      
     }
     #ctrl-loading-screen::before {
       content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
@@ -242,6 +246,7 @@
     }
     .app-header {
       flex-shrink: 0;
+      
       background-size: cover;
       background-position: center top;
       border-bottom: 1px solid rgba(200,164,78,0.28);
@@ -323,6 +328,7 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+      
       background-size: cover;
       background-position: center bottom;
       border-top: 1px solid rgba(200,164,78,0.28);
@@ -740,8 +746,8 @@
     /* ── Modal historique paiements ── */
     #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(5,3,2,0.68); align-items:center; justify-content:center; padding:20px; }
     html.light #hist-modal { background:rgba(195,182,162,0.52); }
-    .hist-box { background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
-    html.light .hist-box { background-image:linear-gradient(rgba(242,236,224,0.82),rgba(242,236,224,0.82)); border-color:rgba(200,164,78,0.40); }
+    .hist-box { background-color:#0a0704; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
+    html.light .hist-box { background-color:#faf7f2; border-color:rgba(200,164,78,0.40); }
     .hist-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:1.15rem; font-weight:600; color:var(--gold); letter-spacing:0.04em; margin-bottom:3px; }
     .hist-sub { font-size:0.75rem; color:rgba(244,234,208,0.65); margin-bottom:16px; }
     html.light .hist-sub { color:rgba(26,18,8,0.62); }
@@ -1257,6 +1263,7 @@
     .modal-overlay.open { display: flex; }
     .modal-box {
       background-color: #120e0a;
+      
       background-size: cover; background-position: center;
       border: 1px solid rgba(200,164,78,0.28);
       border-radius: 22px; padding: 1.75rem;
@@ -1265,6 +1272,7 @@
     }
     html.light .modal-box {
       background-color: #f5f0e8;
+      
       border-color: rgba(200,164,78,0.22);
     }
     .modal-box h3 {
@@ -1526,9 +1534,9 @@
   @keyframes ctrlConfirmIn  { from { opacity:0; transform:scale(0.88) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
   @keyframes ctrlConfirmOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.9); } }
   #ctrl-confirm-modal { display:none; position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px; }
-  .ctrl-confirm-box { width:100%; max-width:320px; background-color:#120e0a; background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.12); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
+  .ctrl-confirm-box { width:100%; max-width:320px; background-color:#120e0a;  background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.12); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .ctrl-confirm-box.out { animation:ctrlConfirmOut 0.18s ease forwards; }
-  html.light .ctrl-confirm-box { background-color:#f5f0e8; border-color:rgba(200,164,78,0.22); }
+  html.light .ctrl-confirm-box { background-color:#f5f0e8;  border-color:rgba(200,164,78,0.22); }
 
   /* ── Date d'anniversaire ── */
   .commande-birthdate-row {
@@ -1842,6 +1850,7 @@
         </div>
         <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (après 1 mois d'essai gratuit)</div>
         <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
+
           <div class="f4-combo">
             <div class="f4-name">📋 Menu QR</div>
             <div class="f4-mode">Annuel</div>
@@ -1854,6 +1863,7 @@
               <span class="f4-unit">€/an</span>
             </div>
           </div>
+
           <div class="f4-combo">
             <div class="f4-name">🛎 Commandes</div>
             <div class="f4-mode">Annuel</div>
@@ -2120,7 +2130,7 @@ const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
-let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 49, 'qr-annual': 490, 'srv-monthly': 99, 'srv-annual': 990 };
+let _GLOBAL_PLAN_PRICES   = { 'qr-annual': 490, 'srv-annual': 990 };
 let _priceInputTimers     = {};
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
@@ -2478,9 +2488,7 @@ function initFirebase() {
       // Première utilisation — écrire les valeurs par défaut dans Firebase
       _saasDb.ref('demoPage/pricing').set({
         prices: {
-          'qr-monthly':  _GLOBAL_PLAN_PRICES['qr-monthly']  || 49,
           'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 490,
-          'srv-monthly': _GLOBAL_PLAN_PRICES['srv-monthly'] || 99,
           'srv-annual':  _GLOBAL_PLAN_PRICES['srv-annual']  || 990
         }
       }).catch(function(){});
@@ -2488,7 +2496,7 @@ function initFirebase() {
     }
     if (s.prices && typeof s.prices === 'object') {
       const _validated = {};
-      ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
+      ['qr-annual','srv-annual'].forEach(function(k) {
         if (s.prices[k] != null) {
           const _v = Math.max(0, parseInt(Number(s.prices[k]), 10) || 0);
           _validated[k] = _v;
@@ -2497,6 +2505,7 @@ function initFirebase() {
       _GLOBAL_PLAN_PRICES = Object.assign({}, _GLOBAL_PLAN_PRICES, _validated);
     }
     _refreshPricingSettingsUI();
+    _rerenderAllBillingSections();
   });
 }
 
@@ -2642,11 +2651,11 @@ function buildDeliverySubject(rest, forfait, lang) {
 
 function _paySection(lang) {
   const s = {
-    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements annuels, la même procédure s\'applique.',
-    en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming annual payments, the same procedure applies.',
-    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες ετήσιες πληρωμές, εφαρμόζεται η ίδια διαδικασία.',
-    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos anuales, se aplica el mismo procedimiento.',
-    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige jährliche Zahlungen gilt dasselbe Verfahren.'
+    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements (mensuel ou annuel), la même procédure s\'applique.',
+    en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming payments (monthly or annual), the same procedure applies.',
+    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες πληρωμές (μηνιαίες ή ετήσιες), εφαρμόζεται η ίδια διαδικασία.',
+    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos (mensual o anual), se aplica el mismo procedimiento.',
+    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige Zahlungen (monatlich oder jährlich) gilt dasselbe Verfahren.'
   };
   return s[lang] || s.fr;
 }
@@ -2873,9 +2882,7 @@ function _comboKey(forfait, mode) {
 // ── Refresh UI Réglages Tarification ─────────────────────────────────────────
 function _refreshPricingSettingsUI() {
   var el;
-  el = document.getElementById('gs-qr-monthly');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-monthly']  || 49;
   el = document.getElementById('gs-qr-annual');    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-annual']   || 490;
-  el = document.getElementById('gs-srv-monthly');  if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-monthly'] || 99;
   el = document.getElementById('gs-srv-annual');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-annual']  || 990;
 }
 
@@ -2922,23 +2929,21 @@ function _getComboPrice(d, forfait, mode) {
   var ck = _comboKey(forfait, mode);
   if (d.prices && d.prices[ck] != null) return d.prices[ck];
   // Compatibilité : si la combo active correspond au prix custom actuel
-  if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'monthly') && d.price != null) return d.price;
+  if (forfait === (d.forfait || 'menu-qr') && mode === (d.paymentMode || 'annual') && d.price != null) return d.price;
   // Prix publics depuis globalSettings (configurés dans Réglages)
   if (_GLOBAL_PLAN_PRICES[ck] != null) return _GLOBAL_PLAN_PRICES[ck];
   return mode === 'annual' ? (_PRICE_ANNUAL[forfait] || 0) : (_PRICE_MONTHLY[forfait] || 0);
 }
 
-// ── Construire le HTML de la section facturation (grille 4 formules) ─────
+// ── Construire le HTML de la section facturation (grille 2 formules annuelles) ──
 function _buildClientBillingSectionHTML(cmdKey, d) {
   if (d.paymentMode == null) return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '"></div>';
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode = d.paymentMode || 'monthly';
+  var activeMode = d.paymentMode || 'annual';
 
   var combos = [
-    { forfait: 'menu-qr',            mode: 'monthly', label: '&#128203; Menu QR',       modeLabel: 'Mensuel', unit: '&#8364;/mois' },
-    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',       modeLabel: 'Annuel',  unit: '&#8364;/an'   },
-    { forfait: 'commandes-services', mode: 'monthly', label: '&#128717; Commandes',     modeLabel: 'Mensuel', unit: '&#8364;/mois' },
-    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes',     modeLabel: 'Annuel',  unit: '&#8364;/an'   }
+    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',   modeLabel: 'Annuel', unit: '&#8364;/an' },
+    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes', modeLabel: 'Annuel', unit: '&#8364;/an' }
   ];
 
   var gridHtml = combos.map(function(c) {
@@ -3047,6 +3052,13 @@ function _savePaymentMode(cmdKey, mode) {
     }
   }
   showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
+}
+
+// ── Re-render toutes les sections facturation ouvertes (ex: changement prix global) ──
+function _rerenderAllBillingSections() {
+  Object.keys(_commandesCache).forEach(function(k) {
+    _rerenderClientBillingSection(k);
+  });
 }
 
 // ── Re-render la section facturation dans la carte client ────────────────────
@@ -3725,8 +3737,8 @@ async function restoreClient(slug, d) {
     var pwd = _buildPwdDefault(d.name||slug);
     var hash = await ncHashPwd(pwd);
     var isCS = d.forfait === 'commandes-services';
-    var paymentMode = d.paymentMode === 'annual' ? 'annual' : 'monthly';
-    var price = isCS ? (paymentMode === 'annual' ? 990 : 99) : (paymentMode === 'annual' ? 490 : 49);
+    var paymentMode = 'annual';
+    var price = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     await _saasDb.ref('restaurants/'+rid).set({
       profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] }, _restoreContacts),
@@ -3981,9 +3993,9 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const cmdData = _commandesCache[commandeKey] || {};
     const isCS = cmdData.forfait === 'commandes-services';
 
-    const _subPayMode2 = cmdData.paymentMode || 'monthly';
+    const _subPayMode2 = 'annual';
     const _subEmail2   = cmdData.email || null;
-    const _subPrice2   = isCS ? (_subPayMode2 === 'annual' ? 990 : 99) : (_subPayMode2 === 'annual' ? 490 : 49);
+    const _subPrice2   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).set({
       profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
@@ -4038,9 +4050,9 @@ function recreerClientDepuisCommande(btnEl) {
         const ts   = Date.now();
         const cmdData = _commandesCache[commandeKey] || {};
         const isCS = cmdData.forfait === 'commandes-services';
-        const _subPayModeR = cmdData.paymentMode || 'monthly';
+        const _subPayModeR = 'annual';
         const _subEmailR   = cmdData.email || null;
-        const _subPriceR   = isCS ? (_subPayModeR === 'annual' ? 990 : 99) : (_subPayModeR === 'annual' ? 490 : 49);
+        const _subPriceR   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).set({
           profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),
@@ -4689,7 +4701,7 @@ window.toggleThemeVis = function(slug, themeId, isChecked) {
   if (!isChecked) {
     db.ref('menu').once('value').then(snap => {
       const data   = snap.val() || {};
-      const active = data.menuTheme || 'gold-noir';
+      const active = data.menuTheme || 'carte-classique';
       const hidden = data.hiddenThemes || {};
       if (active === themeId) {
         _pendingThemeDisable = { slug, themeId, db };
