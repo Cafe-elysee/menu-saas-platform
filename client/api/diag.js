@@ -112,6 +112,49 @@ module.exports = async (req, res) => {
       ctrlFcmResults[deviceId] = { fcm_status: fcmRes.status, fcm_body: fcmRes.body };
     }
 
+    // Test Apps Script Drive
+    let driveTest = { skipped: true };
+    const driveUrl    = process.env.DRIVE_SCRIPT_URL;
+    const driveSecret = process.env.DRIVE_SCRIPT_SECRET;
+    if (driveUrl && driveSecret) {
+      try {
+        const tiny = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+        const scriptRes = await httpsGet(driveUrl + '?secret=' + encodeURIComponent(driveSecret) + '&diag=1').catch(() => null);
+        // Test via POST
+        const postRes = await (async () => {
+          const bodyStr = JSON.stringify({ secret: driveSecret, filename: 'diag_test.png', imageBase64: tiny });
+          return new Promise((resolve, reject) => {
+            const u = new URL(driveUrl);
+            const req = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyStr) }
+            }, res => {
+              const handleRes = (r) => {
+                const chunks = []; r.on('data', c => chunks.push(c));
+                r.on('end', () => resolve({ status: r.statusCode, body: Buffer.concat(chunks).toString().slice(0, 300) }));
+              };
+              if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                const loc = new URL(res.headers.location);
+                res.resume();
+                const r2 = https.request({ hostname: loc.hostname, path: loc.pathname + loc.search, method: 'GET' }, r => {
+                  if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) {
+                    const loc2 = new URL(r.headers.location);
+                    r.resume();
+                    const r3 = https.request({ hostname: loc2.hostname, path: loc2.pathname + loc2.search, method: 'GET' }, handleRes);
+                    r3.on('error', reject); r3.end();
+                  } else handleRes(r);
+                });
+                r2.on('error', reject); r2.end();
+              } else handleRes(res);
+            });
+            req.on('error', reject); req.write(bodyStr); req.end();
+          });
+        })();
+        driveTest = { status: postRes.status, body: postRes.body };
+      } catch(e) {
+        driveTest = { error: e.message };
+      }
+    }
+
     res.status(200).json({
       service_account_project: projectId,
       control_fcm_tokens_count: ctrlTokens,
@@ -125,7 +168,8 @@ module.exports = async (req, res) => {
         ADMIN_EMAIL_set:         !!(process.env.ADMIN_EMAIL),
         GMAIL_USER_set:          !!(process.env.GMAIL_USER),
         GMAIL_PASS_set:          !!(process.env.GMAIL_PASS)
-      }
+      },
+      drive_test: driveTest
     });
   } catch(err) {
     res.status(200).json({ error: err.message });

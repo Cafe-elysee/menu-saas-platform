@@ -18,6 +18,26 @@ function httpsGet(url) {
   });
 }
 
+function httpsFollowGet(url, depth) {
+  if (depth > 10) return Promise.reject(new Error('Too many redirects'));
+  return new Promise((resolve, reject) => {
+    const u = new URL(url);
+    const req = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: 'GET' }, res => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        const next = new URL(res.headers.location, url).href;
+        res.resume();
+        resolve(httpsFollowGet(next, depth + 1));
+        return;
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString() }));
+    });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 function httpsPostJson(url, body) {
   return new Promise((resolve, reject) => {
     const bodyStr = JSON.stringify(body);
@@ -32,18 +52,10 @@ function httpsPostJson(url, body) {
       }
     };
     const req = https.request(opts, res => {
-      // Apps Script renvoie un 302 → suivre en GET (comportement HTTP standard pour 302)
-      // Le POST a déjà été traité côté Google ; le redirect délivre la réponse via GET
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        const loc = new URL(res.headers.location);
-        const getOpts = { hostname: loc.hostname, path: loc.pathname + loc.search, method: 'GET' };
-        const getReq = https.request(getOpts, getRes => {
-          const chunks = [];
-          getRes.on('data', c => chunks.push(c));
-          getRes.on('end', () => resolve({ status: getRes.statusCode, body: Buffer.concat(chunks).toString() }));
-        });
-        getReq.on('error', reject);
-        getReq.end();
+        const next = new URL(res.headers.location, url).href;
+        res.resume();
+        resolve(httpsFollowGet(next, 0));
         return;
       }
       const chunks = [];
