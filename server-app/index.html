@@ -51,13 +51,13 @@
     body {
       display:flex; flex-direction:column;
       background-color:#080604;
-      background-image:url(assets/gn-bg-dark.jpg);
+      
       background-size:cover; background-position:center;
       color:var(--cream);
       font-family:'Outfit','Noto Sans',sans-serif; font-weight:300;
       overscroll-behavior:none;
     }
-    html.light body { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); }
+    html.light body { background-color:#f5f0e8;  }
     html[dir="rtl"] body { font-family:'Noto Sans Arabic',sans-serif; }
     button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
 
@@ -108,7 +108,7 @@
     .app-header {
       flex-shrink:0;
       height:var(--hdr-h);
-      background-image: url(assets/gn-bg-dark.jpg);
+      
       background-size: cover;
       background-position: center top;
       border-bottom:1px solid rgba(200,164,78,0.28);
@@ -123,7 +123,7 @@
       animation:gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background-image: url(assets/gn-bg-light.jpg);
+      
       background-size: cover;
       background-position: center top;
       border-bottom-color:rgba(200,164,78,0.28);
@@ -428,7 +428,7 @@
     .bottom-nav {
       flex-shrink:0;
       height:var(--nav-h);
-      background-image: url(assets/gn-bg-dark.jpg);
+      
       background-size: cover;
       background-position: center bottom;
       border-top:1px solid rgba(200,164,78,0.28);
@@ -443,7 +443,7 @@
       animation:gnBarFlow 9s ease-in-out infinite reverse;
     }
     html.light .bottom-nav {
-      background-image: url(assets/gn-bg-light.jpg);
+      
       background-size: cover;
       background-position: center bottom;
       border-top-color:rgba(200,164,78,0.28);
@@ -521,13 +521,13 @@
       position:fixed; inset:0; z-index:99999;
       display:flex; align-items:center; justify-content:center;
       background-color:#080604;
-      background-image:url(assets/gn-bg-dark.jpg);
+      
       background-size:cover; background-position:center;
       overflow:hidden;
     }
     html.light #srv-loading-screen {
       background-color:#f0ede8;
-      background-image:url(assets/gn-bg-light.jpg);
+      
     }
     #srv-loading-screen::before {
       content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
@@ -572,30 +572,30 @@
       filter: drop-shadow(0 0 14px rgba(200,164,78,0.4)) drop-shadow(0 0 4px rgba(200,164,78,0.25));
     }
     html.light #setup-screen {
-      background-image:url(assets/gn-bg-light.jpg) !important;
+      
     }
     /* Setup card: fond bokeh pour intégration logo sans décalage */
     #setup-screen > div {
       --card: rgba(0,0,0,0.38);
-      background-image: url(assets/gn-bg-dark.jpg) !important;
+      
       background-size: cover !important; background-position: center !important;
       backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
       border-color: rgba(200,164,78,0.28) !important;
     }
     html.light #setup-screen > div {
       --card: rgba(255,255,255,0.50);
-      background-image: url(assets/gn-bg-light.jpg) !important;
+      
       background-size: cover !important; background-position: center !important;
       backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
     }
     /* Pause/Forfait screens: fond bokeh */
     #srv-pause-screen, #srv-forfait-screen {
-      background-image: url(assets/gn-bg-dark.jpg) !important;
+      
       background-size: cover !important; background-position: center !important;
       background-color: transparent !important;
     }
     html.light #srv-pause-screen, html.light #srv-forfait-screen {
-      background-image: url(assets/gn-bg-light.jpg) !important;
+      
     }
     .gns-setup-subtitle {
       font-family:'Crimson Pro',Georgia,serif; font-size:0.62rem;
@@ -711,7 +711,7 @@
 </div>
 
 <!-- ÉCRAN CONFIGURATION (premier lancement) -->
-<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+<div id="setup-screen" style="display:none;position:fixed;inset:0;z-index:9998;background-size:cover;background-position:center;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
   <div style="max-width:340px;width:100%;background:rgba(10,9,8,0.80);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(200,164,78,0.22);border-radius:24px;padding:28px 24px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
     <div class="gns-setup-logo-wrap">
       <img src="assets/gn-logo-dark.png" class="gns-setup-logo gns-setup-logo-dk" alt="GeNext" draggable="false">
@@ -744,7 +744,7 @@
 
 <!-- Confirmation modal élégant -->
 <div id="confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:24px;">
-  <div id="confirm-box" style="width:100%;max-width:320px;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;background-color:#080604;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.08);">
+  <div id="confirm-box" style="width:100%;max-width:320px;background-size:cover;background-position:center;background-color:#080604;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.08);">
     <div id="confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.2rem;font-weight:600;color:#c8a44e;letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
     <div id="confirm-msg" style="font-size:0.82rem;color:rgba(230,210,170,0.75);line-height:1.7;margin-bottom:24px"></div>
     <div style="display:flex;gap:10px;">
@@ -1868,7 +1868,7 @@ function _showConfirm(title, msg, cancelLabel, okLabel, cb) {
   var isLight = document.documentElement.classList.contains('light');
   var box = document.getElementById('confirm-box');
   if (box) {
-    box.style.backgroundImage = 'url(assets/' + (isLight ? 'gn-bg-light.jpg' : 'gn-bg-dark.jpg') + ')';
+    box.style.backgroundImage = '';
     box.style.backgroundColor = isLight ? '#f0ede8' : '#080604';
     box.style.color = isLight ? '#2a1f10' : '';
     var msg2 = document.getElementById('confirm-msg');

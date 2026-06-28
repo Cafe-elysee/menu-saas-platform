@@ -221,20 +221,20 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
 <body style="margin:0;padding:0;background-color:#f2ece0">
-<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
-<tr><td align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="padding:24px 0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0;background-size:cover;background-position:center;background-repeat:no-repeat">
+<tr><td align="center" style="padding:24px 0;background-size:cover;background-position:center">
 <table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
-<tr><td bgcolor="#ffffff" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
   <img src="cid:gnlogo" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
   <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td bgcolor="#ffffff" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
   <p style="color:#2a1f10;font-size:1rem;margin:0 0 12px;font-weight:600">${t.greeting}</p>
   <p style="color:#4a3728;font-size:0.9rem;line-height:1.6;margin:0 0 4px">${t.intro}</p>
   ${paymentBlock}
   <p style="color:#7a6555;font-size:0.88rem;line-height:1.6;margin:12px 0 0">${t.features}</p>
 </td></tr>
-<tr><td bgcolor="#f2ece0" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
   <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
 </td></tr>
 </table>
@@ -290,18 +290,18 @@ function buildPendingEmail(lang, name, newForfait, paymentMode, priceObj = PRICE
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
 <body style="margin:0;padding:0;background-color:#f2ece0">
-<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
-<tr><td align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="padding:24px 0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0;background-size:cover;background-position:center;background-repeat:no-repeat">
+<tr><td align="center" style="padding:24px 0;background-size:cover;background-position:center">
 <table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
-<tr><td bgcolor="#ffffff" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
   <img src="cid:gnlogo" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
   <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td bgcolor="#ffffff" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
   <p style="color:#2a1f10;font-size:1rem;margin:0 0 16px;font-weight:600">${t.greeting}</p>
   <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-left:3px solid #c8a44e;border-radius:0 8px 8px 0;margin-bottom:8px"><tr><td style="padding:14px 18px;font-size:0.9rem;color:#2a1f10;line-height:1.6">${t.body}</td></tr></table>
 </td></tr>
-<tr><td bgcolor="#f2ece0" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
   <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
 </td></tr>
 </table>
@@ -367,18 +367,18 @@ function buildPaymentModeEmail(lang, name, newMode, forfait, priceObj = PRICE) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeNext</title></head>
 <body style="margin:0;padding:0;background-color:#f2ece0">
-<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
-<tr><td align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="padding:24px 0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center">
+<table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" style="background-color:#f2ece0;background-size:cover;background-position:center;background-repeat:no-repeat">
+<tr><td align="center" style="padding:24px 0;background-size:cover;background-position:center">
 <table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif">
-<tr><td bgcolor="#ffffff" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
+<tr><td bgcolor="#ffffff" align="center" style="background-color:#ffffff;background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8">
   <img src="cid:gnlogo" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0">
   <div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div>
 </td></tr>
-<tr><td bgcolor="#ffffff" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#ffffff;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
+<tr><td bgcolor="#ffffff" style="background-color:#ffffff;background-size:cover;background-position:center;padding:28px 32px;text-align:${align}">
   <p style="color:#2a1f10;font-size:1rem;margin:0 0 12px;font-weight:600">${t.greeting}</p>
   <p style="color:#4a3728;font-size:0.9rem;line-height:1.6;margin:0">${t.body}</p>
 </td></tr>
-<tr><td bgcolor="#f2ece0" align="center" background="https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg" style="background-color:#f2ece0;background-image:url('https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg');background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
+<tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
   <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
 </td></tr>
 </table>

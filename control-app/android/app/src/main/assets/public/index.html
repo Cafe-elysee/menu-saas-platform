@@ -19,7 +19,6 @@
     body {
       display: flex; flex-direction: column;
       background-color: #080604;
-      background-image: url(assets/gn-bg-dark.jpg);
       background-size: cover;
       background-position: center center;
       color: #e8e0d0;
@@ -28,7 +27,6 @@
     }
     html.light body {
       background-color: #e8e2d6;
-      background-image: url(assets/gn-bg-light.jpg);
       color: #1a140a;
     }
 
@@ -59,7 +57,7 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      background-image: url(assets/gn-bg-light.jpg) !important;
+      background-image:none;
       background-size: cover !important;
       background-position: center bottom !important;
       border-top-color: rgba(200,164,78,0.28) !important;
@@ -106,13 +104,11 @@
       position:fixed;inset:0;z-index:9999;
       display:flex;align-items:center;justify-content:center;
       background-color:#080604;
-      background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover;background-position:center;
       overflow:hidden;
     }
     html.light #ctrl-loading-screen {
       background-color:#f0ede8;
-      background-image:url(assets/gn-bg-light.jpg);
     }
     #ctrl-loading-screen::before {
       content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
@@ -143,7 +139,7 @@
     }
 
     .login-box {
-      background-image: url(assets/gn-bg-dark.jpg);
+      
       background-size: cover; background-position: center;
       border: 1px solid rgba(200,164,78,0.28);
       border-radius: 24px;
@@ -153,7 +149,7 @@
       box-shadow: 0 0 0 1px rgba(200,164,78,0.10), 0 24px 64px rgba(0,0,0,0.55);
     }
     html.light .login-box {
-      background-image: url(assets/gn-bg-light.jpg);
+      
       background-size: cover; background-position: center;
     }
     /* ── Logo login ── */
@@ -246,7 +242,6 @@
     }
     .app-header {
       flex-shrink: 0;
-      background-image: url(assets/gn-bg-dark.jpg);
       background-size: cover;
       background-position: center top;
       border-bottom: 1px solid rgba(200,164,78,0.28);
@@ -262,7 +257,7 @@
       animation: gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      background-image: url(assets/gn-bg-light.jpg);
+      
       background-size: cover;
       background-position: center top;
       border-bottom-color: rgba(200,164,78,0.28);
@@ -328,7 +323,6 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-      background-image: url(assets/gn-bg-dark.jpg);
       background-size: cover;
       background-position: center bottom;
       border-top: 1px solid rgba(200,164,78,0.28);
@@ -746,8 +740,8 @@
     /* ── Modal historique paiements ── */
     #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(5,3,2,0.68); align-items:center; justify-content:center; padding:20px; }
     html.light #hist-modal { background:rgba(195,182,162,0.52); }
-    .hist-box { background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg'); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
-    html.light .hist-box { background-image:linear-gradient(rgba(242,236,224,0.82),rgba(242,236,224,0.82)),url('assets/gn-bg-light.jpg'); border-color:rgba(200,164,78,0.40); }
+    .hist-box { background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
+    html.light .hist-box { background-image:linear-gradient(rgba(242,236,224,0.82),rgba(242,236,224,0.82)); border-color:rgba(200,164,78,0.40); }
     .hist-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:1.15rem; font-weight:600; color:var(--gold); letter-spacing:0.04em; margin-bottom:3px; }
     .hist-sub { font-size:0.75rem; color:rgba(244,234,208,0.65); margin-bottom:16px; }
     html.light .hist-sub { color:rgba(26,18,8,0.62); }
@@ -1263,7 +1257,6 @@
     .modal-overlay.open { display: flex; }
     .modal-box {
       background-color: #120e0a;
-      background-image: url(assets/gn-bg-dark.jpg);
       background-size: cover; background-position: center;
       border: 1px solid rgba(200,164,78,0.28);
       border-radius: 22px; padding: 1.75rem;
@@ -1272,7 +1265,6 @@
     }
     html.light .modal-box {
       background-color: #f5f0e8;
-      background-image: url(assets/gn-bg-light.jpg);
       border-color: rgba(200,164,78,0.22);
     }
     .modal-box h3 {
@@ -1463,13 +1455,13 @@
     }
     #del-modal.show { display:flex; }
     .del-box {
-      background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
+      background-size:cover;background-position:center;
       border:1px solid rgba(239,83,80,0.38);
       border-radius:22px; padding:24px 20px; width:100%; max-width:340px; text-align:center;
       box-shadow:0 0 0 1px rgba(239,83,80,0.10),0 24px 64px rgba(0,0,0,0.55);
     }
     html.light .del-box {
-      background-image:url(assets/gn-bg-light.jpg);
+      
       box-shadow:0 0 0 1px rgba(239,83,80,0.08),0 16px 40px rgba(0,0,0,0.12);
     }
     .del-icon { font-size:2.2rem; margin-bottom:10px; }
@@ -1534,9 +1526,9 @@
   @keyframes ctrlConfirmIn  { from { opacity:0; transform:scale(0.88) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
   @keyframes ctrlConfirmOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.9); } }
   #ctrl-confirm-modal { display:none; position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px; }
-  .ctrl-confirm-box { width:100%; max-width:320px; background-color:#120e0a; background-image:url(assets/gn-bg-dark.jpg); background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.12); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
+  .ctrl-confirm-box { width:100%; max-width:320px; background-color:#120e0a; background-size:cover; background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:22px; padding:30px 22px 24px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(200,164,78,0.12); animation:ctrlConfirmIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .ctrl-confirm-box.out { animation:ctrlConfirmOut 0.18s ease forwards; }
-  html.light .ctrl-confirm-box { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); border-color:rgba(200,164,78,0.22); }
+  html.light .ctrl-confirm-box { background-color:#f5f0e8; border-color:rgba(200,164,78,0.22); }
 
   /* ── Date d'anniversaire ── */
   .commande-birthdate-row {
@@ -1846,31 +1838,10 @@
         <div class="settings-title">💶 Tarification — Prix publics</div>
         <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
           Ces prix s'affichent sur la page Démo et sont appliqués par défaut aux nouveaux clients.<br>
-          Le frais de création est le même pour les deux forfaits.
+          L'abonnement commence après 1 mois d'essai gratuit — aucun frais de création.
         </div>
-        <div class="settings-label" style="margin-bottom:6px;font-weight:700;color:var(--gold);">🏷 Frais de création (unique · 7 jours · les deux forfaits)</div>
-        <div class="settings-row" style="margin-bottom:18px;align-items:center;">
-          <input id="gs-creation-fee" type="number" class="f4-price-inp" style="width:90px;display:inline-block"
-            min="0" step="1" value="149"
-            oninput="_debouncePriceInput('gs-creation-fee', _saveGlobalCreationFee)"
-            onchange="_saveGlobalCreationFee(this.value)"
-            onkeydown="if(event.key==='Enter'){_saveGlobalCreationFee(this.value);this.blur();}">
-          <span style="margin-left:8px;color:var(--muted);font-size:0.81rem;">€ &nbsp;·&nbsp; paiement unique, 7 premiers jours</span>
-        </div>
-        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (à partir du 2ème mois)</div>
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (après 1 mois d'essai gratuit)</div>
         <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
-          <div class="f4-combo">
-            <div class="f4-name">📋 Menu QR</div>
-            <div class="f4-mode">Mensuel</div>
-            <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-qr-monthly" class="f4-price-inp" type="number" min="0" step="1" value="49"
-                onclick="event.stopPropagation()"
-                oninput="_debouncePriceInput('gs-qr-monthly', function(v){_saveGlobalPlanPrice('qr-monthly',v);})"
-                onchange="_saveGlobalPlanPrice('qr-monthly',this.value)"
-                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-monthly',this.value);this.blur();}">
-              <span class="f4-unit">€/mois</span>
-            </div>
-          </div>
           <div class="f4-combo">
             <div class="f4-name">📋 Menu QR</div>
             <div class="f4-mode">Annuel</div>
@@ -1881,18 +1852,6 @@
                 onchange="_saveGlobalPlanPrice('qr-annual',this.value)"
                 onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-annual',this.value);this.blur();}">
               <span class="f4-unit">€/an</span>
-            </div>
-          </div>
-          <div class="f4-combo">
-            <div class="f4-name">🛎 Commandes</div>
-            <div class="f4-mode">Mensuel</div>
-            <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-srv-monthly" class="f4-price-inp" type="number" min="0" step="1" value="99"
-                onclick="event.stopPropagation()"
-                oninput="_debouncePriceInput('gs-srv-monthly', function(v){_saveGlobalPlanPrice('srv-monthly',v);})"
-                onchange="_saveGlobalPlanPrice('srv-monthly',this.value)"
-                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-monthly',this.value);this.blur();}">
-              <span class="f4-unit">€/mois</span>
             </div>
           </div>
           <div class="f4-combo">
@@ -2161,8 +2120,6 @@ const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
-// Frais de création : prix UNIQUE pour les deux forfaits, configurable depuis Réglages
-let _GLOBAL_CREATION_FEE  = 149;
 let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 49, 'qr-annual': 490, 'srv-monthly': 99, 'srv-annual': 990 };
 let _priceInputTimers     = {};
 
@@ -2520,7 +2477,6 @@ function initFirebase() {
     if (!s) {
       // Première utilisation — écrire les valeurs par défaut dans Firebase
       _saasDb.ref('demoPage/pricing').set({
-        creationFee: _GLOBAL_CREATION_FEE,
         prices: {
           'qr-monthly':  _GLOBAL_PLAN_PRICES['qr-monthly']  || 49,
           'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 490,
@@ -2529,10 +2485,6 @@ function initFirebase() {
         }
       }).catch(function(){});
       return;
-    }
-    if (s.creationFee != null) {
-      const _fee = Math.max(0, parseInt(Number(s.creationFee), 10) || 0);
-      _GLOBAL_CREATION_FEE = _fee;
     }
     if (s.prices && typeof s.prices === 'object') {
       const _validated = {};
@@ -2624,12 +2576,9 @@ function _watchFirstOpen(rid, cmdKey) {
     if (snap.val() === true && _commandesCache[cmdKey]) {
       const _foTs = Date.now();
       const _trialEnd = _addMonths(_foTs, 1);
-      const _foNext = _foTs + 7 * 24 * 60 * 60 * 1000;
-      // Fixer le frais de création au prix global du moment (immuable ensuite pour ce client)
-      const _snapFee = _GLOBAL_CREATION_FEE;
-      const _snapPrices = Object.assign({}, (_commandesCache[cmdKey].prices || {}), { creation: _snapFee });
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _foNext, trialEndAt: _trialEnd, prices: _snapPrices });
-      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _foNext, trialEndAt: _trialEnd, prices: _snapPrices });
+      // Essai gratuit : nextReminderAt = fin du mois d'essai (premier paiement dû à trialEndAt)
+      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd });
+      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _trialEnd, trialEndAt: _trialEnd });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -2693,11 +2642,11 @@ function buildDeliverySubject(rest, forfait, lang) {
 
 function _paySection(lang) {
   const s = {
-    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements (mensuel ou annuel), la même procédure s\'applique.',
-    en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming payments (monthly or annual), the same procedure applies.',
-    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες πληρωμές (μηνιαίες ή ετήσιες), εφαρμόζεται η ίδια διαδικασία.',
-    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos (mensual o anual), se aplica el mismo procedimiento.',
-    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige Zahlungen (monatlich oder jährlich) gilt dasselbe Verfahren.'
+    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements annuels, la même procédure s\'applique.',
+    en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming annual payments, the same procedure applies.',
+    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες ετήσιες πληρωμές, εφαρμόζεται η ίδια διαδικασία.',
+    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos anuales, se aplica el mismo procedimiento.',
+    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige jährliche Zahlungen gilt dasselbe Verfahren.'
   };
   return s[lang] || s.fr;
 }
@@ -2707,13 +2656,12 @@ function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const menuUrl  = 'https://menu-saas-platform.vercel.app/?rid=' + rid + '&table=1';
   const apkUrl   = 'https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk';
   const isCS     = forfait === 'Commandes & Services';
-  const _cf      = _GLOBAL_CREATION_FEE; // Prix frais de création au moment de l'envoi
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n💶 Frais de création : ' + _cf + '€ (à régler dans les 7 premiers jours après votre 1ère connexion)\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
-    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n💶 Creation fee: ' + _cf + '€ (to pay within 7 days of your first login)\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
-    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n💶 Τέλη δημιουργίας: ' + _cf + '€ (να καταβληθούν εντός 7 ημερών από την 1η σύνδεση)\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    es: '¡Hola ' + rest + '! 🎉\n\nSu espacio GeNext está listo.\n\n📋 Plan: ' + forfait + '\n💶 Tarifa de creación: ' + _cf + '€ (a pagar en los 7 primeros días tras su 1ª conexión)\n\n— Panel de administración —\n🔗 Enlace de acceso: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Contraseña: ' + pwd + '\n\nVaya a este enlace e inicie sesión para gestionar su restaurante.\n\n— Su menú online —\n🍽️ Enlace del menú: ' + menuUrl + '\n\nComparta este enlace o muestre su código QR en las mesas — sus clientes pueden consultar el menú directamente desde su teléfono.' + (isCS ? '\n\nCon el plan Pedidos y Servicios, sus clientes también pueden realizar pedidos y llamar al camarero desde su teléfono.\n\n— App de camareros —\n📱 Comparta este enlace con sus camareros para que descarguen e instalen la app en su teléfono Android:\n' + apkUrl + '\n\n⚠️ La app está actualmente disponible solo en Android. La versión iOS está en desarrollo y estará disponible pronto.' : '') + '\n\nAtentamente,\nEl equipo GeNext',
-    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n💶 Einrichtungsgebühr: ' + _cf + '€ (innerhalb von 7 Tagen nach Ihrer 1. Anmeldung zu bezahlen)\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n🎁 1 mois d\'essai gratuit dès votre première connexion — aucun frais de création\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n🎁 1-month free trial from your first login — no setup fee\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n🎁 1 μήνας δωρεάν δοκιμή από την πρώτη σύνδεση — χωρίς τέλη δημιουργίας\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    es: '¡Hola ' + rest + '! 🎉\n\nSu espacio GeNext está listo.\n\n📋 Plan: ' + forfait + '\n🎁 1 mes de prueba gratis desde su primer inicio de sesión — sin tarifa de creación\n\n— Panel de administración —\n🔗 Enlace de acceso: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Contraseña: ' + pwd + '\n\nVaya a este enlace e inicie sesión para gestionar su restaurante.\n\n— Su menú online —\n🍽️ Enlace del menú: ' + menuUrl + '\n\nComparta este enlace o muestre su código QR en las mesas — sus clientes pueden consultar el menú directamente desde su teléfono.' + (isCS ? '\n\nCon el plan Pedidos y Servicios, sus clientes también pueden realizar pedidos y llamar al camarero desde su teléfono.\n\n— App de camareros —\n📱 Comparta este enlace con sus camareros para que descarguen e instalen la app en su teléfono Android:\n' + apkUrl + '\n\n⚠️ La app está actualmente disponible solo en Android. La versión iOS está en desarrollo y estará disponible pronto.' : '') + '\n\nAtentamente,\nEl equipo GeNext',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n🎁 1 Monat kostenlose Testphase ab Ihrer ersten Anmeldung — keine Einrichtungsgebühr\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
   const _base = m[lang] || m.fr;
   const _lb = _base.lastIndexOf('\n\n');
@@ -2864,7 +2812,6 @@ function _trialInfo(d, key) {
   const isSuspended = d.suspendu === true;
   const now = Date.now();
 
-  // expireTs = timestamp absolu d'expiration (pas startTs + WEEK)
   function _makeResult(expireTs, expiredLabel, ptype) {
     const remaining = expireTs - now;
     const isExpired = remaining <= 0;
@@ -2882,42 +2829,27 @@ function _trialInfo(d, key) {
     return { isExpired, isSuspended, label, urgency, ts: expireTs, noTrial: false, paymentType: ptype };
   }
 
-  // ── Phase 3 : Cycles récurrents (après premier abonnement payé) ──────────────
+  // ── Cycles récurrents (après premier paiement) ──────────────────────────────
   if (d.paidAt) {
-    if (!d.nextReminderAt) {
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'recurring' };
-    }
-    if (now < d.nextReminderAt) {
+    if (!d.nextReminderAt || now < d.nextReminderAt) {
       return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'recurring' };
     }
     return _makeResult(d.nextReminderAt + WEEK, '⌛ Paiement expiré', 'recurring');
   }
 
-  // ── Phase 2 : Premier abonnement (frais création payés, fin du mois d'essai) ─
-  if (d.creationFeePaid) {
-    const trialEnd = d.trialEndAt || (d.firstOpenAt ? d.firstOpenAt + 30 * 24 * 60 * 60 * 1000 : 0);
-    if (!trialEnd || now < trialEnd) {
-      // Toujours en période d'essai — aucun paiement dû pour l'instant
+  // ── Essai gratuit → premier abonnement (1 mois depuis premier usage) ─────────
+  if (d.firstOpenAt) {
+    const trialEnd = d.trialEndAt || (d.firstOpenAt + 30 * 24 * 60 * 60 * 1000);
+    if (now < trialEnd) {
       return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'subscription' };
     }
-    return _makeResult(trialEnd + WEEK, '⌛ Abonnement expiré', 'subscription');
+    // Essai terminé — premier paiement dû (délai 7 jours)
+    const dueTs = (d.nextReminderAt && d.nextReminderAt >= trialEnd) ? d.nextReminderAt : trialEnd;
+    return _makeResult(dueTs + WEEK, '⌛ Abonnement expiré', 'subscription');
   }
 
-  // ── Phase 1 : Frais de création (7j depuis le premier accès) ─────────────────
-  if (d.firstOpenAt) {
-    return _makeResult(d.firstOpenAt + WEEK, '⌛ Frais de création expirés', 'creation');
-  }
-  if (d.statut === 'traite') {
-    // Legacy : commande traitée avant firstOpenAt — fallback sur d.ts
-    const legacyTs = Number(d.ts) || parseInt(key) || 0;
-    if (legacyTs < 1000000000000) {
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'creation' };
-    }
-    return _makeResult(legacyTs + WEEK, '⌛ Essai expiré', 'creation');
-  }
-
-  // Client pas encore activé (jamais ouvert admin/server-app)
-  return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'creation' };
+  // Client pas encore activé (jamais utilisé l'ID)
+  return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'subscription' };
 }
 
 // ── Trouver la commande d'un slug client ────────────────────────────────────
@@ -2938,28 +2870,13 @@ function _comboKey(forfait, mode) {
   return f + '-' + m;
 }
 
-// ── Prix des frais de création (prix global unique, fixé au moment du firstOpen) ──
-function _getCreationFeePrice(d) {
-  if (d.prices && d.prices['creation'] != null) return d.prices['creation'];
-  return _GLOBAL_CREATION_FEE;
-}
-
 // ── Refresh UI Réglages Tarification ─────────────────────────────────────────
 function _refreshPricingSettingsUI() {
   var el;
-  el = document.getElementById('gs-creation-fee'); if (el && document.activeElement !== el) el.value = _GLOBAL_CREATION_FEE;
   el = document.getElementById('gs-qr-monthly');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-monthly']  || 49;
   el = document.getElementById('gs-qr-annual');    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-annual']   || 490;
   el = document.getElementById('gs-srv-monthly');  if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-monthly'] || 99;
   el = document.getElementById('gs-srv-annual');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-annual']  || 990;
-}
-
-// ── Sauvegarder le frais de création global ───────────────────────────────────
-function _saveGlobalCreationFee(rawVal) {
-  const price = Math.max(0, parseInt(rawVal, 10) || 0);
-  _GLOBAL_CREATION_FEE = price;
-  if (_saasDb) _saasDb.ref('demoPage/pricing/creationFee').set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
-  showToast('💾 Frais de création : ' + price + ' €');
 }
 
 // ── Sauvegarder un prix de plan global ───────────────────────────────────────
@@ -3047,22 +2964,8 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
-  // Ligne frais de création — montant fixé au moment du premier usage (non modifiable par client)
-  var creationFeePrice = _getCreationFeePrice(d);
-  var creationFeeSet = d.prices && d.prices['creation'] != null;
-  var creationFeeRow = '<div class="f4-creation-row">' +
-    '<div class="f4-creation-label">🏷 Frais de cr&#233;ation <span class="f4-creation-tag">paiement unique</span>' +
-    (creationFeeSet ? '' : ' <span class="f4-creation-fixed-note">prix actuel (sera fixé au 1er usage)</span>') +
-    '</div>' +
-    '<div class="f4-price-wrap">' +
-      '<input class="f4-price-inp" type="number" value="' + creationFeePrice + '" min="0" step="1" disabled>' +
-      '<span class="f4-unit">&#8364;</span>' +
-    '</div>' +
-  '</div>';
-
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
     '<div class="f4-grid">' + gridHtml + '</div>' +
-    creationFeeRow +
     birthdateRow +
   '</div>';
 }
@@ -3071,49 +2974,25 @@ function _buildPaymentHistoryInlineHTML(cmdKey, d) {
   var paiementsObj = d.paiements || {};
   var payments = Object.values(paiementsObj).filter(function(p) { return p && p.date; }).sort(function(a,b) { return b.date - a.date; });
 
-  // Ligne frais de création (statut dédié en tête d'historique)
-  var creationRow = '';
-  if (d.firstOpenAt) {
-    var creationPaid = d.creationFeePaid === true;
-    var creationDate = creationPaid
-      ? new Date(d.firstOpenAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })
-      : '';
-    var creationStatus = creationPaid
-      ? '<span style="color:#4caf84;font-weight:700">✅ Payés</span>'
-      : '<span style="color:#e09050;font-weight:700">⏳ En attente</span>';
-    var creationFeeAmt = _getCreationFeePrice(d);
-    var creationPriceStr = '<span class="hist-inline-amt">' + escapeHtml(String(creationFeeAmt)) + ' €</span>';
-    creationRow = '<div class="hist-inline-item" style="border-bottom:1px solid rgba(200,164,78,.15);margin-bottom:4px;padding-bottom:6px">' +
-      '<span class="hist-inline-date" style="color:#c8a44e;font-weight:700">🏷 Frais création</span>' +
-      creationPriceStr +
-      creationStatus +
-    '</div>';
-  }
-
   if (payments.length === 0) {
-    return creationRow + '<div class="hist-inline-empty">Aucun abonnement enregistré.</div>';
+    return '<div class="hist-inline-empty">Aucun paiement enregistré.</div>';
   }
   var rows = payments.slice(0, 5).map(function(p) {
     var ds  = new Date(p.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
-    var lbl = p.type === 'creation' ? '🏷 Frais création' : (p.mode === 'annual' ? '📅 Annuel' : '🔁 Mensuel');
-    var unit = (p.mode === 'annual') ? 'an' : (p.mode === 'creation' ? '' : 'mois');
+    var lbl = p.mode === 'annual' ? '📅 Annuel' : '🔁 Mensuel';
+    var unit = p.mode === 'annual' ? 'an' : 'mois';
     var amt  = p.montant !== undefined ? p.montant : '?';
-    var amtStr = unit ? escapeHtml(String(amt)) + ' €/' + unit : escapeHtml(String(amt)) + ' €';
-    return '<div class="hist-inline-item"><span class="hist-inline-date">' + escapeHtml(ds) + ' · ' + lbl + '</span><span class="hist-inline-amt">' + amtStr + '</span></div>';
+    return '<div class="hist-inline-item"><span class="hist-inline-date">' + escapeHtml(ds) + ' · ' + lbl + '</span><span class="hist-inline-amt">' + escapeHtml(String(amt)) + ' €/' + unit + '</span></div>';
   }).join('');
-  return creationRow + rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
+  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
 }
 
 function _buildPaymentSectionHTML(cmdKey, d) {
   var trial = _trialInfo(d, cmdKey);
   var pendingHtml = '';
   if (!trial.noTrial) {
-    var isCreation = trial.paymentType === 'creation';
-    var creationAmt = isCreation ? (' · ' + _getCreationFeePrice(d) + ' &#8364;') : '';
-    var paidBtnLabel = isCreation
-      ? ('&#9989; Frais de cr&#233;ation pay&#233;s (' + _getCreationFeePrice(d) + ' &#8364;)')
-      : '&#9989; Marquer comme pay&#233;';
-    var typePrefix = isCreation ? ('Frais cr&#233;ation' + creationAmt + ' · ') : (trial.paymentType === 'subscription' ? 'Abonnement · ' : '');
+    var paidBtnLabel = '&#9989; Marquer comme pay&#233;';
+    var typePrefix = trial.paymentType === 'subscription' ? '1er abonnement · ' : (trial.paymentType === 'recurring' ? 'Abonnement · ' : '');
     var suspHtml = trial.isExpired
       ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + cmdKey + '\')" style="width:100%;margin-top:6px">' +
           (trial.isSuspended ? '&#9654; R&#233;activer le compte' : '&#9208; Suspendre le compte') +
@@ -3145,7 +3024,7 @@ function _savePaymentMode(cmdKey, mode) {
   if (unitEl) unitEl.textContent = '€/' + (mode === 'annual' ? 'an' : 'mois');
   const prev = Object.assign({}, d);
   const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
-  const baseTs = isInTrial ? null : (d.paidAt || (d.creationFeePaid ? (d.trialEndAt || null) : null) || d.firstOpenAt);
+  const baseTs = isInTrial ? null : (d.paidAt || d.trialEndAt || d.firstOpenAt || null);
   const newNextReminderAt = (!isInTrial && baseTs) ? _addMonths(baseTs, mode === 'annual' ? 12 : 1) : d.nextReminderAt;
   _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode, nextReminderAt: newNextReminderAt });
   _rerenderClientBillingSection(cmdKey);
@@ -3450,7 +3329,7 @@ function _setActiveCombo(cmdKey, forfait, mode) {
   const prevMode = d.paymentMode || 'monthly';
   const modeChanged = normMode !== prevMode;
   const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
-  const baseTs = isInTrial ? null : (d.paidAt || (d.creationFeePaid ? (d.trialEndAt || null) : null) || d.firstOpenAt);
+  const baseTs = isInTrial ? null : (d.paidAt || d.trialEndAt || d.firstOpenAt || null);
   const newNextReminderAt = (!isInTrial && modeChanged && baseTs) ? _addMonths(baseTs, normMode === 'annual' ? 12 : 1) : d.nextReminderAt;
   _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice, nextReminderAt: newNextReminderAt });
 
@@ -3552,43 +3431,28 @@ function _saveFirstOpenAt(key, newTs) {
 function _markPaid(key) {
   const d = _commandesCache[key];
   if (!d) return;
-  const isCreationFee  = !d.creationFeePaid;                 // Phase 1 : frais de création
-  const isFirstSub     = d.creationFeePaid && !d.paidAt;     // Phase 2 : premier abonnement
-  const isMonthly      = d.paymentMode !== 'annual';
-  const price          = isCreationFee ? _getCreationFeePrice(d) : _getCommandePrice(d);
-
-  let confirmTitle, confirmMsg;
-  if (isCreationFee) {
-    confirmTitle = 'Frais de création payés ?';
-    confirmMsg   = 'Enregistrer les frais de création ' + price + ' € pour « ' + escapeHtml(d.restaurant || '') + ' ». Le prochain paiement sera l\'abonnement à la fin du mois d\'essai.';
-  } else {
-    const priceStr  = price + ' €/' + (isMonthly ? 'mois' : 'an');
-    const nextLabel = isMonthly ? 'dans 1 mois' : 'dans 12 mois';
-    confirmTitle = 'Confirmer le paiement ?';
-    confirmMsg   = 'Paiement ' + priceStr + ' enregistré pour « ' + escapeHtml(d.restaurant || '') + ' ». Prochain rappel ' + nextLabel + '.';
-  }
+  const isFirstSub = !d.paidAt;  // Premier abonnement = fin du mois d'essai
+  const isMonthly  = d.paymentMode !== 'annual';
+  const price      = _getCommandePrice(d);
+  const priceStr   = price + ' €/' + (isMonthly ? 'mois' : 'an');
+  const nextLabel  = isMonthly ? 'dans 1 mois' : 'dans 12 mois';
 
   _showCtrlConfirm(
-    confirmTitle,
-    confirmMsg,
+    'Confirmer le paiement ?',
+    'Paiement ' + priceStr + ' enregistré pour « ' + escapeHtml(d.restaurant || '') + ' ». Prochain rappel ' + nextLabel + '.',
     '✅ Confirmer',
     function() {
       const now = Date.now();
       let update, payEntry;
 
-      if (isCreationFee) {
-        // Phase 1 → frais création payés, prochaine échéance = trialEndAt (fin du mois d'essai)
-        const trialEnd = d.trialEndAt || _addMonths(d.firstOpenAt || now, 1);
-        update = { creationFeePaid: true, nextReminderAt: trialEnd, suspendu: false };
-        payEntry = { date: now, montant: price, mode: 'creation', forfait: d.forfait || 'menu-qr', type: 'creation' };
-      } else if (isFirstSub) {
-        // Phase 2 → premier abonnement, cycles alignés sur trialEndAt
+      if (isFirstSub) {
+        // Premier abonnement — cycles alignés sur trialEndAt pour régularité
         const base = d.trialEndAt || d.nextReminderAt || now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
-        // Phase 3 → récurrent. Si nextReminderAt est dans le passé (suspension longue), partir de now
+        // Récurrent — partir de nextReminderAt si dans le futur, sinon de now
         const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false };
@@ -3606,41 +3470,23 @@ function _markPaid(key) {
           const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
           if (rid) {
             _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
-            const subSync = { endDate: update.nextReminderAt };
-            if (isCreationFee) subSync.creationFeePaid = true;
-            _saasDb.ref('restaurants/' + rid + '/config/subscription').update(subSync);
+            _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: update.nextReminderAt });
           }
-          // Email de confirmation paiement — frais création ET abonnements
           const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
           if (emailAddr) {
-            if (isCreationFee) {
-              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  rid: rid || '',
-                  email: emailAddr,
-                  name: d.restaurant || '',
-                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                  type: 'creation',
-                  nextDue: update.nextReminderAt
-                })
-              }).catch(function() {});
-            } else {
-              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  rid: rid || '',
-                  email: emailAddr,
-                  name: d.restaurant || '',
-                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                  amount: price,
-                  paymentMode: d.paymentMode || 'monthly',
-                  nextDue: update.nextReminderAt
-                })
-              }).catch(function() {});
-            }
+            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                rid: rid || '',
+                email: emailAddr,
+                name: d.restaurant || '',
+                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                amount: price,
+                paymentMode: d.paymentMode || 'monthly',
+                nextDue: update.nextReminderAt
+              })
+            }).catch(function() {});
           }
         })
         .catch(function() {
@@ -3747,13 +3593,10 @@ function _doRenderPaiements() {
     var created = d.clientCree || _lastCreatedClients[k];
     var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
     var name = d.restaurant || (d.emailData && d.emailData.name) || '—';
-    var isCreationPhase = trial.paymentType === 'creation';
-    var displayPrice = isCreationPhase ? _getCreationFeePrice(d) : _getCommandePrice(d);
-    var displayPhase = isCreationPhase ? 'Frais de cr&#233;ation' : (trial.paymentType === 'subscription' ? '1er abonnement' : 'Abonnement');
-    var displayUnit  = isCreationPhase ? '' : ('/' + (d.paymentMode === 'annual' ? 'an' : 'mois'));
-    var paidBtnLabel = isCreationPhase
-      ? '&#9989; Frais de cr&#233;ation pay&#233;s (' + displayPrice + ' &#8364;)'
-      : '&#9989; Marquer comme pay&#233; (' + displayPrice + ' &#8364;' + displayUnit + ')';
+    var displayPrice = _getCommandePrice(d);
+    var displayPhase = trial.paymentType === 'subscription' ? '1er abonnement' : 'Abonnement';
+    var displayUnit  = '/' + (d.paymentMode === 'annual' ? 'an' : 'mois');
+    var paidBtnLabel = '&#9989; Marquer comme pay&#233; (' + displayPrice + ' &#8364;' + displayUnit + ')';
     var suspTag = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
     var paieBadge;
     if (trial.isExpired) {
@@ -3823,15 +3666,18 @@ function buildExClientCard(slug, d) {
   card.className = 'exclient-card';
   var deletedStr = d.deletedAt ? new Date(d.deletedAt).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
   var slugEsc = escapeHtml(slug);
+  var isAutoDelete = d.deletedBy === 'auto_7j';
+  var badge7j = isAutoDelete ? '<span style="display:inline-block;background:#e09050;color:#fff;font-size:0.65rem;font-weight:800;padding:2px 7px;border-radius:12px;letter-spacing:0.04em;margin-left:6px;vertical-align:middle">7J</span>' : '';
+  var deleteReason = isAutoDelete ? ' <span style="color:#e09050;font-size:0.72rem">(jamais utilisé — supprimé automatiquement)</span>' : '';
   card.innerHTML =
     '<div class="exclient-header">' +
-      '<span class="exclient-name">'+escapeHtml(d.name||slug)+'</span>' +
+      '<span class="exclient-name">'+escapeHtml(d.name||slug)+badge7j+'</span>' +
       '<button class="exclient-restore-btn" onclick="_askRestoreClient(\'' + slugEsc + '\')">&#x21A9; Retour</button>' +
     '</div>' +
     '<div class="exclient-info">Forfait : '+escapeHtml(d.forfait||'—')+'</div>' +
     '<div class="exclient-info">Paiement : '+escapeHtml(d.paymentMode||'—')+'</div>' +
     '<div class="exclient-info">Email : '+escapeHtml(d.email||'—')+'</div>' +
-    '<div class="exclient-info" style="color:var(--muted);font-size:0.75rem">Supprimé le '+escapeHtml(deletedStr)+'</div>' +
+    '<div class="exclient-info" style="color:var(--muted);font-size:0.75rem">Supprimé le '+escapeHtml(deletedStr)+deleteReason+'</div>' +
     '<button class="exclient-delete-btn" onclick="_askPermanentDelete(\'' + slugEsc + '\')">&#128465; Supprimer définitivement</button>';
   return card;
 }

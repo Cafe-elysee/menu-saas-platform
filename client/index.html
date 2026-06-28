@@ -13,7 +13,7 @@
         var _rid = _p.get('rid') || 'demo';
         var urlDark  = _p.get('demo_dark');
         var cached = localStorage.getItem(_rid + '_admin_data_v1');
-        var themeId = urlTheme || 'genext';
+        var themeId = urlTheme || 'gold-noir';
         if (!urlTheme && cached) { var d = JSON.parse(cached); if (d.menuTheme) themeId = d.menuTheme; }
         document.documentElement.dataset.menuTheme = themeId;
         var LIGHT_DEFAULTS = ['botanical','santorin'];
@@ -856,21 +856,19 @@
     /* ── Corps : bokeh pur sans overlay ── */
     html[data-menu-theme="genext"] body {
       background-color:#080604;
-      background-image:url('assets/gn-bg-dark.jpg');
       background-size:cover; background-position:center; background-attachment:fixed;
     }
     html[data-menu-theme="genext"].light body {
       background-color:#e8e2d6;
-      background-image:url('assets/gn-bg-light.jpg');
       background-size:cover; background-position:center; background-attachment:fixed;
     }
     /* ── Hero : bokeh + overlay chaud ── */
     html[data-menu-theme="genext"] #hero {
-      background-image:url('assets/gn-bg-dark.jpg');
+      
       background-size:cover; background-position:center;
     }
     html[data-menu-theme="genext"].light #hero {
-      background-image:url('assets/gn-bg-light.jpg');
+      
       background-size:cover; background-position:center;
     }
     html[data-menu-theme="genext"] .hero-overlay {
@@ -907,7 +905,6 @@
     /* ── Barre de navigation : bokeh + gold border + gnBarFlow ── */
     html[data-menu-theme="genext"] #nav {
       background-color:rgba(8,6,4,0.82);
-      background-image:url('assets/gn-bg-dark.jpg');
       background-size:cover; background-position:center top;
       backdrop-filter:none; -webkit-backdrop-filter:none;
       border-bottom:1px solid rgba(200,164,78,0.28);
@@ -917,7 +914,6 @@
     }
     html[data-menu-theme="genext"].light #nav {
       background-color:rgba(245,242,237,0.88);
-      background-image:url('assets/gn-bg-light.jpg');
       background-size:cover; background-position:center top;
       backdrop-filter:none; -webkit-backdrop-filter:none;
       border-bottom:1px solid rgba(200,164,78,0.28);
@@ -999,13 +995,13 @@
     }
     /* ── Sheet (détail produit) ── */
     html[data-menu-theme="genext"] #sheet {
-      background-image:linear-gradient(rgba(10,7,4,0.82),rgba(10,7,4,0.82)),url('assets/gn-bg-dark.jpg');
+      background-image:linear-gradient(rgba(10,7,4,0.82),rgba(10,7,4,0.82));
       background-size:cover; background-position:center;
       border-top:1px solid rgba(200,164,78,0.40);
       box-shadow:0 -4px 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(200,164,78,0.10);
     }
     html[data-menu-theme="genext"].light #sheet {
-      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80));
       background-size:cover; background-position:center;
       border-top:1px solid rgba(200,164,78,0.40);
       box-shadow:0 -4px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(200,164,78,0.18);
@@ -1039,13 +1035,13 @@
       background:rgba(195,182,162,0.48);
     }
     html[data-menu-theme="genext"] .table-box {
-      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84));
       background-size:cover; background-position:center;
       border:1px solid rgba(200,164,78,0.38);
       box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.12);
     }
     html[data-menu-theme="genext"].light .table-box {
-      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80));
       background-size:cover; background-position:center;
       box-shadow:0 24px 64px rgba(0,0,0,0.12), 0 0 0 1px rgba(200,164,78,0.20);
     }
@@ -1061,12 +1057,12 @@
       background:rgba(195,182,162,0.48);
     }
     html[data-menu-theme="genext"] #cart-box {
-      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84));
       background-size:cover; background-position:center;
       border-top:1px solid rgba(200,164,78,0.38);
     }
     html[data-menu-theme="genext"].light #cart-box {
-      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80));
       background-size:cover; background-position:center;
     }
     /* ── Modal Mes commandes ── */
@@ -1077,12 +1073,12 @@
       background:rgba(195,182,162,0.48);
     }
     html[data-menu-theme="genext"] #hist-box {
-      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84));
       background-size:cover; background-position:center;
       border-top:1px solid rgba(200,164,78,0.38);
     }
     html[data-menu-theme="genext"].light #hist-box {
-      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80));
       background-size:cover; background-position:center;
     }
 
@@ -1105,12 +1101,12 @@
     }
     #dose-modal.show #dose-box { transform:translateY(0); }
     html[data-menu-theme="genext"] #dose-box {
-      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84)),url('assets/gn-bg-dark.jpg');
+      background-image:linear-gradient(rgba(10,7,4,0.84),rgba(10,7,4,0.84));
       background-color:#120e0a; background-size:cover; background-position:center;
       border-top:1px solid rgba(200,164,78,0.38);
     }
     html[data-menu-theme="genext"].light #dose-box {
-      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80)),url('assets/gn-bg-light.jpg');
+      background-image:linear-gradient(rgba(242,236,224,0.80),rgba(242,236,224,0.80));
       background-color:#f5f0e8; background-size:cover; background-position:center;
     }
     .dose-handle { width:40px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 16px; }
@@ -2644,13 +2640,11 @@
       position:fixed; inset:0; z-index:9999;
       display:flex; align-items:center; justify-content:center;
       background-color:#080604;
-      background-image:url('assets/gn-bg-dark.jpg');
       background-size:cover; background-position:center;
       overflow:hidden;
     }
     html.light #preloader {
       background-color:#f0ede8;
-      background-image:url('assets/gn-bg-light.jpg');
     }
     #preloader::before {
       content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
@@ -2663,12 +2657,10 @@
     /* C-1 fix : GeNext preloader aligné sur background body (même gradient overlay) */
     html[data-menu-theme="genext"] #preloader {
       background-color:#080604;
-      background-image:url('assets/gn-bg-dark.jpg');
       background-size:cover; background-position:center;
     }
     html[data-menu-theme="genext"].light #preloader {
       background-color:#e8e2d6;
-      background-image:url('assets/gn-bg-light.jpg');
       background-size:cover; background-position:center;
     }
     .pre-logo-img {
@@ -5542,8 +5534,8 @@
   </div>
 </div>
 
-<div id="not-found-screen" style="display:none;position:fixed;inset:0;z-index:9999;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;background-attachment:fixed;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
-  <style>html.light #not-found-screen{background-image:linear-gradient(rgba(245,236,220,0.52),rgba(245,236,220,0.52)),url(assets/gn-bg-dark.jpg)}</style>
+<div id="not-found-screen" style="display:none;position:fixed;inset:0;z-index:9999;background-attachment:fixed;align-items:center;justify-content:center;flex-direction:column;padding:2rem;text-align:center;">
+  <style>html.light #not-found-screen{background-image:linear-gradient(rgba(245,236,220,0.52),rgba(245,236,220,0.52))}</style>
   <div style="max-width:360px;width:100%;background:rgba(18,14,10,0.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(200,164,78,0.22);border-radius:24px;padding:44px 32px 36px;box-shadow:0 8px 48px rgba(0,0,0,0.45)">
     <div style="width:64px;height:64px;border-radius:50%;background:rgba(200,164,78,0.10);border:1.5px solid rgba(200,164,78,0.28);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 26px">🔍</div>
     <div id="nf-title" style="font-family:'Crimson Pro',serif;font-size:1.55rem;color:#c8a44e;letter-spacing:0.04em;margin-bottom:14px;line-height:1.3">Établissement introuvable</div>

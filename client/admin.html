@@ -48,7 +48,7 @@
     }
     html.light body { background-color:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-image: url(assets/gn-bg-light.jpg) !important;
+      background-image:none;
       background-size: cover !important;
       background-position: center top !important;
       border-bottom-color:rgba(200,164,78,0.28) !important;
@@ -67,7 +67,7 @@
     html.light .ico-pb-label { color:var(--cream) !important; }
     html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
     /* Popups et cards */
-    html.light .ico-modal-box { background-color:#f5f0e8; background-image:linear-gradient(rgba(245,236,220,0.58),rgba(245,236,220,0.58)),url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center; border-color:rgba(200,164,78,0.22); }
+    html.light .ico-modal-box { background-color:#f5f0e8; background-image:linear-gradient(rgba(245,236,220,0.58),rgba(245,236,220,0.58)); border-color:rgba(200,164,78,0.22); }
     html.light .ico-modal-hd { background:rgba(245,236,220,0.04); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border-color:rgba(200,164,78,0.15); }
     html.light .ico-modal-title { color:var(--cream); }
     html.light .ico-modal-item { color:var(--cream); }
@@ -75,7 +75,7 @@
     html.light .login-box {
       --card: rgba(255,255,255,0.50) !important;
       background-color:#f5f0e8 !important;
-      background-image:url(assets/gn-bg-light.jpg) !important;
+      background-image:none;
       background-size:cover !important; background-position:center !important;
       backdrop-filter:none !important;
       -webkit-backdrop-filter:none !important;
@@ -85,11 +85,11 @@
     html.light .login-box .login-input { background:rgba(255,255,255,0.50) !important; }
     /* Admin login screens — bokeh background */
     #login-screen, #rid-sel-screen {
-      background-image:url(assets/gn-bg-dark.jpg) !important;
+      background-image:none;
       background-size:cover !important; background-position:center !important;
     }
     html.light #login-screen, html.light #rid-sel-screen {
-      background-image:url(assets/gn-bg-light.jpg) !important;
+      background-image:none;
     }
     /* Admin login logo */
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
@@ -164,11 +164,10 @@
     html { overflow-x:hidden; }
     body {
       background-color:#080604;
-      background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover; background-position:center; background-attachment:fixed;
       color:var(--cream); font-family:'Outfit','Noto Sans',sans-serif; font-weight:300; min-height:100vh;
     }
-    html.light body { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); }
+    html.light body { background-color:#f5f0e8; }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }
@@ -186,13 +185,11 @@
       position:fixed;inset:0;z-index:99999;
       display:flex;align-items:center;justify-content:center;
       background-color:#080604;
-      background-image:url(assets/gn-bg-dark.jpg);
       background-size:cover;background-position:center;
       overflow:hidden;
     }
     html.light #adm-loading-screen {
       background-color:#f0ede8;
-      background-image:url(assets/gn-bg-light.jpg);
     }
     #adm-loading-screen::before {
       content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
@@ -228,7 +225,7 @@
     .fl-popup-overlay.show { opacity:1; }
     html.light .fl-popup-overlay { background:rgba(0,0,0,0.55); }
     .fl-popup-card {
-      background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
+      background-size:cover;background-position:center;
       border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:28px 22px 22px;
       max-width:370px;width:90%;text-align:center;
       box-shadow:0 0 0 1px rgba(200,164,78,0.10),0 24px 64px rgba(0,0,0,0.55);
@@ -237,7 +234,7 @@
       transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
     }
     .fl-popup-overlay.show .fl-popup-card { transform:none; }
-    html.light .fl-popup-card { background-image:url(assets/gn-bg-light.jpg); }
+    html.light .fl-popup-card {  }
     .fl-popup-step {
       font-size:0.65rem;color:rgba(244,234,210,0.80);text-transform:uppercase;
       letter-spacing:0.18em;margin-bottom:12px;
@@ -277,7 +274,7 @@
     .login-box {
       --card: rgba(0,0,0,0.38);
       width:100%; max-width:360px;
-      background-color:#120e0a; background-image:url(assets/gn-bg-dark.jpg);
+      background-color:#120e0a;
       background-size:cover; background-position:center;
       border:1px solid rgba(200,164,78,0.28); border-radius:24px;
       padding:36px 28px; text-align:center;
@@ -321,7 +318,7 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      background-image: url(assets/gn-bg-dark.jpg);
+      
       background-size: cover;
       background-position: center top;
       border-top:1px solid rgba(200,164,78,0.10); border-bottom:1px solid rgba(200,164,78,0.28);
@@ -667,13 +664,13 @@
     }
     #notif-modal.on { opacity:1; pointer-events:auto; }
     .notif-box {
-      background-color:#120e0a; background-image:url(assets/gn-bg-dark.jpg); background-size:cover; background-position:center;
+      background-color:#120e0a; background-size:cover; background-position:center;
       border:1px solid rgba(200,164,78,0.28); border-radius:22px;
       padding:28px 24px; width:100%; max-width:420px;
       box-shadow:0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,164,78,0.12);
       transform:translateY(20px); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
     }
-    html.light .notif-box { background-color:#f5f0e8; background-image:url(assets/gn-bg-light.jpg); border-color:rgba(200,164,78,0.22); box-shadow:0 20px 60px rgba(0,0,0,0.18),0 0 0 1px rgba(200,164,78,0.12); }
+    html.light .notif-box { background-color:#f5f0e8; border-color:rgba(200,164,78,0.22); box-shadow:0 20px 60px rgba(0,0,0,0.18),0 0 0 1px rgba(200,164,78,0.12); }
     #notif-modal.on .notif-box { transform:translateY(0); }
     .notif-title {
       font-family:'Crimson Pro',serif; font-size:1.3rem; font-weight:600;
@@ -1019,7 +1016,7 @@
     }
     .ico-modal-overlay.open { display:flex; }
     .ico-modal-box {
-      background-color:#120e0a; background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;
+      background-color:#120e0a;
       border:1px solid rgba(200,164,78,0.28);
       border-radius:20px 20px 0 0;
       padding:0 16px 28px; width:100%; max-width:480px;
@@ -1547,8 +1544,8 @@
     .tc-color-btn { background:none; border:1px solid rgba(200,164,78,0.3); border-radius:6px; color:rgba(200,164,78,0.7); cursor:pointer; font-size:0.78rem; padding:3px 8px; margin-left:auto; flex-shrink:0; transition:border-color 0.18s, color 0.18s; font-family:inherit; }
     .tc-color-btn:hover { border-color:var(--gold); color:var(--gold); }
     .adm-color-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:900; align-items:flex-end; justify-content:center; padding:0.75rem; }
-    .adm-color-modal-box { background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:20px 20px 16px 16px; padding:1.5rem 1.25rem 1.75rem; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; box-shadow:0 0 0 1px rgba(200,164,78,0.10),0 24px 64px rgba(0,0,0,0.55); }
-    html.light .adm-color-modal-box { background-image:url(assets/gn-bg-light.jpg); }
+    .adm-color-modal-box { background-size:cover;background-position:center; border:1px solid rgba(200,164,78,0.28); border-radius:20px 20px 16px 16px; padding:1.5rem 1.25rem 1.75rem; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; box-shadow:0 0 0 1px rgba(200,164,78,0.10),0 24px 64px rgba(0,0,0,0.55); }
+    html.light .adm-color-modal-box {  }
     .adm-color-modal-title { font-size:0.95rem; font-weight:600; color:#e8e0d0; margin:0 0 1rem; letter-spacing:0.01em; }
     .adm-color-grid { display:flex; flex-wrap:wrap; gap:10px; margin:0.4rem 0 0.75rem; }
     .adm-color-swatch { width:38px; height:38px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .2s,border-color .2s,box-shadow .2s; flex-shrink:0; }
@@ -1673,7 +1670,6 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background-image: url(assets/gn-bg-dark.jpg);
     background-size: cover;
     background-position: center bottom;
     border-top:1px solid rgba(200,164,78,0.28);
@@ -1688,7 +1684,7 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background-image: url(assets/gn-bg-light.jpg);
+    
     background-size: cover;
     background-position: center bottom;
     border-top-color:rgba(200,164,78,0.28);
@@ -2062,8 +2058,8 @@
   }
   .adm-modal-box { animation:admModalIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both; }
   .adm-modal-box.out { animation:admModalOut 0.18s ease forwards; }
-  html.light .adm-modal-box { background-color:#f5f0e8!important; background-image:url(assets/gn-bg-light.jpg)!important; border-color:rgba(200,164,78,0.22)!important; }
-  html.light #pay-modal > div { background-color:#f5f0e8!important; background-image:url(assets/gn-bg-light.jpg)!important; }
+  html.light .adm-modal-box { background-color:#f5f0e8!important; background-image:none; border-color:rgba(200,164,78,0.22)!important; }
+  html.light #pay-modal > div { background-color:#f5f0e8!important; background-image:none; }
   html.light #pay-modal-details { background:rgba(200,164,78,0.07)!important; }
   html.light #pay-modal-details-body, html.light #pay-modal-close-btn { color:var(--muted)!important; }
 
@@ -2661,7 +2657,7 @@
 
 <!-- ── MODAL PAIEMENT ── -->
 <div id="pay-modal" style="display:none;position:fixed;inset:0;z-index:10006;background:rgba(0,0,0,0.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px">
-  <div style="width:100%;max-width:360px;background-color:#120e0a;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;border:1px solid rgba(200,164,78,0.3);border-radius:22px;padding:28px 22px 22px;box-shadow:0 0 0 1px rgba(200,164,78,0.1),0 24px 64px rgba(0,0,0,0.6)">
+  <div style="width:100%;max-width:360px;background-color:#120e0a;border:1px solid rgba(200,164,78,0.3);border-radius:22px;padding:28px 22px 22px;box-shadow:0 0 0 1px rgba(200,164,78,0.1),0 24px 64px rgba(0,0,0,0.6)">
     <div id="pay-modal-badge" style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#c8a44e;margin-bottom:8px;opacity:0.7"></div>
     <div id="pay-modal-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:#c8a44e;margin-bottom:6px"></div>
     <div id="pay-modal-amount" style="font-size:1.6rem;font-weight:700;color:#fff;margin-bottom:20px"></div>
@@ -2680,7 +2676,7 @@
 
 <!-- ── ADMIN CONFIRM MODAL (changement mot de passe) ── -->
 <div id="adm-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
-  <div class="adm-modal-box" style="width:100%;max-width:320px;background-color:#120e0a;background-image:url(assets/gn-bg-dark.jpg);background-size:cover;background-position:center;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 0 0 1px rgba(200,164,78,0.12),0 24px 64px rgba(0,0,0,0.55);">
+  <div class="adm-modal-box" style="width:100%;max-width:320px;background-color:#120e0a;border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:30px 22px 24px;text-align:center;box-shadow:0 0 0 1px rgba(200,164,78,0.12),0 24px 64px rgba(0,0,0,0.55);">
     <div id="adm-confirm-title" style="font-family:'Crimson Pro',Georgia,serif;font-size:1.25rem;font-weight:600;color:var(--gold);letter-spacing:0.04em;line-height:1.3;margin-bottom:10px"></div>
     <div id="adm-confirm-msg" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:26px"></div>
     <div style="display:flex;gap:10px;">
@@ -4734,8 +4730,7 @@ function _updateHeroSectionForTheme() {
   if (hint)      hint.style.display      = isGenext ? 'none' : '';
   if (!phoneBg) return;
   if (isGenext) {
-    const bgFile = document.documentElement.classList.contains('light') ? 'assets/gn-bg-light.jpg' : 'assets/gn-bg-dark.jpg';
-    phoneBg.style.backgroundImage = `url('${bgFile}')`;
+    phoneBg.style.backgroundImage = '';
     phoneBg.classList.add('flow');
   } else {
     phoneBg.style.backgroundImage = adminData.heroImage ? `url('${adminData.heroImage}')` : '';
@@ -6860,8 +6855,6 @@ const THEMES_DATA = [
   { id:'dyn-bento',     styles:['paper','simple'], names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        es:'Bento Board'},    dark:'#121212', accent:'#ffffff' },
   // Nouveaux thèmes premium
   { id:'aurora',        styles:['paper','simple'], names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 es:'Aurora'},         dark:'#0c0d14', accent:'#9070f8' },
-  // Thème GeNext (design admin/demo)
-  { id:'genext',        styles:['simple'],         names:{el:'GeNext',             fr:'GeNext',             en:'GeNext',             de:'GeNext',                 es:'GeNext'},         dark:'#080604', accent:'#c8a44e' },
 ];
 
 
@@ -7169,10 +7162,8 @@ function renderThemeSelector() {
 
   const staticThemes = THEMES_DATA.filter(t => !hiddenData[t.id] && !layoutFamilies.has(t.id));
   const CARTE_IDS = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
-  const GENEXT_IDS = new Set(['genext']);
   const carteThemes = staticThemes.filter(t => CARTE_IDS.has(t.id));
-  const genextThemes = staticThemes.filter(t => GENEXT_IDS.has(t.id));
-  const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id) && !GENEXT_IDS.has(t.id));
+  const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id));
 
   if (carteThemes.length > 0) {
     const lbl = currentLang==='en'?'Basic':currentLang==='de'?'Einfach':currentLang==='es'?'Carta':'Carte';
@@ -7203,13 +7194,6 @@ function renderThemeSelector() {
     });
   }
 
-  if (genextThemes.length > 0) {
-    grid.appendChild(makeSep('GeNext'));
-    genextThemes.forEach(th => {
-      const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
-      grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
-    });
-  }
 }
 
 function _colorDist(h1, h2) {
@@ -7475,7 +7459,7 @@ async function _loadSubscriptionSection() {
 function _renderSubSection(el, t, sub) {
   const forfait  = sub.forfait || 'menu-qr';
   const isCS     = forfait === 'commandes-services';
-  const payMode  = sub.paymentMode || 'monthly';
+  const payMode  = sub.paymentMode || 'annual';
   const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   const price    = sub.price != null ? sub.price : defaultPrice;
   const now      = Date.now();
@@ -7526,7 +7510,7 @@ function _renderSubSection(el, t, sub) {
   const _perYear  = { fr:'/an',   en:'/year',  el:'/χρόνο', es:'/year',  de:'/Jahr' };
   const _subOpts = [];
   for (const _f of ['menu-qr','commandes-services']) {
-    for (const _m of ['monthly','annual']) {
+    for (const _m of ['annual']) {
       const _act  = _f === forfait && _m === payMode;
       const _std  = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
       const _sfx  = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
@@ -7742,7 +7726,7 @@ function _showPaymentReminderPopup(sub, t) {
 async function _changeSubscription(newForfait, newMode) {
   const t          = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const curForfait = _subData?.forfait      || 'menu-qr';
-  const curMode    = _subData?.paymentMode  || 'monthly';
+  const curMode    = _subData?.paymentMode  || 'annual';
   if (newForfait === curForfait && newMode === curMode) return;
 
   // Pendant la période d'essai : changement libre (pas d'anti-spam)
@@ -7843,7 +7827,7 @@ async function _doChangeSubscription(newForfait, newMode, t) {
 async function _changeSubscriptionForfait(newForfait) {
   const t         = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const isUpgrade = newForfait === 'commandes-services';
-  const payMode   = _subData?.paymentMode || 'monthly';
+  const payMode   = _subData?.paymentMode || 'annual';
 
   // 1. Anti-spam : pas plus d'un changement par mois
   const lastChange = _subData?.lastForfaitChange || 0;
@@ -7893,7 +7877,7 @@ async function _doChangeForfait(newForfait, t) {
   if (fb)  fb.textContent = t.subChanging || 'Mise à jour…';
   try {
     const isCS     = newForfait === 'commandes-services';
-    const payMode  = _subData?.paymentMode || 'monthly';
+    const payMode  = _subData?.paymentMode || 'annual';
     const newPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
     const newFeats = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
     const now      = Date.now();
@@ -7925,7 +7909,7 @@ async function _doChangeForfait(newForfait, t) {
 
 async function _changeSubscriptionPaymentMode(newMode) {
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const currentMode = _subData?.paymentMode || 'monthly';
+  const currentMode = _subData?.paymentMode || 'annual';
   if (currentMode === newMode) return;
 
   // 1. Anti-spam : pas plus d'un changement par mois
@@ -8007,7 +7991,7 @@ async function _doChangePaymentMode(newMode, t) {
 async function _doScheduleForfait(newForfait) {
   const t    = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const isCS = newForfait === 'commandes-services';
-  const payMode = _subData?.paymentMode || 'monthly';
+  const payMode = _subData?.paymentMode || 'annual';
   const price   = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
   try {
     await Promise.all([
@@ -8042,7 +8026,7 @@ async function _cancelScheduledForfait() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         rid: _RID, name: '', oldForfait: '', newForfait: _subData?.forfait || 'menu-qr',
-        email: null, lang: currentLang, paymentMode: _subData?.paymentMode || 'monthly',
+        email: null, lang: currentLang, paymentMode: _subData?.paymentMode || 'annual',
         pending: 'cancel'
       })
     }).catch(() => {});
