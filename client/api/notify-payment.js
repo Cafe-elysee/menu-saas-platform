@@ -114,25 +114,7 @@ function buildPaymentEmail(lang, name, amount, paymentMode, nextDue) {
 }
 
 
-// ── Email confirmation frais de création payés ────────────────────────────────
-function buildCreationPaidEmail(lang, name, trialEnd) {
-  const safeName = escHtml(name);
-  const isRTL    = false;
-  const dateStr  = fmtDate(trialEnd, lang);
-  const T = {
-    fr: { subject: '✅ Frais de création reçus — Votre essai GeNext commence !', greeting: 'Bonjour ' + safeName + ' 👋', confirmed: 'Vos <strong>frais de création (149&nbsp;€)</strong> ont bien été reçus. Merci !', nextLabel: 'Fin de votre essai gratuit', nextDate: dateStr, note: "Votre mois d'essai est en cours — explorez toutes les fonctionnalités librement. Votre premier abonnement sera dû à la fin de cette période.", closing: "Merci pour votre confiance — L'équipe GeNext" },
-    en: { subject: '✅ Setup fee received — Your GeNext trial starts now!', greeting: 'Hello ' + safeName + ' 👋', confirmed: 'Your <strong>setup fee (149&nbsp;€)</strong> has been received. Thank you!', nextLabel: 'End of your free trial', nextDate: dateStr, note: 'Your trial month is underway — explore all features freely. Your first subscription will be due at the end of this period.', closing: 'Thank you for your trust — The GeNext Team' },
-    el: { subject: '✅ Τέλη δημιουργίας ελήφθησαν — Η δοκιμή GeNext ξεκινά!', greeting: 'Γεια σας ' + safeName + ' 👋', confirmed: 'Τα <strong>τέλη δημιουργίας (149&nbsp;€)</strong> σας ελήφθησαν. Ευχαριστούμε!', nextLabel: 'Λήξη δωρεάν δοκιμής', nextDate: dateStr, note: 'Ο μήνας δοκιμής σας είναι σε εξέλιξη — εξερευνήστε όλες τις λειτουργίες ελεύθερα. Η πρώτη συνδρομή σας θα είναι απαιτητή στο τέλος αυτής της περιόδου.', closing: 'Ευχαριστούμε — Η ομάδα GeNext' },
-    de: { subject: '✅ Einrichtungsgebühr erhalten — Ihre GeNext-Testphase beginnt!', greeting: 'Guten Tag ' + safeName + ' 👋', confirmed: 'Ihre <strong>Einrichtungsgebühr (149&nbsp;€)</strong> wurde empfangen. Danke!', nextLabel: 'Ende Ihrer kostenlosen Testphase', nextDate: dateStr, note: 'Ihr Testmonat läuft — nutzen Sie alle Funktionen frei. Ihr erstes Abonnement wird am Ende dieses Zeitraums fällig.', closing: 'Vielen Dank — Das GeNext Team' },
-    es: { subject: '✅ Tarifa de creación recibida — ¡Su prueba GeNext comienza!', greeting: 'Hola ' + safeName + ' 👋', confirmed: 'Su <strong>tarifa de creación (149&nbsp;€)</strong> ha sido recibida. ¡Gracias!', nextLabel: 'Fin de su período de prueba gratuito', nextDate: dateStr, note: 'Su mes de prueba está en curso — explore todas las funciones libremente. Su primera suscripción vencerá al final de este período.', closing: 'Gracias por su confianza — El equipo GeNext' }
-  };
-  const t = T[lang] || T.fr; const dir = isRTL ? 'rtl' : 'ltr'; const align = isRTL ? 'right' : 'left';
-  const BG = 'https://menu-saas-platform.vercel.app/assets/gn-bg-light.jpg';
-  const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeNext</title></head><body style="margin:0;padding:0;background-color:#f2ece0"><table dir="${dir}" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2ece0" background="${BG}" style="background-color:#f2ece0;background-image:url('${BG}');background-size:cover;background-position:center;background-repeat:no-repeat"><tr><td align="center" background="${BG}" style="padding:24px 0;background-image:url('${BG}');background-size:cover;background-position:center"><table width="580" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:580px;width:100%;background-color:#ffffff;font-family:'Segoe UI',Arial,sans-serif"><tr><td bgcolor="#ffffff" align="center" background="${BG}" style="background-color:#ffffff;background-image:url('${BG}');background-size:cover;background-position:center;padding:26px 32px;border-bottom:1px solid #ead9b8"><img src="cid:gnlogo" alt="GeNext" width="140" height="147" style="display:block;margin:0 auto;max-width:140px;border:0"><div style="font-size:0.75rem;color:#9a8060;margin-top:8px;letter-spacing:0.06em">DIGITAL MENU PLATFORM</div></td></tr><tr><td bgcolor="#ffffff" background="${BG}" style="background-color:#ffffff;background-image:url('${BG}');background-size:cover;background-position:center;padding:28px 32px;text-align:${align}"><p style="color:#2a1f10;font-size:1rem;margin:0 0 16px;font-weight:600">${t.greeting}</p><table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f0faf4" style="background-color:#f0faf4;border:1px solid #b8e8c8;border-left:3px solid #4caf80;border-radius:0 8px 8px 0;margin-bottom:20px"><tr><td style="padding:12px 16px;font-size:0.95rem;color:#2a1f10;line-height:1.6">${t.confirmed}</td></tr></table><table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8f4ec" style="background-color:#f8f4ec;border:1px solid #e8dfc8;border-radius:10px;margin-bottom:20px"><tr><td style="padding:16px 22px;text-align:center"><div style="font-size:0.72rem;color:#9a8060;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${t.nextLabel}</div><div style="font-size:1.2rem;font-weight:700;color:#c8a44e">${t.nextDate}</div></td></tr></table><p style="color:#7a6555;font-size:0.85rem;line-height:1.6;margin:0">${t.note}</p></td></tr><tr><td bgcolor="#f2ece0" align="center" background="${BG}" style="background-color:#f2ece0;background-image:url('${BG}');background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8"><p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing}</p></td></tr></table></td></tr></table></body></html>`;
-  return { subject: t.subject, html };
-}
-
-// ── Email notification réactivation compte ─────────────────────────────────────
+// ── Email notification réactivation compte// ── Email notification réactivation compte ─────────────────────────────────────
 function buildReactivationEmail(lang, name) {
   const safeName = escHtml(name);
   const isRTL    = false;
@@ -169,9 +151,7 @@ module.exports = async function handler(req, res) {
 
   try {
     let subject, html;
-    if (type === 'creation') {
-      ({ subject, html } = buildCreationPaidEmail(safeLang, safeName, Number(nextDue)));
-    } else if (type === 'reactivation') {
+    if (type === 'reactivation') {
       ({ subject, html } = buildReactivationEmail(safeLang, safeName));
     } else {
       ({ subject, html } = buildPaymentEmail(safeLang, safeName, safeAmt, paymentMode, Number(nextDue)));
