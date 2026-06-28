@@ -1850,18 +1850,7 @@
         </div>
         <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (après 1 mois d'essai gratuit)</div>
         <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
-          <div class="f4-combo">
-            <div class="f4-name">📋 Menu QR</div>
-            <div class="f4-mode">Mensuel</div>
-            <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-qr-monthly" class="f4-price-inp" type="number" min="0" step="1" value="49"
-                onclick="event.stopPropagation()"
-                oninput="_debouncePriceInput('gs-qr-monthly', function(v){_saveGlobalPlanPrice('qr-monthly',v);})"
-                onchange="_saveGlobalPlanPrice('qr-monthly',this.value)"
-                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-monthly',this.value);this.blur();}">
-              <span class="f4-unit">€/mois</span>
-            </div>
-          </div>
+
           <div class="f4-combo">
             <div class="f4-name">📋 Menu QR</div>
             <div class="f4-mode">Annuel</div>
@@ -1874,18 +1863,7 @@
               <span class="f4-unit">€/an</span>
             </div>
           </div>
-          <div class="f4-combo">
-            <div class="f4-name">🛎 Commandes</div>
-            <div class="f4-mode">Mensuel</div>
-            <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-srv-monthly" class="f4-price-inp" type="number" min="0" step="1" value="99"
-                onclick="event.stopPropagation()"
-                oninput="_debouncePriceInput('gs-srv-monthly', function(v){_saveGlobalPlanPrice('srv-monthly',v);})"
-                onchange="_saveGlobalPlanPrice('srv-monthly',this.value)"
-                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-monthly',this.value);this.blur();}">
-              <span class="f4-unit">€/mois</span>
-            </div>
-          </div>
+
           <div class="f4-combo">
             <div class="f4-name">🛎 Commandes</div>
             <div class="f4-mode">Annuel</div>
@@ -2152,7 +2130,7 @@ const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
 const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
-let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 49, 'qr-annual': 490, 'srv-monthly': 99, 'srv-annual': 990 };
+let _GLOBAL_PLAN_PRICES   = { 'qr-annual': 490, 'srv-annual': 990 };
 let _priceInputTimers     = {};
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
@@ -2510,9 +2488,7 @@ function initFirebase() {
       // Première utilisation — écrire les valeurs par défaut dans Firebase
       _saasDb.ref('demoPage/pricing').set({
         prices: {
-          'qr-monthly':  _GLOBAL_PLAN_PRICES['qr-monthly']  || 49,
           'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 490,
-          'srv-monthly': _GLOBAL_PLAN_PRICES['srv-monthly'] || 99,
           'srv-annual':  _GLOBAL_PLAN_PRICES['srv-annual']  || 990
         }
       }).catch(function(){});
@@ -2520,7 +2496,7 @@ function initFirebase() {
     }
     if (s.prices && typeof s.prices === 'object') {
       const _validated = {};
-      ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
+      ['qr-annual','srv-annual'].forEach(function(k) {
         if (s.prices[k] != null) {
           const _v = Math.max(0, parseInt(Number(s.prices[k]), 10) || 0);
           _validated[k] = _v;
@@ -2905,9 +2881,7 @@ function _comboKey(forfait, mode) {
 // ── Refresh UI Réglages Tarification ─────────────────────────────────────────
 function _refreshPricingSettingsUI() {
   var el;
-  el = document.getElementById('gs-qr-monthly');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-monthly']  || 49;
   el = document.getElementById('gs-qr-annual');    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-annual']   || 490;
-  el = document.getElementById('gs-srv-monthly');  if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-monthly'] || 99;
   el = document.getElementById('gs-srv-annual');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-annual']  || 990;
 }
 
