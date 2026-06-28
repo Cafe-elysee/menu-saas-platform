@@ -4632,8 +4632,6 @@ function renderLogoSection() {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
           const bgRemoved = _removeGreenScreen(ctx, w, h);
-          // Afficher le canvas preview immédiatement (avant upload)
-          setLogo(canvas.toDataURL('image/png', 0.9));
           _logoUploading = true; // bloquer renderLogoSection() pendant l'upload
           if (uploadLabel) { uploadLabel.innerHTML = '<span style="opacity:.6">⏳ Upload…</span>'; uploadLabel.style.pointerEvents = 'none'; }
           canvas.toBlob(blob => {
