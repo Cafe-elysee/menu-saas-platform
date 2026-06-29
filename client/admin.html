@@ -48,7 +48,7 @@
     }
     html.light body { background-color:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-color: rgba(245,240,228,0.90) !important;
+      background-color: #f5f0e8 !important;
       border-bottom-color:rgba(200,164,78,0.28) !important;
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05) !important;
     }
@@ -83,12 +83,10 @@
     html.light .login-box .login-input { background:rgba(255,255,255,0.50) !important; }
     /* Admin login screens */
     #login-screen, #rid-sel-screen {
-      background-color: rgba(8,6,4,0.92);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      background-color: #080604;
     }
     html.light #login-screen, html.light #rid-sel-screen {
-      background-color: rgba(245,240,228,0.95);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      background-color: #f5f0e8;
     }
     /* Admin login logo */
     .gna-login-logo-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:8px; }
@@ -224,6 +222,7 @@
     .fl-popup-overlay.show { opacity:1; }
     html.light .fl-popup-overlay { background:rgba(0,0,0,0.55); }
     .fl-popup-card {
+      background-color:#120e0a;
       background-size:cover;background-position:center;
       border:1px solid rgba(200,164,78,0.28);border-radius:22px;padding:28px 22px 22px;
       max-width:370px;width:90%;text-align:center;
@@ -233,7 +232,7 @@
       transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
     }
     .fl-popup-overlay.show .fl-popup-card { transform:none; }
-    html.light .fl-popup-card {  }
+    html.light .fl-popup-card { background-color:#f5f0e8; }
     .fl-popup-step {
       font-size:0.65rem;color:rgba(244,234,210,0.80);text-transform:uppercase;
       letter-spacing:0.18em;margin-bottom:12px;
@@ -317,7 +316,7 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      background-color: rgba(8,6,4,0.90);
+      background-color: #080604;
       border-top:1px solid rgba(200,164,78,0.10); border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
@@ -1297,7 +1296,7 @@
     .adm-sel-btn:hover, .adm-sel-btn.open { border-color:var(--gold); }
     .adm-sel-popup {
       position:fixed; top:0; left:0;
-      background:rgba(22,16,12,0.88); backdrop-filter:blur(20px) saturate(160%);
+      background:#16100c; backdrop-filter:blur(20px) saturate(160%);
       border:1px solid var(--bord2); border-radius:12px;
       padding:6px; z-index:99999; min-width:160px;
       box-shadow:0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(200,164,78,0.06);
@@ -1667,7 +1666,7 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background-color: rgba(8,6,4,0.90);
+    background-color: #080604;
     border-top:1px solid rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
@@ -1680,7 +1679,7 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background-color: rgba(245,240,228,0.90);
+    background-color: #f5f0e8;
     border-top-color:rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
   }
@@ -2209,7 +2208,9 @@
       <div style="height:1px;background:rgba(200,164,78,0.12);margin:0 0 16px"></div>
     </div>
     <div id="rsel-new-label" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;text-align:left"></div>
+    <div id="rsel-rid-label" style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">ID du restaurant</div>
     <input type="text" class="login-input" id="rsel-rid-input" autocomplete="off" style="text-transform:lowercase;letter-spacing:0.06em">
+    <div id="rsel-rid-hint" style="font-size:0.68rem;color:var(--muted);margin-top:8px;margin-bottom:16px">Demandez votre code d'accès à l'administrateur</div>
     <button class="login-btn" id="rsel-confirm-btn">Continuer</button>
     <div class="login-err" id="rsel-err"></div>
   </div>
@@ -2233,6 +2234,7 @@
       <button class="llang-btn" data-lang="el" onclick="_loginPickLang('el')">🇬🇷</button>
       <button class="llang-btn" data-lang="es" onclick="_loginPickLang('es')">🇪🇸</button>
     </div>
+    <div id="login-pwd-label" style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;text-align:left">Mot de passe</div>
     <div class="pw-wrap pw-wrap-block">
       <input type="password" class="login-input" id="pwd-input"
              placeholder="Mot de passe" autocomplete="current-password">
@@ -2241,6 +2243,7 @@
         <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
       </button>
     </div>
+    <div id="login-pwd-hint" style="font-size:0.68rem;color:var(--muted);margin-top:8px;margin-bottom:16px">Demandez votre mot de passe à l'administrateur</div>
     <button class="login-btn" id="login-btn">Connexion</button>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -3735,7 +3738,16 @@ function _showRidSelector() {
   document.getElementById('rid-sel-screen').style.display = 'flex';
   // Sync sous-titre localisé + active flag button
   const _rselSub = document.getElementById('rsel-sub');
-  if (_rselSub) _rselSub.textContent = (_LOGIN_UI[_l] || _LOGIN_UI.fr).sub;
+  const _tRsel = _LOGIN_UI[_l] || _LOGIN_UI.fr;
+  if (_rselSub) _rselSub.textContent = _tRsel.sub;
+  const _rselNewLbl = document.getElementById('rsel-new-label');
+  if (_rselNewLbl) _rselNewLbl.textContent = _tRsel.ridNew;
+  const _rselRidLbl = document.getElementById('rsel-rid-label');
+  if (_rselRidLbl) _rselRidLbl.textContent = _tRsel.ridLabel;
+  const _rselRidHnt = document.getElementById('rsel-rid-hint');
+  if (_rselRidHnt) _rselRidHnt.textContent = _tRsel.ridHint;
+  const _rselConfBtn = document.getElementById('rsel-confirm-btn');
+  if (_rselConfBtn) _rselConfBtn.textContent = _tRsel.ridBtn;
   _syncLoginLangStrip('rsel-lang-strip', _l);
 }
 
@@ -3988,11 +4000,11 @@ let _loginBlockUntil = 0;
 
 // _LOGIN_UI déclaré ici (avant l'IIFE ci-dessous) car const n'est pas hoisté
 const _LOGIN_UI = {
-  fr: { pwd:'Mot de passe',   btn:'Connexion', sub:'Administration' },
-  en: { pwd:'Password',       btn:'Sign in',   sub:'Administration' },
-  de: { pwd:'Passwort',       btn:'Anmelden',  sub:'Verwaltung' },
-  el: { pwd:'Κωδικός',        btn:'Σύνδεση',   sub:'Διαχείριση' },
-  es: { pwd:'Contraseña',      btn:'Entrar',    sub:'Administración' }
+  fr: { pwd:'Mot de passe',  btn:'Connexion', sub:'Administration', ridLabel:'ID du restaurant',   ridHint:'Demandez votre code d\'accès à l\'administrateur', ridNew:'Nouvel identifiant', ridBtn:'Continuer', pwdHint:'Demandez votre mot de passe à l\'administrateur' },
+  en: { pwd:'Password',      btn:'Sign in',   sub:'Administration', ridLabel:'Restaurant ID',      ridHint:'Ask your administrator for the access code',        ridNew:'New account',        ridBtn:'Continue',  pwdHint:'Ask your administrator for your password' },
+  de: { pwd:'Passwort',      btn:'Anmelden',  sub:'Verwaltung',     ridLabel:'Restaurant-ID',      ridHint:'Fragen Sie Ihren Administrator nach dem Zugangscode', ridNew:'Neue Kennung',      ridBtn:'Weiter',    pwdHint:'Fragen Sie Ihren Administrator nach Ihrem Passwort' },
+  el: { pwd:'Κωδικός',       btn:'Σύνδεση',   sub:'Διαχείριση',    ridLabel:'ID εστιατορίου',     ridHint:'Ζητήστε τον κωδικό πρόσβασης από τον διαχειριστή',  ridNew:'Νέος λογαριασμός',  ridBtn:'Συνέχεια',  pwdHint:'Ζητήστε τον κωδικό πρόσβασης σας από τον διαχειριστή' },
+  es: { pwd:'Contraseña',    btn:'Entrar',    sub:'Administración', ridLabel:'ID del restaurante', ridHint:'Solicite el código de acceso al administrador',       ridNew:'Nueva cuenta',      ridBtn:'Continuar', pwdHint:'Solicite su contraseña al administrador' }
 };
 
 // Appliquer la langue mémorisée sur les écrans de login au chargement
@@ -8717,6 +8729,10 @@ function _loginPickLang(l) {
   const t = _LOGIN_UI[l] || _LOGIN_UI.fr;
   const pwdInput = document.getElementById('pwd-input');
   if (pwdInput) pwdInput.placeholder = t.pwd;
+  const loginPwdLbl = document.getElementById('login-pwd-label');
+  if (loginPwdLbl) loginPwdLbl.textContent = t.pwd;
+  const loginPwdHnt = document.getElementById('login-pwd-hint');
+  if (loginPwdHnt) loginPwdHnt.textContent = t.pwdHint;
   const loginBtn = document.getElementById('login-btn');
   if (loginBtn) loginBtn.textContent = t.btn;
   const loginSub = document.getElementById('login-sub-txt');

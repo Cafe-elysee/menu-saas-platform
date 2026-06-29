@@ -59,7 +59,7 @@
       --muted:    #7a6040;
     }
     html.light .bottom-nav {
-      
+      background-color: #f5f0e8 !important;
       background-size: cover !important;
       background-position: center bottom !important;
       border-top-color: rgba(200,164,78,0.28) !important;
@@ -246,7 +246,7 @@
     }
     .app-header {
       flex-shrink: 0;
-      
+      background-color: #080604;
       background-size: cover;
       background-position: center top;
       border-bottom: 1px solid rgba(200,164,78,0.28);
@@ -262,7 +262,7 @@
       animation: gnBarFlow 7s ease-in-out infinite;
     }
     html.light .app-header {
-      
+      background-color: #f5f0e8;
       background-size: cover;
       background-position: center top;
       border-bottom-color: rgba(200,164,78,0.28);
@@ -328,7 +328,7 @@
       flex-shrink: 0;
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-      
+      background-color: #080604;
       background-size: cover;
       background-position: center bottom;
       border-top: 1px solid rgba(200,164,78,0.28);
@@ -3375,19 +3375,17 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   prices[comboKey] = price;
   _commandesCache[cmdKey] = Object.assign({}, d, { prices });
 
-  // Si la combo modifiée est la combo active → mettre à jour le prix actif aussi
+  // La grille ne montre que les combos annuels → la combo du forfait actif est toujours annual
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode    = d.paymentMode || 'monthly';
-  var activeComboKey = _comboKey(activeForfait, activeMode);
-  var isActiveCombo = (comboKey === activeComboKey);
+  var activeForfaitAnnualKey = _comboKey(activeForfait, 'annual');
+  var isActiveCombo = (comboKey === activeForfaitAnnualKey);
+  _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
+  const slug = _getSlugFromCmdKey(cmdKey);
   if (isActiveCombo) {
-    _commandesCache[cmdKey].price = price;
-    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices });
-    const slug = _getSlugFromCmdKey(cmdKey);
-    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices });
+    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices, paymentMode: 'annual' });
+    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices, paymentMode: 'annual' });
   } else {
     _controlDb.ref('/commandes/' + cmdKey + '/prices').update({ [comboKey]: price });
-    const slug = _getSlugFromCmdKey(cmdKey);
     if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
   }
   showToast('&#128190; Prix enregistré : ' + price + ' €');
