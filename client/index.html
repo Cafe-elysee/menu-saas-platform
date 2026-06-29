@@ -5446,24 +5446,19 @@
     transition:border-radius 0.25s;
   }
   html.light .hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
-  /* ── Straddle fix List/Élégant — position:absolute évite le margin-collapse ── */
-  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero-card {
+  /* ── Straddle fix : Élégant + Carte (sauf carte-classique qui cache #hero) ── */
+  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero-card,
+  html[data-menu-theme^="carte-"]:not([data-menu-theme="carte-classique"]) #hero-card {
     padding-top: 64px;
   }
-  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hc-logo-wrap {
+  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hc-logo-wrap,
+  html[data-menu-theme^="carte-"]:not([data-menu-theme="carte-classique"]) .hc-logo-wrap {
     position: absolute;
     top: 0;
     left: 50%;
     transform: translate(-50%, -50%);
     margin: 0;
     z-index: 5;
-  }
-  /* Anneau gold : rend le chevauchement photo/carte visible en dark ET light */
-  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hc-logo {
-    box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px rgba(200,164,78,0.65) !important;
-  }
-  html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hc-logo {
-    box-shadow:0 4px 18px rgba(0,0,0,0.22),0 0 0 3px rgba(200,164,78,0.45) !important;
   }
   .hc-name {
     font-family:'Cormorant Garamond','Cormorant',serif;
