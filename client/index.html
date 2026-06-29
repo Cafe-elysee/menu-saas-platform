@@ -5428,16 +5428,13 @@
   /* ── #hero-card ── */
   #hero-card {
     position:relative; background:var(--bg);
-    padding:0 20px 22px; text-align:center;
-    border-bottom:1px solid rgba(200,164,78,0.08);
+    padding:0 14px 22px; text-align:center;
   }
-  html.light #hero-card { border-bottom-color:rgba(0,0,0,0.06); }
   .hc-logo-wrap {
     display:flex; justify-content:center;
     margin-top:-48px; margin-bottom:14px;
     position:relative; z-index:4;
   }
-  html[data-menu-theme^="carte-"] .hc-logo-wrap { margin-top:-38px; }
   .hc-logo {
     width:96px; height:96px; border-radius:50%;
     object-fit:contain; object-position:center;
@@ -5446,13 +5443,13 @@
     transition:border-radius 0.25s;
   }
   html.light .hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
-  /* ── Straddle fix : Élégant + Carte (sauf carte-classique qui cache #hero) ── */
+  /* ── Straddle fix : Élégant + tous les thèmes Carte ── */
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero-card,
-  html[data-menu-theme^="carte-"]:not([data-menu-theme="carte-classique"]) #hero-card {
+  html[data-menu-theme^="carte-"] #hero-card {
     padding-top: 64px;
   }
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hc-logo-wrap,
-  html[data-menu-theme^="carte-"]:not([data-menu-theme="carte-classique"]) .hc-logo-wrap {
+  html[data-menu-theme^="carte-"] .hc-logo-wrap {
     position: absolute;
     top: 0;
     left: 50%;
