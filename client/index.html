@@ -6770,6 +6770,7 @@ function applyAdminData(data) {
           full:      { el: f.el||f.fr||'', fr: f.fr||f.el||'', en: f.en||f.el||f.fr||'', de: f.de||f.en||f.fr||'', es: f.es||f.en||f.fr||'' },
           allergens: { el: al.el||al.fr||[], fr: al.fr||al.el||[], en: al.en||al.el||al.fr||[], de: al.de||al.en||al.fr||[], es: al.es||al.en||al.fr||[] },
           visible:   item.visible !== false,
+          doseOption: item.doseOption === true,
         };
         ITEMS.push(safe);
       });
