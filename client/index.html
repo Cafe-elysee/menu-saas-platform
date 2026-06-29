@@ -5432,6 +5432,10 @@
   .hc-ig { color:#e1306c; border-color:rgba(225,48,108,0.35); background:rgba(225,48,108,0.07); }
   .hc-fb { color:#1877f2; border-color:rgba(24,119,242,0.35); background:rgba(24,119,242,0.07); }
   .hc-tt { color:#ff0050; border-color:rgba(255,0,80,0.35); background:rgba(255,0,80,0.07); }
+  /* ── Mode Livre (paper) — fix #175 ── */
+  /* Le flip-wrap position:fixed couvre tout — hero + hero-card inutiles et causent le carré blanc */
+  body[data-style="paper"] #hero,
+  body[data-style="paper"] #hero-card { display:none !important; }
 </style>
 <div id="demo-banner">🔒 Mode démo · Navigation uniquement — aucune action n'est enregistrée</div>
 
