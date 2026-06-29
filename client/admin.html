@@ -1326,6 +1326,26 @@
     /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
     body[data-style="paper"] .prod-thumb,
     body[data-style="paper"] .prod-thumb-empty { display:none !important; }
+    /* En thème Carte : même comportement que Livre pour la section photo produits */
+    body[data-theme^="carte-"] .photo-form-group { display:none !important; }
+    body[data-theme^="carte-"] .prod-thumb,
+    body[data-theme^="carte-"] .prod-thumb-empty { display:none !important; }
+    /* Toggle visibilité produit dans le menu */
+    .prod-vis-row { margin-top:12px; padding:8px 12px; background:rgba(200,164,78,0.06); border-radius:8px; border:1px solid rgba(200,164,78,0.14); }
+    html.light .prod-vis-row { background:rgba(200,164,78,0.08); border-color:rgba(200,164,78,0.20); }
+    .prod-visible-chk { accent-color:var(--green); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+    /* Bouton visibilité catégorie */
+    .cat-vis-btn {
+      width:36px; height:36px; flex-shrink:0; border-radius:10px; cursor:pointer;
+      border:1px solid var(--border); background:transparent; color:var(--muted);
+      display:flex; align-items:center; justify-content:center;
+      transition:color 0.15s,border-color 0.15s,background 0.15s;
+    }
+    .cat-vis-btn svg { width:16px; height:16px; pointer-events:none; }
+    .cat-vis-btn.on { color:var(--gold); border-color:rgba(200,164,78,0.35); }
+    .cat-vis-btn.on:hover { background:rgba(200,164,78,0.08); }
+    .cat-vis-btn:not(.on) { opacity:0.5; }
+    .cat-vis-btn:not(.on):hover { opacity:0.8; border-color:var(--red); color:var(--red); background:rgba(224,82,82,0.05); }
     /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
     .cat-photos-row { display:none; }
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
@@ -3021,8 +3041,10 @@ const ADMIN_UI = {
     notifSaved:    '✓ Μήνυμα αποθηκεύτηκε — ορατό στην επόμενη εκκίνηση',
     notifErrSrv:   '✗ Σφάλμα διακομιστή: {e}',
     notifErrNet:   '✗ Σφάλμα δικτύου: {e}',
-    showInMenu:    'Εμφάνιση στο μενού',
-    doseOptionLabel: 'Επιλογή Δόσης & Ζάχαρης',
+    showInMenu:       'Εμφάνιση φωτογραφίας',
+    doseOptionLabel:  'Επιλογή Δόσης & Ζάχαρης',
+    prodVisibleLabel: 'Εμφάνιση στο μενού',
+    catVisibleLabel:  'Κατηγορία ορατή',
     btnMove:       'Μετακίνηση',
     changeCat:     '— Αλλαγή κατηγορίας —',
     newCat:        'Νέα κατηγορία',
@@ -3160,8 +3182,10 @@ const ADMIN_UI = {
     notifSaved:    '✓ Message enregistré — visible au prochain lancement de l\'app serveur',
     notifErrSrv:   '✗ Erreur serveur : {e}',
     notifErrNet:   '✗ Erreur réseau : {e}',
-    showInMenu:    'Afficher dans le menu',
-    doseOptionLabel: 'Option Dose & Sucre',
+    showInMenu:       'Afficher la photo',
+    doseOptionLabel:  'Option Dose & Sucre',
+    prodVisibleLabel: 'Afficher dans le menu',
+    catVisibleLabel:  'Catégorie visible',
     btnMove:       'Déplacer',
     changeCat:     '— Changer de catégorie —',
     newCat:        'Nouvelle catégorie',
@@ -3299,8 +3323,10 @@ const ADMIN_UI = {
     notifSaved:    '✓ Message saved — visible on next server app launch',
     notifErrSrv:   '✗ Server error: {e}',
     notifErrNet:   '✗ Network error: {e}',
-    showInMenu:    'Show in menu',
-    doseOptionLabel: 'Dose & Sugar option',
+    showInMenu:       'Show photo',
+    doseOptionLabel:  'Dose & Sugar option',
+    prodVisibleLabel: 'Show in menu',
+    catVisibleLabel:  'Category visible',
     btnMove:       'Move',
     changeCat:     '— Change category —',
     newCat:        'New category',
@@ -3438,8 +3464,10 @@ const ADMIN_UI = {
     notifSaved:    '✓ Nachricht gespeichert — beim nächsten Start sichtbar',
     notifErrSrv:   '✗ Serverfehler: {e}',
     notifErrNet:   '✗ Netzwerkfehler: {e}',
-    showInMenu:    'Im Menü anzeigen',
-    doseOptionLabel: 'Dose & Zucker Option',
+    showInMenu:       'Foto anzeigen',
+    doseOptionLabel:  'Dose & Zucker Option',
+    prodVisibleLabel: 'Im Menü anzeigen',
+    catVisibleLabel:  'Kategorie sichtbar',
     btnMove:       'Verschieben',
     changeCat:     '— Kategorie wechseln —',
     newCat:        'Neue Kategorie',
@@ -3577,8 +3605,10 @@ const ADMIN_UI = {
     notifSaved:    '✓ Mensaje guardado — aparecerá en el próximo inicio',
     notifErrSrv:   '✗ Error del servidor: {e}',
     notifErrNet:   '✗ Error de red: {e}',
-    showInMenu:    'Mostrar en el menú',
-    doseOptionLabel: 'Opción Dosis & Azúcar',
+    showInMenu:       'Mostrar foto',
+    doseOptionLabel:  'Opción Dosis & Azúcar',
+    prodVisibleLabel: 'Mostrar en el menú',
+    catVisibleLabel:  'Categoría visible',
     btnMove:       'Mover',
     changeCat:     '— Cambiar categoría —',
     newCat:        'Nueva categoría',
@@ -4301,20 +4331,25 @@ function _admPreviewErr(img) {
 }
 
 function sanitizeItems(items) {
-  return (items || []).map(item => ({
-    id:        item.id ?? 0,
-    cat:       item.cat ?? 0,
-    price:     item.price ?? '',
-    photo:     item.photo ?? '',
-    showPhoto: item.showPhoto !== false,
-    type:      item.type  || '',
-    temp:      item.temp  || '',
-    badges:    Array.isArray(item.badges) ? item.badges : [],
-    name:      item.name      || { fr:'', en:'', es: '' },
-    desc:      item.desc      || { fr:'', en:'', es: '' },
-    full:      item.full      || { fr:'', en:'', es: '' },
-    allergens: item.allergens || { fr:[], en:[], es: [] },
-  }));
+  return (items || []).map(item => {
+    const r = {
+      id:        item.id ?? 0,
+      cat:       item.cat ?? 0,
+      price:     item.price ?? '',
+      photo:     item.photo ?? '',
+      showPhoto: item.showPhoto !== false,
+      type:      item.type  || '',
+      temp:      item.temp  || '',
+      badges:    Array.isArray(item.badges) ? item.badges : [],
+      name:      item.name      || { fr:'', en:'', es: '' },
+      desc:      item.desc      || { fr:'', en:'', es: '' },
+      full:      item.full      || { fr:'', en:'', es: '' },
+      allergens: item.allergens || { fr:[], en:[], es: [] },
+    };
+    if (item.doseOption === true) r.doseOption = true;
+    if (item.visible === false)   r.visible = false;
+    return r;
+  });
 }
 
 function saveData() {
@@ -5478,6 +5513,12 @@ function renderCatsSection() {
           <span class="ico-pb-label">${currentIco ? icoNameClean : _tCat.noneIco}</span>
           <span>▾</span>
         </button>
+        <button class="cat-vis-btn ${cat.visible !== false ? 'on' : ''}" data-ci="${ci}" title="${_tCat.catVisibleLabel || 'Catégorie visible'}">
+          ${cat.visible !== false
+            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+          }
+        </button>
         <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
       </div>
       <div class="cat-photos-row">
@@ -5526,6 +5567,19 @@ function renderCatsSection() {
       if (currentLang !== PRIMARY_LANG) setTxLock(`cat-${i}-${currentLang}`, e.target.value.trim() !== '');
       markUnsaved();
       renderProductsSection();
+    });
+
+    // Toggle visibilité catégorie
+    row.querySelector('.cat-vis-btn').addEventListener('click', e => {
+      const btn = e.currentTarget;
+      const i = parseInt(btn.dataset.ci);
+      const nowVisible = adminData.cats[i].visible !== false;
+      adminData.cats[i].visible = !nowVisible;
+      btn.classList.toggle('on', !nowVisible);
+      const eyeOpen  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+      const eyeClosed = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+      btn.innerHTML = !nowVisible ? eyeOpen : eyeClosed;
+      markUnsaved();
     });
 
     // Ouvrir le modal icône
@@ -6020,13 +6074,18 @@ function buildProdForm(item) {
         }
         <label class="photo-show-row">
           <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
-          ${t1.showInMenu}
+          <span data-uitxt="showInMenu">${t1.showInMenu}</span>
         </label>
         <label class="photo-show-row" style="margin-top:8px">
           <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
           <span data-uitxt="doseOptionLabel">${t1.doseOptionLabel || 'Option Dose & Sucre'}</span>
         </label>
       </div>
+
+      <label class="photo-show-row prod-vis-row">
+        <input type="checkbox" class="prod-visible-chk" ${item.visible !== false ? 'checked' : ''}>
+        <span data-uitxt="prodVisibleLabel">${t1.prodVisibleLabel || 'Afficher dans le menu'}</span>
+      </label>
 
     </div>
 
@@ -6068,6 +6127,8 @@ function collectProdForm(card, item) {
   if (showChk) item.showPhoto = showChk.checked;
   const doseChk = card.querySelector('.dose-option-chk');
   if (doseChk) { if (doseChk.checked) item.doseOption = true; else delete item.doseOption; }
+  const visChk = card.querySelector('.prod-visible-chk');
+  if (visChk) { if (!visChk.checked) item.visible = false; else delete item.visible; }
 
   // Badges — dropdowns
   const typeEl = card.querySelector('[data-bdg-select="type"]');

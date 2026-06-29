@@ -6735,7 +6735,7 @@ function applyAdminData(data) {
       data.cats.forEach(c => {
         // Migration flipPhoto → flipPhotos (3 slots)
         const fp = c.flipPhotos || (c.flipPhoto ? [c.flipPhoto] : []);
-        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), flipPhotos: [fp[0]||'', fp[1]||'', fp[2]||''] });
+        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), flipPhotos: [fp[0]||'', fp[1]||'', fp[2]||''], visible: c.visible !== false });
         // Injecter le nom dans UI[lang].cats pour chaque langue
         Object.keys(UI).forEach(l => {
           if (!UI[l].cats) UI[l].cats = [];
@@ -6769,6 +6769,7 @@ function applyAdminData(data) {
           desc:      { el: d.el||d.fr||'', fr: d.fr||d.el||'', en: d.en||d.el||d.fr||'', de: d.de||d.en||d.fr||'', es: d.es||d.en||d.fr||'' },
           full:      { el: f.el||f.fr||'', fr: f.fr||f.el||'', en: f.en||f.el||f.fr||'', de: f.de||f.en||f.fr||'', es: f.es||f.en||f.fr||'' },
           allergens: { el: al.el||al.fr||[], fr: al.fr||al.el||[], en: al.en||al.el||al.fr||[], de: al.de||al.en||al.fr||[], es: al.es||al.en||al.fr||[] },
+          visible:   item.visible !== false,
         };
         ITEMS.push(safe);
       });
@@ -6971,7 +6972,8 @@ function buildFlipBook() {
   // For Arabic: categories are in REVERSE DOM order (rightmost = hero, leftmost = last cat)
   // so swiping LEFT physically moves the track left, revealing cats from the left side.
   const _buildCatPage = (cat, ci) => {
-    const catItems = ITEMS.filter(it => it.cat === ci);
+    if (cat.visible === false) return null;
+    const catItems = ITEMS.filter(it => it.cat === ci && it.visible !== false);
     if (!catItems.length) return null;
 
     const catName = u.cats[ci] || cat.sub[lang] || '';
@@ -8686,6 +8688,7 @@ function buildCatPills() {
   const wrap = document.getElementById('cat-pills');
   wrap.innerHTML = '';
   CATS.forEach((cat, i) => {
+    if (cat.visible === false) return;
     const pill = document.createElement('button');
     pill.className = 'cat-pill' + (activeCat === i.toString() ? ' on' : '');
     pill.dataset.cat = i;
@@ -8708,7 +8711,8 @@ function renderMenu() {
   const container = document.getElementById('menu-secs');
   container.innerHTML = '';
   CATS.forEach((cat, ci) => {
-    const catItems = ITEMS.filter(it => it.cat === ci);
+    if (cat.visible === false) return;
+    const catItems = ITEMS.filter(it => it.cat === ci && it.visible !== false);
     const sec = document.createElement('div');
     sec.className = 'cat-sec';
     sec.dataset.cat = ci;
