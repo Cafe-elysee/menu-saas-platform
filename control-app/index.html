@@ -3375,19 +3375,17 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   prices[comboKey] = price;
   _commandesCache[cmdKey] = Object.assign({}, d, { prices });
 
-  // Si la combo modifiée est la combo active → mettre à jour le prix actif aussi
+  // La grille ne montre que les combos annuels → la combo du forfait actif est toujours annual
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode    = d.paymentMode || 'monthly';
-  var activeComboKey = _comboKey(activeForfait, activeMode);
-  var isActiveCombo = (comboKey === activeComboKey);
+  var activeForfaitAnnualKey = _comboKey(activeForfait, 'annual');
+  var isActiveCombo = (comboKey === activeForfaitAnnualKey);
+  _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
+  const slug = _getSlugFromCmdKey(cmdKey);
   if (isActiveCombo) {
-    _commandesCache[cmdKey].price = price;
-    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices });
-    const slug = _getSlugFromCmdKey(cmdKey);
-    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices });
+    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices, paymentMode: 'annual' });
+    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices, paymentMode: 'annual' });
   } else {
     _controlDb.ref('/commandes/' + cmdKey + '/prices').update({ [comboKey]: price });
-    const slug = _getSlugFromCmdKey(cmdKey);
     if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
   }
   showToast('&#128190; Prix enregistré : ' + price + ' €');

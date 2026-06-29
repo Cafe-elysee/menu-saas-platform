@@ -48,7 +48,7 @@
     }
     html.light body { background-color:var(--bg); color:var(--cream); }
     html.light .adm-header {
-      background-color: rgba(245,240,228,0.76) !important;
+      background-color: rgba(245,240,228,0.90) !important;
       border-bottom-color:rgba(200,164,78,0.28) !important;
       box-shadow:0 1px 0 rgba(200,164,78,0.12), 0 4px 16px rgba(0,0,0,0.05) !important;
     }
@@ -317,7 +317,7 @@
       100% { transform: translateX(200%); opacity: 0; }
     }
     .adm-header {
-      background-color: rgba(8,6,4,0.76);
+      background-color: rgba(8,6,4,0.90);
       border-top:1px solid rgba(200,164,78,0.10); border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 4px 20px rgba(0,0,0,0.30);
       padding:8px 16px; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
@@ -1667,7 +1667,7 @@
   #admin-bottom-nav {
     position:fixed; bottom:0; left:0; right:0;
     height:calc(var(--admin-nav-h) + env(safe-area-inset-bottom));
-    background-color: rgba(8,6,4,0.76);
+    background-color: rgba(8,6,4,0.90);
     border-top:1px solid rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.10), 0 -6px 28px rgba(0,0,0,0.28);
     display:flex; align-items:stretch;
@@ -1680,7 +1680,7 @@
     animation:gnBarFlow 9s ease-in-out infinite reverse;
   }
   html.light #admin-bottom-nav {
-    background-color: rgba(245,240,228,0.76);
+    background-color: rgba(245,240,228,0.90);
     border-top-color:rgba(200,164,78,0.28);
     box-shadow:0 -1px 0 rgba(200,164,78,0.12), 0 -4px 18px rgba(0,0,0,0.04);
   }
@@ -7454,8 +7454,10 @@ function _renderSubSection(el, t, sub) {
   const forfait  = sub.forfait || 'menu-qr';
   const isCS     = forfait === 'commandes-services';
   const payMode  = sub.paymentMode || 'annual';
+  const activeCk = (isCS ? 'srv' : 'qr') + '-' + (payMode === 'annual' ? 'annual' : 'monthly');
   const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
-  const price    = sub.price != null ? sub.price : defaultPrice;
+  // Lecture prioritaire : prix per-combo Firebase > prix flat > fallback hardcodé
+  const price    = (sub.prices && sub.prices[activeCk] != null) ? sub.prices[activeCk] : (sub.price != null ? sub.price : defaultPrice);
   const now      = Date.now();
   const trialEndAt   = sub.trialEndAt || 0;
   const isInTrial    = trialEndAt && now < trialEndAt;
@@ -7506,7 +7508,9 @@ function _renderSubSection(el, t, sub) {
   for (const _f of ['menu-qr','commandes-services']) {
     for (const _m of ['annual']) {
       const _act  = _f === forfait && _m === payMode;
-      const _std  = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
+      const _ck   = (_f === 'commandes-services' ? 'srv' : 'qr') + '-' + (_m === 'annual' ? 'annual' : 'monthly');
+      const _hard = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
+      const _std  = (sub.prices && sub.prices[_ck] != null) ? sub.prices[_ck] : _hard;
       const _sfx  = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
       const _fLbl = _f === 'commandes-services' ? (t.subForfaitCS||'C&S') : (t.subForfaitMenuQR||'Menu QR');
       const _mLbl = _m === 'annual' ? (t.subAnnual||'Annuel') : (t.subMonthly||'Mensuel');
