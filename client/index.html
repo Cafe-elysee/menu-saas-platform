@@ -5360,6 +5360,78 @@
     font-family: 'Outfit', sans-serif; letter-spacing: 0.03em;
   }
   body.demo-mode #demo-banner { display: block; }
+
+  /* ═══════════════════════════════════════════════════════════════
+     HERO COVER STRIP + #hero-card — Fix #174
+  ═══════════════════════════════════════════════════════════════ */
+  /* Hero raccourci en bandeau couverture */
+  #hero { min-height:200px !important; max-height:260px !important; }
+  /* Overlay léger pour le bandeau */
+  .hero-overlay {
+    background:linear-gradient(to bottom,rgba(10,6,4,0.15) 0%,rgba(10,6,4,0.45) 100%) !important;
+  }
+  /* Contenu texte masqué → déplacé dans #hero-card */
+  .hero-content,.hero-scroll,#hero-wifi { display:none !important; }
+  /* Thèmes carte-* : afficher aussi le bandeau cover */
+  html[data-menu-theme^="carte-"] #hero {
+    display:block !important; min-height:150px !important; max-height:190px !important;
+  }
+  /* cc-header masqué — remplacé par #hero-card */
+  #cc-header { display:none !important; }
+
+  /* ── #hero-card ── */
+  #hero-card {
+    position:relative; background:var(--bg);
+    padding:0 20px 22px; text-align:center;
+    border-bottom:1px solid rgba(200,164,78,0.08);
+  }
+  html.light #hero-card { border-bottom-color:rgba(0,0,0,0.06); }
+  .hc-logo-wrap {
+    display:flex; justify-content:center;
+    margin-top:-48px; margin-bottom:14px;
+    position:relative; z-index:4;
+  }
+  html[data-menu-theme^="carte-"] .hc-logo-wrap { margin-top:-38px; }
+  .hc-logo {
+    width:96px; height:96px; border-radius:14px;
+    object-fit:contain; object-position:center;
+    background:var(--bg);
+    border:2.5px solid #c8a44e;
+    box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px var(--bg);
+  }
+  html.light .hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
+  .hc-name {
+    font-family:'Cormorant Garamond','Cormorant',serif;
+    font-size:clamp(1.4rem,5vw,2rem); font-weight:600;
+    color:var(--cream); letter-spacing:0.04em;
+    line-height:1.2; margin:0 0 5px;
+  }
+  .hc-tagline {
+    font-family:'Cormorant Garamond','Cormorant',serif;
+    font-style:italic; font-size:clamp(0.85rem,2.8vw,1.02rem);
+    color:#c8a44e; letter-spacing:0.05em; margin:0;
+  }
+  html.light .hc-tagline { color:var(--gold,#c8a44e); }
+  .hc-desc {
+    font-size:0.84rem; color:var(--muted); line-height:1.65;
+    max-width:480px; margin:12px auto 0;
+  }
+  .hc-socials {
+    display:flex; gap:8px; justify-content:center;
+    flex-wrap:wrap; margin-top:14px;
+  }
+  .hc-social-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:6px 13px; border-radius:18px;
+    font-size:0.78rem; font-weight:500;
+    text-decoration:none; border:1px solid;
+    transition:opacity 0.2s,transform 0.15s;
+    letter-spacing:0.02em;
+  }
+  .hc-social-btn:active { transform:scale(0.96); opacity:0.8; }
+  .hc-ig { color:#e1306c; border-color:rgba(225,48,108,0.35); background:rgba(225,48,108,0.07); }
+  .hc-fb { color:#1877f2; border-color:rgba(24,119,242,0.35); background:rgba(24,119,242,0.07); }
+  .hc-tt { color:#ff0050; border-color:rgba(255,0,80,0.35); background:rgba(255,0,80,0.07); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Navigation uniquement — aucune action n'est enregistrée</div>
 
@@ -5602,6 +5674,30 @@
     </div>
   </div>
 </section>
+
+<!-- ── HERO CARD (universel — tous les thèmes) ── -->
+<div id="hero-card">
+  <div class="hc-logo-wrap">
+    <img id="hc-logo-img" class="hc-logo" style="display:none" alt="">
+  </div>
+  <h1 class="hc-name" id="hc-name"></h1>
+  <p class="hc-tagline" id="hc-tagline"></p>
+  <p class="hc-desc" id="hc-desc" style="display:none"></p>
+  <div class="hc-socials" id="hc-socials" style="display:none">
+    <a id="hc-ig" class="hc-social-btn hc-ig" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      Instagram
+    </a>
+    <a id="hc-fb" class="hc-social-btn hc-fb" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      Facebook
+    </a>
+    <a id="hc-tt" class="hc-social-btn hc-tt" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
+      TikTok
+    </a>
+  </div>
+</div>
 
 <!-- ================================================
      NAVIGATION
@@ -6245,6 +6341,8 @@ function loadAdminData() {
       _restaurantName = cached;
       const heroTitle = document.getElementById('hero-title-text');
       if (heroTitle) heroTitle.textContent = cached;
+      const hcName = document.getElementById('hc-name');
+      if (hcName) hcName.textContent = cached;
       const ccName = document.getElementById('cc-name-wrap');
       if (ccName) ccName.textContent = cached;
       const ftCr = document.getElementById('ft-cr');
@@ -6276,6 +6374,8 @@ function loadAdminData() {
       localStorage.setItem(_RID + '_prof_name', name);
       const heroTitle = document.getElementById('hero-title-text');
       if (heroTitle) heroTitle.textContent = name;
+      const hcName = document.getElementById('hc-name');
+      if (hcName) hcName.textContent = name;
       const ccName = document.getElementById('cc-name-wrap');
       if (ccName) ccName.textContent = name;
       const ftCr = document.getElementById('ft-cr');
@@ -6790,14 +6890,21 @@ function applyAdminData(data) {
     // Mettre à jour les infos du footer + tagline custom
     if (data.info) {
       Object.keys(UI).forEach(l => {
-        if (data.info.wifi_name?.[l])  UI[l].wifiN   = data.info.wifi_name[l];
-        if (data.info.wifi_val?.[l])   UI[l].wifiV   = data.info.wifi_val[l];
-        if (data.info.hours_name?.[l]) UI[l].hoursN  = data.info.hours_name[l];
-        if (data.info.hours_val?.[l])  UI[l].hoursV  = data.info.hours_val[l];
-        if (data.info.addr_name?.[l])  UI[l].addrN   = data.info.addr_name[l];
-        if (data.info.addr_val?.[l])   UI[l].addrV   = data.info.addr_val[l];
-        if (data.info.tagline?.[l])    UI[l].tagline  = data.info.tagline[l];
+        if (data.info.wifi_name?.[l])    UI[l].wifiN       = data.info.wifi_name[l];
+        if (data.info.wifi_val?.[l])     UI[l].wifiV       = data.info.wifi_val[l];
+        if (data.info.hours_name?.[l])   UI[l].hoursN      = data.info.hours_name[l];
+        if (data.info.hours_val?.[l])    UI[l].hoursV      = data.info.hours_val[l];
+        if (data.info.addr_name?.[l])    UI[l].addrN       = data.info.addr_name[l];
+        if (data.info.addr_val?.[l])     UI[l].addrV       = data.info.addr_val[l];
+        if (data.info.tagline?.[l])      UI[l].tagline     = data.info.tagline[l];
+        if (data.info.description?.[l])  UI[l].description = data.info.description[l];
       });
+      // Réseaux sociaux et description dans hero-card
+      applyHeroCardExtras(
+        data.info.instagram || '',
+        data.info.facebook  || '',
+        data.info.tiktok    || ''
+      );
 
       // Visibilité bouton serveur — pilotée uniquement par le toggle, indépendante du style
       showCallBtn = data.info.showCallBtn !== false;
@@ -6821,6 +6928,14 @@ function applyAdminData(data) {
     // Mettre à jour le DOM du tagline avec la valeur courante (vide si non défini)
     const _hTag = document.getElementById('hero-tag');
     if (_hTag) _hTag.textContent = UI[lang]?.tagline || '';
+    const _hcTag2 = document.getElementById('hc-tagline');
+    if (_hcTag2) _hcTag2.textContent = UI[lang]?.tagline || '';
+    const _hcDesc2 = document.getElementById('hc-desc');
+    if (_hcDesc2) {
+      const _d2 = UI[lang]?.description || '';
+      _hcDesc2.textContent = _d2;
+      _hcDesc2.style.display = _d2 ? '' : 'none';
+    }
   } catch(e) {
     console.warn('Admin data load error:', e);
   }
@@ -8329,16 +8444,27 @@ function applyLogoUrl(url) {
     if (preImg && hasLogo) preImg.src = _logoUrl;
   }
 
-  // Hero dynamique
+  // Hero dynamique (caché via CSS, conservé pour compat)
   const heroImg   = document.getElementById('hero-logo-img');
-  const heroTitle = document.getElementById('hero-title-text');
   if (heroImg) { heroImg.src = _logoUrl; heroImg.style.display = hasLogo ? '' : 'none'; }
-  if (heroTitle) heroTitle.style.display = hasLogo ? 'none' : '';
-  // CC Header (carte-classique)
-  const ccLogoImg  = document.getElementById('cc-logo-img');
-  const ccNameWrap = document.getElementById('cc-name-wrap');
-  if (ccLogoImg)  { ccLogoImg.src = _logoUrl; ccLogoImg.style.display = hasLogo ? '' : 'none'; }
-  if (ccNameWrap) ccNameWrap.style.display = hasLogo ? 'none' : '';
+  // Hero card logo
+  const hcLogo = document.getElementById('hc-logo-img');
+  if (hcLogo) { hcLogo.src = _logoUrl; hcLogo.style.display = hasLogo ? '' : 'none'; }
+  // CC Header logo (conservé pour compat)
+  const ccLogoImg = document.getElementById('cc-logo-img');
+  if (ccLogoImg) { ccLogoImg.src = _logoUrl; ccLogoImg.style.display = hasLogo ? '' : 'none'; }
+}
+
+/* Réseaux sociaux hero-card */
+function applyHeroCardExtras(ig, fb, tt) {
+  const igEl = document.getElementById('hc-ig');
+  const fbEl = document.getElementById('hc-fb');
+  const ttEl = document.getElementById('hc-tt');
+  const socials = document.getElementById('hc-socials');
+  if (igEl) { igEl.style.display = ig ? '' : 'none'; if (ig) igEl.href = ig; }
+  if (fbEl) { fbEl.style.display = fb ? '' : 'none'; if (fb) fbEl.href = fb; }
+  if (ttEl) { ttEl.style.display = tt ? '' : 'none'; if (tt) ttEl.href = tt; }
+  if (socials) socials.style.display = (ig || fb || tt) ? '' : 'none';
 }
 
 /* ================================================
@@ -8608,6 +8734,15 @@ function applyTranslations() {
   // Dynamic elements
   document.getElementById('hero-tag').textContent = t.tagline;
   document.getElementById('hero-explore').textContent = t.explore;
+  // Hero card — slogan et description (langue active)
+  const _hcTag = document.getElementById('hc-tagline');
+  if (_hcTag) _hcTag.textContent = t.tagline || '';
+  const _hcDesc = document.getElementById('hc-desc');
+  if (_hcDesc) {
+    const _desc = t.description || '';
+    _hcDesc.textContent = _desc;
+    _hcDesc.style.display = _desc ? '' : 'none';
+  }
   const _sub1 = (t.sub && t.sub[0]) || '';
   const _sub2 = (t.sub && t.sub[1]) || '';
   const _sub3 = (t.sub && t.sub[2]) || '';

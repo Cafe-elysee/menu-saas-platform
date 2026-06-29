@@ -2432,6 +2432,16 @@
         <div class="info-lbl" style="margin-bottom:6px" data-uitxt="taglineLabel">Slogan (sous le nom)</div>
         <div id="tagline-inputs"></div>
       </div>
+      <div style="margin-top:12px">
+        <div class="info-lbl" style="margin-bottom:6px" data-uitxt="descLabel">Description (paragraphe)</div>
+        <div id="description-inputs"></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="info-lbl" style="margin-bottom:8px" data-uitxt="socialLabel">Réseaux sociaux</div>
+        <input class="info-input" id="admin-ig-input" placeholder="Instagram (URL)" style="margin-bottom:6px">
+        <input class="info-input" id="admin-fb-input" placeholder="Facebook (URL)" style="margin-bottom:6px">
+        <input class="info-input" id="admin-tt-input" placeholder="TikTok (URL)">
+      </div>
     </div>
   </div>
 
@@ -3024,7 +3034,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Λειτουργία παραγγελίας',
     visBtnNote:    'Σημείωμα πελατών',
     secEvents:'Ενεργή Γιορτή', badgeEventsNone:'Καμία',
-    secTables:'Τραπέζια & QR Codes', taglineLabel:'Σύνθημα (κάτω από το όνομα)',
+    secTables:'Τραπέζια & QR Codes', taglineLabel:'Σύνθημα (κάτω από το όνομα)', descLabel:'Περιγραφή (παράγραφος)', socialLabel:'Κοινωνικά δίκτυα',
     secTheme:'Σχεδίαση', badgeTheme:'Design',
     secOrders:'Παραγγελίες',
     scDesign:'🎨 Σχεδίαση', scHero:'🖼️ Εικόνα', scInfos:'ℹ️ Πληροφορίες',
@@ -3166,7 +3176,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Mode commande',
     visBtnNote:    'Note clients',
     secEvents:'Fête active', badgeEventsNone:'Aucune',
-    secTables:'Tables & QR Codes', taglineLabel:'Slogan (sous le nom)',
+    secTables:'Tables & QR Codes', taglineLabel:'Slogan (sous le nom)', descLabel:'Description (paragraphe)', socialLabel:'Réseaux sociaux',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Commandes',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -3308,7 +3318,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Order mode',
     visBtnNote:    'Customer note',
     secEvents:'Active Event', badgeEventsNone:'None',
-    secTables:'Tables & QR Codes', taglineLabel:'Tagline (below the name)',
+    secTables:'Tables & QR Codes', taglineLabel:'Tagline (below the name)', descLabel:'Description (paragraph)', socialLabel:'Social networks',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Orders',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Info',
@@ -3450,7 +3460,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Bestellmodus',
     visBtnNote:    'Kunden-Notiz',
     secEvents:'Aktives Fest', badgeEventsNone:'Kein',
-    secTables:'Tische & QR-Codes', taglineLabel:'Slogan (unter dem Namen)',
+    secTables:'Tische & QR-Codes', taglineLabel:'Slogan (unter dem Namen)', descLabel:'Beschreibung (Absatz)', socialLabel:'Soziale Netzwerke',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Bestellungen',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -3592,7 +3602,7 @@ const ADMIN_UI = {
     visBtnOrder:   'Modo pedido',
     visBtnNote:    'Nota clientes',
     secEvents:'Evento activo', badgeEventsNone:'Ninguno',
-    secTables:'Mesas y códigos QR', taglineLabel:'Lema (bajo el nombre)',
+    secTables:'Mesas y códigos QR', taglineLabel:'Lema (bajo el nombre)', descLabel:'Descripción (párrafo)', socialLabel:'Redes sociales',
     secTheme:'Diseño', badgeTheme:'Design',
     secOrders:'Pedidos',
     scDesign:'🎨 Diseño', scHero:'🖼️ Imagen', scInfos:'ℹ️ Información',
@@ -4443,6 +4453,8 @@ function renderAll() {
   renderHeroImageSection();
   renderLogoSection();
   renderTaglineSection();
+  renderDescriptionSection();
+  renderSocialLinksSection();
   renderInfoSection();
   renderNoteSection();
   renderCatsSection();
@@ -4741,6 +4753,51 @@ function renderTaglineSection() {
       if (l !== PRIMARY_LANG) setTxLock(`info-tagline-${l}`, e.target.value.trim() !== '');
       const pmTag = document.getElementById('pm-tagline');
       if (pmTag && l === currentLang) pmTag.textContent = e.target.value;
+      markUnsaved();
+    });
+  });
+}
+
+function renderDescriptionSection() {
+  const container = document.getElementById('description-inputs');
+  if (!container) return;
+  let html = '';
+  LANGS.forEach(l => {
+    html += `<textarea class="info-input desc-input info-field-${l}${l===currentLang?'':' hide'}"
+      style="${l!==currentLang?'display:none;':''}resize:vertical;min-height:64px"
+      data-lang="${l}"
+      placeholder="Description (${l.toUpperCase()})">${esc(adminData.info?.description?.[l] || '')}</textarea>`;
+  });
+  container.innerHTML = html;
+  container.querySelectorAll('.desc-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      if (!adminData.info) adminData.info = {};
+      if (!adminData.info.description) adminData.info.description = {};
+      const l = e.target.dataset.lang;
+      adminData.info.description[l] = e.target.value;
+      if (l !== PRIMARY_LANG) setTxLock(`info-description-${l}`, e.target.value.trim() !== '');
+      markUnsaved();
+    });
+  });
+}
+
+function renderSocialLinksSection() {
+  const igInp = document.getElementById('admin-ig-input');
+  const fbInp = document.getElementById('admin-fb-input');
+  const ttInp = document.getElementById('admin-tt-input');
+  if (!igInp) return;
+  // Mettre à jour les valeurs
+  igInp.value = adminData.info?.instagram || '';
+  fbInp.value = adminData.info?.facebook  || '';
+  ttInp.value = adminData.info?.tiktok    || '';
+  // Listeners : une seule fois (guard sur le premier élément)
+  if (igInp._socialBound) return;
+  igInp._socialBound = true;
+  const _fieldMap = { 'admin-ig-input':'instagram', 'admin-fb-input':'facebook', 'admin-tt-input':'tiktok' };
+  [igInp, fbInp, ttInp].forEach(inp => {
+    inp.addEventListener('input', e => {
+      if (!adminData.info) adminData.info = {};
+      adminData.info[_fieldMap[e.target.id]] = e.target.value.trim();
       markUnsaved();
     });
   });
