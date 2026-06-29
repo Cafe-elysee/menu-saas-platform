@@ -2498,10 +2498,8 @@
     /* 1. L'image de la page d'accueil principale (fondu vers le bas, sans halo en haut) */
     html.light .hero-overlay {
       background: linear-gradient(to bottom,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0) 88%,
-        rgba(255,255,255,0.15) 96%,
-        var(--bg, #faf8f4) 100%
+        rgba(255,255,255,0.02) 0%,
+        rgba(255,255,255,0.18) 100%
       ) !important;
     }
 
@@ -5405,20 +5403,17 @@
   #hero { min-height:200px !important; max-height:260px !important; }
   /* Styles List + Élégant : 30% écran, JS override via inline !important contrôle la vraie hauteur */
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
-    min-height: 180px !important;
-    max-height: 280px !important;
+    height: 220px !important;
     box-shadow:0 8px 32px rgba(0,0,0,0.38);
   }
   html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
     box-shadow:0 6px 22px rgba(0,0,0,0.14);
   }
-  /* Overlay bandeau dark : transparent en bas → couleurs naturelles visibles au niveau du logo */
+  /* Overlay identique au fp-hero-overlay du style Livre */
   .hero-overlay {
     background:linear-gradient(to bottom,
-      rgba(10,6,4,0.28) 0%,
-      rgba(10,6,4,0.28) 72%,
-      rgba(10,6,4,0.0) 94%,
-      rgba(10,6,4,0.0) 100%
+      rgba(12,10,8,0.05) 0%,
+      rgba(12,10,8,0.50) 100%
     ) !important;
   }
   /* Contenu texte masqué → déplacé dans #hero-card */
@@ -5490,6 +5485,13 @@
   .hc-ig { color:#e1306c; border-color:rgba(225,48,108,0.35); background:rgba(225,48,108,0.07); }
   .hc-fb { color:#1877f2; border-color:rgba(24,119,242,0.35); background:rgba(24,119,242,0.07); }
   .hc-tt { color:#ff0050; border-color:rgba(255,0,80,0.35); background:rgba(255,0,80,0.07); }
+  .hc-wifi {
+    font-size:0.72rem; color:var(--muted);
+    margin:16px auto 0; display:flex; flex-direction:column; gap:5px; align-items:center;
+  }
+  .hc-wifi-row {
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
   /* ── Mode Livre (paper) — fix #175 ── */
   /* Le flip-wrap position:fixed couvre tout — hero + hero-card inutiles et causent le carré blanc */
   body[data-style="paper"] #hero,
@@ -5762,6 +5764,18 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
       TikTok
     </a>
+  </div>
+  <div id="hc-wifi" class="hc-wifi" style="display:none">
+    <div class="hc-wifi-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      <span id="hc-wifi-name"></span>
+    </div>
+    <div id="hc-wifi-pw-row" style="display:none">
+      <div class="hc-wifi-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="hc-wifi-pw"></span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -8906,6 +8920,19 @@ function applyTranslations() {
       if (_hPw) _hPw.textContent = t.wifiV || '';
     } else { _hWifi.style.display = 'none'; }
   }
+  // Hero-card WiFi (styles List/Élégant — même données que Livre)
+  const _hcWifi = document.getElementById('hc-wifi');
+  if (_hcWifi) {
+    const _hcNm = document.getElementById('hc-wifi-name');
+    const _hcPw = document.getElementById('hc-wifi-pw');
+    const _hcPwRow = document.getElementById('hc-wifi-pw-row');
+    if (t.wifiN || t.wifiV) {
+      _hcWifi.style.display = '';
+      if (_hcNm) _hcNm.textContent = t.wifiN || '';
+      if (_hcPwRow) _hcPwRow.style.display = t.wifiV ? '' : 'none';
+      if (_hcPw) _hcPw.textContent = t.wifiV || '';
+    } else { _hcWifi.style.display = 'none'; }
+  }
   document.getElementById('ft-hours').innerHTML = `<strong>${_esc(t.hoursN||'')}</strong>${_esc(t.hoursV||'')}`;
   document.getElementById('ft-addr').innerHTML = `<strong>${_esc(t.addrN||'')}</strong>${_esc(t.addrV||'')}`;
   // Cart modal translations (if open)
@@ -10106,16 +10133,15 @@ window.scrollTo(0, 0);
       }
     } else {
       if (hero) {
-        // 30% de l'écran, plafonné entre 180px et 280px
-        const h = Math.min(280, Math.max(180, Math.round(window.innerHeight * 0.30)));
-        hero.style.setProperty('height', h + 'px', 'important');
+        // Même hauteur que fp-hero-strip du style Livre (220px)
+        hero.style.setProperty('height', '220px', 'important');
       }
       if (heroBg) {
-        // Photo entière visible : pas de zoom, pas de recadrage
-        heroBg.style.setProperty('inset', '0', 'important');
-        heroBg.style.setProperty('background-size', 'contain', 'important');
-        heroBg.style.setProperty('background-position', 'center center', 'important');
-        heroBg.style.setProperty('background-repeat', 'no-repeat', 'important');
+        // Identique au fp-hero-bg du Livre : cover + cadrage + débord -10% pour animation
+        heroBg.style.removeProperty('background-repeat');
+        heroBg.style.setProperty('inset', '-10%', 'important');
+        heroBg.style.setProperty('background-size', 'cover', 'important');
+        heroBg.style.setProperty('background-position', '50% 40%', 'important');
       }
     }
   }
