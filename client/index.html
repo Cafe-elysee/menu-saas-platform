@@ -2499,8 +2499,8 @@
     html.light .hero-overlay {
       background: linear-gradient(to bottom,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0) 90%,
-        rgba(255,255,255,0.30) 97%,
+        rgba(255,255,255,0) 94%,
+        rgba(255,255,255,0.22) 98%,
         var(--bg, #faf8f4) 100%
       ) !important;
     }
@@ -5405,8 +5405,8 @@
   #hero { min-height:200px !important; max-height:260px !important; }
   /* Styles List + Élégant (non-paper, non-carte) : photo descend jusqu'à la mi-logo */
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
-    min-height:270px !important;
-    max-height:340px !important;
+    min-height:320px !important;
+    max-height:420px !important;
     box-shadow:0 8px 32px rgba(0,0,0,0.38);
   }
   html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
@@ -9871,23 +9871,32 @@ let _heroFabObserver = null;
 
 function _setupHeroFabHide() {
   if (_heroFabObserver) { _heroFabObserver.disconnect(); _heroFabObserver = null; }
+  const fabIds = ['call-fab','cart-fab','hist-fab'];
+  // En mode papier : aucune gestion ici
   if (menuStyle === 'paper') {
-    ['call-fab','cart-fab','hist-fab'].forEach(id => {
+    fabIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.remove('hero-fab-hide');
     });
     return;
   }
-  const hcEl = document.getElementById('hero-card');
-  if (!hcEl) return;
+  // Masquer par défaut — visible seulement depuis les catégories
+  fabIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hero-fab-hide');
+  });
+  // Observer la première catégorie (ou le conteneur si pas encore rendu)
+  const target = document.querySelector('#menu-secs .cat-sec')
+              || document.getElementById('menu-secs');
+  if (!target) return;
   _heroFabObserver = new IntersectionObserver(entries => {
-    const onHero = entries[0].isIntersecting;
-    ['call-fab','cart-fab','hist-fab'].forEach(id => {
+    const catsVisible = entries[0].isIntersecting;
+    fabIds.forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.classList.toggle('hero-fab-hide', onHero);
+      if (el) el.classList.toggle('hero-fab-hide', !catsVisible);
     });
-  }, { threshold: 0 });
-  _heroFabObserver.observe(hcEl);
+  }, { threshold: 0.01 });
+  _heroFabObserver.observe(target);
 }
 
 /* ================================================
@@ -10066,15 +10075,13 @@ function setupTableModal() {
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
-// Lock hero height to initial viewport — prevents jump when mobile browser chrome shows/hides
+// Post-Fix #174 : hero est un bandeau fixe, CSS contrôle la hauteur.
+// On efface l'ancien style inline pour ne pas bloquer les règles CSS.
 (function lockHeroHeight() {
   const hero = document.getElementById('hero');
-  function setH() {
-    if (hero) hero.style.height = window.innerHeight + 'px';
-  }
-  setH();
+  if (hero) hero.style.height = '';
   window.addEventListener('orientationchange', function() {
-    setTimeout(setH, 300);
+    setTimeout(function() { if (hero) hero.style.height = ''; }, 300);
   });
 })();
 
