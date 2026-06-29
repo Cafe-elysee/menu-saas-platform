@@ -1338,10 +1338,33 @@
     body[data-theme^="carte-"] .photo-form-group { display:none !important; }
     body[data-theme^="carte-"] .prod-thumb,
     body[data-theme^="carte-"] .prod-thumb-empty { display:none !important; }
-    /* Toggle visibilité produit dans le menu */
+    /* Dose & Sucre row dans le formulaire produit */
     .prod-vis-row { margin-top:12px; padding:8px 12px; background:rgba(200,164,78,0.06); border-radius:8px; border:1px solid rgba(200,164,78,0.14); }
     html.light .prod-vis-row { background:rgba(200,164,78,0.08); border-color:rgba(200,164,78,0.20); }
     .prod-visible-chk { accent-color:var(--green); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+    /* Boutons inline oeil + X dans la tête de la carte produit */
+    .prod-top-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .prod-vis-btn {
+      width:34px; height:34px; flex-shrink:0; border-radius:10px; cursor:pointer;
+      border:1px solid var(--border); background:transparent; color:var(--muted);
+      display:flex; align-items:center; justify-content:center;
+      transition:color 0.15s,border-color 0.15s,background 0.15s;
+    }
+    .prod-vis-btn svg { width:16px; height:16px; pointer-events:none; }
+    .prod-vis-btn.on { color:var(--gold); border-color:rgba(200,164,78,0.35); }
+    .prod-vis-btn.on:hover { background:rgba(200,164,78,0.08); }
+    .prod-vis-btn:not(.on) { opacity:0.5; }
+    .prod-vis-btn:not(.on):hover { opacity:0.8; border-color:var(--red); color:var(--red); background:rgba(224,82,82,0.05); }
+    .prod-del-btn {
+      width:34px; height:34px; flex-shrink:0;
+      border:1px solid rgba(224,82,82,0.3); border-radius:8px;
+      color:var(--red); opacity:0.6; font-size:1.1rem; font-weight:300;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform 0.15s,box-shadow 0.15s,opacity 0.15s,background 0.15s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.09);
+    }
+    .prod-del-btn:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); transform:translateY(-1px); box-shadow:0 3px 8px rgba(180,40,40,0.18),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.09); }
+    .prod-del-btn:active { transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
     /* Bouton visibilité catégorie */
     .cat-vis-btn {
       width:36px; height:36px; flex-shrink:0; border-radius:10px; cursor:pointer;
@@ -4368,6 +4391,7 @@ function sanitizeItems(items) {
       full:      item.full      || { fr:'', en:'', es: '' },
       allergens: item.allergens || { fr:[], en:[], es: [] },
     };
+    if (item.salePrice)           r.salePrice = item.salePrice;
     if (item.doseOption === true) r.doseOption = true;
     if (item.visible === false)   r.visible = false;
     return r;
@@ -5785,12 +5809,21 @@ function renderProdCard(container, item, ci) {
         </svg>
       </div>`;
 
+  const _eyeOn  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const _eyeOff = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  const _isVisible = item.visible !== false;
   card.innerHTML = `
     <div class="prod-card-top">
       ${thumbHTML}
       <div class="prod-top-info">
         <div class="prod-top-name">${item.name?.[currentLang] ? esc(item.name[currentLang]) : '<span style="opacity:0.3">—</span>'}</div>
         <div class="prod-top-price">${item.salePrice ? `<span style="text-decoration:line-through;opacity:0.5;font-size:0.85em;margin-right:4px">${esc(item.price||'')}</span><span style="color:#e05252">${esc(item.salePrice)}</span>` : esc(item.price||'')}</div>
+      </div>
+      <div class="prod-top-actions">
+        <button class="prod-vis-btn ${_isVisible ? 'on' : ''}" title="">
+          ${_isVisible ? _eyeOn : _eyeOff}
+        </button>
+        <button class="prod-del-btn" title="">✕</button>
       </div>
       <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
     </div>
@@ -5800,9 +5833,23 @@ function renderProdCard(container, item, ci) {
   `;
   container.appendChild(card);
 
-  // Toggle expand
-  card.querySelector('.prod-card-top').addEventListener('click', () => {
+  // Toggle expand (clics sur les boutons action ne doivent pas déclencher l'expand)
+  card.querySelector('.prod-card-top').addEventListener('click', e => {
+    if (e.target.closest('.prod-top-actions')) return;
     card.classList.toggle('open');
+  });
+
+  // Visibilité inline
+  card.querySelector('.prod-vis-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const nowVisible = !btn.classList.contains('on');
+    btn.classList.toggle('on', nowVisible);
+    const _eyeOnSvg  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const _eyeOffSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+    btn.innerHTML = nowVisible ? _eyeOnSvg : _eyeOffSvg;
+    if (nowVisible) delete item.visible; else item.visible = false;
+    markUnsaved();
   });
 
   // Verrou traduction : champ modifié manuellement en EN/AR
@@ -5985,8 +6032,9 @@ function renderProdCard(container, item, ci) {
     markUnsaved(); renderProductsSection();
   });
 
-  // Delete product
-  card.querySelector('.btn-del-prod').addEventListener('click', () => {
+  // Supprimer produit (bouton X inline)
+  card.querySelector('.prod-del-btn').addEventListener('click', e => {
+    e.stopPropagation();
     const tDel = ADMIN_UI[currentLang] || ADMIN_UI.el;
     _showAdmConfirm(
       tDel.deleteTitle,
@@ -6092,11 +6140,7 @@ function buildProdForm(item) {
         </div>
       </div>
 
-      <!-- ③ Visibilité dans le menu (accès prioritaire) -->
-      <label class="photo-show-row prod-vis-row">
-        <input type="checkbox" class="prod-visible-chk" ${item.visible !== false ? 'checked' : ''}>
-        <span data-uitxt="prodVisibleLabel">${t.prodVisibleLabel || 'Afficher dans le menu'}</span>
-      </label>
+      <!-- ③ Options produit -->
       <label class="photo-show-row prod-vis-row">
         <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
         <span data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
@@ -6147,7 +6191,6 @@ function buildProdForm(item) {
         </select>
         <button class="btn-move-cat">${t.btnMove}</button>
       </div>
-      <button class="btn-del-prod">${t.btnDelProd}</button>
     </div>
   `;
 }
@@ -6186,8 +6229,8 @@ function collectProdForm(card, item) {
   if (showChk) item.showPhoto = showChk.checked;
   const doseChk = card.querySelector('.dose-option-chk');
   if (doseChk) { if (doseChk.checked) item.doseOption = true; else delete item.doseOption; }
-  const visChk = card.querySelector('.prod-visible-chk');
-  if (visChk) { if (!visChk.checked) item.visible = false; else delete item.visible; }
+  const visBtn = card.querySelector('.prod-vis-btn');
+  if (visBtn) { if (!visBtn.classList.contains('on')) item.visible = false; else delete item.visible; }
 
   // Badges — dropdowns
   const typeEl = card.querySelector('[data-bdg-select="type"]');
