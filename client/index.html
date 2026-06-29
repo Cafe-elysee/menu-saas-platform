@@ -5395,6 +5395,15 @@
   ═══════════════════════════════════════════════════════════════ */
   /* Hero raccourci en bandeau couverture */
   #hero { min-height:200px !important; max-height:260px !important; }
+  /* Styles List + Élégant (non-paper, non-carte) : photo descend jusqu'à la mi-logo */
+  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
+    min-height:270px !important;
+    max-height:340px !important;
+    box-shadow:0 8px 32px rgba(0,0,0,0.38);
+  }
+  html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
+    box-shadow:0 6px 22px rgba(0,0,0,0.14);
+  }
   /* Overlay léger pour le bandeau */
   .hero-overlay {
     background:linear-gradient(to bottom,rgba(10,6,4,0.15) 0%,rgba(10,6,4,0.45) 100%) !important;
