@@ -4134,11 +4134,16 @@ function showAdmin() {
     // Sauvegarder l'ID dans la liste mémorisée après login réussi
     _addSavedId(_RID);
   }
-  // Overlay "Menu en cours de création" : affiché les 24h suivant la création (jamais si ctrl=1)
+  // Overlay "Menu en cours de création" : créé < 24h ET aucune catégorie, jamais si ctrl=1 ou demo
   if (new URLSearchParams(location.search).get('ctrl') !== '1' && !document.body.classList.contains('demo-mode')) {
     _rref('profile/createdAt').once('value').then(snap => {
       const ct = snap.val();
-      if (ct && Date.now() - ct < 86400000) {
+      if (!ct || Date.now() - ct >= 86400000) return; // plus de 24h → rien
+      // Vérifier si le menu est vide (aucune catégorie)
+      return _rref('menu/cats').once('value').then(cSnap => {
+        const cats = cSnap.val();
+        const isEmpty = !cats || (Array.isArray(cats) ? cats.length === 0 : Object.keys(cats).length === 0);
+        if (!isEmpty) return; // menu déjà configuré → rien
         const overlay = document.getElementById('menu-setup-overlay');
         if (overlay) {
           const _tM = ADMIN_UI[currentLang] || ADMIN_UI.fr;
@@ -4146,7 +4151,7 @@ function showAdmin() {
           document.getElementById('mso-msg').textContent   = _tM.menuSetupMsg   || 'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !';
           overlay.style.display = 'flex';
         }
-      }
+      });
     }).catch(() => {});
   }
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
@@ -4646,21 +4651,6 @@ function renderLogoSection() {
   // Ne pas écraser le canvas preview si un upload est en cours (A-4 fix)
   if (!_logoUploading) {
     setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
-  }
-  // Popup d'information AVANT l'ouverture du sélecteur de fichier (fond transparent = supprimé auto)
-  if (uploadLabel && !uploadLabel._greenInfoBound) {
-    uploadLabel._greenInfoBound = true;
-    uploadLabel.addEventListener('click', e => {
-      e.preventDefault();
-      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-      _showAdmConfirm(
-        t.logoGreenTitle  || 'Fond du logo',
-        t.logoGreenMsg    || 'Si vous voulez que le fond de votre logo ne s\'affiche pas, uploadez un logo avec un fond <strong style="color:var(--gold)">Transparent</strong> (PNG). Il sera supprimé automatiquement. Sinon, le logo sera affiché tel quel, avec son fond.',
-        t.logoGreenOk     || 'Choisir le logo',
-        t.logoGreenCancel || 'Annuler',
-        () => logoInput.click()
-      );
-    });
   }
 
   // A-4 fix : _changeBound évite les listeners multiples (renderAll() appelé plusieurs fois)
