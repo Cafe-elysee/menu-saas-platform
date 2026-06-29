@@ -5412,9 +5412,14 @@
   html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
     box-shadow:0 6px 22px rgba(0,0,0,0.14);
   }
-  /* Overlay léger pour le bandeau */
+  /* Overlay bandeau dark : transparent en bas → couleurs naturelles visibles au niveau du logo */
   .hero-overlay {
-    background:linear-gradient(to bottom,rgba(10,6,4,0.15) 0%,rgba(10,6,4,0.45) 100%) !important;
+    background:linear-gradient(to bottom,
+      rgba(10,6,4,0.28) 0%,
+      rgba(10,6,4,0.28) 72%,
+      rgba(10,6,4,0.0) 94%,
+      rgba(10,6,4,0.0) 100%
+    ) !important;
   }
   /* Contenu texte masqué → déplacé dans #hero-card */
   .hero-content,.hero-scroll,#hero-wifi { display:none !important; }
@@ -9895,7 +9900,7 @@ function _setupHeroFabHide() {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hero-fab-hide', !catsVisible);
     });
-  }, { threshold: 0.01 });
+  }, { threshold: 0.15 });
   _heroFabObserver.observe(target);
 }
 
