@@ -2428,9 +2428,6 @@
           <span data-uitxt="btnDelLogo">Supprimer le logo</span>
         </button>
       </div>
-      <div id="logo-pending-badge" style="display:none;margin-top:8px;padding:9px 13px;border-radius:10px;background:rgba(200,164,78,0.10);border:1px solid rgba(200,164,78,0.30);font-size:0.78rem;color:#c8a44e;align-items:center;gap:7px;line-height:1.4">
-        <span style="font-size:1rem">🕐</span><span id="logo-pending-badge-text"></span>
-      </div>
       <div style="margin-top:12px">
         <div class="info-lbl" style="margin-bottom:6px" data-uitxt="taglineLabel">Slogan (sous le nom)</div>
         <div id="tagline-inputs"></div>
@@ -2613,6 +2610,15 @@
   </div><!-- /admin-panel-settings -->
 
 </div><!-- /adm-wrap -->
+
+<!-- Overlay "Menu en cours de création" (<24h, bypass si ctrl=1) -->
+<div id="menu-setup-overlay" style="display:none;position:fixed;inset:0;z-index:9900;background:var(--bg,#0c0a08);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px">
+  <div style="max-width:380px">
+    <div style="font-size:2.2rem;margin-bottom:16px">⏳</div>
+    <div id="mso-title" style="font-size:1.25rem;font-weight:700;color:#c8a44e;margin-bottom:12px"></div>
+    <div id="mso-msg" style="font-size:0.9rem;color:var(--muted,#9a8060);line-height:1.7"></div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════
      FIRST-LOGIN POPUPS — defaultLang + primaryLang
@@ -3080,7 +3086,8 @@ const ADMIN_UI = {
     loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη 30 δευτερόλεπτα.',
     loginErrIncorrect:'Λανθασμένος κωδικός',
     pdfDownloaded: '✅ PDF ληφθέν',
-    logoReceivedTitle:'✅ Λογότυπο ελήφθη!', logoReceivedMsg:'Το λογότυπό σας ελήφθη. Η ομάδα μας θα το επικυρώσει και θα το ενσωματώσει στο μενού σας <strong style="color:#c8a44e">εντός 48 ωρών</strong>. Δεν χρειάζεται να κάνετε τίποτα άλλο.', logoReceivedClose:'Τέλεια, ευχαριστώ', logoPendingBadge:'🕐 Ενσωμάτωση λογοτύπου σε εξέλιξη — εντός 48h', logoBgRemoved:'✨ Φόντο Διαφανές ανιχνεύθηκε και αφαιρέθηκε αυτόματα',
+    logoReceivedTitle:'✅ Λογότυπο μεταφορτώθηκε!', logoReceivedMsg:'Το λογότυπό σας εμφανίζεται τώρα στο μενού σας.', logoReceivedClose:'Τέλεια, ευχαριστώ', logoBgRemoved:'✨ Φόντο Διαφανές ανιχνεύθηκε και αφαιρέθηκε αυτόματα',
+    menuSetupTitle:'Το μενού σας ετοιμάζεται', menuSetupMsg:'Η ομάδα μας διαμορφώνει τον χώρο σας τις επόμενες 24 ώρες. Επιστρέψτε σύντομα!',
   },
   fr: {
     admSub:        'Administration du menu',
@@ -3221,7 +3228,8 @@ const ADMIN_UI = {
     loginErrBlocked:'Trop de tentatives — accès bloqué 30 secondes.',
     loginErrIncorrect:'Mot de passe incorrect',
     pdfDownloaded: '✅ PDF téléchargé',
-    logoReceivedTitle:'✅ Logo bien reçu !', logoReceivedMsg:'Votre logo a bien été reçu. Notre équipe le validera et l\'intégrera dans votre menu <strong style="color:#c8a44e">sous 48 heures</strong>. Vous n\'avez rien d\'autre à faire.', logoReceivedClose:'Parfait, merci !', logoPendingBadge:'🕐 Intégration du logo en cours — sous 48h', logoBgRemoved:'✨ Fond Transparent supprimé automatiquement',
+    logoReceivedTitle:'✅ Logo uploadé !', logoReceivedMsg:'Votre logo s\'affiche maintenant dans votre menu.', logoReceivedClose:'Parfait, merci !', logoBgRemoved:'✨ Fond Transparent supprimé automatiquement',
+    menuSetupTitle:'Votre menu est en cours de création', menuSetupMsg:'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !',
   },
   en: {
     admSub:        'Menu administration',
@@ -3362,7 +3370,8 @@ const ADMIN_UI = {
     loginErrBlocked:'Too many attempts — access blocked for 30 seconds.',
     loginErrIncorrect:'Incorrect password',
     pdfDownloaded: '✅ PDF downloaded',
-    logoReceivedTitle:'✅ Logo received!', logoReceivedMsg:'Your logo has been received. Our team will validate and integrate it into your menu <strong style="color:#c8a44e">within 48 hours</strong>. Nothing else to do on your end.', logoReceivedClose:'Perfect, thank you!', logoPendingBadge:'🕐 Logo integration in progress — within 48h', logoBgRemoved:'✨ Transparent background removed automatically',
+    logoReceivedTitle:'✅ Logo uploaded!', logoReceivedMsg:'Your logo is now displayed in your menu.', logoReceivedClose:'Perfect, thank you!', logoBgRemoved:'✨ Transparent background removed automatically',
+    menuSetupTitle:'Your menu is being created', menuSetupMsg:'Our team is setting up your space within the next 24 hours. Check back soon!',
   },
   de: {
     admSub:        'Menüverwaltung',
@@ -3503,7 +3512,8 @@ const ADMIN_UI = {
     loginErrBlocked:'Zu viele Versuche — Zugang für 30 Sekunden gesperrt.',
     loginErrIncorrect:'Falsches Passwort',
     pdfDownloaded: '✅ PDF heruntergeladen',
-    logoReceivedTitle:'✅ Logo erhalten!', logoReceivedMsg:'Ihr Logo wurde empfangen. Unser Team wird es validieren und <strong style="color:#c8a44e">innerhalb von 48 Stunden</strong> in Ihr Menü integrieren. Sie müssen nichts weiter tun.', logoReceivedClose:'Prima, danke!', logoPendingBadge:'🕐 Logo-Integration läuft — innerhalb 48h', logoBgRemoved:'✨ Transparenter Hintergrund automatisch entfernt',
+    logoReceivedTitle:'✅ Logo hochgeladen!', logoReceivedMsg:'Ihr Logo wird jetzt in Ihrem Menü angezeigt.', logoReceivedClose:'Prima, danke!', logoBgRemoved:'✨ Transparenter Hintergrund automatisch entfernt',
+    menuSetupTitle:'Ihr Menü wird erstellt', menuSetupMsg:'Unser Team richtet Ihren Bereich in den nächsten 24 Stunden ein. Schauen Sie bald wieder vorbei!',
   },
   es: {
     admSub:        'Gestión del menú',
@@ -3644,7 +3654,8 @@ const ADMIN_UI = {
     loginErrBlocked:'Demasiados intentos — acceso bloqueado 30 segundos.',
     loginErrIncorrect:'Contraseña incorrecta',
     pdfDownloaded: '✅ PDF descargado',
-    logoReceivedTitle:'✅ ¡Logo recibido!', logoReceivedMsg:'Su logo ha sido recibido. Nuestro equipo lo validará e integrará en su menú <strong style="color:#c8a44e">en 48 horas</strong>. No necesita hacer nada más.', logoReceivedClose:'¡Perfecto, gracias!', logoPendingBadge:'🕐 Integración del logo en curso — en 48h', logoBgRemoved:'✨ Fondo Transparente eliminado automáticamente',
+    logoReceivedTitle:'✅ ¡Logo subido!', logoReceivedMsg:'Su logo se muestra ahora en su menú.', logoReceivedClose:'¡Perfecto, gracias!', logoBgRemoved:'✨ Fondo Transparente eliminado automáticamente',
+    menuSetupTitle:'Su menú está siendo creado', menuSetupMsg:'Nuestro equipo configurará su espacio en las próximas 24 horas. ¡Vuelva pronto!',
   },
 };
 
@@ -4122,6 +4133,21 @@ function showAdmin() {
     });
     // Sauvegarder l'ID dans la liste mémorisée après login réussi
     _addSavedId(_RID);
+  }
+  // Overlay "Menu en cours de création" : affiché les 24h suivant la création (jamais si ctrl=1)
+  if (new URLSearchParams(location.search).get('ctrl') !== '1' && !document.body.classList.contains('demo-mode')) {
+    _rref('profile/createdAt').once('value').then(snap => {
+      const ct = snap.val();
+      if (ct && Date.now() - ct < 86400000) {
+        const overlay = document.getElementById('menu-setup-overlay');
+        if (overlay) {
+          const _tM = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+          document.getElementById('mso-title').textContent = _tM.menuSetupTitle || 'Votre menu est en cours de création';
+          document.getElementById('mso-msg').textContent   = _tM.menuSetupMsg   || 'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !';
+          overlay.style.display = 'flex';
+        }
+      }
+    }).catch(() => {});
   }
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
   _rref('profile/name').once('value').then(snap => {
@@ -4618,23 +4644,9 @@ function renderLogoSection() {
   }
 
   // Ne pas écraser le canvas preview si un upload est en cours (A-4 fix)
-  // Logo masqué dans la simulation si logoStatus=pending (même logique que index.html côté client)
   if (!_logoUploading) {
-    const _logoForSim = (adminData.logoStatus === 'pending') ? '' : (adminData.logoUrl || adminData.info?.logoUrl || '');
-    setLogo(_logoForSim);
+    setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
   }
-  // Badge "en cours d'intégration" si logoStatus === 'pending'
-  const _logoPendBadge = document.getElementById('logo-pending-badge');
-  const _logoPendText  = document.getElementById('logo-pending-badge-text');
-  if (_logoPendBadge) {
-    const _isPending = adminData.logoStatus === 'pending';
-    _logoPendBadge.style.display = _isPending ? 'flex' : 'none';
-    if (_isPending && _logoPendText) {
-      const _tL = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-      _logoPendText.textContent = _tL.logoPendingBadge || 'Intégration du logo en cours — sous 48h';
-    }
-  }
-
   // Popup d'information AVANT l'ouverture du sélecteur de fichier (fond transparent = supprimé auto)
   if (uploadLabel && !uploadLabel._greenInfoBound) {
     uploadLabel._greenInfoBound = true;
@@ -4681,29 +4693,16 @@ function renderLogoSection() {
                 if (!json.secure_url) throw new Error('Upload failed');
                 // Cache-bust : force le browser à recharger même si même URL Cloudinary
                 const freshUrl = json.secure_url + '?v=' + Date.now();
-                adminData.logoUrl    = json.secure_url;
-                adminData.logoStatus = 'pending';
+                adminData.logoUrl = json.secure_url;
                 _rref('menu/logoUrl').set(json.secure_url);
-                _rref('menu/logoStatus').set('pending');
-                setLogo(''); // logoStatus=pending → masqué dans la simulation (clients ne voient pas encore)
+                setLogo(freshUrl);
                 if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-                // Afficher le badge pending
-                const _lpb = document.getElementById('logo-pending-badge');
-                const _lpt = document.getElementById('logo-pending-badge-text');
-                if (_lpb) {
-                  const _tLg = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-                  _lpb.style.display = 'flex';
-                  if (_lpt) _lpt.textContent = _tLg.logoPendingBadge || 'Intégration du logo en cours — sous 48h';
-                }
-                // Notifier l'API (Drive + email) — fire & forget
-                const _rN = adminData.info ? (adminData.info.name?.fr || adminData.info.name?.en || Object.values(adminData.info.name || {}).find(Boolean) || _RID) : _RID;
-                fetch('/api/logo-notify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ rid:_RID, logoUrl:json.secure_url, restaurantName:_rN }) }).catch(()=>{});
-                // Popup de confirmation bokeh
+                // Popup de confirmation
                 const _tC = ADMIN_UI[currentLang] || ADMIN_UI.fr;
                 const _bgNote = bgRemoved ? `<div style="display:inline-flex;align-items:center;gap:6px;font-size:0.76rem;padding:5px 11px;border-radius:20px;background:rgba(76,175,84,0.13);border:1px solid rgba(76,175,84,0.28);color:#4caf84;margin-bottom:12px">${_tC.logoBgRemoved||'✨ Fond Transparent supprimé automatiquement'}</div>` : '';
                 _showAdmConfirm(
-                  _tC.logoReceivedTitle || '✅ Logo bien reçu !',
-                  `<div style="text-align:center">${_bgNote}<div style="margin:0 auto 14px;padding:8px;border-radius:12px;background:rgba(200,164,78,0.06);border:1px solid rgba(200,164,78,0.18);display:inline-block"><img src="${freshUrl}" style="max-height:72px;max-width:172px;object-fit:contain;display:block;border-radius:6px"></div></div><div style="font-size:0.84rem;color:var(--muted);line-height:1.75;text-align:center">${_tC.logoReceivedMsg||'Votre logo a bien été reçu. Il sera intégré dans votre menu <strong style="color:#c8a44e">sous 48 heures</strong>.'}</div>`,
+                  _tC.logoReceivedTitle || '✅ Logo uploadé !',
+                  `<div style="text-align:center">${_bgNote}<div style="margin:0 auto 14px;padding:8px;border-radius:12px;background:rgba(200,164,78,0.06);border:1px solid rgba(200,164,78,0.18);display:inline-block"><img src="${freshUrl}" style="max-height:72px;max-width:172px;object-fit:contain;display:block;border-radius:6px"></div></div><div style="font-size:0.84rem;color:var(--muted);line-height:1.75;text-align:center">${_tC.logoReceivedMsg||'Votre logo s\'affiche maintenant dans votre menu.'}</div>`,
                   _tC.logoReceivedClose || 'Parfait, merci !',
                   null,
                   () => {}
@@ -4723,13 +4722,9 @@ function renderLogoSection() {
   }
 
   logoDelBtn.addEventListener('click', () => {
-    adminData.logoUrl    = '';
-    adminData.logoStatus = null;
+    adminData.logoUrl = '';
     _rref('menu/logoUrl').set('');
-    _rref('menu/logoStatus').set(null);
     setLogo('');
-    const _lpbD = document.getElementById('logo-pending-badge');
-    if (_lpbD) _lpbD.style.display = 'none';
     showToast('✅ Logo supprimé');
   });
 }
