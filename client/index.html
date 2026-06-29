@@ -2499,8 +2499,8 @@
     html.light .hero-overlay {
       background: linear-gradient(to bottom,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0) 72%,
-        rgba(255,255,255,0.40) 88%,
+        rgba(255,255,255,0) 90%,
+        rgba(255,255,255,0.30) 97%,
         var(--bg, #faf8f4) 100%
       ) !important;
     }
@@ -4606,6 +4606,14 @@
     body[data-style="paper"] #call-fab.fp-hero-hide,
     body[data-style="paper"] #cart-fab.fp-hero-hide,
     body[data-style="paper"] #hist-fab.fp-hero-hide {
+      opacity:0 !important; pointer-events:none !important;
+      transform:translateY(14px) scale(0.8) !important;
+      transition:opacity 0.22s ease, transform 0.22s ease !important;
+    }
+    /* FABs masqués sur le hero en style scroll — visibles seulement depuis les catégories */
+    body:not([data-style="paper"]) #call-fab.hero-fab-hide,
+    body:not([data-style="paper"]) #cart-fab.hero-fab-hide,
+    body:not([data-style="paper"]) #hist-fab.hero-fab-hide {
       opacity:0 !important; pointer-events:none !important;
       transform:translateY(14px) scale(0.8) !important;
       transition:opacity 0.22s ease, transform 0.22s ease !important;
@@ -7078,6 +7086,7 @@ function applyStyle(style) {
   updateCartBar();
   updateCardBadges();
   window._refreshCallFab?.();
+  _setupHeroFabHide();
   // Particules fête : actives uniquement en style dynamique
   setupEventsOverlay();
 }
@@ -8979,6 +8988,7 @@ function renderMenu() {
   });
   // IntersectionObserver gère l'apparition (plus rapide, pas de setTimeout)
   setupScrollObserver();
+  _setupHeroFabHide();
   // Signaler que le menu est rendu → setupFAB peut observer la première card
   document.dispatchEvent(new Event('menuRendered'));
   // Reconstruire le flipbook si mode papier actif, en conservant la page courante
@@ -9852,6 +9862,32 @@ function setupFAB() {
 
   // Exposer pour rafraîchir l'état au changement de style ou de toggle showCallBtn
   window._refreshCallFab = checkCallFab;
+}
+
+/* ================================================
+   HERO FAB HIDE — masquer sonnette/commande sur hero (styles scroll)
+================================================ */
+let _heroFabObserver = null;
+
+function _setupHeroFabHide() {
+  if (_heroFabObserver) { _heroFabObserver.disconnect(); _heroFabObserver = null; }
+  if (menuStyle === 'paper') {
+    ['call-fab','cart-fab','hist-fab'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hero-fab-hide');
+    });
+    return;
+  }
+  const hcEl = document.getElementById('hero-card');
+  if (!hcEl) return;
+  _heroFabObserver = new IntersectionObserver(entries => {
+    const onHero = entries[0].isIntersecting;
+    ['call-fab','cart-fab','hist-fab'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hero-fab-hide', onHero);
+    });
+  }, { threshold: 0 });
+  _heroFabObserver.observe(hcEl);
 }
 
 /* ================================================
