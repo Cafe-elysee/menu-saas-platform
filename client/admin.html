@@ -2375,43 +2375,6 @@
     <div class="sec-hd" id="sec-hd-hero">Photo d'accueil <span class="sec-badge" id="badge-hero">Hero</span></div>
     <div class="hero-img-card" id="hero-img-card">
 
-      <!-- Mockup téléphone -->
-      <div class="phone-mockup-wrap">
-        <div class="phone-mockup">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="phone-hero-bg" id="phone-hero-bg"></div>
-            <div class="phone-overlay"></div>
-            <div class="phone-content">
-
-              <img class="phone-logo" id="pm-logo" src="" alt="" style="display:none">
-              <div class="phone-ornament">
-                <div class="phone-orn-line"></div>
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
-                <div class="phone-orn-line phone-orn-line-r"></div>
-              </div>
-              <div class="phone-title" id="pm-title"></div>
-              <div class="phone-tagline" id="pm-tagline"></div>
-              <div class="phone-sub" id="pm-sub"></div>
-              <div class="phone-socials">
-                <span class="phone-social-btn">
-                  <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-                  Facebook
-                </span>
-                <span class="phone-social-btn">
-                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-                  Instagram
-                </span>
-              </div>
-            </div>
-            <div class="phone-scroll">
-              <div class="phone-scroll-lbl"></div>
-              <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Contrôles -->
       <div class="hero-controls">
         <label class="hero-upload-btn" for="hero-file-input">
@@ -6140,6 +6103,10 @@ function buildProdForm(item) {
         <input type="checkbox" class="prod-visible-chk" ${item.visible !== false ? 'checked' : ''}>
         <span data-uitxt="prodVisibleLabel">${t.prodVisibleLabel || 'Afficher dans le menu'}</span>
       </label>
+      <label class="photo-show-row prod-vis-row">
+        <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
+        <span data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
+      </label>
 
       <div class="form-divider"></div>
 
@@ -6173,10 +6140,6 @@ function buildProdForm(item) {
         <label class="photo-show-row" style="margin-top:8px">
           <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
           <span data-uitxt="showInMenu">${t.showInMenu}</span>
-        </label>
-        <label class="photo-show-row" style="margin-top:6px">
-          <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
-          <span data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
         </label>
       </div>
 

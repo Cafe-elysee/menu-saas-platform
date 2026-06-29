@@ -4737,6 +4737,21 @@
       font-size:0.72rem; color:var(--gold); opacity:0.75;
       letter-spacing:0.06em; margin-bottom:24px;
     }
+    .fp-hero-desc {
+      font-size:0.76rem; color:var(--muted); letter-spacing:0.03em;
+      line-height:1.6; margin-bottom:18px; max-width:28ch;
+      font-style:italic;
+    }
+    .fp-hero-socials {
+      display:flex; gap:16px; margin-bottom:22px; flex-wrap:wrap;
+    }
+    .fp-social-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:0.6rem; letter-spacing:0.22em; text-transform:uppercase;
+      color:var(--gold); text-decoration:none; font-weight:600;
+      opacity:0.82; transition:opacity 0.18s;
+    }
+    .fp-social-btn:active { opacity:0.5; }
     /* WiFi bottom-left */
     .fp-wifi {
       display:flex; flex-direction:column; gap:3px;
@@ -7064,6 +7079,15 @@ function buildFlipBook() {
 
   const isAr = false;
 
+  const _fpDesc = u.description || '';
+  const _fpIgSrc = _igSrc, _fpFbSrc = _fbSrc, _fpTtSrc = _ttSrc;
+  const _fpSocialsHtml = (_fpIgSrc || _fpFbSrc || _fpTtSrc) ? `
+    <div class="fp-hero-socials">
+      ${_fpIgSrc ? `<a class="fp-social-btn" href="${_fpIgSrc}" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>Instagram</a>` : ''}
+      ${_fpFbSrc ? `<a class="fp-social-btn" href="${_fpFbSrc}" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook</a>` : ''}
+      ${_fpTtSrc ? `<a class="fp-social-btn" href="${_fpTtSrc}" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>TikTok</a>` : ''}
+    </div>` : '';
+
   const hero = document.createElement('div');
   hero.className = 'flip-page fp-hero';
   hero.innerHTML = `
@@ -7079,7 +7103,9 @@ function buildFlipBook() {
       <div class="fp-hero-title">${u.explore || 'Menu'}</div>
       <div class="fp-hero-tag">${_esc(_restaurantName)}</div>
       <div class="fp-hero-sub">${_esc(u.tagline || '')}</div>
+      ${_fpDesc ? `<div class="fp-hero-desc">${_esc(_fpDesc)}</div>` : ''}
       <div class="fp-hero-sub2">${(u.sub || []).map(_esc).join(' · ')}</div>
+      ${_fpSocialsHtml}
       <div class="fp-wifi">
         <div class="fp-wifi-row">
           <svg class="fp-wifi-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
@@ -8466,6 +8492,7 @@ function applyLogoUrl(url) {
 
 /* Réseaux sociaux hero-card */
 function applyHeroCardExtras(ig, fb, tt) {
+  _igSrc = ig || ''; _fbSrc = fb || ''; _ttSrc = tt || '';
   const igEl = document.getElementById('hc-ig');
   const fbEl = document.getElementById('hc-fb');
   const ttEl = document.getElementById('hc-tt');
@@ -8492,6 +8519,7 @@ function _priceHtml(item) {
    HERO IMAGE
 ================================================ */
 let _heroImageSrc = '';
+let _igSrc = '', _fbSrc = '', _ttSrc = '';
 
 function applyHeroImage(src) {
   _heroImageSrc = src || '';
