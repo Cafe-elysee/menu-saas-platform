@@ -4621,24 +4621,14 @@ function _removeGreenScreen(ctx, w, h) {
 }
 
 function renderLogoSection() {
-  const logoImg   = document.getElementById('pm-logo');
   const logoInput = document.getElementById('logo-file-input');
   const logoDelBtn= document.getElementById('logo-del-btn');
-  if (!logoImg || !logoInput || !logoDelBtn) return;
+  if (!logoInput || !logoDelBtn) return;
   const uploadLabel = logoInput.previousElementSibling;
 
   function setLogo(src) {
-    const titleEl = document.getElementById('pm-title');
     const hasCustom = !!(adminData.logoUrl || adminData.info?.logoUrl);
-    if (src) {
-      logoImg.src = src; logoImg.style.display = '';
-      if (titleEl) titleEl.style.display = 'none';
-      logoDelBtn.style.display = hasCustom ? 'flex' : 'none';
-    } else {
-      logoImg.src = ''; logoImg.style.display = 'none';
-      if (titleEl) titleEl.style.display = '';
-      logoDelBtn.style.display = 'none';
-    }
+    logoDelBtn.style.display = (src && hasCustom) ? 'flex' : 'none';
   }
 
   // Ne pas écraser le canvas preview si un upload est en cours (A-4 fix)
@@ -4704,12 +4694,15 @@ function renderLogoSection() {
     });
   }
 
-  logoDelBtn.addEventListener('click', () => {
-    adminData.logoUrl = '';
-    _rref('menu/logoUrl').set('');
-    setLogo('');
-    showToast('✅ Logo supprimé');
-  });
+  if (!logoDelBtn._clickBound) {
+    logoDelBtn._clickBound = true;
+    logoDelBtn.addEventListener('click', () => {
+      adminData.logoUrl = '';
+      _rref('menu/logoUrl').set('');
+      setLogo('');
+      showToast('✅ Logo supprimé');
+    });
+  }
 }
 
 /* ─── SECTION TAGLINE ─── */
@@ -4809,7 +4802,8 @@ function renderHeroImageSection() {
   const phoneBg   = document.getElementById('phone-hero-bg');
 
   function setPhoneBg(src) {
-    if (currentMenuTheme === 'genext') return; // simulation pilotée par _updateHeroSectionForTheme
+    if (!phoneBg) { if (delBtn) delBtn.style.display = src ? 'flex' : 'none'; return; }
+    if (currentMenuTheme === 'genext') return;
     if (src) {
       phoneBg.style.backgroundImage = `url('${src}')`;
       requestAnimationFrame(() => requestAnimationFrame(() => phoneBg.classList.add('flow')));
