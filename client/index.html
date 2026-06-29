@@ -4717,12 +4717,12 @@
       overflow:hidden; background:var(--bg);
     }
     .fp-hero-strip {
-      position:relative; height:42vh; height:42svh; min-height:220px; max-height:340px; flex-shrink:0;
+      position:relative; height:220px; flex-shrink:0;
       overflow:hidden; background:#0c0a08;
     }
     .fp-hero-bg {
       position:absolute; inset:-10%;
-      background-size:cover; background-position:center bottom;
+      background-size:cover; background-position:50% 40%;
       opacity:0; transition:opacity 1.4s ease;
       transform-origin:center; will-change:transform;
     }
@@ -5403,20 +5403,14 @@
   ═══════════════════════════════════════════════════════════════ */
   /* Hero raccourci en bandeau couverture */
   #hero { min-height:200px !important; max-height:260px !important; }
-  /* Styles List + Élégant (non-paper, non-carte) : photo proportionnelle + partie basse visible */
+  /* Styles List + Élégant : 30% écran, JS override via inline !important contrôle la vraie hauteur */
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
-    height: 45vh !important;
-    height: 45svh !important;
-    min-height: 280px !important;
-    max-height: 460px !important;
+    min-height: 180px !important;
+    max-height: 280px !important;
     box-shadow:0 8px 32px rgba(0,0,0,0.38);
   }
   html.light:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero {
     box-shadow:0 6px 22px rgba(0,0,0,0.14);
-  }
-  /* Cadrage bas de la photo → tissu/décor visible au niveau du logo */
-  html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) .hero-bg-img {
-    background-position: 50% 70% !important;
   }
   /* Overlay bandeau dark : transparent en bas → couleurs naturelles visibles au niveau du logo */
   .hero-overlay {
@@ -10096,7 +10090,7 @@ function setupTableModal() {
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
-// Fix #197 : hero proportionnel à l'écran + cadrage bas de photo (tissu visible au niveau du logo)
+// Fix #198 : hero 30% écran + photo entière visible (contain) + logo à cheval bas de photo
 (function lockHeroHeight() {
   function _applyHeroLayout() {
     const hero = document.getElementById('hero');
@@ -10105,15 +10099,23 @@ window.scrollTo(0, 0);
     const isCarte = ((document.documentElement.dataset.menuTheme) || '').startsWith('carte-');
     if (isPaper || isCarte) {
       if (hero) hero.style.height = '';
+      if (heroBg) {
+        heroBg.style.inset = '';
+        heroBg.style.backgroundSize = '';
+        heroBg.style.backgroundPosition = '';
+      }
     } else {
       if (hero) {
-        // 55% de la hauteur visible → ~440px sur un 800px viewport = nettement plus grand que 320px
-        const h = Math.min(460, Math.max(300, Math.round(window.innerHeight * 0.55)));
+        // 30% de l'écran, plafonné entre 180px et 280px
+        const h = Math.min(280, Math.max(180, Math.round(window.innerHeight * 0.30)));
         hero.style.setProperty('height', h + 'px', 'important');
       }
       if (heroBg) {
-        // Cadrage bas : montre le tissu/décor en bas du hero, là où le logo se pose
-        heroBg.style.setProperty('background-position', 'center bottom', 'important');
+        // Photo entière visible : pas de zoom, pas de recadrage
+        heroBg.style.setProperty('inset', '0', 'important');
+        heroBg.style.setProperty('background-size', 'contain', 'important');
+        heroBg.style.setProperty('background-position', 'center center', 'important');
+        heroBg.style.setProperty('background-repeat', 'no-repeat', 'important');
       }
     }
   }
