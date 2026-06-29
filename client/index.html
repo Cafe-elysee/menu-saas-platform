@@ -4602,6 +4602,15 @@
     body[data-style="paper"] .cat-pills { display:none; }
     body[data-style="paper"] #note-bar { display:none; }
     body[data-style="paper"] #footer { display:none; }
+    /* FABs masqués sur la page d'accueil du livre (page 0) — visibles seulement depuis les catégories */
+    body[data-style="paper"] #call-fab.fp-hero-hide,
+    body[data-style="paper"] #cart-fab.fp-hero-hide,
+    body[data-style="paper"] #hist-fab.fp-hero-hide {
+      opacity:0 !important; pointer-events:none !important;
+      transform:translateY(14px) scale(0.8) !important;
+      transition:opacity 0.22s ease, transform 0.22s ease !important;
+    }
+
     /* En style papier les FAB se superposent au flipbook (z-index élevé) ;
        leur visibilité dépend uniquement des toggles showCallBtn / showOrderUI,
        gérée en JavaScript. Les positions ci-dessous évitent toute collision
@@ -4680,7 +4689,7 @@
       display:flex; flex-direction:row;
       direction:ltr; /* prevent RTL from reversing page order */
       height:100%;
-      transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
+      transition:transform 0.52s cubic-bezier(0.22,1,0.36,1);
       will-change:transform;
     }
 
@@ -4690,6 +4699,15 @@
       height:100%; overflow-y:auto; overflow-x:hidden;
       -webkit-overflow-scrolling:touch;
       box-sizing:border-box;
+    }
+    /* Ombre de reliure — chaque page projette une ombre sur sa gauche */
+    .flip-page + .flip-page {
+      box-shadow:-10px 0 28px rgba(0,0,0,0.28),
+                 -2px 0 6px rgba(0,0,0,0.18);
+    }
+    html.light .flip-page + .flip-page {
+      box-shadow:-8px 0 22px rgba(0,0,0,0.12),
+                 -1px 0 4px rgba(0,0,0,0.08);
     }
 
     /* ── Hero page (page 0) ── */
@@ -4717,6 +4735,13 @@
       position:absolute; inset:0;
       background:linear-gradient(to bottom,rgba(12,10,8,0.05) 0%,rgba(12,10,8,0.5) 100%);
     }
+    /* Logo hors du scroll container — enfant direct de .fp-hero (flex) */
+    .fp-hc-logo-wrap {
+      display:flex; justify-content:center;
+      flex-shrink:0;
+      margin-top:-48px; margin-bottom:12px;
+      position:relative; z-index:5;
+    }
     /* Carte info — comme #hero-card sur les autres thèmes */
     .fp-hc-card {
       flex:1; overflow-y:auto; overflow-x:hidden;
@@ -4724,11 +4749,6 @@
       border-bottom:1px solid rgba(200,164,78,0.08);
     }
     html.light .fp-hc-card { border-bottom-color:rgba(0,0,0,0.06); }
-    .fp-hc-logo-wrap {
-      display:flex; justify-content:center;
-      margin-top:-48px; margin-bottom:14px;
-      position:relative; z-index:4;
-    }
     .fp-hc-logo {
       width:96px; height:96px; border-radius:50%;
       object-fit:contain; object-position:center;
@@ -7092,8 +7112,8 @@ function buildFlipBook() {
         <svg class="fp-swipe-hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="${isAr ? '9,18 15,12 9,6' : '15,18 9,12 15,6'}"/></svg>
       </div>
     </div>
-    <div class="fp-hc-card">
-      ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_logoUrl}" alt="" style="border-radius:${_logoRadius}"></div>` : '<div style="height:22px"></div>'}
+    ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_logoUrl}" alt="" style="border-radius:${_logoRadius}"></div>` : ''}
+    <div class="fp-hc-card" style="${_logoUrl ? '' : 'padding-top:30px'}">
       <div class="fp-hc-name">${_esc(_restaurantName)}</div>
       ${u.tagline ? `<div class="fp-hc-tagline">${_esc(u.tagline)}</div>` : ''}
       ${_fpDesc ? `<div class="fp-hc-desc">${_esc(_fpDesc)}</div>` : ''}
@@ -7194,6 +7214,7 @@ function buildFlipBook() {
 
   _applyFlipTranslate(false);
   _updatePaperNav();
+  _updatePaperFabs(true); // démarrage sur hero (page 0) → FABs cachés
   _setupPaperSwipe();
 
   // Nav height CSS variable + masquer les flèches pour les descriptions non tronquées
@@ -7234,7 +7255,7 @@ function _applyFlipTranslate(animate) {
   const vw = window.innerWidth;
   // Arabic: DOM is reversed (hero rightmost), so physIdx = N-1-logicalPage
   const physIdx = flipCurrentPage;
-  track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.4,0,0.2,1)' : 'none';
+  track.style.transition = animate ? 'transform 0.52s cubic-bezier(0.22,1,0.36,1)' : 'none';
   track.style.transform  = `translateX(${-physIdx * vw}px)`;
 }
 
@@ -7263,11 +7284,19 @@ function _updatePaperNav() {
   if (nextBtn) nextBtn.disabled = flipCurrentPage === _flipPages - 1;
 }
 
+function _updatePaperFabs(onHero) {
+  ['call-fab','cart-fab','hist-fab'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('fp-hero-hide', onHero);
+  });
+}
+
 function flipToPage(newIdx) {
   if (newIdx < 0 || newIdx >= _flipPages) return;
   flipCurrentPage = newIdx;
   _applyFlipTranslate(true);
   _updatePaperNav();
+  _updatePaperFabs(newIdx === 0);
   // Overlay fête + décors : visibles uniquement sur la page d'accueil (page 0)
   const _onHero = newIdx === 0;
   const _fpPanel = document.getElementById('fp-ev-panel');
