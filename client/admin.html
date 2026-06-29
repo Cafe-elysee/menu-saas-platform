@@ -1141,19 +1141,27 @@
     .form-textarea { resize:vertical; min-height:86px; line-height:1.6; }
     .form-select option { background:#181612; }
 
-    /* Photo preview */
+    /* Photo preview — compact */
     .photo-preview {
-      width:100%; height:160px; border-radius:12px; object-fit:cover;
+      width:100%; height:90px; border-radius:10px; object-fit:cover;
       border:1px solid var(--bord2); background:var(--bg3); margin-top:6px;
     }
     .photo-preview-empty {
-      width:100%; height:160px; border-radius:12px; margin-top:6px;
+      width:100%; height:90px; border-radius:10px; margin-top:6px;
       border:1px dashed var(--bord2); background:var(--bg3);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:8px; color:var(--muted);
+      display:flex; flex-direction:row; align-items:center; justify-content:center;
+      gap:10px; color:var(--muted);
     }
-    .photo-preview-empty svg { width:32px; height:32px; opacity:0.4; }
+    .photo-preview-empty svg { width:26px; height:26px; opacity:0.4; flex-shrink:0; }
     .photo-preview-empty span { font-size:0.75rem; letter-spacing:0.04em; }
+    /* Remise — badge % dans l'admin */
+    .disc-pct-badge {
+      display:inline-flex; align-items:center;
+      font-size:0.65rem; font-weight:700; letter-spacing:0.02em;
+      background:rgba(224,82,82,0.15); color:#e05252; border:1px solid rgba(224,82,82,0.3);
+      border-radius:20px; padding:1px 7px; margin-left:6px; vertical-align:middle;
+    }
+    html.light .disc-pct-badge { background:rgba(180,30,30,0.1); color:#c02020; border-color:rgba(180,30,30,0.25); }
     .photo-help { font-size:0.72rem; color:var(--muted); margin-top:6px; line-height:1.55; }
     .photo-help a { color:var(--gold); }
 
@@ -3057,6 +3065,8 @@ const ADMIN_UI = {
     notifSaved:    '✓ Μήνυμα αποθηκεύτηκε — ορατό στην επόμενη εκκίνηση',
     notifErrSrv:   '✗ Σφάλμα διακομιστή: {e}',
     notifErrNet:   '✗ Σφάλμα δικτύου: {e}',
+    lblSalePrice:  'Τιμή έκπτωσης',
+    phSalePrice:   '0.00',
     showInMenu:       'Εμφάνιση φωτογραφίας',
     doseOptionLabel:  'Επιλογή Δόσης & Ζάχαρης',
     prodVisibleLabel: 'Εμφάνιση στο μενού',
@@ -3199,6 +3209,8 @@ const ADMIN_UI = {
     notifSaved:    '✓ Message enregistré — visible au prochain lancement de l\'app serveur',
     notifErrSrv:   '✗ Erreur serveur : {e}',
     notifErrNet:   '✗ Erreur réseau : {e}',
+    lblSalePrice:  'Prix remisé',
+    phSalePrice:   '0.00',
     showInMenu:       'Afficher la photo',
     doseOptionLabel:  'Option Dose & Sucre',
     prodVisibleLabel: 'Afficher dans le menu',
@@ -3341,6 +3353,8 @@ const ADMIN_UI = {
     notifSaved:    '✓ Message saved — visible on next server app launch',
     notifErrSrv:   '✗ Server error: {e}',
     notifErrNet:   '✗ Network error: {e}',
+    lblSalePrice:  'Sale price',
+    phSalePrice:   '0.00',
     showInMenu:       'Show photo',
     doseOptionLabel:  'Dose & Sugar option',
     prodVisibleLabel: 'Show in menu',
@@ -3483,6 +3497,8 @@ const ADMIN_UI = {
     notifSaved:    '✓ Nachricht gespeichert — beim nächsten Start sichtbar',
     notifErrSrv:   '✗ Serverfehler: {e}',
     notifErrNet:   '✗ Netzwerkfehler: {e}',
+    lblSalePrice:  'Sonderpreis',
+    phSalePrice:   '0.00',
     showInMenu:       'Foto anzeigen',
     doseOptionLabel:  'Dose & Zucker Option',
     prodVisibleLabel: 'Im Menü anzeigen',
@@ -3625,6 +3641,8 @@ const ADMIN_UI = {
     notifSaved:    '✓ Mensaje guardado — aparecerá en el próximo inicio',
     notifErrSrv:   '✗ Error del servidor: {e}',
     notifErrNet:   '✗ Error de red: {e}',
+    lblSalePrice:  'Precio de oferta',
+    phSalePrice:   '0.00',
     showInMenu:       'Mostrar foto',
     doseOptionLabel:  'Opción Dosis & Azúcar',
     prodVisibleLabel: 'Mostrar en el menú',
@@ -5815,7 +5833,7 @@ function renderProdCard(container, item, ci) {
       ${thumbHTML}
       <div class="prod-top-info">
         <div class="prod-top-name">${item.name?.[currentLang] ? esc(item.name[currentLang]) : '<span style="opacity:0.3">—</span>'}</div>
-        <div class="prod-top-price">${esc(item.price || '')}</div>
+        <div class="prod-top-price">${item.salePrice ? `<span style="text-decoration:line-through;opacity:0.5;font-size:0.85em;margin-right:4px">${esc(item.price||'')}</span><span style="color:#e05252">${esc(item.salePrice)}</span>` : esc(item.price||'')}</div>
       </div>
       <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
     </div>
@@ -5836,6 +5854,22 @@ function renderProdCard(container, item, ci) {
     if (!field || !fieldLang || fieldLang === PRIMARY_LANG) return;
     setTxLock(`item-${item.id}-${field}-${fieldLang}`, e.target.value.trim() !== '');
   });
+
+  // Mise à jour badge remise en temps réel
+  const _refreshDiscBadge = () => {
+    const pN = parseFloat(card.querySelector('[data-field="price-num"]')?.value || '0');
+    const pS = parseFloat(card.querySelector('[data-field="sale-price-num"]')?.value || '0');
+    const badge = card.querySelector('.disc-pct-badge');
+    if (!badge) return;
+    if (pN > 0 && pS > 0 && pS < pN) {
+      badge.textContent = `−${Math.round((1 - pS/pN)*100)}%`;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  };
+  card.querySelector('[data-field="price-num"]')?.addEventListener('input', _refreshDiscBadge);
+  card.querySelector('[data-field="sale-price-num"]')?.addEventListener('input', _refreshDiscBadge);
 
   // Lang tabs inside product
   card.querySelectorAll('.prod-lang-tab').forEach(tab => {
@@ -6016,64 +6050,61 @@ function renderProdCard(container, item, ci) {
 
 function buildProdForm(item) {
   const firstLang = currentLang;
-  const langTabs = LANGS.map(l =>
-    `<button class="lang-tab prod-lang-tab${l===firstLang?' on':''}" data-l="${l}">${LANG_LABELS[l]}</button>`
-  ).join('');
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.el;
 
-  const srcOptions = LANGS.map(l =>
-    `<option value="${l}"${l===currentLang?' selected':''}>${LANG_LABELS[l]}</option>`
-  ).join('');
-
-  const t0 = ADMIN_UI[currentLang] || ADMIN_UI.el;
+  // Multilang fields (name + shortDesc + fullDesc) — per lang panel
   const langFields = LANGS.map(l => `
     <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblName">${t0.lblName} (${l.toUpperCase()})</div>
+        <div class="form-lbl" data-uitxt="lblName">${t.lblName} (${l.toUpperCase()})</div>
         <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName"
-          value="${esc(item.name?.[l] || '')}" placeholder="${t0.phName}">
+          value="${esc(item.name?.[l] || '')}" placeholder="${t.phName}">
       </div>
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblShortDesc">${t0.lblShortDesc} (${l.toUpperCase()})</div>
+        <div class="form-lbl" data-uitxt="lblShortDesc">${t.lblShortDesc} (${l.toUpperCase()})</div>
         <input class="form-input prod-desc-input" data-field="desc" data-lang="${l}" data-uiph="phShortDesc"
-          value="${esc(item.desc?.[l] || '')}" placeholder="${t0.phShortDesc}">
+          value="${esc(item.desc?.[l] || '')}" placeholder="${t.phShortDesc}">
       </div>
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblFullDesc">${t0.lblFullDesc} (${l.toUpperCase()})</div>
-        <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:110px" data-uiph="phFullDesc"
-          placeholder="${t0.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
+        <div class="form-lbl" data-uitxt="lblFullDesc">${t.lblFullDesc} (${l.toUpperCase()})</div>
+        <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:80px" data-uiph="phFullDesc"
+          placeholder="${t.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
       </div>
     </div>
   `).join('');
 
+  // Price parts
+  const CURLST = ['—','€','$','£','CHF','DT','DA','MAD','SAR','AED','TL'];
+  const p     = _parsePriceParts(item.price    || '');
+  const pSale = _parsePriceParts(item.salePrice || '');
+  const makeCurSel = (fieldName, selCur) =>
+    `<select class="form-select price-cur-sel" data-field="${fieldName}">${CURLST.map(c=>`<option value="${c==='—'?'':c}"${selCur===(c==='—'?'':c)?' selected':''}>${c}</option>`).join('')}</select>`;
+
+  // Discount badge preview (static at render time)
+  const pN = parseFloat(p.num); const pS = parseFloat(pSale.num);
+  const discPct = (pN > 0 && pS > 0 && pS < pN) ? Math.round((1 - pS/pN)*100) : 0;
+  const discBadge = discPct > 0 ? `<span class="disc-pct-badge">−${discPct}%</span>` : `<span class="disc-pct-badge" style="display:none"></span>`;
+
   // Badges
-  const t1 = ADMIN_UI[currentLang] || ADMIN_UI.el;
   const curType  = item.type  || '';
   const curTemp  = item.temp  || '';
   const curFlags = Array.isArray(item.badges) ? item.badges : [];
-  const typeOpts = [
-    ['', t1.badgeType],
-    ['boisson', t1.bdgBoisson], ['cuisine', t1.bdgCuisine],
-    ['sucre', t1.bdgSucre], ['hookah', t1.bdgHookah],
-  ].map(([v,l]) => `<option value="${v}"${curType===v?' selected':''}>${l}</option>`).join('');
-  const tempOpts = [
-    ['', t1.badgeTemp],
-    ['chaud', t1.bdgChaud], ['froid', t1.bdgFroid], ['glace', t1.bdgGlace],
-  ].map(([v,l]) => `<option value="${v}"${curTemp===v?' selected':''}>${l}</option>`).join('');
-  const toggleFlags = [
-    ['morning', t1.badgeMorning], ['vegan', t1.badgeVegan],
-    ['limited', t1.badgeLimited], ['new', t1.badgeNew], ['popular', t1.badgePopular],
-  ];
+  const typeOpts = [['',t.badgeType],['boisson',t.bdgBoisson],['cuisine',t.bdgCuisine],['sucre',t.bdgSucre],['hookah',t.bdgHookah]]
+    .map(([v,l])=>`<option value="${v}"${curType===v?' selected':''}>${l}</option>`).join('');
+  const tempOpts = [['',t.badgeTemp],['chaud',t.bdgChaud],['froid',t.bdgFroid],['glace',t.bdgGlace]]
+    .map(([v,l])=>`<option value="${v}"${curTemp===v?' selected':''}>${l}</option>`).join('');
   const badgesHtml = `
     <div class="badge-selects">
       <select class="badge-select" data-bdg-select="type">${typeOpts}</select>
       <select class="badge-select" data-bdg-select="temp">${tempOpts}</select>
     </div>
     <div class="badge-toggles">
-      ${toggleFlags.map(([f,l]) => `<button type="button" class="badge-toggle${curFlags.includes(f)?' active':''}" data-badge="${f}">${l}</button>`).join('')}
-    </div>
-  `;
+      ${[['morning',t.badgeMorning],['vegan',t.badgeVegan],['limited',t.badgeLimited],['new',t.badgeNew],['popular',t.badgePopular]]
+        .map(([f,l])=>`<button type="button" class="badge-toggle${curFlags.includes(f)?' active':''}" data-badge="${f}">${l}</button>`).join('')}
+    </div>`;
 
-  const photoId = item.photo || '';
+  // Photo
+  const photoId  = item.photo || '';
   const photoSrc = photoId
     ? (photoId.startsWith('data:') || photoId.startsWith('http') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
     : '';
@@ -6081,31 +6112,50 @@ function buildProdForm(item) {
   return `
     <div class="form-grid">
 
-      <div>
-        ${langFields}
-      </div>
+      <!-- ① Nom + descriptions (multilang) -->
+      <div>${langFields}</div>
 
       <div class="form-divider"></div>
 
+      <!-- ② Prix normal | Prix remisé -->
       <div class="form-grid-2">
         <div class="form-group">
-          <div class="form-lbl" data-uitxt="lblPrice">${t1.lblPrice}</div>
+          <div class="form-lbl" data-uitxt="lblPrice">${t.lblPrice}</div>
           <div class="price-inp-row">
-            ${(()=>{const p=_parsePriceParts(item.price||'');const CURLST=['—','€','$','£','CHF','DT','DA','MAD','SAR','AED','TL'];return '<select class="form-select price-cur-sel" data-field="currency">'+CURLST.map(c=>'<option value="'+(c==='—'?'':c)+'"'+(p.cur===(c==='—'?'':c)?' selected':'')+'>'+c+'</option>').join('')+'</select><input class="form-input price-num-inp" data-field="price-num" value="'+esc(p.num)+'" data-uiph="phPrice" placeholder="'+t1.phPrice+'">'})()}
+            ${makeCurSel('currency', p.cur)}
+            <input class="form-input price-num-inp" data-field="price-num" value="${esc(p.num)}" placeholder="${t.phPrice}">
           </div>
         </div>
         <div class="form-group">
-          <div class="form-lbl" data-uitxt="lblBadges">${t1.lblBadges}</div>
-          <div class="badges-wrap">${badgesHtml}</div>
+          <div class="form-lbl" data-uitxt="lblSalePrice">${t.lblSalePrice || 'Prix remisé'} ${discBadge}</div>
+          <div class="price-inp-row">
+            ${makeCurSel('sale-currency', pSale.cur || p.cur)}
+            <input class="form-input price-num-inp" data-field="sale-price-num" value="${esc(pSale.num)}" placeholder="${t.phSalePrice || '0.00'}">
+          </div>
         </div>
       </div>
 
+      <!-- ③ Visibilité dans le menu (accès prioritaire) -->
+      <label class="photo-show-row prod-vis-row">
+        <input type="checkbox" class="prod-visible-chk" ${item.visible !== false ? 'checked' : ''}>
+        <span data-uitxt="prodVisibleLabel">${t.prodVisibleLabel || 'Afficher dans le menu'}</span>
+      </label>
+
+      <div class="form-divider"></div>
+
+      <!-- ④ Badges -->
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblBadges">${t.lblBadges}</div>
+        <div class="badges-wrap">${badgesHtml}</div>
+      </div>
+
+      <!-- ⑤ Photo (compacte) -->
       <div class="form-group photo-form-group">
-        <div class="form-lbl" data-uitxt="lblPhoto">${t1.lblPhoto}</div>
+        <div class="form-lbl" data-uitxt="lblPhoto">${t.lblPhoto}</div>
         <div class="photo-upload-row">
           <label class="btn-upload-photo">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            ${t1.lblFromDevice}
+            ${t.lblFromDevice}
             <input type="file" class="photo-file-input" accept="image/*">
           </label>
           <button type="button" class="btn-clear-photo" title="✕">✕</button>
@@ -6113,52 +6163,55 @@ function buildProdForm(item) {
         ${photoSrc
           ? `<img class="photo-preview" src="${photoSrc}" alt="" onerror="_admPreviewErr(this)">`
           : `<div class="photo-preview-empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <rect x="3" y="5" width="18" height="14" rx="2"/>
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M8 5l1.5-2h5L16 5"/>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
               </svg>
-              <span>${t1.noPhoto}</span>
+              <span data-uitxt="noPhoto">${t.noPhoto}</span>
             </div>`
         }
-        <label class="photo-show-row">
-          <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
-          <span data-uitxt="showInMenu">${t1.showInMenu}</span>
-        </label>
         <label class="photo-show-row" style="margin-top:8px">
+          <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
+          <span data-uitxt="showInMenu">${t.showInMenu}</span>
+        </label>
+        <label class="photo-show-row" style="margin-top:6px">
           <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
-          <span data-uitxt="doseOptionLabel">${t1.doseOptionLabel || 'Option Dose & Sucre'}</span>
+          <span data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
         </label>
       </div>
-
-      <label class="photo-show-row prod-vis-row">
-        <input type="checkbox" class="prod-visible-chk" ${item.visible !== false ? 'checked' : ''}>
-        <span data-uitxt="prodVisibleLabel">${t1.prodVisibleLabel || 'Afficher dans le menu'}</span>
-      </label>
 
     </div>
 
     <div class="prod-actions">
       <div class="move-cat-row">
         <select class="form-select move-cat-sel">
-          <option value="">${t1.changeCat}</option>
-          ${adminData.cats.map((c,i) => `<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang] || c.names?.fr || 'Cat '+i)}</option>`).join('')}
+          <option value="">${t.changeCat}</option>
+          ${adminData.cats.map((c,i)=>`<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang]||c.names?.fr||'Cat '+i)}</option>`).join('')}
         </select>
-        <button class="btn-move-cat">${t1.btnMove}</button>
+        <button class="btn-move-cat">${t.btnMove}</button>
       </div>
-      <button class="btn-del-prod">${t1.btnDelProd}</button>
+      <button class="btn-del-prod">${t.btnDelProd}</button>
     </div>
   `;
 }
 
 function collectProdForm(card, item) {
-  // Price + currency
+  // Prix normal
   const curEl  = card.querySelector('[data-field="currency"]');
   const numEl  = card.querySelector('[data-field="price-num"]');
   if (numEl) {
     const num = numEl.value.trim();
     const cur = curEl ? curEl.value : '';
     item.price = (cur && num) ? cur + num : num;
+  }
+  // Prix remisé
+  const saleCurEl = card.querySelector('[data-field="sale-currency"]');
+  const saleNumEl = card.querySelector('[data-field="sale-price-num"]');
+  if (saleNumEl) {
+    const saleNum = saleNumEl.value.trim();
+    const saleCur = saleCurEl ? saleCurEl.value : '';
+    if (saleNum) item.salePrice = (saleCur && saleNum) ? saleCur + saleNum : saleNum;
+    else delete item.salePrice;
   }
 
   // Photo
@@ -6212,8 +6265,7 @@ function addProduct(ci) {
   const id = Date.now();
   const newItem = {
     id, cat: ci,
-    price: '',
-    photo: 'photo-1509042239860-f550ce710b93',
+    price: '', photo: '',
     badges: [],
     name: {}, full: {}
   };

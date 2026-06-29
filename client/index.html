@@ -5436,6 +5436,10 @@
   /* Le flip-wrap position:fixed couvre tout — hero + hero-card inutiles et causent le carré blanc */
   body[data-style="paper"] #hero,
   body[data-style="paper"] #hero-card { display:none !important; }
+  /* ── Système de remise produit — fix #176 ── */
+  .price-promo { color:#e85050; font-weight:700; }
+  html.light .price-promo { color:#c02020; }
+  .price-old { text-decoration:line-through; opacity:0.45; font-size:0.82em; margin-left:4px; font-weight:400; }
 </style>
 <div id="demo-banner">🔒 Mode démo · Navigation uniquement — aucune action n'est enregistrée</div>
 
@@ -6875,6 +6879,7 @@ function applyAdminData(data) {
           allergens: { el: al.el||al.fr||[], fr: al.fr||al.el||[], en: al.en||al.el||al.fr||[], de: al.de||al.en||al.fr||[], es: al.es||al.en||al.fr||[] },
           visible:   item.visible !== false,
           doseOption: item.doseOption === true,
+          salePrice: item.salePrice || '',
         };
         ITEMS.push(safe);
       });
@@ -6883,7 +6888,7 @@ function applyAdminData(data) {
     applyLogoUrl(data.logoUrl || '');
 
     // Photo d'accueil hero (fallback → image Unsplash si rien dans Firebase)
-    applyHeroImage(data.heroImage || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=85');
+    applyHeroImage(data.heroImage || '');
 
     // Mettre à jour le copyright footer avec le nom du restaurant
     if (data.info?.name) {
@@ -7121,7 +7126,7 @@ function buildFlipBook() {
           ${desc ? `<div class="fp-item-desc">${desc}</div>` : ''}
         </div>
         <div class="fp-item-right">
-          <div class="fp-item-price">${_esc(item.price)}</div>
+          <div class="fp-item-price">${_priceHtml(item)}</div>
           ${qtyHtml}
         </div>
       </div>`;
@@ -8472,6 +8477,18 @@ function applyHeroCardExtras(ig, fb, tt) {
 }
 
 /* ================================================
+   PRIX + REMISE — helper de rendu
+================================================ */
+function _priceHtml(item) {
+  const price = item.price || '';
+  const sale  = item.salePrice || '';
+  if (sale && price && sale !== price) {
+    return `<span class="price-promo">${_esc(sale)}</span><span class="price-old">${_esc(price)}</span>`;
+  }
+  return _esc(price || sale);
+}
+
+/* ================================================
    HERO IMAGE
 ================================================ */
 let _heroImageSrc = '';
@@ -8949,14 +8966,14 @@ function _cardCinema(item) {
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
         <div class="cinema-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-        <div class="cinema-price">${_esc(item.price)}</div>
+        <div class="cinema-price">${_priceHtml(item)}</div>
       </div>`;
   } else {
     card.innerHTML = `
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
         <div class="cinema-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-        <div class="cinema-price">${_esc(item.price)}</div>
+        <div class="cinema-price">${_priceHtml(item)}</div>
       </div>`;
   }
   _setupCardEvents(card, item);
@@ -8984,7 +9001,7 @@ function _cardStrip(item) {
       <div class="strip-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       <div class="strip-right">
         ${badges ? `<div class="strip-badges">${badges}</div>` : ''}
-        <div class="strip-price">${_esc(item.price)}</div>
+        <div class="strip-price">${_priceHtml(item)}</div>
         ${chevronSvg}
       </div>
     </div>`;
@@ -9011,7 +9028,7 @@ function _cardForest(item) {
     <div class="forest-body">
       <div class="forest-leaf">🌿</div>
       <div class="forest-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-      <div class="forest-price">${_esc(item.price)}</div>
+      <div class="forest-price">${_priceHtml(item)}</div>
       ${badges ? `<div class="forest-badges">${badges}</div>` : ''}
     </div>`;
   _setupCardEvents(card, item);
@@ -9035,7 +9052,7 @@ function _cardRose(item) {
   card.innerHTML = `
     ${imgBlock}
     <div class="por-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-    <div class="por-price">${_esc(item.price)}</div>
+    <div class="por-price">${_priceHtml(item)}</div>
     ${badges ? `<div class="por-badges">${badges}</div>` : ''}`;
   _setupCardEvents(card, item);
   return card;
@@ -9058,7 +9075,7 @@ function _cardEnseigne(item) {
       : '';
   card.innerHTML = `
     <div class="ens-price-col">
-      <div class="ens-price">${_esc(item.price)}</div>
+      <div class="ens-price">${_priceHtml(item)}</div>
       <div class="ens-diamond"></div>
     </div>
     <div class="ens-body">
@@ -9096,7 +9113,7 @@ function _cardVelvet(item, idx) {
       ${badges ? `<div class="vel-badges">${badges}</div>` : ''}
     </div>
     <div class="vel-right">
-      <div class="vel-price">${_esc(item.price)}</div>
+      <div class="vel-price">${_priceHtml(item)}</div>
       ${imgBlock}
     </div>`;
   _setupCardEvents(card, item);
@@ -9123,7 +9140,7 @@ function _cardAurora(item) {
       <div class="aurora-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       ${desc ? `<div class="aurora-desc">${desc}</div>` : ''}
       <div class="aurora-meta">
-        <div class="aurora-price">${_esc(item.price)}</div>
+        <div class="aurora-price">${_priceHtml(item)}</div>
         ${badges ? `<div class="aurora-badges">${badges}</div>` : ''}
       </div>
     </div>
@@ -9152,7 +9169,7 @@ function _cardPrestige(item) {
       <div class="c-info">
         <div class="c-name-row">
           <div class="c-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-          <div class="c-price">${_esc(item.price)}</div>
+          <div class="c-price">${_priceHtml(item)}</div>
         </div>
         ${desc ? `<div class="c-desc">${desc}</div>` : ''}
         ${badges ? `<div class="c-badges">${badges}</div>` : ''}
@@ -9179,7 +9196,7 @@ function _cardSantorin(item) {
       : '';
   card.innerHTML = `
     <div class="san-shutter">
-      <div class="san-price">${_esc(item.price)}</div>
+      <div class="san-price">${_priceHtml(item)}</div>
       <div class="san-stars">✦ ✦ ✦</div>
     </div>
     <div class="san-body">
@@ -9208,7 +9225,7 @@ function _cardClassique(item) {
         <span class="cls-name">${_esc(item.name[lang]||item.name.fr||'')}</span>
         ${badges ? `<span class="cls-badges-inline">${badges}</span>` : ''}
       </div>
-      <div class="cls-price">${_esc(item.price)}</div>
+      <div class="cls-price">${_priceHtml(item)}</div>
     </div>
     ${desc ? `<div class="cls-desc">${desc}</div>` : ''}`;
   _setupCardEvents(card, item);
@@ -9230,7 +9247,7 @@ function _cardSommelier(item) {
       (desc ? '<div class="som-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="som-badges">' + badges + '</div>' : '') +
     '</div>' +
-    '<div class="som-price-col"><span class="som-price">' + item.price + '</span></div>';
+    '<div class="som-price-col"><span class="som-price">' + _priceHtml(item) + '</span></div>';
   _setupCardEvents(card, item);
   return card;
 }
@@ -9247,7 +9264,7 @@ function _cardBento(item) {
     (desc ? '<div class="ben-desc">' + desc + '</div>' : '<div class="ben-desc"></div>') +
     '<div class="ben-bottom">' +
       (badges ? '<div class="ben-badges">' + badges + '</div>' : '<div class="ben-badges"></div>') +
-      '<div class="ben-price">' + item.price + '</div>' +
+      '<div class="ben-price">' + _priceHtml(item) + '</div>' +
     '</div>';
   _setupCardEvents(card, item);
   return card;
@@ -9264,7 +9281,7 @@ function _cardTelegraphe(item) {
     '<div class="tel-row">' +
       '<span class="tel-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
       '<span class="tel-dots"></span>' +
-      '<span class="tel-price">' + item.price + '</span>' +
+      '<span class="tel-price">' + _priceHtml(item) + '</span>' +
     '</div>' +
     (desc ? '<div class="tel-desc">' + desc + '</div>' : '') +
     (badges ? '<div class="tel-badges">' + badges + '</div>' : '');
@@ -9288,7 +9305,7 @@ function _cardCouture(item, idx) {
     (desc ? '<div class="cou-desc">' + desc + '</div>' : '') +
     '<div class="cou-footer">' +
       (badges ? '<div class="cou-badges">' + badges + '</div>' : '<div class="cou-badges"></div>') +
-      '<div class="cou-price">' + item.price + '</div>' +
+      '<div class="cou-price">' + _priceHtml(item) + '</div>' +
     '</div>';
   _setupCardEvents(card, item);
   return card;
@@ -9303,7 +9320,7 @@ function _cardJournal(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
-    '<div class="dva-price-block"><div class="dva-price">' + (item.price||'') + '</div></div>' +
+    '<div class="dva-price-block"><div class="dva-price">' + _priceHtml(item) + '</div></div>' +
     '<div class="dva-body">' +
       '<div class="dva-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="dva-desc">' + desc + '</div>' : '') +
@@ -9317,9 +9334,10 @@ function _cardVoyage(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  const priceParts = item.price.replace(/[€$£]/g,'').trim().split(/[.,]/);
-  const priceInt = priceParts[0] || item.price;
-  const currency = (item.price.match(/[€$£]/)||['€'])[0];
+  const _dp = item.salePrice || item.price;
+  const priceParts = _dp.replace(/[€$£]/g,'').trim().split(/[.,]/);
+  const priceInt = priceParts[0] || _dp;
+  const currency = (_dp.match(/[€$£]/)||['€'])[0];
   card.className = 'card card-voyage';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -9329,7 +9347,7 @@ function _cardVoyage(item) {
       (desc ? '<div class="voy-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="voy-badges">' + badges + '</div>' : '') +
     '</div>' +
-    '<div class="voy-tag"><div class="voy-price">' + item.price + '</div></div>';
+    '<div class="voy-tag"><div class="voy-price">' + _priceHtml(item) + '</div></div>';
   _setupCardEvents(card, item);
   return card;
 }
@@ -9347,7 +9365,7 @@ function _cardArtisan(item) {
       (badges ? '<span class="art-badges">' + badges + '</span>' : '') +
     '</div>' +
     (desc ? '<div class="art-desc">' + desc + '</div>' : '') +
-    '<div class="art-bottom"><div class="art-dash"></div><div class="art-price">' + item.price + '</div></div>';
+    '<div class="art-bottom"><div class="art-dash"></div><div class="art-price">' + _priceHtml(item) + '</div></div>';
   _setupCardEvents(card, item);
   return card;
 }
@@ -9362,7 +9380,7 @@ function _cardArdoise(item) {
   card.style.transitionDelay = '0s';
   card.innerHTML =
     '<div class="ard-top">' +
-      '<span class="ard-prix-pill">' + (item.price||'') + '</span>' +
+      '<span class="ard-prix-pill">' + _priceHtml(item) + '</span>' +
       (badges ? '<span class="ard-badges">' + badges + '</span>' : '<span></span>') +
     '</div>' +
     '<div class="ard-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
@@ -9384,7 +9402,7 @@ function _cardMaroc(item) {
         '<div class="marc-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
         (badges ? '<div class="marc-badges">' + badges + '</div>' : '') +
       '</div>' +
-      '<div class="marc-price">' + item.price + '</div>' +
+      '<div class="marc-price">' + _priceHtml(item) + '</div>' +
     '</div>' +
     (desc ? '<div class="marc-desc">' + desc + '</div>' : '');
   _setupCardEvents(card, item);
@@ -9411,7 +9429,7 @@ function _cardEditorial(item) {
     <div class="edt-body">
       <div class="edt-header">
         <div class="edt-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-        <div class="edt-price">${_esc(item.price)}</div>
+        <div class="edt-price">${_priceHtml(item)}</div>
       </div>
       ${desc ? `<div class="edt-desc">${desc}</div>` : ''}
       ${badges ? `<div class="edt-badges">${badges}</div>` : ''}
@@ -9568,7 +9586,7 @@ function openSheet(item) {
   shImg.onload  = () => { shImg.style.display = ''; };
   shImg.src = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http')) ? item.photo : `https://images.unsplash.com/${item.photo}?w=800&h=500&fit=crop`;
   document.getElementById('sh-name').textContent = _esc(item.name[lang]||item.name.fr||'');
-  document.getElementById('sh-price').textContent = item.price;
+  const _shEl=document.getElementById('sh-price');if(_shEl){_shEl.innerHTML=_priceHtml(item);}
   document.getElementById('sh-desc').textContent = item.full[lang]||item.full.fr||item.desc[lang]||item.desc.fr||'';
   document.getElementById('al-lbl').textContent = t.alLabel;
   const shAddBtn = document.getElementById('sh-add-btn');
