@@ -6338,7 +6338,7 @@ async function doSaveAll() {
   // 2. Auto-traduire depuis la langue principale vers les autres langues
   const srcLang    = PRIMARY_LANG; // Toujours traduire depuis la langue principale
   const targets    = LANGS.filter(l => l !== srcLang);
-  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText','tagline'];
+  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText','tagline','description'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   if (!adminData._txLock)   adminData._txLock   = {};
