@@ -5593,6 +5593,9 @@
     <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
   </symbol>
+  <symbol id="ico-phone" viewBox="0 0 24 24">
+    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 015.13 12.7 19.79 19.79 0 012.06 4.11 2 2 0 014.05 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
   <symbol id="ico-diamond" viewBox="0 0 24 24">
     <path d="M12 2L2 9l10 13L22 9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -5884,13 +5887,17 @@
     <svg class="ft-ico"><use href="#ico-lock"/></svg>
     <div class="ft-txt" id="ft-wifi-pw"></div>
   </div>
-  <div class="ft-row">
+  <div class="ft-row" id="ft-hours-row">
     <svg class="ft-ico"><use href="#ico-clock"/></svg>
     <div class="ft-txt" id="ft-hours"></div>
   </div>
-  <div class="ft-row">
+  <div class="ft-row" id="ft-addr-row">
     <svg class="ft-ico"><use href="#ico-pin"/></svg>
     <div class="ft-txt" id="ft-addr"></div>
+  </div>
+  <div class="ft-row" id="ft-contact-row">
+    <svg class="ft-ico"><use href="#ico-phone"/></svg>
+    <div class="ft-txt" id="ft-contact"></div>
   </div>
   <div class="ft-cr" id="ft-cr">© 2026 GeNext</div>
 </footer>
@@ -6036,8 +6043,7 @@ const UI = {
     alLabel:'Λεπτομέρειες',
     noRes:'Δεν βρέθηκαν αποτελέσματα',
     wifiN:'WiFi ', wifiV:'',
-    hoursN:'Ωράριο ', hoursV:'',
-    addrN:'Διεύθυνση ', addrV:'',
+    hoursV:'', addrV:'', contactV:'',
     cartTitle:'Η παραγγελία μου', cartTotal:'Σύνολο', cartSend:'Αποστολή παραγγελίας', cartCancel:'Ακύρωση',
     destTakeaway:'🥡 Για take away', destTable:'🪑 Για τραπέζι', destTableNum:'Αριθμός τραπεζιού (1–99)',
     histTitle:'Οι παραγγελίες μου', histEmpty:'Καμία παραγγελία', histClose:'Κλείσιμο',
@@ -6070,8 +6076,7 @@ const UI = {
     alLabel:'Détails',
     noRes:'Aucun résultat pour votre recherche',
     wifiN:'WiFi ', wifiV:'',
-    hoursN:'Horaires ', hoursV:'',
-    addrN:'Adresse ', addrV:'',
+    hoursV:'', addrV:'', contactV:'',
     cartTitle:'Votre commande', cartTotal:'Total', cartSend:'Envoyer la commande', cartCancel:'Annuler',
     destTakeaway:'🥡 À emporter', destTable:'🪑 À table', destTableNum:'Numéro de table (1–99)',
     histTitle:'Mes commandes', histEmpty:'Aucune commande enregistrée', histClose:'Fermer',
@@ -6104,8 +6109,7 @@ const UI = {
     alLabel:'Details',
     noRes:'No results for your search',
     wifiN:'WiFi ', wifiV:'',
-    hoursN:'Hours ', hoursV:'',
-    addrN:'Address ', addrV:'',
+    hoursV:'', addrV:'', contactV:'',
     cartTitle:'Your order', cartTotal:'Total', cartSend:'Send order', cartCancel:'Cancel',
     destTakeaway:'🥡 Takeaway', destTable:'🪑 Dine in', destTableNum:'Table number (1–99)',
     histTitle:'My orders', histEmpty:'No orders recorded', histClose:'Close',
@@ -6138,8 +6142,7 @@ const UI = {
     alLabel:'Detalles',
     noRes:'No hay resultados para su búsqueda',
     wifiN:'Wi-Fi ', wifiV:'',
-    hoursN:'Horario ', hoursV:'',
-    addrN:'Dirección ', addrV:'',
+    hoursV:'', addrV:'', contactV:'',
     cartTitle:'Su pedido', cartTotal:'Total', cartSend:'Enviar pedido', cartCancel:'Cancelar',
     destTakeaway:'🥡 Para llevar', destTable:'🪑 En la mesa', destTableNum:'Número de mesa (1–99)',
     histTitle:'Mis pedidos', histEmpty:'No hay pedidos registrados', histClose:'Cerrar',
@@ -6172,8 +6175,7 @@ const UI = {
     alLabel:'Details',
     noRes:'Keine Ergebnisse für Ihre Suche',
     wifiN:'WLAN ', wifiV:'',
-    hoursN:'Öffnungszeiten ', hoursV:'',
-    addrN:'Adresse ', addrV:'',
+    hoursV:'', addrV:'', contactV:'',
     cartTitle:'Meine Bestellung', cartTotal:'Gesamt', cartSend:'Bestellung senden', cartCancel:'Abbrechen',
     destTakeaway:'🥡 Zum Mitnehmen', destTable:'🪑 Am Tisch', destTableNum:'Tischnummer (1–99)',
     histTitle:'Meine Bestellungen', histEmpty:'Keine Bestellungen', histClose:'Schließen',
@@ -6987,10 +6989,11 @@ function applyAdminData(data) {
       Object.keys(UI).forEach(l => {
         if (data.info.wifi_name?.[l])    UI[l].wifiN       = data.info.wifi_name[l];
         if (data.info.wifi_val?.[l])     UI[l].wifiV       = data.info.wifi_val[l];
-        if (data.info.hours_name?.[l])   UI[l].hoursN      = data.info.hours_name[l];
         if (data.info.hours_val?.[l])    UI[l].hoursV      = data.info.hours_val[l];
-        if (data.info.addr_name?.[l])    UI[l].addrN       = data.info.addr_name[l];
         if (data.info.addr_val?.[l])     UI[l].addrV       = data.info.addr_val[l];
+        // contact_val est global (même valeur pour toutes les langues)
+        const cv = data.info.contact_val;
+        if (cv) UI[l].contactV = cv[l] || cv[Object.keys(cv)[0]] || '';
         if (data.info.tagline?.[l])      UI[l].tagline     = data.info.tagline[l];
         if (data.info.description?.[l])  UI[l].description = data.info.description[l];
       });
@@ -8947,8 +8950,18 @@ function applyTranslations() {
       if (_hcPw) _hcPw.textContent = t.wifiV || '';
     } else { _hcWifi.style.display = 'none'; }
   }
-  document.getElementById('ft-hours').innerHTML = `<strong>${_esc(t.hoursN||'')}</strong>${_esc(t.hoursV||'')}`;
-  document.getElementById('ft-addr').innerHTML = `<strong>${_esc(t.addrN||'')}</strong>${_esc(t.addrV||'')}`;
+  const _ftHoursRow = document.getElementById('ft-hours-row');
+  const _ftHours = document.getElementById('ft-hours');
+  if (_ftHoursRow) _ftHoursRow.style.display = t.hoursV ? '' : 'none';
+  if (_ftHours) _ftHours.textContent = t.hoursV || '';
+  const _ftAddrRow = document.getElementById('ft-addr-row');
+  const _ftAddr = document.getElementById('ft-addr');
+  if (_ftAddrRow) _ftAddrRow.style.display = t.addrV ? '' : 'none';
+  if (_ftAddr) _ftAddr.textContent = t.addrV || '';
+  const _ftContactRow = document.getElementById('ft-contact-row');
+  const _ftContact = document.getElementById('ft-contact');
+  if (_ftContactRow) _ftContactRow.style.display = t.contactV ? '' : 'none';
+  if (_ftContact) _ftContact.textContent = t.contactV || '';
   // Cart modal translations (if open)
   const cartTitleTxt = document.getElementById('cart-title-txt');
   if (cartTitleTxt) cartTitleTxt.textContent = t.cartTitle || 'Votre commande';
@@ -8980,6 +8993,7 @@ function applyTranslations() {
     document.getElementById('ft-wifi'),
     document.getElementById('ft-hours'),
     document.getElementById('ft-addr'),
+    document.getElementById('ft-contact'),
   ];
   targets.forEach(el => {
     if (el) { el.classList.remove('lt'); void el.offsetWidth; el.classList.add('lt'); }

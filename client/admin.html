@@ -2986,9 +2986,10 @@ const ADMIN_UI = {
     infoWifiName:  'WiFi — Όνομα',
     infoWifiVal:   'WiFi — Κωδικός',
     infoHoursName: 'Ωράριο',
-    infoHoursVal: '',
+    infoHoursVal: 'Ωράριο',
     infoAddrName: 'Διεύθυνση',
-    infoAddrVal: '',
+    infoAddrVal: 'Διεύθυνση',
+    infoContactVal: 'Επικοινωνία',
     badgePopular:  '🔥 Δημοφιλές',
     badgeNew:      '✨ Νέο',
     badgeVegan:    '🌱 Vegan',
@@ -3132,9 +3133,10 @@ const ADMIN_UI = {
     infoWifiName:  'WiFi — Nom',
     infoWifiVal:   'WiFi — Mot de passe',
     infoHoursName: 'Horaires',
-    infoHoursVal: '',
+    infoHoursVal: 'Horaires',
     infoAddrName: 'Adresse',
-    infoAddrVal: '',
+    infoAddrVal: 'Adresse',
+    infoContactVal: 'Contact',
     badgeType:     '— Type —',
     badgeTemp:     '— Température —',
     bdgBoisson:'🥤 Boisson', bdgCuisine:'🍽 Cuisine', bdgSucre:'🧁 Sucré', bdgHookah:'💨 HOOKAH',
@@ -3276,9 +3278,10 @@ const ADMIN_UI = {
     infoWifiName:  'WiFi name',
     infoWifiVal:   'WiFi password',
     infoHoursName: 'Hours',
-    infoHoursVal: '',
+    infoHoursVal: 'Hours',
     infoAddrName: 'Address',
-    infoAddrVal: '',
+    infoAddrVal: 'Address',
+    infoContactVal: 'Contact',
     badgeType:     '— Type —',
     badgeTemp:     '— Temperature —',
     bdgBoisson:'🥤 Drink', bdgCuisine:'🍽 Food', bdgSucre:'🧁 Sweet', bdgHookah:'💨 Hookah',
@@ -3419,10 +3422,11 @@ const ADMIN_UI = {
     fabTooltip:    'Alles speichern',
     infoWifiName:  'WLAN-Name',
     infoWifiVal:   'WLAN-Passwort',
-    infoHoursName: 'Hours',
-    infoHoursVal: '',
+    infoHoursName: 'Öffnungszeiten',
+    infoHoursVal: 'Öffnungszeiten',
     infoAddrName: 'Adresse',
-    infoAddrVal: '',
+    infoAddrVal: 'Adresse',
+    infoContactVal: 'Kontakt',
     badgeType:     '— Typ —',
     badgeTemp:     '— Temperatur —',
     bdgBoisson:'🥤 Getränk', bdgCuisine:'🍽 Speise', bdgSucre:'🧁 Süßes', bdgHookah:'💨 Hookah',
@@ -3563,10 +3567,11 @@ const ADMIN_UI = {
     fabTooltip:    'Guardar todo',
     infoWifiName:  'Nombre del Wi-Fi',
     infoWifiVal:   'Contraseña del Wi-Fi',
-    infoHoursName: 'Hours',
-    infoHoursVal: '',
+    infoHoursName: 'Horario',
+    infoHoursVal: 'Horario',
     infoAddrName: 'Dirección',
-    infoAddrVal: '',
+    infoAddrVal: 'Dirección',
+    infoContactVal: 'Contacto',
     badgeType:     '— Tipo —',
     badgeTemp:     '— Temperatura —',
     bdgBoisson:'🥤 Bebida', bdgCuisine:'🍽 Cocina', bdgSucre:'🧁 Dulce', bdgHookah:'💨 Shisha',
@@ -4309,7 +4314,7 @@ function migrateToEl(data) {
   (data.cats || []).forEach(cat => {
     if (cat.names && !cat.names.el && cat.names.fr) cat.names.el = cat.names.fr;
   });
-  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
+  const infoFields = ['wifi_name','wifi_val','hours_val','addr_val','contact_val','noteText'];
   if (data.info) infoFields.forEach(f => {
     // Migrate: plain string → per-language object (old Firebase format)
     if (typeof data.info[f] === 'string') {
@@ -5097,12 +5102,11 @@ function showToastMsg(msg, isError = false) {
 function renderInfoSection() {
   const card = document.getElementById('info-card');
   const fields = [
-    { key:'wifi_name',  label:'WiFi — Nom', global:true }, // même valeur pour toutes les langues
-    { key:'wifi_val',   label:'WiFi — Mot de passe', global:true }, // même valeur pour toutes les langues
-    { key:'hours_name', label:'Horaires — Titre' },
-    { key:'hours_val',  label:'Horaires — Valeur' },
-    { key:'addr_name',  label:'Adresse — Titre' },
-    { key:'addr_val',   label:'Adresse — Valeur' },
+    { key:'wifi_name',    label:'WiFi — Nom', global:true },
+    { key:'wifi_val',     label:'WiFi — Mot de passe', global:true },
+    { key:'hours_val',    label:'Horaires' },
+    { key:'addr_val',     label:'Adresse' },
+    { key:'contact_val',  label:'Contact', global:true },
   ];
 
   let html = `<div></div>`;
@@ -5206,14 +5210,13 @@ function applyAdminUI(l) {
   if (fab) fab.title = t.fabTitle;
 
   // Info section labels
-  const infoKeys = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const infoKeys = ['wifi_name','wifi_val','hours_val','addr_val','contact_val'];
   const infoLblMap = {
-    wifi_name:  t.infoWifiName,
-    wifi_val:   t.infoWifiVal,
-    hours_name: t.infoHoursName,
-    hours_val:  t.infoHoursVal,
-    addr_name:  t.infoAddrName,
-    addr_val:   t.infoAddrVal,
+    wifi_name:   t.infoWifiName,
+    wifi_val:    t.infoWifiVal,
+    hours_val:   t.infoHoursVal   || 'Horaires',
+    addr_val:    t.infoAddrVal    || 'Adresse',
+    contact_val: t.infoContactVal || 'Contact',
   };
   document.querySelectorAll('.info-row').forEach(row => {
     const inp = row.querySelector('.info-input');
@@ -6350,7 +6353,7 @@ async function doSaveAll() {
   // 2. Auto-traduire depuis la langue principale vers les autres langues
   const srcLang    = PRIMARY_LANG; // Toujours traduire depuis la langue principale
   const targets    = LANGS.filter(l => l !== srcLang);
-  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText','tagline','description'];
+  const infoFields = ['hours_val','addr_val','noteText','tagline','description'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   if (!adminData._txLock)   adminData._txLock   = {};
