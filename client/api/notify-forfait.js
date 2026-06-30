@@ -149,11 +149,11 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
   const payM = PAY_METHODS_F[lang] || PAY_METHODS_F.fr;
   const weekP = WEEK_PAYMENT_F[lang] || WEEK_PAYMENT_F.fr;
   const forfaitLabel = {
-    fr: { mq: 'Menu QR', cs: 'Commandes &amp; Services', monthly: 'mensuel',   annual: 'annuel'     },
-    en: { mq: 'Menu QR', cs: 'Orders &amp; Services',    monthly: 'monthly',   annual: 'annual'     },
-    el: { mq: 'Menu QR', cs: 'Παραγγελίες &amp; Υπηρεσίες', monthly: 'μηνιαίο', annual: 'ετήσιο'  },
-    de: { mq: 'Menu QR', cs: 'Bestellungen &amp; Services',  monthly: 'monatlich', annual: 'jährlich' },
-    es: { mq: 'Menu QR', cs: 'Pedidos &amp; Servicios',   monthly: 'Mensual',   annual: 'Anual'      }
+    fr: { mq: 'Menu QR',   cs: 'Commandes &amp; Services',       monthly: 'mensuel',   annual: 'annuel'   },
+    en: { mq: 'QR Menu',   cs: 'Orders &amp; Services',          monthly: 'monthly',   annual: 'annual'   },
+    el: { mq: 'Μενού QR',  cs: 'Παραγγελίες &amp; Υπηρεσίες',   monthly: 'μηνιαίο',   annual: 'ετήσιο'   },
+    de: { mq: 'QR-Menü',   cs: 'Bestellungen &amp; Services',    monthly: 'monatlich', annual: 'jährlich' },
+    es: { mq: 'Menú QR',   cs: 'Pedidos &amp; Servicios',        monthly: 'mensual',   annual: 'anual'    }
   }[lang] || { mq: 'Menu QR', cs: 'Commandes &amp; Services', monthly: 'mensuel', annual: 'annuel' };
 
   const newLabel  = isCS ? forfaitLabel.cs : forfaitLabel.mq;
@@ -163,8 +163,8 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
   const isRTL     = false;
 
   const subjects = {
-    fr: isUpgrade ? `🚀 Votre forfait a été mis à niveau — ${isCS ? 'Commandes & Services' : 'Menu QR'}` : `ℹ️ Votre forfait a changé — ${isCS ? 'Commandes & Services' : 'Menu QR'}`,
-    en: isUpgrade ? `🚀 Your plan has been upgraded — ${isCS ? 'Orders & Services' : 'Menu QR'}` : `ℹ️ Your plan has changed — ${isCS ? 'Orders & Services' : 'Menu QR'}`,
+    fr: isUpgrade ? `🚀 Votre forfait a été mis à niveau — ${isCS ? 'Commandes & Services' : forfaitLabel.mq}` : `ℹ️ Votre forfait a changé — ${isCS ? 'Commandes & Services' : forfaitLabel.mq}`,
+    en: isUpgrade ? `🚀 Your plan has been upgraded — ${isCS ? 'Orders & Services' : forfaitLabel.mq}` : `ℹ️ Your plan has changed — ${isCS ? 'Orders & Services' : forfaitLabel.mq}`,
     el: isUpgrade ? `🚀 Η συνδρομή σας αναβαθμίστηκε` : `ℹ️ Η συνδρομή σας άλλαξε`,
     de: isUpgrade ? `🚀 Ihr Plan wurde aktualisiert` : `ℹ️ Ihr Plan hat sich geändert`,
     es: isUpgrade ? `🚀 Su plan ha sido actualizado` : `ℹ️ Su plan ha cambiado`
@@ -249,36 +249,37 @@ function buildPendingEmail(lang, name, newForfait, paymentMode, priceObj = PRICE
   const priceMap = paymentMode === 'annual' ? priceObj.annual : priceObj.monthly;
   const price    = priceMap[newForfait];
   const isRTL    = false;
+  const mqLabel  = { fr:'Menu QR', en:'QR Menu', el:'Μενού QR', de:'QR-Menü', es:'Menú QR' }[lang] || 'Menu QR';
 
   const T = {
     fr: {
       subject: `📅 Changement de forfait programmé — GeNext`,
       greeting: `Bonjour ${safeName} 👋`,
-      body: `Votre demande de changement de forfait vers <strong>${isCS ? 'Commandes &amp; Services' : 'Menu QR'}</strong> (${price}€) a bien été enregistrée. Elle sera appliquée automatiquement à la fin de votre période en cours.`,
+      body: `Votre demande de changement de forfait vers <strong>${isCS ? 'Commandes &amp; Services' : mqLabel}</strong> (${price}€) a bien été enregistrée. Elle sera appliquée automatiquement à la fin de votre période en cours.`,
       closing: `L'équipe GeNext`
     },
     en: {
       subject: `📅 Scheduled plan change — GeNext`,
       greeting: `Hello ${safeName} 👋`,
-      body: `Your request to change your plan to <strong>${isCS ? 'Orders &amp; Services' : 'Menu QR'}</strong> (€${price}) has been recorded. It will be applied automatically at the end of your current period.`,
+      body: `Your request to change your plan to <strong>${isCS ? 'Orders &amp; Services' : mqLabel}</strong> (€${price}) has been recorded. It will be applied automatically at the end of your current period.`,
       closing: `The GeNext Team`
     },
     el: {
       subject: `📅 Προγραμματισμένη αλλαγή πλάνου — GeNext`,
       greeting: `Γεια σας ${safeName} 👋`,
-      body: `Το αίτημά σας για αλλαγή πλάνου σε <strong>${isCS ? 'Παραγγελίες &amp; Υπηρεσίες' : 'Menu QR'}</strong> (${price}€) καταγράφηκε. Θα εφαρμοστεί αυτόματα στο τέλος της τρέχουσας περιόδου σας.`,
+      body: `Το αίτημά σας για αλλαγή πλάνου σε <strong>${isCS ? 'Παραγγελίες &amp; Υπηρεσίες' : mqLabel}</strong> (${price}€) καταγράφηκε. Θα εφαρμοστεί αυτόματα στο τέλος της τρέχουσας περιόδου σας.`,
       closing: `Η ομάδα GeNext`
     },
     de: {
       subject: `📅 Geplante Planänderung — GeNext`,
       greeting: `Guten Tag ${safeName} 👋`,
-      body: `Ihre Anfrage zur Planänderung auf <strong>${isCS ? 'Bestellungen &amp; Services' : 'Menu QR'}</strong> (${price}€) wurde erfasst. Sie wird automatisch am Ende Ihres aktuellen Zeitraums angewendet.`,
+      body: `Ihre Anfrage zur Planänderung auf <strong>${isCS ? 'Bestellungen &amp; Services' : mqLabel}</strong> (${price}€) wurde erfasst. Sie wird automatisch am Ende Ihres aktuellen Zeitraums angewendet.`,
       closing: `Das GeNext Team`
     },
     es: {
       subject: `📅 Cambio de plan programado — GeNext`,
       greeting: `¡Hola ${safeName} 👋`,
-      body: `Su solicitud de cambio de plan a <strong>${isCS ? 'Pedidos &amp; Servicios' : 'Menu QR'}</strong> (${price}€) ha sido registrada. Se aplicará automáticamente al final de su período actual.`,
+      body: `Su solicitud de cambio de plan a <strong>${isCS ? 'Pedidos &amp; Servicios' : mqLabel}</strong> (${price}€) ha sido registrada. Se aplicará automáticamente al final de su período actual.`,
       closing: `El equipo GeNext`
     }
   };
