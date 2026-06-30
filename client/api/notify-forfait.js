@@ -406,24 +406,34 @@ module.exports = async function handler(req, res) {
   const isPending = pending === true || pending === 'true';
   const isUpgrade = newForfait === 'commandes-services' && oldForfait !== 'commandes-services';
   const safeName  = String(name || rid).slice(0, 80);
-  const livePrice = await fetchSaasPricing();
-  const priceObj  = livePrice || PRICE;
-  const price     = priceObj[safeMode][newForfait];
   const forfaitLabel = newForfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
   const results   = { email: null, fcm: null, sync: null };
 
-  // Recherche de la commande dans control Firebase
+  // Recherche de la commande dans control Firebase (avant calcul du prix pour priorité carte client)
   const secret = process.env.FIREBASE_CONTROL_SECRET;
   let cmdKey = null;
+  let cmdData = null;
   if (secret) {
     try {
       const commandes = await fbGet(CONTROL_DB, '/commandes', secret);
       if (commandes) {
         const entry = Object.entries(commandes).find(([, d]) => d?.clientCree?.rid === rid);
-        if (entry) cmdKey = entry[0];
+        if (entry) { cmdKey = entry[0]; cmdData = entry[1]; }
       }
     } catch(e) { /* non-bloquant */ }
   }
+
+  // Prix : priorité prix combo de la carte client → demoPage/pricing → défaut codé
+  const _ck = (newForfait === 'commandes-services' ? 'srv' : 'qr') + '-' + safeMode;
+  const livePrice = await fetchSaasPricing();
+  const priceObj  = livePrice || PRICE;
+  const price = (cmdData?.prices?.[_ck] != null)
+    ? cmdData.prices[_ck]
+    : priceObj[safeMode][newForfait];
+  // Injecter le prix effectif dans priceObj pour les builders d'email
+  const effectivePriceObj = (price !== priceObj[safeMode]?.[newForfait])
+    ? Object.assign({}, priceObj, { [safeMode]: Object.assign({}, priceObj[safeMode], { [newForfait]: price }) })
+    : priceObj;
 
   // ── Mode "changement du mode de paiement uniquement" (forfait inchangé) ─────
   if (onlyPaymentMode === true) {
@@ -438,7 +448,7 @@ module.exports = async function handler(req, res) {
 
     if (email) {
       try {
-        const { subject, html } = buildPaymentModeEmail(safeLang, safeName, safeMode, newForfait, priceObj);
+        const { subject, html } = buildPaymentModeEmail(safeLang, safeName, safeMode, newForfait, effectivePriceObj);
         await createTransport().sendMail({
           from: `"GeNext" <${process.env.GMAIL_USER}>`,
           to: email, subject, html,
@@ -485,7 +495,7 @@ module.exports = async function handler(req, res) {
 
     if (email) {
       try {
-        const { subject, html } = buildPendingEmail(safeLang, safeName, newForfait, safeMode, priceObj);
+        const { subject, html } = buildPendingEmail(safeLang, safeName, newForfait, safeMode, effectivePriceObj);
         await createTransport().sendMail({
           from: `"GeNext" <${process.env.GMAIL_USER}>`,
           to: email, subject, html,
@@ -510,7 +520,7 @@ module.exports = async function handler(req, res) {
     // ── Mode immédiat : email + sync commande + FCM ─────────────────────────────
     if (email) {
       try {
-        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, priceObj, !!isTrial);
+        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, effectivePriceObj, !!isTrial);
         await createTransport().sendMail({
           from: `"GeNext" <${process.env.GMAIL_USER}>`,
           to: email, subject, html,
