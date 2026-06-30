@@ -1101,7 +1101,7 @@
     }
     .prod-card:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
     .prod-card-top {
-      display:flex; align-items:center; gap:12px; padding:14px;
+      display:flex; align-items:center; gap:10px; padding:14px 14px 14px 8px;
       cursor:pointer; user-select:none; min-height:70px;
     }
     .prod-thumb {
@@ -5568,14 +5568,18 @@ function renderCatsSection() {
     `;
     list.appendChild(row);
 
-    // ── Drag & drop catégorie ──
-    row.setAttribute('draggable', 'true');
+    // ── Drag & drop catégorie — handle uniquement ──
+    const _catHandle = row.querySelector('.drag-handle');
+    _catHandle.addEventListener('mousedown', () => { row.draggable = true; });
+    _catHandle.addEventListener('touchstart', () => { row.draggable = true; }, {passive:true});
     row.addEventListener('dragstart', e => {
+      if (!row.draggable) return;
       _dragCatIdx = ci;
       e.dataTransfer.effectAllowed = 'move';
       setTimeout(() => row.classList.add('dragging'), 0);
     });
     row.addEventListener('dragend', () => {
+      row.draggable = false;
       row.classList.remove('dragging');
       document.querySelectorAll('.cat-row').forEach(r => r.classList.remove('drag-over'));
       _dragCatIdx = null;
@@ -5814,6 +5818,9 @@ function renderProdCard(container, item, ci) {
   const _isVisible = item.visible !== false;
   card.innerHTML = `
     <div class="prod-card-top">
+      <div class="drag-handle" draggable="false" title="Maintenir pour déplacer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+      </div>
       ${thumbHTML}
       <div class="prod-top-info">
         <div class="prod-top-name">${item.name?.[currentLang] ? esc(item.name[currentLang]) : '<span style="opacity:0.3">—</span>'}</div>
@@ -5833,9 +5840,10 @@ function renderProdCard(container, item, ci) {
   `;
   container.appendChild(card);
 
-  // Toggle expand (clics sur les boutons action ne doivent pas déclencher l'expand)
+  // Toggle expand (handle et boutons action ne déclenchent pas l'expand)
   card.querySelector('.prod-card-top').addEventListener('click', e => {
     if (e.target.closest('.prod-top-actions')) return;
+    if (e.target.closest('.drag-handle')) return;
     card.classList.toggle('open');
   });
 
@@ -5998,15 +6006,19 @@ function renderProdCard(container, item, ci) {
     markUnsaved(); renderProductsSection();
   });
 
-  // ── Drag & drop produit ──
-  card.setAttribute('draggable', 'true');
+  // ── Drag & drop produit — handle uniquement ──
+  const _prodHandle = card.querySelector('.drag-handle');
+  _prodHandle.addEventListener('mousedown', () => { card.draggable = true; });
+  _prodHandle.addEventListener('touchstart', () => { card.draggable = true; }, {passive:true});
   card.addEventListener('dragstart', e => {
+    if (!card.draggable) return;
     _dragItemId = item.id;
     e.dataTransfer.effectAllowed = 'move';
     setTimeout(() => card.classList.add('dragging'), 0);
     e.stopPropagation();
   });
   card.addEventListener('dragend', () => {
+    card.draggable = false;
     card.classList.remove('dragging');
     document.querySelectorAll('.prod-card').forEach(c => c.classList.remove('drag-over'));
     document.querySelectorAll('.cat-products').forEach(s => s.classList.remove('drag-over-cat'));
@@ -8944,6 +8956,18 @@ document.addEventListener('click', () => {
     p.previousElementSibling?.classList.remove('open');
   });
 });
+
+// Réinitialiser draggable si mouseup/touchend sans drag (handle pressé puis relâché)
+document.addEventListener('mouseup', () => {
+  document.querySelectorAll('.cat-row[draggable="true"],.prod-card[draggable="true"]').forEach(el => {
+    el.draggable = false;
+  });
+});
+document.addEventListener('touchend', () => {
+  document.querySelectorAll('.cat-row[draggable="true"],.prod-card[draggable="true"]').forEach(el => {
+    el.draggable = false;
+  });
+}, {passive:true});
 
 // ── Icon Modal ──
 let _icoModalCi = null;
