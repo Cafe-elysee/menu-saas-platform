@@ -4751,6 +4751,7 @@
       background:var(--bg); overflow:hidden;
       box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px var(--bg);
       transition:border-radius 0.25s;
+      animation:hcLogoFloat 3.2s ease-in-out infinite;
     }
     html.light .fp-hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
     .fp-hc-name {
@@ -5434,12 +5435,17 @@
     margin-top:-48px; margin-bottom:14px;
     position:relative; z-index:4;
   }
+  @keyframes hcLogoFloat {
+    0%, 100% { transform:translateY(0px); }
+    50%       { transform:translateY(-8px); }
+  }
   .hc-logo {
     width:96px; height:96px; border-radius:50%;
     object-fit:contain; object-position:center;
     background:var(--bg); overflow:hidden;
     box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px var(--bg);
     transition:border-radius 0.25s;
+    animation:hcLogoFloat 3.2s ease-in-out infinite;
   }
   html.light .hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
   /* ── Straddle fix : Élégant + tous les thèmes Carte ── */
