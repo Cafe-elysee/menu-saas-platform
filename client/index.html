@@ -1360,8 +1360,7 @@
     html[data-menu-theme="carte-classique"] .nav-search-wrap { display:none; }
     html[data-menu-theme="carte-classique"] #cat-pills { display:none; }
     html[data-menu-theme="carte-classique"] #nav {
-      background:transparent; border:none; box-shadow:none;
-      backdrop-filter:none; -webkit-backdrop-filter:none;
+      background:var(--bg-nav); border-bottom:1px solid var(--border);
     }
     html[data-menu-theme="carte-classique"] .nav-top { justify-content:center; padding:8px 0; }
 
@@ -1691,7 +1690,7 @@
     html[data-menu-theme="carte-telegraphe"] #nav,html[data-menu-theme="carte-couture"] #nav,
     html[data-menu-theme="carte-journal"] #nav,html[data-menu-theme="carte-voyage"] #nav,
     html[data-menu-theme="carte-artisan"] #nav,html[data-menu-theme="carte-ardoise"] #nav,
-    html[data-menu-theme="carte-maroc"] #nav { background:transparent; border:none; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+    html[data-menu-theme="carte-maroc"] #nav { background:var(--bg-nav); border-bottom:1px solid var(--border); }
     html[data-menu-theme="carte-sommelier"] .nav-top,html[data-menu-theme="carte-bento"] .nav-top,
     html[data-menu-theme="carte-telegraphe"] .nav-top,html[data-menu-theme="carte-couture"] .nav-top,
     html[data-menu-theme="carte-journal"] .nav-top,html[data-menu-theme="carte-voyage"] .nav-top,
@@ -5471,7 +5470,7 @@
   html.light .hc-tagline { color:var(--gold,#c8a44e); }
   .hc-desc {
     font-size:0.84rem; color:var(--muted); line-height:1.65;
-    max-width:480px; margin:12px auto 0;
+    max-width:480px; margin:12px auto 0; white-space:pre-line;
   }
   .hc-socials {
     display:flex; gap:8px; justify-content:center;
