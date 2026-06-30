@@ -2666,10 +2666,17 @@
       background-size:cover; background-position:center;
     }
     .pre-logo-img {
-      width:72vw; max-width:320px; height:auto; display:block;
+      width:140px; height:140px; display:block;
+      object-fit:contain; object-position:center;
+      border-radius:50%; overflow:hidden;
+      background:#080604;
+      box-shadow:0 8px 32px rgba(0,0,0,0.7),0 0 0 4px #080604;
       will-change:opacity,filter;
-      background:transparent;
       position:relative; z-index:1;
+    }
+    html.light .pre-logo-img {
+      background:#f0ede8;
+      box-shadow:0 6px 22px rgba(0,0,0,0.2),0 0 0 4px #f0ede8;
     }
     @keyframes gnBarFlow {
       0%   { transform: translateX(-100%); opacity: 0; }
@@ -4746,14 +4753,14 @@
     }
     html.light .fp-hc-card { border-bottom-color:rgba(0,0,0,0.06); }
     .fp-hc-logo {
-      max-height:96px; width:auto; max-width:200px;
+      width:96px; height:96px; border-radius:50%;
       object-fit:contain; object-position:center;
-      border-radius:0;
-      filter:drop-shadow(0 4px 18px rgba(0,0,0,0.55));
+      background:var(--bg); overflow:hidden;
+      box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px var(--bg);
       transition:border-radius 0.25s;
       animation:hcLogoFloat 3.2s ease-in-out infinite;
     }
-    html.light .fp-hc-logo { filter:drop-shadow(0 3px 12px rgba(0,0,0,0.22)); }
+    html.light .fp-hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
     .fp-hc-name {
       font-family:'Cormorant Garamond','Cormorant',serif;
       font-size:clamp(1.4rem,5vw,2rem); font-weight:600;
@@ -5440,14 +5447,14 @@
     50%       { transform:translateY(-8px); }
   }
   .hc-logo {
-    max-height:96px; width:auto; max-width:200px;
+    width:96px; height:96px; border-radius:50%;
     object-fit:contain; object-position:center;
-    border-radius:0;
-    filter:drop-shadow(0 4px 18px rgba(0,0,0,0.55));
+    background:var(--bg); overflow:hidden;
+    box-shadow:0 6px 22px rgba(0,0,0,0.55),0 0 0 3px var(--bg);
     transition:border-radius 0.25s;
     animation:hcLogoFloat 3.2s ease-in-out infinite;
   }
-  html.light .hc-logo { filter:drop-shadow(0 3px 12px rgba(0,0,0,0.22)); }
+  html.light .hc-logo { box-shadow:0 4px 16px rgba(0,0,0,0.18),0 0 0 3px var(--bg); }
   /* ── Straddle fix : Élégant + tous les thèmes Carte ── */
   html:not([data-menu-theme^="carte-"]) body:not([data-style="paper"]) #hero-card,
   html[data-menu-theme^="carte-"] #hero-card {
@@ -7168,7 +7175,7 @@ function buildFlipBook() {
       <div class="fp-menu-capsule"><div class="fp-menu-dot"></div></div>
       <svg class="fp-swipe-hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="${isAr ? '9,18 15,12 9,6' : '15,18 9,12 15,6'}"/></svg>
     </div>
-    ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_logoUrl}" alt=""></div>` : ''}
+    ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_logoUrl}" alt="" style="border-radius:${_logoRadius}"></div>` : ''}
     <div class="fp-hc-card" style="${_logoUrl ? '' : 'padding-top:30px'}">
       <div class="fp-hc-name">${_esc(_restaurantName)}</div>
       ${u.tagline ? `<div class="fp-hc-tagline">${_esc(u.tagline)}</div>` : ''}
@@ -8588,7 +8595,7 @@ function _detectLogoShape(src) {
       for (let i=3;i<d.length;i+=4){tot++;if(d[i]<40)trans++;}
       _logoRadius = (trans/tot > 0.25) ? '50%' : '14px';
     } catch(e) { _logoRadius = '50%'; }
-    // border-radius non appliqué : logo transparent sans fond, pas de clip nécessaire
+    document.querySelectorAll('.hc-logo,.fp-hc-logo,#pre-logo-img').forEach(el => el.style.borderRadius = _logoRadius);
   };
   t.onerror = function(){};
   t.src = src;
