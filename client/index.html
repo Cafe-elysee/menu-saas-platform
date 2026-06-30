@@ -5477,12 +5477,10 @@
     flex-wrap:wrap; margin-top:14px;
   }
   .hc-social-btn {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:6px 13px; border-radius:18px;
-    font-size:0.78rem; font-weight:500;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
     text-decoration:none; border:1px solid;
     transition:opacity 0.2s,transform 0.15s;
-    letter-spacing:0.02em;
   }
   .hc-social-btn:active { transform:scale(0.96); opacity:0.8; }
   .hc-ig { color:#e1306c; border-color:rgba(225,48,108,0.35); background:rgba(225,48,108,0.07); }
@@ -5755,17 +5753,14 @@
   <p class="hc-tagline" id="hc-tagline"></p>
   <p class="hc-desc" id="hc-desc" style="display:none"></p>
   <div class="hc-socials" id="hc-socials" style="display:none">
-    <a id="hc-ig" class="hc-social-btn hc-ig" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-      Instagram
+    <a id="hc-ig" class="hc-social-btn hc-ig" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
     </a>
-    <a id="hc-fb" class="hc-social-btn hc-fb" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-      Facebook
+    <a id="hc-fb" class="hc-social-btn hc-fb" href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
     </a>
-    <a id="hc-tt" class="hc-social-btn hc-tt" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
-      TikTok
+    <a id="hc-tt" class="hc-social-btn hc-tt" href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
     </a>
   </div>
   <div id="hc-wifi" class="hc-wifi" style="display:none">
@@ -7147,9 +7142,9 @@ function buildFlipBook() {
   const _fpIgSrc = _igSrc, _fpFbSrc = _fbSrc, _fpTtSrc = _ttSrc;
   const _fpSocialsHtml = (_fpIgSrc || _fpFbSrc || _fpTtSrc) ? `
     <div class="hc-socials" style="margin-top:14px">
-      ${_fpIgSrc ? `<a class="hc-social-btn hc-ig" href="${_fpIgSrc}" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>Instagram</a>` : ''}
-      ${_fpFbSrc ? `<a class="hc-social-btn hc-fb" href="${_fpFbSrc}" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook</a>` : ''}
-      ${_fpTtSrc ? `<a class="hc-social-btn hc-tt" href="${_fpTtSrc}" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>TikTok</a>` : ''}
+      ${_fpIgSrc ? `<a class="hc-social-btn hc-ig" href="${_fpIgSrc}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>` : ''}
+      ${_fpFbSrc ? `<a class="hc-social-btn hc-fb" href="${_fpFbSrc}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>` : ''}
+      ${_fpTtSrc ? `<a class="hc-social-btn hc-tt" href="${_fpTtSrc}" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg></a>` : ''}
     </div>` : '';
 
   const hero = document.createElement('div');
