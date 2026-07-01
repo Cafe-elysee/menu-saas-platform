@@ -6690,11 +6690,19 @@ async function doSaveAll() {
 
   // 4. Sauvegarder
   delete fab.dataset.saving;
+  // Mémoriser les cartes ouvertes avant le re-rendu
+  const _openCardIds = new Set([...document.querySelectorAll('.prod-card.open')].map(c => c.dataset.id));
   saveData();
   // Vider les cartes avant renderAll pour éviter que collectProdForm écrase les traductions
   const _pa = document.getElementById('products-area');
   if (_pa) _pa.innerHTML = '';
   renderAll();
+  // Restaurer l'état ouvert des cartes
+  if (_openCardIds.size > 0) {
+    document.querySelectorAll('.prod-card').forEach(c => {
+      if (_openCardIds.has(c.dataset.id)) c.classList.add('open');
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════
