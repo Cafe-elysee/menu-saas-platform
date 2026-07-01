@@ -3075,6 +3075,8 @@
     .bdg-v { background:rgba(126,189,106,0.13); color:#7ebd6a; border:1px solid rgba(126,189,106,0.28); }
     .bdg-l { background:rgba(220,80,80,0.12); color:#e07070; border:1px solid rgba(220,80,80,0.28); animation:pulse 2.6s ease-in-out infinite; }
     .bdg-m { background:rgba(255,190,80,0.13); color:#f5a623; border:1px solid rgba(255,190,80,0.28); }
+    .bdg-hh { background:rgba(200,164,78,0.18); color:var(--gold); border:1px solid rgba(200,164,78,0.4); animation:pulse 2.6s ease-in-out infinite; font-weight:600; }
+    .price-hh { color:var(--gold); font-weight:700; }
     .bdg-type { background:rgba(100,140,200,0.12); color:#8ab4e8; border:1px solid rgba(100,140,200,0.25); }
     .bdg-temp-chaud { background:rgba(220,100,60,0.12); color:#e08060; border:1px solid rgba(220,100,60,0.25); }
     .bdg-temp-froid { background:rgba(80,160,220,0.12); color:#70b8e8; border:1px solid rgba(80,160,220,0.25); }
@@ -6006,7 +6008,7 @@ const UI = {
     search:'Αναζήτηση στο μενού…',
     all:'Όλα',
     cats:['Ζεστά Ροφήματα','Κρύα Ροφήματα','Φαγητό','Γλυκά','Πρωινό','Ναργιλές'],
-    badgeN:'Νέο', badgeP:'Δημοφιλές', badgeV:'Vegan', badgeL:'Περιορισμένο', badgeM:'Πρωινό',
+    badgeN:'Νέο', badgeP:'Δημοφιλές', badgeV:'Vegan', badgeL:'Περιορισμένο', badgeM:'Πρωινό', badgeHH:'Happy Hour',
     bdgBoisson:'Ρόφημα', bdgCuisine:'Φαγητό', bdgSucre:'Γλυκό', bdgHookah:'Ναργιλές',
     bdgChaud:'Ζεστό', bdgFroid:'Κρύο', bdgGlace:'Παγωμένο',
     callBtn:'Κλήση σερβιτόρου',
@@ -6039,7 +6041,7 @@ const UI = {
     search:'Rechercher dans le menu…',
     all:'Tout',
     cats:['Boissons Chaudes','Boissons Froides','Cuisine','Sucré','Le Matin','Hookah'],
-    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin',
+    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin', badgeHH:'Happy Hour',
     bdgBoisson:'Boisson', bdgCuisine:'Cuisine', bdgSucre:'Sucré', bdgHookah:'Hookah',
     bdgChaud:'Chaud', bdgFroid:'Froid', bdgGlace:'Glacé',
     callBtn:'Appeler le serveur',
@@ -6072,7 +6074,7 @@ const UI = {
     search:'Search the menu…',
     all:'All',
     cats:['Hot Drinks','Cold Drinks','Food','Sweet','Breakfast','Hookah'],
-    badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning',
+    badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning', badgeHH:'Happy Hour',
     bdgBoisson:'Drink', bdgCuisine:'Food', bdgSucre:'Sweet', bdgHookah:'Hookah',
     bdgChaud:'Hot', bdgFroid:'Cold', bdgGlace:'Iced',
     callBtn:'Call the waiter',
@@ -6105,7 +6107,7 @@ const UI = {
     search:'Buscar en el menú…',
     all:'Todo',
     cats:['Bebidas calientes','Bebidas frías','Comida','Postres','Desayuno','Shisha'],
-    badgeN:'Nuevo', badgeP:'Más pedido', badgeV:'Vegetariano', badgeL:'Oferta limitada', badgeM:'Mañana',
+    badgeN:'Nuevo', badgeP:'Más pedido', badgeV:'Vegetariano', badgeL:'Oferta limitada', badgeM:'Mañana', badgeHH:'Happy Hour',
     bdgBoisson:'Bebida', bdgCuisine:'Cocina', bdgSucre:'Dulce', bdgHookah:'Shisha',
     bdgChaud:'Caliente', bdgFroid:'Frío', bdgGlace:'Helado',
     callBtn:'Llamar al camarero',
@@ -6138,7 +6140,7 @@ const UI = {
     search:'Speisekarte durchsuchen…',
     all:'Alle',
     cats:['Heiße Getränke','Kalte Getränke','Speisen','Süßes','Frühstück','Hookah'],
-    badgeN:'Neu', badgeP:'Beliebt', badgeV:'Vegan', badgeL:'Begrenztes Angebot', badgeM:'Frühstück',
+    badgeN:'Neu', badgeP:'Beliebt', badgeV:'Vegan', badgeL:'Begrenztes Angebot', badgeM:'Frühstück', badgeHH:'Happy Hour',
     bdgBoisson:'Getränk', bdgCuisine:'Speise', bdgSucre:'Süß', bdgHookah:'Hookah',
     bdgChaud:'Heiß', bdgFroid:'Kalt', bdgGlace:'Eisgekühlt',
     callBtn:'Kellner rufen',
@@ -6908,7 +6910,7 @@ function applyAdminData(data) {
       data.cats.forEach(c => {
         // Migration flipPhoto → flipPhotos (3 slots)
         const fp = c.flipPhotos || (c.flipPhoto ? [c.flipPhoto] : []);
-        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), flipPhotos: [fp[0]||'', fp[1]||'', fp[2]||''], visible: c.visible !== false });
+        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), flipPhotos: [fp[0]||'', fp[1]||'', fp[2]||''], visible: c.visible !== false, schedule: c.schedule || null });
         // Injecter le nom dans UI[lang].cats pour chaque langue
         Object.keys(UI).forEach(l => {
           if (!UI[l].cats) UI[l].cats = [];
@@ -6945,6 +6947,7 @@ function applyAdminData(data) {
           visible:   item.visible !== false,
           doseOption: item.doseOption === true,
           salePrice: item.salePrice || '',
+          happyHour: (item.happyHour?.enabled && item.happyHour.price) ? item.happyHour : null,
         };
         ITEMS.push(safe);
       });
@@ -8597,6 +8600,12 @@ function applyHeroCardExtras(ig, fb, tt) {
    PRIX + REMISE — helper de rendu
 ================================================ */
 function _priceHtml(item) {
+  if (item.happyHour?.enabled && _isInSchedule(item.happyHour) && item.happyHour.price) {
+    const orig = item.price || '';
+    return orig
+      ? `<span class="price-old">${_esc(orig)}</span><span class="price-hh">${_esc(item.happyHour.price)}</span>`
+      : `<span class="price-hh">${_esc(item.happyHour.price)}</span>`;
+  }
   const price = item.price || '';
   const sale  = item.salePrice || '';
   if (sale && price && sale !== price) {
@@ -8981,12 +8990,25 @@ function applyTranslations() {
 /* ================================================
    CATEGORY PILLS
 ================================================ */
+function _isInSchedule(s) {
+  if (!s || !s.enabled) return true;
+  const now = new Date();
+  if (!(s.days & (1 << now.getDay()))) return false;
+  const cur = now.getHours() * 60 + now.getMinutes();
+  if (!s.from || !s.to) return true;
+  const [fh, fm] = s.from.split(':').map(Number);
+  const [th, tm] = s.to.split(':').map(Number);
+  const from = fh * 60 + fm, to = th * 60 + tm;
+  return from <= to ? (cur >= from && cur < to) : (cur >= from || cur < to);
+}
+
 function buildCatPills() {
   const t = UI[lang];
   const wrap = document.getElementById('cat-pills');
   wrap.innerHTML = '';
   CATS.forEach((cat, i) => {
     if (cat.visible === false) return;
+    if (!_isInSchedule(cat.schedule)) return;
     const pill = document.createElement('button');
     pill.className = 'cat-pill' + (activeCat === i.toString() ? ' on' : '');
     pill.dataset.cat = i;
@@ -9010,6 +9032,7 @@ function renderMenu() {
   container.innerHTML = '';
   CATS.forEach((cat, ci) => {
     if (cat.visible === false) return;
+    if (!_isInSchedule(cat.schedule)) return;
     const catItems = ITEMS.filter(it => it.cat === ci && it.visible !== false);
     const sec = document.createElement('div');
     sec.className = 'cat-sec';
@@ -9058,6 +9081,9 @@ function renderMenu() {
 function _getBadges(item) {
   const t = UI[lang];
   const parts = [];
+  if (item.happyHour?.enabled && _isInSchedule(item.happyHour)) {
+    parts.push(`<span class="bdg bdg-hh">${t.badgeHH || 'Happy Hour'}</span>`);
+  }
   if (item.type) {
     const lbl = { boisson:t.bdgBoisson, cuisine:t.bdgCuisine, sucre:t.bdgSucre, hookah:t.bdgHookah }[item.type] || '';
     if (lbl) parts.push(`<span class="bdg bdg-type">${lbl}</span>`);

@@ -1061,6 +1061,41 @@
     .cat-row-controls {
       display:flex; align-items:center; gap:8px; flex-shrink:0;
     }
+    /* ── Programmation horaire (catégorie) ── */
+    .cat-sched-panel { flex-basis:100%; }
+    .cat-sched-header { padding-top:10px; margin-top:6px; border-top:1px solid var(--border); }
+    .cat-sched-toggle { display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .sched-enabled-chk { accent-color:#c8a44e; width:17px; height:17px; cursor:pointer; flex-shrink:0; }
+    .cat-sched-lbl { font-size:0.83em; opacity:0.6; letter-spacing:0.01em; }
+    .cat-sched-body { display:none; padding:14px 0 4px; }
+    .cat-sched-body.open { display:block; }
+    /* ── Jours ── */
+    .sched-days { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .sched-day-pill {
+      width:34px; height:34px; border-radius:50%;
+      border:1.5px solid rgba(200,164,78,0.22); background:transparent;
+      color:var(--t); font-size:0.76em; font-weight:500; cursor:pointer;
+      transition:background 0.15s,border-color 0.15s,color 0.15s,transform 0.1s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .sched-day-pill:hover { border-color:rgba(200,164,78,0.5); }
+    .sched-day-pill.on { background:rgba(200,164,78,0.16); border-color:#c8a44e; color:#c8a44e; font-weight:700; transform:scale(1.08); }
+    /* ── Heures ── */
+    .sched-times { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.83em; opacity:0.8; }
+    .sched-time-inp {
+      background:rgba(255,255,255,0.06); border:1.5px solid var(--border); border-radius:10px;
+      color:var(--t); padding:6px 10px; font-size:0.88em; cursor:pointer;
+      transition:border-color 0.15s;
+    }
+    .sched-time-inp:focus { border-color:#c8a44e; outline:none; }
+    html.light .sched-time-inp { background:#f5f5f5; border-color:#ddd; color:#333; }
+    /* ── Happy Hour (produit) ── */
+    .prod-hh-section { border-top:1px solid var(--border); padding-top:14px; margin-top:8px; }
+    .hh-toggle-row { display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .hh-enabled-chk { accent-color:#c8a44e; width:17px; height:17px; cursor:pointer; flex-shrink:0; }
+    .hh-lbl { font-size:0.92em; font-weight:700; color:#c8a44e; letter-spacing:0.02em; }
+    .hh-body { display:none; margin-top:14px; }
+    .hh-body.open { display:block; }
     .btn-del {
       width:36px; height:36px; flex-shrink:0;
       border:1px solid rgba(224,82,82,0.3); border-radius:8px;
@@ -3058,6 +3093,8 @@ const ADMIN_UI = {
     doseOptionLabel:  'Επιλογή Δόσης & Ζάχαρης',
     prodVisibleLabel: 'Εμφάνιση στο μενού',
     catVisibleLabel:  'Κατηγορία ορατή',
+    scheduleLabel:'Χρονοδιάγραμμα', scheduleFrom:'Από', scheduleTo:'Έως', scheduleDays:'Ενεργές ημέρες',
+    hhLabel:'Happy Hour', hhPrice:'Τιμή Happy Hour',
     btnMove:       'Μετακίνηση',
     changeCat:     '— Αλλαγή κατηγορίας —',
     newCat:        'Νέα κατηγορία',
@@ -3203,6 +3240,8 @@ const ADMIN_UI = {
     doseOptionLabel:  'Option Dose & Sucre',
     prodVisibleLabel: 'Afficher dans le menu',
     catVisibleLabel:  'Catégorie visible',
+    scheduleLabel:'Programmation horaire', scheduleFrom:'De', scheduleTo:'À', scheduleDays:'Jours actifs',
+    hhLabel:'Happy Hour', hhPrice:'Prix Happy Hour',
     btnMove:       'Déplacer',
     changeCat:     '— Changer de catégorie —',
     newCat:        'Nouvelle catégorie',
@@ -3348,6 +3387,8 @@ const ADMIN_UI = {
     doseOptionLabel:  'Dose & Sugar option',
     prodVisibleLabel: 'Show in menu',
     catVisibleLabel:  'Category visible',
+    scheduleLabel:'Time schedule', scheduleFrom:'From', scheduleTo:'To', scheduleDays:'Active days',
+    hhLabel:'Happy Hour', hhPrice:'Happy Hour price',
     btnMove:       'Move',
     changeCat:     '— Change category —',
     newCat:        'New category',
@@ -3493,6 +3534,8 @@ const ADMIN_UI = {
     doseOptionLabel:  'Dose & Zucker Option',
     prodVisibleLabel: 'Im Menü anzeigen',
     catVisibleLabel:  'Kategorie sichtbar',
+    scheduleLabel:'Zeitplan', scheduleFrom:'Von', scheduleTo:'Bis', scheduleDays:'Aktive Tage',
+    hhLabel:'Happy Hour', hhPrice:'Happy-Hour-Preis',
     btnMove:       'Verschieben',
     changeCat:     '— Kategorie wechseln —',
     newCat:        'Neue Kategorie',
@@ -3638,6 +3681,8 @@ const ADMIN_UI = {
     doseOptionLabel:  'Opción Dosis & Azúcar',
     prodVisibleLabel: 'Mostrar en el menú',
     catVisibleLabel:  'Categoría visible',
+    scheduleLabel:'Programación horaria', scheduleFrom:'Desde', scheduleTo:'Hasta', scheduleDays:'Días activos',
+    hhLabel:'Happy Hour', hhPrice:'Precio Happy Hour',
     btnMove:       'Mover',
     changeCat:     '— Cambiar categoría —',
     newCat:        'Nueva categoría',
@@ -4399,6 +4444,7 @@ function sanitizeItems(items) {
     if (item.salePrice)           r.salePrice = item.salePrice;
     if (item.doseOption === true) r.doseOption = true;
     if (item.visible === false)   r.visible = false;
+    if (item.happyHour?.enabled && item.happyHour.price) r.happyHour = item.happyHour;
     return r;
   });
 }
@@ -5490,6 +5536,20 @@ const ICON_LABELS = {
 };
 function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
 
+/* Jours de la semaine pour les panneaux horaires — ordre Lun→Dim, index = getDay() */
+const _DAYS = {
+  fr: [{i:1,l:'L'},{i:2,l:'M'},{i:3,l:'M'},{i:4,l:'J'},{i:5,l:'V'},{i:6,l:'S'},{i:0,l:'D'}],
+  en: [{i:1,l:'M'},{i:2,l:'T'},{i:3,l:'W'},{i:4,l:'T'},{i:5,l:'F'},{i:6,l:'S'},{i:0,l:'S'}],
+  el: [{i:1,l:'Δ'},{i:2,l:'Τ'},{i:3,l:'Τ'},{i:4,l:'Π'},{i:5,l:'Π'},{i:6,l:'Σ'},{i:0,l:'Κ'}],
+  de: [{i:1,l:'M'},{i:2,l:'D'},{i:3,l:'M'},{i:4,l:'D'},{i:5,l:'F'},{i:6,l:'S'},{i:0,l:'S'}],
+  es: [{i:1,l:'L'},{i:2,l:'M'},{i:3,l:'M'},{i:4,l:'J'},{i:5,l:'V'},{i:6,l:'S'},{i:0,l:'D'}],
+};
+function _schedDayPillsHtml(days, cls) {
+  return (_DAYS[currentLang]||_DAYS.fr).map(({i,l})=>
+    `<button type="button" class="sched-day-pill ${cls} ${(days&(1<<i))?'on':''}" data-di="${i}">${l}</button>`
+  ).join('');
+}
+
 function renderCatsSection() {
   const list = document.getElementById('cats-list');
   document.getElementById('cat-count').textContent = adminData.cats.length;
@@ -5568,6 +5628,24 @@ function renderCatsSection() {
       <div class="cat-photos-row">
         <div class="cat-photos-slots">${slotsHtml}</div>
       </div>
+      <div class="cat-sched-panel">
+        <div class="cat-sched-header">
+          <label class="cat-sched-toggle">
+            <input type="checkbox" class="sched-enabled-chk" ${cat.schedule?.enabled ? 'checked' : ''}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:#c8a44e;opacity:${cat.schedule?.enabled?'1':'0.45'}"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="cat-sched-lbl">${_tCat.scheduleLabel || 'Programmation horaire'}</span>
+          </label>
+        </div>
+        <div class="cat-sched-body ${cat.schedule?.enabled ? 'open' : ''}">
+          <div class="sched-days">${_schedDayPillsHtml(cat.schedule?.days ?? 127, 'cat-day-pill')}</div>
+          <div class="sched-times">
+            <span>${_tCat.scheduleFrom || 'De'}</span>
+            <input type="time" class="sched-time-inp sched-from-inp" value="${esc(cat.schedule?.from || '08:00')}">
+            <span>${_tCat.scheduleTo || 'À'}</span>
+            <input type="time" class="sched-time-inp sched-to-inp" value="${esc(cat.schedule?.to || '22:00')}">
+          </div>
+        </div>
+      </div>
     `;
     list.appendChild(row);
 
@@ -5635,6 +5713,50 @@ function renderCatsSection() {
       const eyeOpen  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
       const eyeClosed = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
       btn.innerHTML = nextVisible ? eyeOpen : eyeClosed;
+    });
+
+    // ── Programmation horaire catégorie ──
+    const _schedSaveToFirebase = (ci) => {
+      const s = adminData.cats[ci].schedule;
+      _lastLocalSave = Date.now();
+      if (!s || !s.enabled) {
+        _rref('menu/cats/' + ci + '/schedule').remove();
+      } else {
+        _rref('menu/cats/' + ci + '/schedule').set({ enabled:true, days:s.days, from:s.from, to:s.to });
+      }
+    };
+    const schedChk = row.querySelector('.sched-enabled-chk');
+    const schedBody = row.querySelector('.cat-sched-body');
+    schedChk.addEventListener('change', () => {
+      const enabled = schedChk.checked;
+      const cat = adminData.cats[ci];
+      if (!cat.schedule) cat.schedule = { enabled:false, days:127, from:'08:00', to:'22:00' };
+      cat.schedule.enabled = enabled;
+      schedBody.classList.toggle('open', enabled);
+      row.querySelector('svg[viewBox="0 0 24 24"] circle')?.parentElement?.style?.setProperty('opacity', enabled ? '1' : '0.45');
+      _schedSaveToFirebase(ci);
+    });
+    row.querySelectorAll('.cat-day-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const di = parseInt(pill.dataset.di);
+        const cat = adminData.cats[ci];
+        if (!cat.schedule) cat.schedule = { enabled:true, days:127, from:'08:00', to:'22:00' };
+        cat.schedule.days ^= (1 << di);
+        pill.classList.toggle('on', !!(cat.schedule.days & (1 << di)));
+        if (cat.schedule.enabled) _schedSaveToFirebase(ci);
+      });
+    });
+    row.querySelector('.sched-from-inp').addEventListener('change', e => {
+      const cat = adminData.cats[ci];
+      if (!cat.schedule) cat.schedule = { enabled:true, days:127, from:'08:00', to:'22:00' };
+      cat.schedule.from = e.target.value;
+      if (cat.schedule.enabled) _schedSaveToFirebase(ci);
+    });
+    row.querySelector('.sched-to-inp').addEventListener('change', e => {
+      const cat = adminData.cats[ci];
+      if (!cat.schedule) cat.schedule = { enabled:true, days:127, from:'08:00', to:'22:00' };
+      cat.schedule.to = e.target.value;
+      if (cat.schedule.enabled) _schedSaveToFirebase(ci);
     });
 
     // Ouvrir le modal icône
@@ -5999,6 +6121,19 @@ function renderProdCard(container, item, ci) {
     btn.addEventListener('click', () => { btn.classList.toggle('active'); markUnsaved(); });
   });
 
+  // Happy Hour toggle
+  const hhChk = card.querySelector('.hh-enabled-chk');
+  const hhBody = card.querySelector('.hh-body');
+  if (hhChk && hhBody) {
+    hhChk.addEventListener('change', () => {
+      hhBody.classList.toggle('open', hhChk.checked);
+    });
+  }
+  // Happy Hour day pills
+  card.querySelectorAll('.hh-day-pill').forEach(pill => {
+    pill.addEventListener('click', () => { pill.classList.toggle('on'); markUnsaved(); });
+  });
+
   // ── Déplacer / Copier vers une autre catégorie ──
   card.querySelector('.btn-move-cat').addEventListener('click', () => {
     const sel = card.querySelector('.move-cat-sel');
@@ -6198,6 +6333,43 @@ function buildProdForm(item) {
 
     </div>
 
+    <!-- ⑥ Happy Hour -->
+    ${(() => {
+      const hh = item.happyHour || {};
+      const hhEnabled = !!hh.enabled;
+      const hhDays = hh.days ?? 127;
+      const hhFrom = hh.from || '17:00';
+      const hhTo   = hh.to   || '19:00';
+      const pHH    = _parsePriceParts(hh.price || '');
+      const hhCurSel = `<select class="form-select price-cur-sel hh-cur-sel">${CURLST.map(c=>`<option value="${c==='—'?'':c}"${(pHH.cur||(p.cur||''))===(c==='—'?'':c)?' selected':''}>${c}</option>`).join('')}</select>`;
+      return `
+      <div class="prod-hh-section">
+        <label class="hh-toggle-row">
+          <input type="checkbox" class="hh-enabled-chk" ${hhEnabled ? 'checked' : ''}>
+          <span class="hh-lbl">⚡ ${t.hhLabel || 'Happy Hour'}</span>
+        </label>
+        <div class="hh-body ${hhEnabled ? 'open' : ''}">
+          <div class="form-group" style="margin-bottom:10px">
+            <div class="form-lbl">${t.hhPrice || 'Prix Happy Hour'}</div>
+            <div class="price-inp-row">
+              ${hhCurSel}
+              <input class="form-input price-num-inp hh-price-inp" value="${esc(pHH.num)}" placeholder="0.00" type="number" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <div class="form-lbl">${t.scheduleDays || 'Jours actifs'}</div>
+            <div class="sched-days hh-days-row">${_schedDayPillsHtml(hhDays,'hh-day-pill')}</div>
+          </div>
+          <div class="sched-times">
+            <span>${t.scheduleFrom || 'De'}</span>
+            <input type="time" class="sched-time-inp hh-from-inp" value="${esc(hhFrom)}">
+            <span>${t.scheduleTo || 'À'}</span>
+            <input type="time" class="sched-time-inp hh-to-inp" value="${esc(hhTo)}">
+          </div>
+        </div>
+      </div>`;
+    })()}
+
     <div class="prod-actions">
       <div class="move-cat-row">
         <select class="form-select move-cat-sel">
@@ -6244,6 +6416,36 @@ function collectProdForm(card, item) {
   if (showChk) item.showPhoto = showChk.checked;
   const doseChk = card.querySelector('.dose-option-chk');
   if (doseChk) { if (doseChk.checked) item.doseOption = true; else delete item.doseOption; }
+
+  // Happy Hour
+  const hhEnabledChk = card.querySelector('.hh-enabled-chk');
+  if (hhEnabledChk) {
+    const hhEnabled = hhEnabledChk.checked;
+    if (!hhEnabled) {
+      delete item.happyHour;
+    } else {
+      const hhCurEl  = card.querySelector('.hh-cur-sel');
+      const hhNumEl  = card.querySelector('.hh-price-inp');
+      const hhFromEl = card.querySelector('.hh-from-inp');
+      const hhToEl   = card.querySelector('.hh-to-inp');
+      const hhNum = hhNumEl ? hhNumEl.value.trim() : '';
+      const hhCur = hhCurEl ? hhCurEl.value : '';
+      let hhDays = 127;
+      card.querySelectorAll('.hh-day-pill').forEach(pill => {
+        const di = parseInt(pill.dataset.di);
+        if (!pill.classList.contains('on')) hhDays &= ~(1 << di);
+      });
+      item.happyHour = {
+        enabled: true,
+        price: (hhCur && hhNum) ? hhCur + hhNum : hhNum,
+        days: hhDays,
+        from: hhFromEl ? hhFromEl.value : '17:00',
+        to:   hhToEl   ? hhToEl.value   : '19:00',
+      };
+      if (!item.happyHour.price) delete item.happyHour;
+    }
+  }
+
   const visBtn = card.querySelector('.prod-vis-btn');
   if (visBtn) { if (!visBtn.classList.contains('on')) item.visible = false; else delete item.visible; }
 
