@@ -1126,6 +1126,10 @@
       border:1px solid rgba(255,255,255,0.1); background:transparent;
       color:var(--muted); font-family:inherit; font-size:0.85rem; cursor:pointer; margin-top:4px;
     }
+    .dose-opt-btn { flex-direction:column; gap:3px; }
+    .dose-btn-lbl { font-size:0.9rem; line-height:1.2; }
+    .dose-btn-price { font-size:0.78rem; color:var(--gold); opacity:0.9; line-height:1; }
+    .dose-opt-btn.sel .dose-btn-price { color:#0c0a08; opacity:1; }
 
     /* ══ VARIANTES DYN-BENTO ══ */
 
@@ -6947,6 +6951,8 @@ function applyAdminData(data) {
           visible:   item.visible !== false,
           doseOption: item.doseOption === true,
           salePrice: item.salePrice || '',
+          doseDoublePrice:    item.doseDoublePrice    || '',
+          doseDoubleSalePrice: item.doseDoubleSalePrice || '',
           happyHour: (item.happyHour?.enabled && item.happyHour.price) ? item.happyHour : null,
         };
         ITEMS.push(safe);
@@ -7580,6 +7586,18 @@ function parsePrice(priceStr) {
   return parseFloat(String(priceStr).replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
 }
 
+function _effectivePrice(item, dose) {
+  if (dose === 'double' && item.doseDoublePrice) {
+    const p = item.doseDoubleSalePrice || item.doseDoublePrice;
+    return { price: p, priceNum: parsePrice(p) };
+  }
+  if (item.happyHour?.enabled && _isInSchedule(item.happyHour) && item.happyHour.price) {
+    return { price: item.happyHour.price, priceNum: parsePrice(item.happyHour.price) };
+  }
+  const p = item.salePrice || item.price || '';
+  return { price: p, priceNum: parsePrice(p) };
+}
+
 function addToCart(item, dose, sugar) {
   if (navigator.vibrate) navigator.vibrate(60);
   if (item.doseOption && dose === undefined) {
@@ -7598,7 +7616,8 @@ function _doAddToCart(item, dose, sugar) {
   if (existing) {
     existing.qty++;
   } else {
-    const entry = { id: item.id, nameObj: item.name, price: item.price, priceNum: parsePrice(item.price), qty: 1 };
+    const _ep = _effectivePrice(item, hasDose ? dose : undefined);
+    const entry = { id: item.id, nameObj: item.name, price: _ep.price, priceNum: _ep.priceNum, qty: 1 };
     if (hasDose)  entry.dose  = dose;
     if (hasSugar) entry.sugar = sugar;
     cartItems.push(entry);
@@ -7622,10 +7641,12 @@ function _showDosePopup(item, onConfirm) {
   document.getElementById('dose-lbl-sugar').textContent = t.sugarLabel || 'Sucre';
   document.getElementById('dose-cancel-btn').textContent = t.doseCancel || 'Annuler';
 
-  // Boutons dose
+  // Boutons dose — affiche le prix effectif de chaque choix
+  const _singleEp = _effectivePrice(item, 'single');
+  const _doubleEp = _effectivePrice(item, 'double');
   const doseOpts = [
-    { val:'single', lbl: t.doseSingle || 'Single' },
-    { val:'double', lbl: t.doseDouble || 'Double' }
+    { val:'single', lbl: t.doseSingle || 'Single', price: _singleEp.price },
+    { val:'double', lbl: t.doseDouble || 'Double', price: item.doseDoublePrice ? _doubleEp.price : '' }
   ];
   const sugarOpts = [
     { val:'none',   lbl: t.sugarNone   || 'Sans sucre'  },
@@ -7635,7 +7656,12 @@ function _showDosePopup(item, onConfirm) {
 
   const doseContainer  = document.getElementById('dose-btns-dose');
   const sugarContainer = document.getElementById('dose-btns-sugar');
-  doseContainer.innerHTML  = doseOpts.map(o  => `<button class="dose-opt-btn" data-val="${o.val}">${o.lbl}</button>`).join('');
+  doseContainer.innerHTML  = doseOpts.map(o =>
+    `<button class="dose-opt-btn" data-val="${o.val}">
+      <span class="dose-btn-lbl">${o.lbl}</span>
+      ${o.price ? `<span class="dose-btn-price">${_esc(o.price)}</span>` : ''}
+    </button>`
+  ).join('');
   sugarContainer.innerHTML = sugarOpts.map(o => `<button class="dose-opt-btn" data-val="${o.val}">${o.lbl}</button>`).join('');
 
   let selDose = null, selSugar = null, _closed = false;

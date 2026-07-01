@@ -1089,11 +1089,26 @@
     }
     .sched-time-inp:focus { border-color:#c8a44e; outline:none; }
     html.light .sched-time-inp { background:#f5f5f5; border-color:#ddd; color:#333; }
+    /* ── Section Prix unifiée ── */
+    .price-section-block { display:flex; flex-direction:column; gap:0; }
+    .price-sub-block {
+      margin-top:10px; padding:10px 14px 12px;
+      background:rgba(200,164,78,0.05); border:1px solid rgba(200,164,78,0.14);
+      border-radius:12px; transition:border-color 0.15s;
+    }
+    .price-sub-block:has(.price-chk:checked) { border-color:rgba(200,164,78,0.28); background:rgba(200,164,78,0.08); }
+    .price-toggle-row { display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .price-chk { accent-color:#c8a44e; width:17px; height:17px; cursor:pointer; flex-shrink:0; }
+    .price-toggle-ico { font-size:1em; flex-shrink:0; }
+    .price-toggle-lbl { font-size:0.88em; font-weight:600; color:var(--t); }
+    /* ── Dose double ── */
+    .dose-double-body { display:none; }
+    .dose-double-body.open { display:block; }
     /* ── Happy Hour (produit) ── */
-    .prod-hh-section { margin-top:4px; }
-    .hh-toggle-row { display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
-    .hh-enabled-chk { accent-color:#c8a44e; width:17px; height:17px; cursor:pointer; flex-shrink:0; }
-    .hh-lbl { font-size:0.92em; font-weight:700; color:#c8a44e; letter-spacing:0.02em; }
+    .prod-hh-section { margin-top:0; }
+    .hh-toggle-row { }
+    .hh-enabled-chk { }
+    .hh-lbl { color:#c8a44e !important; }
     .hh-body { display:none; }
     .hh-body.open { display:block; }
     .btn-del {
@@ -3095,6 +3110,7 @@ const ADMIN_UI = {
     catVisibleLabel:  'Κατηγορία ορατή',
     scheduleLabel:'Χρονοδιάγραμμα', scheduleFrom:'Από', scheduleTo:'Έως', scheduleDays:'Ενεργές ημέρες',
     hhLabel:'Happy Hour', hhPrice:'Τιμή Happy Hour',
+    doseDoublePrice:'Τιμή διπλής δόσης', doseDoubleSalePrice:'Έκπτωση διπλής',
     btnMove:       'Μετακίνηση',
     changeCat:     '— Αλλαγή κατηγορίας —',
     newCat:        'Νέα κατηγορία',
@@ -3242,6 +3258,7 @@ const ADMIN_UI = {
     catVisibleLabel:  'Catégorie visible',
     scheduleLabel:'Programmation horaire', scheduleFrom:'De', scheduleTo:'À', scheduleDays:'Jours actifs',
     hhLabel:'Happy Hour', hhPrice:'Prix Happy Hour',
+    doseDoublePrice:'Prix double dose', doseDoubleSalePrice:'Remise double',
     btnMove:       'Déplacer',
     changeCat:     '— Changer de catégorie —',
     newCat:        'Nouvelle catégorie',
@@ -3389,6 +3406,7 @@ const ADMIN_UI = {
     catVisibleLabel:  'Category visible',
     scheduleLabel:'Time schedule', scheduleFrom:'From', scheduleTo:'To', scheduleDays:'Active days',
     hhLabel:'Happy Hour', hhPrice:'Happy Hour price',
+    doseDoublePrice:'Double dose price', doseDoubleSalePrice:'Double discount',
     btnMove:       'Move',
     changeCat:     '— Change category —',
     newCat:        'New category',
@@ -3536,6 +3554,7 @@ const ADMIN_UI = {
     catVisibleLabel:  'Kategorie sichtbar',
     scheduleLabel:'Zeitplan', scheduleFrom:'Von', scheduleTo:'Bis', scheduleDays:'Aktive Tage',
     hhLabel:'Happy Hour', hhPrice:'Happy-Hour-Preis',
+    doseDoublePrice:'Doppeldosis-Preis', doseDoubleSalePrice:'Rabatt Doppel',
     btnMove:       'Verschieben',
     changeCat:     '— Kategorie wechseln —',
     newCat:        'Neue Kategorie',
@@ -3683,6 +3702,7 @@ const ADMIN_UI = {
     catVisibleLabel:  'Categoría visible',
     scheduleLabel:'Programación horaria', scheduleFrom:'Desde', scheduleTo:'Hasta', scheduleDays:'Días activos',
     hhLabel:'Happy Hour', hhPrice:'Precio Happy Hour',
+    doseDoublePrice:'Precio doble dosis', doseDoubleSalePrice:'Descuento doble',
     btnMove:       'Mover',
     changeCat:     '— Cambiar categoría —',
     newCat:        'Nueva categoría',
@@ -4441,9 +4461,13 @@ function sanitizeItems(items) {
       full:      item.full      || { fr:'', en:'', es: '' },
       allergens: item.allergens || { fr:[], en:[], es: [] },
     };
-    if (item.salePrice)           r.salePrice = item.salePrice;
-    if (item.doseOption === true) r.doseOption = true;
-    if (item.visible === false)   r.visible = false;
+    if (item.salePrice)              r.salePrice = item.salePrice;
+    if (item.doseOption === true) {
+      r.doseOption = true;
+      if (item.doseDoublePrice)     r.doseDoublePrice = item.doseDoublePrice;
+      if (item.doseDoubleSalePrice) r.doseDoubleSalePrice = item.doseDoubleSalePrice;
+    }
+    if (item.visible === false)      r.visible = false;
     if (item.happyHour?.enabled && item.happyHour.price) r.happyHour = item.happyHour;
     return r;
   });
@@ -6121,6 +6145,15 @@ function renderProdCard(container, item, ci) {
     btn.addEventListener('click', () => { btn.classList.toggle('active'); markUnsaved(); });
   });
 
+  // Dose & Sucre toggle → affiche/masque le panel "Prix double"
+  const doseChkToggle = card.querySelector('.dose-option-chk');
+  const doseDoubleBody = card.querySelector('.dose-double-body');
+  if (doseChkToggle && doseDoubleBody) {
+    doseChkToggle.addEventListener('change', () => {
+      doseDoubleBody.classList.toggle('open', doseChkToggle.checked);
+    });
+  }
+
   // Happy Hour toggle
   const hhChk = card.querySelector('.hh-enabled-chk');
   const hhBody = card.querySelector('.hh-body');
@@ -6230,8 +6263,10 @@ function buildProdForm(item) {
 
   // Price parts
   const CURLST = ['—','€','$','£','CHF','DT','DA','MAD','SAR','AED','TL'];
-  const p     = _parsePriceParts(item.price    || '');
-  const pSale = _parsePriceParts(item.salePrice || '');
+  const p        = _parsePriceParts(item.price              || '');
+  const pSale    = _parsePriceParts(item.salePrice          || '');
+  const pDbl     = _parsePriceParts(item.doseDoublePrice    || '');
+  const pDblSale = _parsePriceParts(item.doseDoubleSalePrice || '');
   const makeCurSel = (fieldName, selCur) =>
     `<select class="form-select price-cur-sel" data-field="${fieldName}">${CURLST.map(c=>`<option value="${c==='—'?'':c}"${selCur===(c==='—'?'':c)?' selected':''}>${c}</option>`).join('')}</select>`;
 
@@ -6270,70 +6305,97 @@ function buildProdForm(item) {
       <!-- ① Nom + descriptions (multilang) -->
       <div>${langFields}</div>
 
-      <!-- Dose & Sucre — sous le nom -->
-      <label class="photo-show-row prod-vis-row" style="margin-top:6px">
-        <input type="checkbox" class="dose-option-chk" ${item.doseOption ? 'checked' : ''}>
-        <span data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
-      </label>
-
       <div class="form-divider"></div>
 
-      <!-- ② Prix normal | Prix remisé -->
-      <div class="form-grid-2">
-        <div class="form-group">
-          <div class="form-lbl" data-uitxt="lblPrice">${t.lblPrice}</div>
-          <div class="price-inp-row">
-            ${makeCurSel('currency', p.cur)}
-            <input class="form-input price-num-inp" data-field="price-num" value="${esc(p.num)}" placeholder="${t.phPrice}">
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="form-lbl" data-uitxt="lblSalePrice">${t.lblSalePrice || 'Prix remisé'} ${discBadge}</div>
-          <div class="price-inp-row">
-            ${makeCurSel('sale-currency', pSale.cur || p.cur)}
-            <input class="form-input price-num-inp" data-field="sale-price-num" value="${esc(pSale.num)}" placeholder="${t.phSalePrice || '0.00'}">
-          </div>
-        </div>
-      </div>
+      <!-- ② SECTION PRIX — Prix · Remise · Dose & Sucre · Happy Hour -->
+      <div class="price-section-block">
 
-      <!-- Happy Hour — sous les prix -->
-      ${(() => {
-        const hh = item.happyHour || {};
-        const hhEnabled = !!hh.enabled;
-        const hhDays = hh.days ?? 127;
-        const hhFrom = hh.from || '17:00';
-        const hhTo   = hh.to   || '19:00';
-        const pHH    = _parsePriceParts(hh.price || '');
-        const hhCurSel = `<select class="form-select price-cur-sel hh-cur-sel">${CURLST.map(c=>`<option value="${c==='—'?'':c}"${(pHH.cur||(p.cur||''))===(c==='—'?'':c)?' selected':''}>${c}</option>`).join('')}</select>`;
-        return `
-        <div class="prod-hh-section">
-          <label class="hh-toggle-row">
-            <input type="checkbox" class="hh-enabled-chk" ${hhEnabled ? 'checked' : ''}>
-            <span class="hh-lbl">⚡ ${t.hhLabel || 'Happy Hour'}</span>
+        <!-- 2a. Prix normal | Prix remisé -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <div class="form-lbl" data-uitxt="lblPrice">${t.lblPrice}</div>
+            <div class="price-inp-row">
+              ${makeCurSel('currency', p.cur)}
+              <input class="form-input price-num-inp" data-field="price-num" value="${esc(p.num)}" placeholder="${t.phPrice}">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-lbl" data-uitxt="lblSalePrice">${t.lblSalePrice || 'Prix remisé'} ${discBadge}</div>
+            <div class="price-inp-row">
+              ${makeCurSel('sale-currency', pSale.cur || p.cur)}
+              <input class="form-input price-num-inp" data-field="sale-price-num" value="${esc(pSale.num)}" placeholder="${t.phSalePrice || '0.00'}">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2b. Option Dose & Sucre -->
+        <div class="price-sub-block">
+          <label class="price-toggle-row">
+            <input type="checkbox" class="dose-option-chk price-chk" ${item.doseOption ? 'checked' : ''}>
+            <span class="price-toggle-ico">☕</span>
+            <span class="price-toggle-lbl" data-uitxt="doseOptionLabel">${t.doseOptionLabel || 'Option Dose & Sucre'}</span>
           </label>
-          <div class="hh-body ${hhEnabled ? 'open' : ''}">
-            <div class="form-grid-2" style="margin-top:12px">
+          <div class="dose-double-body ${item.doseOption ? 'open' : ''}">
+            <div class="form-grid-2" style="margin-top:10px">
               <div class="form-group">
-                <div class="form-lbl">${t.hhPrice || 'Prix Happy Hour'}</div>
+                <div class="form-lbl">${t.doseDoublePrice || 'Prix double dose'}</div>
                 <div class="price-inp-row">
-                  ${hhCurSel}
-                  <input class="form-input price-num-inp hh-price-inp" value="${esc(pHH.num)}" placeholder="0.00" type="number" min="0" step="0.01">
+                  ${makeCurSel('dbl-currency', pDbl.cur || p.cur)}
+                  <input class="form-input price-num-inp" data-field="dbl-price-num" value="${esc(pDbl.num)}" placeholder="${t.phPrice || '0.00'}">
                 </div>
               </div>
               <div class="form-group">
-                <div class="form-lbl">${t.scheduleDays || 'Jours actifs'}</div>
-                <div class="sched-days hh-days-row" style="margin-top:6px">${_schedDayPillsHtml(hhDays,'hh-day-pill')}</div>
+                <div class="form-lbl">${t.doseDoubleSalePrice || 'Remise double'}</div>
+                <div class="price-inp-row">
+                  ${makeCurSel('dbl-sale-currency', pDblSale.cur || pDbl.cur || p.cur)}
+                  <input class="form-input price-num-inp" data-field="dbl-sale-price-num" value="${esc(pDblSale.num)}" placeholder="0.00">
+                </div>
               </div>
             </div>
-            <div class="sched-times" style="margin-top:10px">
-              <span>${t.scheduleFrom || 'De'}</span>
-              <input type="time" class="sched-time-inp hh-from-inp" value="${esc(hhFrom)}">
-              <span>${t.scheduleTo || 'À'}</span>
-              <input type="time" class="sched-time-inp hh-to-inp" value="${esc(hhTo)}">
-            </div>
           </div>
-        </div>`;
-      })()}
+        </div>
+
+        <!-- 2c. Happy Hour -->
+        ${(() => {
+          const hh = item.happyHour || {};
+          const hhEnabled = !!hh.enabled;
+          const hhDays = hh.days ?? 127;
+          const hhFrom = hh.from || '17:00';
+          const hhTo   = hh.to   || '19:00';
+          const pHH    = _parsePriceParts(hh.price || '');
+          const hhCurSel = `<select class="form-select price-cur-sel hh-cur-sel">${CURLST.map(c=>`<option value="${c==='—'?'':c}"${(pHH.cur||(p.cur||''))===(c==='—'?'':c)?' selected':''}>${c}</option>`).join('')}</select>`;
+          return `
+          <div class="price-sub-block prod-hh-section">
+            <label class="price-toggle-row hh-toggle-row">
+              <input type="checkbox" class="hh-enabled-chk price-chk" ${hhEnabled ? 'checked' : ''}>
+              <span class="price-toggle-ico">⚡</span>
+              <span class="price-toggle-lbl hh-lbl">${t.hhLabel || 'Happy Hour'}</span>
+            </label>
+            <div class="hh-body ${hhEnabled ? 'open' : ''}">
+              <div class="form-grid-2" style="margin-top:10px">
+                <div class="form-group">
+                  <div class="form-lbl">${t.hhPrice || 'Prix Happy Hour'}</div>
+                  <div class="price-inp-row">
+                    ${hhCurSel}
+                    <input class="form-input price-num-inp hh-price-inp" value="${esc(pHH.num)}" placeholder="0.00" type="number" min="0" step="0.01">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-lbl">${t.scheduleDays || 'Jours actifs'}</div>
+                  <div class="sched-days hh-days-row" style="margin-top:6px">${_schedDayPillsHtml(hhDays,'hh-day-pill')}</div>
+                </div>
+              </div>
+              <div class="sched-times" style="margin-top:10px">
+                <span>${t.scheduleFrom || 'De'}</span>
+                <input type="time" class="sched-time-inp hh-from-inp" value="${esc(hhFrom)}">
+                <span>${t.scheduleTo || 'À'}</span>
+                <input type="time" class="sched-time-inp hh-to-inp" value="${esc(hhTo)}">
+              </div>
+            </div>
+          </div>`;
+        })()}
+
+      </div><!-- /price-section-block -->
 
       <div class="form-divider"></div>
 
@@ -6417,7 +6479,33 @@ function collectProdForm(card, item) {
   const showChk = card.querySelector('.photo-show-chk');
   if (showChk) item.showPhoto = showChk.checked;
   const doseChk = card.querySelector('.dose-option-chk');
-  if (doseChk) { if (doseChk.checked) item.doseOption = true; else delete item.doseOption; }
+  if (doseChk) {
+    if (doseChk.checked) {
+      item.doseOption = true;
+      // Prix double dose
+      const dblCurEl  = card.querySelector('[data-field="dbl-currency"]');
+      const dblNumEl  = card.querySelector('[data-field="dbl-price-num"]');
+      if (dblNumEl) {
+        const dblNum = dblNumEl.value.trim();
+        const dblCur = dblCurEl ? dblCurEl.value : '';
+        if (dblNum) item.doseDoublePrice = (dblCur && dblNum) ? dblCur + dblNum : dblNum;
+        else delete item.doseDoublePrice;
+      }
+      // Remise double dose
+      const dblSaleCurEl  = card.querySelector('[data-field="dbl-sale-currency"]');
+      const dblSaleNumEl  = card.querySelector('[data-field="dbl-sale-price-num"]');
+      if (dblSaleNumEl) {
+        const dblSaleNum = dblSaleNumEl.value.trim();
+        const dblSaleCur = dblSaleCurEl ? dblSaleCurEl.value : '';
+        if (dblSaleNum) item.doseDoubleSalePrice = (dblSaleCur && dblSaleNum) ? dblSaleCur + dblSaleNum : dblSaleNum;
+        else delete item.doseDoubleSalePrice;
+      }
+    } else {
+      delete item.doseOption;
+      delete item.doseDoublePrice;
+      delete item.doseDoubleSalePrice;
+    }
+  }
 
   // Happy Hour
   const hhEnabledChk = card.querySelector('.hh-enabled-chk');
