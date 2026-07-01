@@ -1343,7 +1343,6 @@
     html[data-menu-theme="carte-classique"] .cards { gap:0; }
     /* ── Compact header (carte-classique uniquement) ── */
     #cc-header { display:none; }
-    html[data-menu-theme="carte-classique"] #preloader { display:none !important; }
     html[data-menu-theme="carte-classique"] #hero { display:none !important; }
     html[data-menu-theme="carte-classique"] #cc-header { display:block; text-align:center; padding:52px 24px 0; }
     .cc-logo { max-height:72px; max-width:200px; margin:0 auto 12px; display:block; filter:url(#logo-on-dark); }
@@ -1661,11 +1660,6 @@
     }
 
     /* ══ STRUCTURE PARTAGÉE — 9 NOUVEAUX THÈMES CARTE ══ */
-    html[data-menu-theme="carte-sommelier"] #preloader,html[data-menu-theme="carte-bento"] #preloader,
-    html[data-menu-theme="carte-telegraphe"] #preloader,html[data-menu-theme="carte-couture"] #preloader,
-    html[data-menu-theme="carte-journal"] #preloader,html[data-menu-theme="carte-voyage"] #preloader,
-    html[data-menu-theme="carte-artisan"] #preloader,html[data-menu-theme="carte-ardoise"] #preloader,
-    html[data-menu-theme="carte-maroc"] #preloader { display:none !important; }
     html[data-menu-theme="carte-sommelier"] #hero,html[data-menu-theme="carte-bento"] #hero,
     html[data-menu-theme="carte-telegraphe"] #hero,html[data-menu-theme="carte-couture"] #hero,
     html[data-menu-theme="carte-journal"] #hero,html[data-menu-theme="carte-voyage"] #hero,
@@ -5480,6 +5474,18 @@
   .hc-wifi-row {
     display:flex; align-items:center; justify-content:center; gap:6px;
   }
+  /* Entrée animée hero-card (styles non-paper uniquement — déclenché par JS via .hc-anim) */
+  @keyframes hcIn {
+    from { opacity:0; transform:translateY(28px); }
+    to   { opacity:1; transform:none; }
+  }
+  #hero-card.hc-anim {
+    animation: hcIn 0.65s cubic-bezier(0.22,1,0.36,1) 0.15s both;
+  }
+  @media(prefers-reduced-motion:reduce) {
+    #hero-card.hc-anim { animation:none !important; }
+  }
+
   /* ── Mode Livre (paper) — fix #175 ── */
   /* Le flip-wrap position:fixed couvre tout — hero + hero-card inutiles et causent le carré blanc */
   body[data-style="paper"] #hero,
@@ -9029,6 +9035,11 @@ function renderMenu() {
   });
   // IntersectionObserver gère l'apparition (plus rapide, pas de setTimeout)
   setupScrollObserver();
+  // Animation d'entrée hero-card (styles non-paper : Carte, List, etc.)
+  if (menuStyle !== 'paper') {
+    const _hc = document.getElementById('hero-card');
+    if (_hc) { _hc.classList.remove('hc-anim'); void _hc.offsetWidth; _hc.classList.add('hc-anim'); }
+  }
   _setupHeroFabHide();
   // Signaler que le menu est rendu → setupFAB peut observer la première card
   document.dispatchEvent(new Event('menuRendered'));
@@ -9969,11 +9980,17 @@ function setupScrollObserver() {
     }, { once: true });
   };
 
+  // Flags : n'ajouter le délai de base qu'au premier reveal (chargement initial)
+  let _fcr = true; // first card reveal
+  let _fkr = true; // first cat reveal
+
   _cardObserver = new IntersectionObserver((entries) => {
     // Trier par position pour stagger naturel
     const sorted = [...entries].sort((a, b) =>
       a.boundingClientRect.top - b.boundingClientRect.top
     );
+    // Délai de base pour laisser hero-card + catégories apparaître en premier
+    const base = (_fcr && menuStyle !== 'paper') ? 0.5 : 0;
     let staggerIdx = 0;
     sorted.forEach(entry => {
       const card = entry.target;
@@ -9981,8 +9998,7 @@ function setupScrollObserver() {
 
       if (entry.isIntersecting) {
         if (card.classList.contains('pre-rv')) {
-          // Carte pas encore montrée → animer
-          animateCard(card, Math.min(staggerIdx * 0.05, 0.15));
+          animateCard(card, base + Math.min(staggerIdx * 0.05, 0.15));
           staggerIdx++;
         }
         // Déjà .rv → rien à faire, reste visible
@@ -9996,18 +10012,35 @@ function setupScrollObserver() {
         // Au-dessus → reste visible (ne pas toucher)
       }
     });
+    _fcr = false;
   }, { threshold: 0.05, rootMargin: '0px 0px 180px 0px' });
 
   _catObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    // Trier par position pour cascade naturelle du haut vers le bas
+    const sorted = [...entries].sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    // Délai de base + stagger pour l'effet cascade au premier chargement
+    const catBase = (_fkr && menuStyle !== 'paper') ? 0.35 : 0;
+    let sIdx = 0;
+    sorted.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('cr');
+        const cat = entry.target;
+        if (!cat.classList.contains('cr')) {
+          const delay = catBase + Math.min(sIdx * 0.1, 0.3);
+          sIdx++;
+          if (delay > 0) {
+            cat.style.transitionDelay = delay + 's';
+            setTimeout(() => { cat.style.transitionDelay = ''; }, (delay + 0.55) * 1000);
+          }
+          cat.classList.add('cr');
+        }
       } else if (entry.boundingClientRect.top > 0) {
         // Sous le viewport → reset pour rejouer au prochain scroll bas
         entry.target.classList.remove('cr');
+        entry.target.style.transitionDelay = '';
       }
       // Au-dessus → reste visible
     });
+    _fkr = false;
   }, { threshold: 0.05, rootMargin: '0px 0px 180px 0px' });
 
   document.querySelectorAll('.card').forEach(card => _cardObserver.observe(card));
