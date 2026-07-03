@@ -625,7 +625,6 @@
       cursor:pointer; transition:background 0.2s;
     }
     .hero-del-btn:hover { background:rgba(224,82,82,0.15); }
-    .hero-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
     html.light .hero-img-card { background:var(--bg3); }
     html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
     html.light .phone-notch { background:#ddd; }
@@ -1546,7 +1545,6 @@
         align-self:start;
       }
       .hero-controls { align-self:end; }
-      .hero-hint { grid-column:2; }
 
       /* Info card : label colonne plus large */
       .info-row { grid-template-columns:180px 1fr; }
@@ -2462,7 +2460,6 @@
           <span id="btn-del-photo-lbl">Supprimer</span>
         </button>
       </div>
-      <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format paysage (horizontal), min. 1600×900 px</div>
       <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;">
         <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -3132,7 +3129,6 @@ const ADMIN_UI = {
     badgeFooter:   'Υποσέλιδο',
     btnChoosePhoto:'Επιλογή φωτογραφίας',
     btnDelPhoto:   'Διαγραφή',
-    heroHint:      'Συνιστώμενη: οριζόντιος προσανατολισμός (τοπίο), ελάχ. 1600×900 px',
     noteShown:     'Εμφανίζεται στο μενού',
     noteHidden:    'Κρυφό στο μενού',
     notePh:        'Κείμενο σε {L}',
@@ -3281,7 +3277,6 @@ const ADMIN_UI = {
     badgeFooter:   'Bas de page',
     btnChoosePhoto:'Choisir une photo',
     btnDelPhoto:   'Supprimer',
-    heroHint:      'Photo recommandée : format paysage (horizontal), min. 1600×900 px',
     noteShown:     'Affichée dans le menu',
     noteHidden:    'Masquée dans le menu',
     notePh:        'Texte de la note en {L}',
@@ -3430,7 +3425,6 @@ const ADMIN_UI = {
     badgeFooter:   'Footer',
     btnChoosePhoto:'Choose a photo',
     btnDelPhoto:   'Delete',
-    heroHint:      'Recommended: landscape format (horizontal), min. 1600×900 px',
     noteShown:     'Visible in menu',
     noteHidden:    'Hidden in menu',
     notePh:        'Note in {L}',
@@ -3579,7 +3573,6 @@ const ADMIN_UI = {
     badgeFooter:   'Fußzeile',
     btnChoosePhoto:'Foto auswählen',
     btnDelPhoto:   'Löschen',
-    heroHint:      'Empfohlen: Querformat (horizontal), min. 1600×900 px',
     noteShown:     'Im Menü sichtbar',
     noteHidden:    'Im Menü ausgeblendet',
     notePh:        'Notiz auf {L}',
@@ -3728,7 +3721,6 @@ const ADMIN_UI = {
     badgeFooter:   'Pie de página',
     btnChoosePhoto:'Elegir imagen',
     btnDelPhoto:   'Eliminar',
-    heroHint:      'Recomendado: formato horizontal (paisaje), mínimo 1600×900 px',
     noteShown:     'Visible en el menú',
     noteHidden:    'Oculto en el menú',
     notePh:        'Nota en {L}',
@@ -4948,10 +4940,8 @@ function renderSocialLinksSection() {
 function _updateHeroSectionForTheme() {
   const isGenext = currentMenuTheme === 'genext';
   const controls = document.querySelector('.hero-controls');
-  const hint      = document.getElementById('hero-hint-txt');
   const phoneBg   = document.getElementById('phone-hero-bg');
   if (controls) controls.style.display = isGenext ? 'none' : '';
-  if (hint)      hint.style.display      = isGenext ? 'none' : '';
   if (!phoneBg) return;
   if (isGenext) {
     phoneBg.style.backgroundImage = '';
@@ -5126,6 +5116,10 @@ function renderHeroImageSection() {
         uploadToCloudinary(croppedBlob)
           .then(url => {
             adminData.heroImage = url;
+            // Écriture directe Firebase (comme le logo, Fix #171) : sans ça la photo
+            // ne change dans le menu qu'après avoir cliqué "Enregistrer", ce que le
+            // client ne pense pas forcément à faire après un simple upload.
+            _rref('menu/heroImage').set(url);
             setPhoneBg(url);
             markUnsaved();
             if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
@@ -5144,6 +5138,7 @@ function renderHeroImageSection() {
   // Supprimer
   delBtn.addEventListener('click', () => {
     adminData.heroImage = '';
+    _rref('menu/heroImage').set('');
     setPhoneBg('');
     markUnsaved();
   });
@@ -5613,8 +5608,6 @@ function applyAdminUI(l) {
     const key = el.getAttribute('data-uitxt');
     if (t[key] !== undefined) el.textContent = t[key];
   });
-  const heroHint = $('hero-hint-txt');
-  if (heroHint) heroHint.textContent = t.heroHint;
 
   // Note section — statut + hint + placeholders
   // Boutons visibilité header
