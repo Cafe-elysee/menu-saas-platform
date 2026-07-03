@@ -2633,6 +2633,11 @@
       background-color:#080604;
       background-size:cover; background-position:center;
       overflow:hidden;
+      /* Empêche le navigateur de traiter tout geste tactile (pan/scroll) sur le
+         preloader — au-delà du scroll-lock JS (overflow:hidden sur html/body),
+         ceci évite que la simple RECONNAISSANCE du geste par le navigateur
+         ralentisse les requestAnimationFrame de l'animation en cours. */
+      touch-action:none;
     }
     html.light #preloader {
       background-color:#f0ede8;
