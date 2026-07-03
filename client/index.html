@@ -951,6 +951,17 @@
     html[data-menu-theme^="prestige"] .c-name-row {
       padding-right:64px;
     }
+    /* Remise/Happy Hour actifs : prix multi-lignes plus haut/large — reste dans le
+       flux normal (comme les autres thèmes) au lieu du positionnement absolu,
+       sinon il chevauche la description sous le nom du produit. */
+    html[data-menu-theme="genext"] .c-price.c-price-wide,
+    html[data-menu-theme^="prestige"] .c-price.c-price-wide {
+      position:static; top:auto; right:auto; margin-left:8px;
+    }
+    html[data-menu-theme="genext"] .c-name-row.c-name-row-wide,
+    html[data-menu-theme^="prestige"] .c-name-row.c-name-row-wide {
+      padding-right:0;
+    }
     /* ── FABs circulaires + animation lightFlow ── */
     html[data-menu-theme="genext"] #call-fab,
     html[data-menu-theme="genext"] #cart-fab {
@@ -3770,6 +3781,15 @@
     html[data-menu-theme^="neon-"] body.option-commande-active .card-strip .strip-body {
       padding-right:62px;
     }
+    /* Remise/Happy Hour actifs : prix multi-lignes plus haut — reste dans le flux
+       normal (comme hors Mode Commande) au lieu du positionnement absolu, sinon
+       il chevauche le nom du produit au-dessus. */
+    html[data-menu-theme^="neon-"] body.option-commande-active .card-strip .strip-price.strip-price-wide {
+      position:static; top:auto; right:auto;
+    }
+    html[data-menu-theme^="neon-"] body.option-commande-active .card-strip .strip-body.strip-body-wide {
+      padding-right:0;
+    }
 
     /* ── 3. BOTANICAL FOREST — Forêt organique ── */
     html[data-menu-theme="botanical"] .cards { padding-left:0; }
@@ -4649,6 +4669,30 @@
     }
     body.option-commande-active[data-style="paper"] #call-fab {
       bottom:calc(var(--paper-nav-h, 90px) + 14px + 52px + 12px + 48px + 12px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Espace réservé en bas du menu : sans ça, en scrollant jusqu'au bout de la
+       page, la dernière carte (prix/badges) se retrouve cachée sous les FABs
+       flottants (sonnette/commande/panier) sans pouvoir scroller davantage pour
+       la révéler. Le palier appliqué dépend des FABs réellement actifs. */
+    body[data-style="simple"] #menu-wrap {
+      padding-bottom:calc(90px + env(safe-area-inset-bottom, 0px));
+    }
+    body.option-sonnette-active[data-style="simple"] #menu-wrap,
+    body.option-commande-active[data-style="simple"] #menu-wrap {
+      padding-bottom:calc(220px + env(safe-area-inset-bottom, 0px));
+    }
+    body.option-sonnette-active.option-commande-active[data-style="simple"] #menu-wrap {
+      padding-bottom:calc(300px + env(safe-area-inset-bottom, 0px));
+    }
+    /* Même principe en style Livre : chaque page catégorie doit dégager assez
+       d'espace sous son dernier produit. */
+    body.option-sonnette-active[data-style="paper"] .fp-cat-page,
+    body.option-commande-active[data-style="paper"] .fp-cat-page {
+      padding-bottom:calc(var(--paper-nav-h, 110px) + 150px);
+    }
+    body.option-sonnette-active.option-commande-active[data-style="paper"] .fp-cat-page {
+      padding-bottom:calc(var(--paper-nav-h, 110px) + 210px);
     }
 
     /* Paper nav: dots row */
@@ -9280,13 +9324,17 @@ function _cardStrip(item) {
       ? `<div class="strip-no-photo">${_camSvg}</div>`
       : '';
   const chevronSvg = `<svg class="strip-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>`;
+  // Remise/Happy Hour actifs → prix multi-lignes : en Mode Commande le prix passe
+  // en absolu (voir CSS, pour ne pas être couvert par le bouton +) — sans cette
+  // classe, un prix plus haut chevaucherait le nom du produit.
+  const priceWide = _priceHasDiscount(item) ? ' wide' : '';
   card.innerHTML = `
     ${imgBlock}
-    <div class="strip-body">
+    <div class="strip-body${priceWide ? ' strip-body-wide' : ''}">
       <div class="strip-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
       <div class="strip-right">
         ${badges ? `<div class="strip-badges">${badges}</div>` : ''}
-        <div class="strip-price">${_priceHtml(item)}</div>
+        <div class="strip-price${priceWide ? ' strip-price-wide' : ''}">${_priceHtml(item)}</div>
         ${chevronSvg}
       </div>
     </div>`;
@@ -9445,6 +9493,10 @@ function _cardPrestige(item) {
   card.className = 'card';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
+  // Remise/Happy Hour actifs → prix multi-lignes (ancien prix + nouveau + -X%) :
+  // sur GeNext/Prestige le prix est positionné en absolu (voir CSS) ; sans cette
+  // classe, un prix plus haut/large chevauche la description en dessous.
+  const priceWide = _priceHasDiscount(item) ? ' c-price-wide' : '';
   card.innerHTML = `
     <div class="card-top">
       ${src
@@ -9453,9 +9505,9 @@ function _cardPrestige(item) {
           ? `<div class="c-img-empty">${_camSvg}</div>`
           : ''}
       <div class="c-info">
-        <div class="c-name-row">
+        <div class="c-name-row${priceWide ? ' c-name-row-wide' : ''}">
           <div class="c-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-          <div class="c-price">${_priceHtml(item)}</div>
+          <div class="c-price${priceWide}">${_priceHtml(item)}</div>
         </div>
         ${desc ? `<div class="c-desc">${desc}</div>` : ''}
         ${badges ? `<div class="c-badges">${badges}</div>` : ''}
