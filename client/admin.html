@@ -186,6 +186,10 @@
       background-color:#080604;
       background-size:cover;background-position:center;
       overflow:hidden;
+      /* Empêche le navigateur de traiter tout geste tactile (pan/scroll) sur
+         l'écran de chargement — sans ça, un scroll pendant l'animation de
+         dissolution (requestAnimationFrame) peut la ralentir/geler. */
+      touch-action:none;
     }
     html.light #adm-loading-screen {
       background-color:#f0ede8;
@@ -2285,6 +2289,13 @@
   <img id="gna-logo-dk" src="assets/gn-logo-dark.png" class="gna-logo-img" alt="GeNext" draggable="false">
   <img id="gna-logo-lt" src="assets/gn-logo-light.png" class="gna-logo-img" alt="GeNext" draggable="false">
 </div>
+<script>
+  /* Verrouille le scroll dès l'affichage de l'écran de chargement : un scroll
+     actif pendant l'animation de dissolution (requestAnimationFrame) la fait
+     ralentir/geler sur mobile — déverrouillé dans _hideAdmLoadingScreen(). */
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+</script>
 
 <!-- ══════════════════════════════════════
      RID SELECTOR SCREEN (pas de ?rid= dans l'URL)
@@ -9455,12 +9466,16 @@ function _hideAdmLoadingScreen() {
   var _elapsed = Date.now() - (window._splashT0 || 0);
   if (_elapsed < 1600) { setTimeout(_hideAdmLoadingScreen, 1600 - _elapsed); return; }
   _admLoadHidden = true;
+  function _unlockAdmLoadScroll() {
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
   const screen = document.getElementById('adm-loading-screen');
-  if (!screen) return;
+  if (!screen) { _unlockAdmLoadScroll(); return; }
   const isLight = document.documentElement.classList.contains('light');
   const logo = document.getElementById(isLight ? 'gna-logo-lt' : 'gna-logo-dk');
   const disp = document.getElementById('gna-sand-disp');
-  if (!logo) { screen.remove(); return; }
+  if (!logo) { screen.remove(); _unlockAdmLoadScroll(); return; }
   logo.style.filter = 'url(#gna-sand-f)';
   let t0 = null;
   const dur = 2000;
@@ -9473,7 +9488,7 @@ function _hideAdmLoadingScreen() {
     logo.style.transform = 'translateX('+(t*28).toFixed(1)+'px) translateY('+(t*-6).toFixed(1)+'px)';
     screen.style.opacity = (1 - t).toFixed(3);
     if (t < 1) requestAnimationFrame(step);
-    else screen.remove();
+    else { screen.remove(); _unlockAdmLoadScroll(); }
   }
   requestAnimationFrame(step);
 }
