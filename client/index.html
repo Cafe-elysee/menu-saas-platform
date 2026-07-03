@@ -1789,7 +1789,11 @@
     html[data-menu-theme="carte-journal"] .cat-ico-box { display:none !important; }
     .card-dva { display:flex !important; align-items:stretch !important; background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:5px 0 !important; border-bottom:1px solid var(--border) !important; }
     .dva-price-block { width:58px; flex-shrink:0; background:var(--gold); display:flex; align-items:center; justify-content:center; border-radius:4px; margin:2px 0; padding:8px 4px; }
+    .dva-price-block.dva-price-block-wide { width:auto; min-width:58px; padding:8px 10px; }
     .dva-price { font-family:'Cormorant',serif; font-size:0.82rem; font-weight:700; color:var(--bg); text-align:center; line-height:1.25; word-break:break-all; }
+    .dva-price-block .price-old { color:var(--bg); }
+    .dva-price-block .price-now.price-hh { color:var(--bg); }
+    .dva-price-block .price-off-hh { background:var(--bg); color:var(--gold); }
     .dva-body { flex:1; min-width:0; padding:10px 10px 10px 12px; }
     .dva-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:600; color:var(--cream); line-height:1.3; }
     .dva-desc { font-size:0.76rem; color:var(--muted); margin-top:3px; line-height:1.42; }
@@ -1807,6 +1811,7 @@
     .voy-desc { font-size:0.77rem; color:var(--muted); margin-top:3px; line-height:1.4; }
     .voy-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
     .voy-tag { width:54px; height:54px; border-radius:50%; flex-shrink:0; border:2px solid var(--gold); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .voy-tag.voy-tag-wide { width:auto; height:auto; min-width:54px; min-height:54px; border-radius:27px; padding:7px 13px; }
     .voy-price { font-family:'Cormorant',serif; font-size:1.0rem; font-weight:700; color:var(--gold); line-height:1.1; }
     .voy-currency { font-size:0.65rem; color:var(--gold); line-height:1; opacity:0.8; }
     html[data-menu-theme="carte-voyage"] body.option-commande-active .card-voyage { padding-right:54px !important; }
@@ -3079,8 +3084,22 @@
     .bdg-v { background:rgba(126,189,106,0.13); color:#7ebd6a; border:1px solid rgba(126,189,106,0.28); }
     .bdg-l { background:rgba(220,80,80,0.12); color:#e07070; border:1px solid rgba(220,80,80,0.28); animation:pulse 2.6s ease-in-out infinite; }
     .bdg-m { background:rgba(255,190,80,0.13); color:#f5a623; border:1px solid rgba(255,190,80,0.28); }
-    .bdg-hh { background:rgba(200,164,78,0.18); color:var(--gold); border:1px solid rgba(200,164,78,0.4); animation:pulse 2.6s ease-in-out infinite; font-weight:600; }
+    .bdg-hh, .bdg-sale { background:rgba(200,164,78,0.18); color:var(--gold); border:1px solid rgba(200,164,78,0.4); animation:pulse 2.6s ease-in-out infinite; font-weight:600; }
     .price-hh { color:var(--gold); font-weight:700; }
+
+    /* ── Prix avec remise / Happy Hour — structure marketing partagée ── */
+    .price-wrap { display:inline-flex; flex-direction:column; align-items:center; line-height:1.15; gap:2px; }
+    .price-wrap .price-old { text-decoration:line-through; opacity:0.55; font-weight:500; font-size:0.68em; margin:0; }
+    .price-wrap .price-now { font-weight:800; font-size:1.06em; }
+    .price-wrap .price-promo { color:#e85050; }
+    html.light .price-wrap .price-promo { color:#c02020; }
+    .price-wrap .price-hh { color:var(--gold); }
+    .price-off {
+      display:inline-block; margin-top:1px; padding:1px 7px;
+      border-radius:20px; font-size:0.6em; font-weight:800; letter-spacing:0.02em;
+      background:#e85050; color:#fff; line-height:1.5; white-space:nowrap;
+    }
+    .price-off-hh { background:var(--gold); color:var(--bg); }
     .bdg-type { background:rgba(100,140,200,0.12); color:#8ab4e8; border:1px solid rgba(100,140,200,0.25); }
     .bdg-temp-chaud { background:rgba(220,100,60,0.12); color:#e08060; border:1px solid rgba(220,100,60,0.25); }
     .bdg-temp-froid { background:rgba(80,160,220,0.12); color:#70b8e8; border:1px solid rgba(80,160,220,0.25); }
@@ -3834,6 +3853,12 @@
       margin-bottom:11px;
       box-shadow:0 0 14px rgba(232,144,176,0.14);
     }
+    /* Remise / Happy Hour : le cercle rigide devient une pastille ovale qui respecte le contenu */
+    .card-portrait .por-price.por-price-wide {
+      width:auto; height:auto; min-width:60px; min-height:60px;
+      padding:9px 15px; border-radius:32px;
+    }
+    .card-portrait .por-price.por-price-wide .price-old { font-size:0.6em; }
     .card-portrait .por-badges { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; }
 
     /* ── 5. ENSEIGNE — Prix dominant à gauche ── */
@@ -6012,7 +6037,7 @@ const UI = {
     search:'Αναζήτηση στο μενού…',
     all:'Όλα',
     cats:['Ζεστά Ροφήματα','Κρύα Ροφήματα','Φαγητό','Γλυκά','Πρωινό','Ναργιλές'],
-    badgeN:'Νέο', badgeP:'Δημοφιλές', badgeV:'Vegan', badgeL:'Περιορισμένο', badgeM:'Πρωινό', badgeHH:'Happy Hour',
+    badgeN:'Νέο', badgeP:'Δημοφιλές', badgeV:'Vegan', badgeL:'Περιορισμένο', badgeM:'Πρωινό', badgeHH:'Happy Hour', badgeSale:'Ειδική Προσφορά',
     bdgBoisson:'Ρόφημα', bdgCuisine:'Φαγητό', bdgSucre:'Γλυκό', bdgHookah:'Ναργιλές',
     bdgChaud:'Ζεστό', bdgFroid:'Κρύο', bdgGlace:'Παγωμένο',
     callBtn:'Κλήση σερβιτόρου',
@@ -6045,7 +6070,7 @@ const UI = {
     search:'Rechercher dans le menu…',
     all:'Tout',
     cats:['Boissons Chaudes','Boissons Froides','Cuisine','Sucré','Le Matin','Hookah'],
-    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin', badgeHH:'Happy Hour',
+    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin', badgeHH:'Happy Hour', badgeSale:'Offre spéciale',
     bdgBoisson:'Boisson', bdgCuisine:'Cuisine', bdgSucre:'Sucré', bdgHookah:'Hookah',
     bdgChaud:'Chaud', bdgFroid:'Froid', bdgGlace:'Glacé',
     callBtn:'Appeler le serveur',
@@ -6078,7 +6103,7 @@ const UI = {
     search:'Search the menu…',
     all:'All',
     cats:['Hot Drinks','Cold Drinks','Food','Sweet','Breakfast','Hookah'],
-    badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning', badgeHH:'Happy Hour',
+    badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning', badgeHH:'Happy Hour', badgeSale:'Special Offer',
     bdgBoisson:'Drink', bdgCuisine:'Food', bdgSucre:'Sweet', bdgHookah:'Hookah',
     bdgChaud:'Hot', bdgFroid:'Cold', bdgGlace:'Iced',
     callBtn:'Call the waiter',
@@ -6111,7 +6136,7 @@ const UI = {
     search:'Buscar en el menú…',
     all:'Todo',
     cats:['Bebidas calientes','Bebidas frías','Comida','Postres','Desayuno','Shisha'],
-    badgeN:'Nuevo', badgeP:'Más pedido', badgeV:'Vegetariano', badgeL:'Oferta limitada', badgeM:'Mañana', badgeHH:'Happy Hour',
+    badgeN:'Nuevo', badgeP:'Más pedido', badgeV:'Vegetariano', badgeL:'Oferta limitada', badgeM:'Mañana', badgeHH:'Happy Hour', badgeSale:'Oferta especial',
     bdgBoisson:'Bebida', bdgCuisine:'Cocina', bdgSucre:'Dulce', bdgHookah:'Shisha',
     bdgChaud:'Caliente', bdgFroid:'Frío', bdgGlace:'Helado',
     callBtn:'Llamar al camarero',
@@ -6144,7 +6169,7 @@ const UI = {
     search:'Speisekarte durchsuchen…',
     all:'Alle',
     cats:['Heiße Getränke','Kalte Getränke','Speisen','Süßes','Frühstück','Hookah'],
-    badgeN:'Neu', badgeP:'Beliebt', badgeV:'Vegan', badgeL:'Begrenztes Angebot', badgeM:'Frühstück', badgeHH:'Happy Hour',
+    badgeN:'Neu', badgeP:'Beliebt', badgeV:'Vegan', badgeL:'Begrenztes Angebot', badgeM:'Frühstück', badgeHH:'Happy Hour', badgeSale:'Sonderangebot',
     bdgBoisson:'Getränk', bdgCuisine:'Speise', bdgSucre:'Süß', bdgHookah:'Hookah',
     bdgChaud:'Heiß', bdgFroid:'Kalt', bdgGlace:'Eisgekühlt',
     callBtn:'Kellner rufen',
@@ -8625,17 +8650,39 @@ function applyHeroCardExtras(ig, fb, tt) {
 /* ================================================
    PRIX + REMISE — helper de rendu
 ================================================ */
+function _pctOff(oldStr, newStr) {
+  const num = s => { const m = String(s||'').replace(',', '.').match(/[\d.]+/); return m ? parseFloat(m[0]) : NaN; };
+  const o = num(oldStr), n = num(newStr);
+  if (!o || !n || o <= n) return null;
+  return Math.round((1 - n / o) * 100);
+}
+
+function _priceHasDiscount(item) {
+  if (item.happyHour?.enabled && _isInSchedule(item.happyHour) && item.happyHour.price) return true;
+  return !!(item.salePrice && item.price && item.salePrice !== item.price);
+}
+
 function _priceHtml(item) {
   if (item.happyHour?.enabled && _isInSchedule(item.happyHour) && item.happyHour.price) {
     const orig = item.price || '';
-    return orig
-      ? `<span class="price-old">${_esc(orig)}</span><span class="price-hh">${_esc(item.happyHour.price)}</span>`
-      : `<span class="price-hh">${_esc(item.happyHour.price)}</span>`;
+    const hh = item.happyHour.price;
+    if (!orig) return `<span class="price-hh">${_esc(hh)}</span>`;
+    const pct = _pctOff(orig, hh);
+    return `<span class="price-wrap price-wrap-hh">
+      <span class="price-old">${_esc(orig)}</span>
+      <span class="price-now price-hh">${_esc(hh)}</span>
+      ${pct ? `<span class="price-off price-off-hh">-${pct}%</span>` : ''}
+    </span>`;
   }
   const price = item.price || '';
   const sale  = item.salePrice || '';
   if (sale && price && sale !== price) {
-    return `<span class="price-promo">${_esc(sale)}</span><span class="price-old">${_esc(price)}</span>`;
+    const pct = _pctOff(price, sale);
+    return `<span class="price-wrap price-wrap-promo">
+      <span class="price-old">${_esc(price)}</span>
+      <span class="price-now price-promo">${_esc(sale)}</span>
+      ${pct ? `<span class="price-off">-${pct}%</span>` : ''}
+    </span>`;
   }
   return _esc(price || sale);
 }
@@ -9107,8 +9154,11 @@ function renderMenu() {
 function _getBadges(item) {
   const t = UI[lang];
   const parts = [];
-  if (item.happyHour?.enabled && _isInSchedule(item.happyHour)) {
+  const hhActive = item.happyHour?.enabled && _isInSchedule(item.happyHour);
+  if (hhActive) {
     parts.push(`<span class="bdg bdg-hh">${t.badgeHH || 'Happy Hour'}</span>`);
+  } else if (item.salePrice && item.price && item.salePrice !== item.price) {
+    parts.push(`<span class="bdg bdg-sale">${t.badgeSale || 'Offre spéciale'}</span>`);
   }
   if (item.type) {
     const lbl = { boisson:t.bdgBoisson, cuisine:t.bdgCuisine, sucre:t.bdgSucre, hookah:t.bdgHookah }[item.type] || '';
@@ -9241,6 +9291,7 @@ function _cardRose(item) {
   const photoEnabled = showPhotos && (item.showPhoto !== false);
   const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
+  const priceWide = _priceHasDiscount(item) ? ' por-price-wide' : '';
   card.className = 'card card-portrait';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -9252,7 +9303,7 @@ function _cardRose(item) {
   card.innerHTML = `
     ${imgBlock}
     <div class="por-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-    <div class="por-price">${_priceHtml(item)}</div>
+    <div class="por-price${priceWide}">${_priceHtml(item)}</div>
     ${badges ? `<div class="por-badges">${badges}</div>` : ''}`;
   _setupCardEvents(card, item);
   return card;
@@ -9516,11 +9567,12 @@ function _cardJournal(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
+  const priceWide = _priceHasDiscount(item) ? ' dva-price-block-wide' : '';
   card.className = 'card card-dva';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
-    '<div class="dva-price-block"><div class="dva-price">' + _priceHtml(item) + '</div></div>' +
+    '<div class="dva-price-block' + priceWide + '"><div class="dva-price">' + _priceHtml(item) + '</div></div>' +
     '<div class="dva-body">' +
       '<div class="dva-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="dva-desc">' + desc + '</div>' : '') +
@@ -9538,6 +9590,7 @@ function _cardVoyage(item) {
   const priceParts = _dp.replace(/[€$£]/g,'').trim().split(/[.,]/);
   const priceInt = priceParts[0] || _dp;
   const currency = (_dp.match(/[€$£]/)||['€'])[0];
+  const priceWide = _priceHasDiscount(item) ? ' voy-tag-wide' : '';
   card.className = 'card card-voyage';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
@@ -9547,7 +9600,7 @@ function _cardVoyage(item) {
       (desc ? '<div class="voy-desc">' + desc + '</div>' : '') +
       (badges ? '<div class="voy-badges">' + badges + '</div>' : '') +
     '</div>' +
-    '<div class="voy-tag"><div class="voy-price">' + _priceHtml(item) + '</div></div>';
+    '<div class="voy-tag' + priceWide + '"><div class="voy-price">' + _priceHtml(item) + '</div></div>';
   _setupCardEvents(card, item);
   return card;
 }
