@@ -951,16 +951,14 @@
     html[data-menu-theme^="prestige"] .c-name-row {
       padding-right:64px;
     }
-    /* Remise/Happy Hour actifs : prix multi-lignes plus haut/large — reste dans le
-       flux normal (comme les autres thèmes) au lieu du positionnement absolu,
-       sinon il chevauche la description sous le nom du produit. */
-    html[data-menu-theme="genext"] .c-price.c-price-wide,
-    html[data-menu-theme^="prestige"] .c-price.c-price-wide {
-      position:static; top:auto; right:auto; margin-left:8px;
-    }
+    /* Remise/Happy Hour actifs : le prix (multi-lignes : ancien prix + nouveau +
+       -X%) reste à L'EXACTE MÊME PLACE que le prix normal — même ancrage absolu
+       top:12/right:12, aucun changement de design. On réserve seulement la
+       hauteur nécessaire sur la ligne du nom (min-height, calée sur la hauteur
+       réelle du bloc prix) pour que la description ne soit jamais chevauchée. */
     html[data-menu-theme="genext"] .c-name-row.c-name-row-wide,
     html[data-menu-theme^="prestige"] .c-name-row.c-name-row-wide {
-      padding-right:0;
+      min-height:56px;
     }
     /* ── FABs circulaires + animation lightFlow ── */
     html[data-menu-theme="genext"] #call-fab,
@@ -9494,9 +9492,10 @@ function _cardPrestige(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   // Remise/Happy Hour actifs → prix multi-lignes (ancien prix + nouveau + -X%) :
-  // sur GeNext/Prestige le prix est positionné en absolu (voir CSS) ; sans cette
-  // classe, un prix plus haut/large chevauche la description en dessous.
-  const priceWide = _priceHasDiscount(item) ? ' c-price-wide' : '';
+  // le prix reste positionné exactement comme le prix normal (absolu, voir CSS) ;
+  // cette classe réserve juste la hauteur nécessaire sur la ligne du nom pour que
+  // le prix plus haut ne chevauche jamais la description en dessous.
+  const priceWide = _priceHasDiscount(item) ? ' c-name-row-wide' : '';
   card.innerHTML = `
     <div class="card-top">
       ${src
@@ -9505,9 +9504,9 @@ function _cardPrestige(item) {
           ? `<div class="c-img-empty">${_camSvg}</div>`
           : ''}
       <div class="c-info">
-        <div class="c-name-row${priceWide ? ' c-name-row-wide' : ''}">
+        <div class="c-name-row${priceWide}">
           <div class="c-name">${_esc(item.name[lang]||item.name.fr||'')}</div>
-          <div class="c-price${priceWide}">${_priceHtml(item)}</div>
+          <div class="c-price">${_priceHtml(item)}</div>
         </div>
         ${desc ? `<div class="c-desc">${desc}</div>` : ''}
         ${badges ? `<div class="c-badges">${badges}</div>` : ''}
