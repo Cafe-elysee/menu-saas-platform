@@ -3113,6 +3113,21 @@
     .price-wrap .price-promo { color:#e85050; }
     html.light .price-wrap .price-promo { color:#c02020; }
     .price-wrap .price-hh { color:var(--gold); }
+    /* Thèmes Carte : police de prix compacte (0.78-1rem) — l'ancien prix barré à
+       0.68em devenait illisible. Agrandi + plus opaque, tout en restant plus
+       petit que le nouveau prix (hiérarchie visuelle préservée). */
+    .cls-price .price-old,
+    .som-price .price-old,
+    .ben-price .price-old,
+    .tel-price .price-old,
+    .cou-price .price-old,
+    .dva-price .price-old,
+    .voy-price .price-old,
+    .art-price .price-old,
+    .ard-prix-pill .price-old,
+    .marc-price .price-old {
+      font-size:0.85em; opacity:0.7;
+    }
     .bdg-type { background:rgba(100,140,200,0.12); color:#8ab4e8; border:1px solid rgba(100,140,200,0.25); }
     .bdg-temp-chaud { background:rgba(220,100,60,0.12); color:#e08060; border:1px solid rgba(220,100,60,0.25); }
     .bdg-temp-froid { background:rgba(80,160,220,0.12); color:#70b8e8; border:1px solid rgba(80,160,220,0.25); }
