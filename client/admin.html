@@ -2751,13 +2751,48 @@
   </div>
 </div>
 
-<!-- ── MODAL APERÇU DU MENU (intégré, jamais de nouvel onglet — le bouton retour ferme l'aperçu et revient à l'admin) ── -->
-<div id="menu-preview-modal" style="display:none;position:fixed;inset:0;z-index:10011;background:#0a0806;flex-direction:column;">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;flex-shrink:0;background:#120e0a;border-bottom:1px solid rgba(200,164,78,0.18);">
-    <div style="font-family:'Crimson Pro',Georgia,serif;font-size:1.0rem;font-weight:600;color:#c8a44e;" data-uitxt="previewTitle">Aperçu du menu</div>
-    <button id="menu-preview-close-btn" title="Fermer" style="width:34px;height:34px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:1.05rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+<!-- ── MODAL APERÇU DU MENU — DESKTOP UNIQUEMENT ──
+     Simule un vrai téléphone (cadre + encoche) pour montrer exactement ce que voient
+     les clients sur mobile, quelle que soit la taille de l'écran de l'ordinateur.
+     Sur mobile, "Voir le menu" navigue directement (pas de popup) — voir openMenuPreview(). -->
+<style>
+  #menu-preview-modal {
+    display:none; position:fixed; inset:0; z-index:10011;
+    background:rgba(8,6,4,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; flex-direction:column; padding:24px;
+  }
+  .mpv-topbar { display:flex; align-items:center; justify-content:space-between; width:390px; max-width:100%; margin-bottom:14px; }
+  .mpv-title { font-family:'Crimson Pro',Georgia,serif; font-size:1.0rem; font-weight:600; color:#c8a44e; }
+  .mpv-close-btn {
+    width:36px; height:36px; flex-shrink:0; border-radius:50%;
+    border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff;
+    font-size:1.05rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background 0.18s ease, transform 0.15s ease;
+  }
+  .mpv-close-btn:hover { background:rgba(255,255,255,0.16); }
+  .mpv-close-btn:active { transform:scale(0.92); }
+  .mpv-phone {
+    position:relative; width:390px; max-width:92vw;
+    height:min(844px, calc(100vh - 130px));
+    background:#000; border:10px solid #131110; border-radius:46px;
+    box-shadow:0 34px 90px rgba(0,0,0,0.65), 0 0 0 1.5px rgba(255,255,255,0.07), inset 0 0 0 2px rgba(0,0,0,0.4);
+    overflow:hidden;
+  }
+  .mpv-notch {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:126px; height:24px; background:#131110; border-radius:0 0 18px 18px; z-index:2;
+  }
+  .mpv-phone iframe { width:100%; height:100%; border:none; display:block; background:#0a0806; }
+</style>
+<div id="menu-preview-modal">
+  <div class="mpv-topbar">
+    <div class="mpv-title" data-uitxt="previewTitle">Aperçu du menu</div>
+    <button id="menu-preview-close-btn" class="mpv-close-btn" title="Fermer">✕</button>
   </div>
-  <iframe id="menu-preview-iframe" src="" title="Aperçu du menu" style="flex:1;min-height:0;width:100%;border:none;background:#0a0806;"></iframe>
+  <div class="mpv-phone">
+    <div class="mpv-notch"></div>
+    <iframe id="menu-preview-iframe" src="" title="Aperçu du menu"></iframe>
+  </div>
 </div>
 
 <!-- ── MODAL PAIEMENT ── -->
@@ -5013,16 +5048,19 @@ function openHeroCropModal(dataUrl, onConfirm) {
   cancelBtn.addEventListener('click', onCancelClick);
 }
 
-/* ─── APERÇU DU MENU (iframe intégré, jamais de nouvel onglet) ───
-   Le bouton retour du téléphone doit revenir à l'admin, jamais fermer le navigateur :
-   on utilise l'API History (pushState/popstate) au lieu de window.open, pour que
-   "retour" ferme toujours l'aperçu et ramène sur cette même page admin. */
+/* ─── APERÇU DU MENU ───
+   Desktop (≥900px, comme le reste de l'admin) : popup avec simulation téléphone —
+   l'admin voit exactement le rendu mobile réel, quelle que soit la largeur de son écran.
+   Mobile : comportement d'origine (nouvel onglet) — l'appareil EST déjà un téléphone,
+   pas besoin de simulation, et on évite toute complexité de popup sur petit écran. */
 let _menuPreviewOpen = false;
 function openMenuPreview() {
+  const url = 'index.html?rid=' + encodeURIComponent(_RID) + '&table=1';
+  const isDesktop = window.matchMedia('(min-width:900px)').matches;
   const modal  = document.getElementById('menu-preview-modal');
   const iframe = document.getElementById('menu-preview-iframe');
-  if (!modal || !iframe) return;
-  iframe.src = 'index.html?rid=' + encodeURIComponent(_RID) + '&table=1';
+  if (!isDesktop || !modal || !iframe) { window.open(url, '_blank'); return; }
+  iframe.src = url;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   _menuPreviewOpen = true;
