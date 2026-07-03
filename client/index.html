@@ -8521,6 +8521,18 @@ let _logoRadius = '50%'; // updated by _detectLogoShape
 let _restaurantName = '';
 let _preloaderStarted = false;
 
+/* Verrouille le scroll pendant le preloader : sans ça, un scroll actif pendant
+   l'animation (requestAnimationFrame) la fait geler sur mobile — les navigateurs
+   ralentissent les rAF non liés au scroll tant qu'un geste de scroll est en cours. */
+function _lockPreloaderScroll() {
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+}
+function _unlockPreloaderScroll() {
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
+
 function _updateCCHeader() {
   const t = UI[lang];
   const sub = document.getElementById('cc-sub');
@@ -8560,12 +8572,13 @@ function _startPreloader() {
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
   if (!pre) return;
+  _lockPreloaderScroll();
   // Pas de logo uploadé → fade-out élégant puis auto-scroll hero→nav
   if (!_logoUrl) {
     // Fade-out élégant même sans logo (évite flash bokeh brusque)
     pre.style.transition = 'opacity 0.35s ease';
     pre.style.opacity = '0';
-    setTimeout(() => { pre.remove(); _triggerHeroAutoScroll(); }, 370);
+    setTimeout(() => { pre.remove(); _unlockPreloaderScroll(); _triggerHeroAutoScroll(); }, 370);
     return;
   }
   const img = document.getElementById('pre-logo-img');
@@ -8581,7 +8594,7 @@ function _dissolvePreloader(pre) {
   _preloaderHidden = true;
   const img  = document.getElementById('pre-logo-img');
   const disp = document.getElementById('gnm-sand-disp');
-  if (!img) { pre.remove(); _triggerHeroAutoScroll(); return; }
+  if (!img) { pre.remove(); _unlockPreloaderScroll(); _triggerHeroAutoScroll(); return; }
   img.style.filter = 'url(#gnm-sand-f)';
   let t0 = null;
   const dur = 2000;
@@ -8594,7 +8607,7 @@ function _dissolvePreloader(pre) {
     img.style.transform = 'translateX('+(t*28).toFixed(1)+'px) translateY('+(t*-6).toFixed(1)+'px)';
     pre.style.opacity = (1 - t).toFixed(3);
     if (t < 1) requestAnimationFrame(step);
-    else { pre.remove(); _triggerHeroAutoScroll(); }
+    else { pre.remove(); _unlockPreloaderScroll(); _triggerHeroAutoScroll(); }
   }
   requestAnimationFrame(step);
 }
