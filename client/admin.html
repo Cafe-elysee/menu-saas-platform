@@ -623,10 +623,10 @@
     }
     .hero-upload-btn:hover { opacity:0.85; }
     .hero-del-btn {
-      display:flex; align-items:center; gap:5px;
+      display:flex; align-items:center; justify-content:center;
       background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.25);
-      color:var(--red); font-size:0.78rem; padding:7px 12px; border-radius:9px;
-      cursor:pointer; transition:background 0.2s;
+      color:var(--red); width:34px; height:34px; padding:0; border-radius:9px;
+      cursor:pointer; transition:background 0.2s; flex-shrink:0;
     }
     .hero-del-btn:hover { background:rgba(224,82,82,0.15); }
     html.light .hero-img-card { background:var(--bg3); }
@@ -2463,12 +2463,11 @@
       <div class="hero-controls">
         <label class="hero-upload-btn" for="hero-file-input">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span id="btn-choose-photo-lbl">Choisir une photo</span>
+          <span id="btn-choose-photo-lbl">Photo d'accueil</span>
         </label>
         <input type="file" id="hero-file-input" accept="image/*" style="display:none">
-        <button class="hero-del-btn" id="hero-del-btn" style="display:none">
+        <button class="hero-del-btn" id="hero-del-btn" style="display:none" aria-label="Supprimer" title="Supprimer">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          <span id="btn-del-photo-lbl">Supprimer</span>
         </button>
       </div>
       <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2477,9 +2476,8 @@
           <span data-uitxt="btnLogo">Logo</span>
         </label>
         <input type="file" id="logo-file-input" accept="image/*" style="display:none">
-        <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
+        <button class="hero-del-btn" id="logo-del-btn" style="display:none;width:28px;height:28px;" aria-label="Supprimer le logo" title="Supprimer le logo">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          <span data-uitxt="btnDelLogo">Supprimer le logo</span>
         </button>
       </div>
       <div>
@@ -3138,7 +3136,7 @@ const ADMIN_UI = {
     secNote:       'Σημείωμα',
     badgeNote:     'Ανακοίνωση',
     badgeFooter:   'Υποσέλιδο',
-    btnChoosePhoto:'Επιλογή φωτογραφίας',
+    btnChoosePhoto:'Φωτογραφία εξωφύλλου',
     btnDelPhoto:   'Διαγραφή',
     noteShown:     'Εμφανίζεται στο μενού',
     noteHidden:    'Κρυφό στο μενού',
@@ -3287,7 +3285,7 @@ const ADMIN_UI = {
     secNote:       'Note',
     badgeNote:     'Annonce',
     badgeFooter:   'Bas de page',
-    btnChoosePhoto:'Choisir une photo',
+    btnChoosePhoto:'Photo d\'accueil',
     btnDelPhoto:   'Supprimer',
     noteShown:     'Affichée dans le menu',
     noteHidden:    'Masquée dans le menu',
@@ -3436,7 +3434,7 @@ const ADMIN_UI = {
     secNote:       'Note',
     badgeNote:     'Notice',
     badgeFooter:   'Footer',
-    btnChoosePhoto:'Choose a photo',
+    btnChoosePhoto:'Cover photo',
     btnDelPhoto:   'Delete',
     noteShown:     'Visible in menu',
     noteHidden:    'Hidden in menu',
@@ -3585,7 +3583,7 @@ const ADMIN_UI = {
     secNote:       'Notiz',
     badgeNote:     'Ankündigung',
     badgeFooter:   'Fußzeile',
-    btnChoosePhoto:'Foto auswählen',
+    btnChoosePhoto:'Titelbild',
     btnDelPhoto:   'Löschen',
     noteShown:     'Im Menü sichtbar',
     noteHidden:    'Im Menü ausgeblendet',
@@ -3734,7 +3732,7 @@ const ADMIN_UI = {
     secNote:       'Nota',
     badgeNote:     'Anuncio',
     badgeFooter:   'Pie de página',
-    btnChoosePhoto:'Elegir imagen',
+    btnChoosePhoto:'Foto de portada',
     btnDelPhoto:   'Eliminar',
     noteShown:     'Visible en el menú',
     noteHidden:    'Oculto en el menú',
@@ -5627,8 +5625,10 @@ function applyAdminUI(l) {
   if (badgeFooter) badgeFooter.textContent = t.badgeFooter;
   const chooseLbl = $('btn-choose-photo-lbl');
   if (chooseLbl) chooseLbl.textContent = t.btnChoosePhoto;
-  const delLbl = $('btn-del-photo-lbl');
-  if (delLbl) delLbl.textContent = t.btnDelPhoto;
+  const heroDelBtn = $('hero-del-btn');
+  if (heroDelBtn && t.btnDelPhoto) { heroDelBtn.setAttribute('aria-label', t.btnDelPhoto); heroDelBtn.title = t.btnDelPhoto; }
+  const logoDelBtnLbl = $('logo-del-btn');
+  if (logoDelBtnLbl && t.btnDelLogo) { logoDelBtnLbl.setAttribute('aria-label', t.btnDelLogo); logoDelBtnLbl.title = t.btnDelLogo; }
   document.querySelectorAll('[data-uitxt]').forEach(el => {
     const key = el.getAttribute('data-uitxt');
     if (t[key] !== undefined) el.textContent = t[key];
