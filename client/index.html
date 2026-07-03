@@ -10063,15 +10063,16 @@ function _setupHeroFabHide() {
     const el = document.getElementById(id);
     if (el) el.classList.add('hero-fab-hide');
   });
-  // Observer la première catégorie (ou le conteneur si pas encore rendu)
-  const target = document.querySelector('#menu-secs .cat-sec')
-              || document.getElementById('menu-secs');
+  // Observer le hero (bandeau photo d'accueil) — FABs masqués tant qu'il est visible,
+  // affichés dès qu'on le quitte, et ce jusqu'en bas de page (pas seulement pendant
+  // la 1ère catégorie : sinon les FABs disparaissaient à nouveau après la 1ère section).
+  const target = document.getElementById('hero');
   if (!target) return;
   _heroFabObserver = new IntersectionObserver(entries => {
-    const catsVisible = entries[0].isIntersecting;
+    const heroVisible = entries[0].isIntersecting;
     fabIds.forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.classList.toggle('hero-fab-hide', !catsVisible);
+      if (el) el.classList.toggle('hero-fab-hide', heroVisible);
     });
   }, { threshold: 0.15 });
   _heroFabObserver.observe(target);
