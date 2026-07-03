@@ -16,9 +16,7 @@
         var themeId = urlTheme || 'gold-noir';
         if (!urlTheme && cached) { var d = JSON.parse(cached); if (d.menuTheme) themeId = d.menuTheme; }
         document.documentElement.dataset.menuTheme = themeId;
-        // Doit rester identique à _LIGHT_DEFAULT_THEMES (plus bas dans le fichier) —
-        // toute divergence entre les deux listes provoque un flash clair/sombre au chargement.
-        var LIGHT_DEFAULTS = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white'];
+        var LIGHT_DEFAULTS = ['botanical','santorin'];
         var mode;
         if (urlDark !== null && urlDark !== undefined) {
           mode = urlDark === '0' ? 'light' : 'dark';
@@ -2655,11 +2653,7 @@
       box-shadow:0 8px 32px rgba(0,0,0,0.7),0 0 0 4px #080604;
       will-change:opacity,filter;
       position:relative; z-index:1;
-      /* Caché tant que la forme (rond/carré) n'est pas détectée — évite le flash "cercle puis forme correcte" */
-      opacity:0;
     }
-    /* Pas de transition ici : le fondu de sortie (dissolve) pilote déjà opacity image par image en JS */
-    .pre-logo-img.pre-logo-ready { opacity:1; }
     html.light .pre-logo-img {
       background:#f0ede8;
       box-shadow:0 6px 22px rgba(0,0,0,0.2),0 0 0 4px #f0ede8;
@@ -6334,8 +6328,6 @@ let activeCat  = 'all';
 
 
 
-// Doit rester identique à LIGHT_DEFAULTS dans le script inline du <head> (anti-flash pré-rendu) —
-// toute divergence entre les deux listes provoque un flash clair/sombre au chargement.
 const _LIGHT_DEFAULT_THEMES = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white'];
 function _defaultThemeMode(vt) { return _LIGHT_DEFAULT_THEMES.includes(vt) ? 'light' : 'dark'; }
 function _loadThemeMode(themeId) { return localStorage.getItem(_RID + '_theme_mode_' + themeId) || _defaultThemeMode(themeId); }
@@ -8622,17 +8614,7 @@ function applyLogoUrl(url) {
   const ccLogoImg = document.getElementById('cc-logo-img');
   if (ccLogoImg) { ccLogoImg.src = _logoUrl; ccLogoImg.style.display = hasLogo ? '' : 'none'; }
   // Détection forme logo (carré → border-radius:14px, rond → 50%)
-  if (hasLogo) {
-    _detectLogoShape(_logoUrl);
-    // Filet de sécurité : révèle le logo du preloader même si la détection tarde/échoue silencieusement
-    setTimeout(_revealPreLogo, 900);
-  }
-}
-
-/* Affiche le logo du preloader une fois sa forme connue (évite le flash "cercle" par défaut) */
-function _revealPreLogo() {
-  const preImg = document.getElementById('pre-logo-img');
-  if (preImg) preImg.classList.add('pre-logo-ready');
+  if (hasLogo) _detectLogoShape(_logoUrl);
 }
 
 /* Détecte si le logo est circulaire (coins transparents) ou carré (coins opaques) */
@@ -8653,9 +8635,8 @@ function _detectLogoShape(src) {
       _logoRadius = (trans/tot > 0.25) ? '50%' : '14px';
     } catch(e) { _logoRadius = '50%'; }
     document.querySelectorAll('.hc-logo,.fp-hc-logo,#pre-logo-img').forEach(el => el.style.borderRadius = _logoRadius);
-    _revealPreLogo();
   };
-  t.onerror = function(){ _revealPreLogo(); };
+  t.onerror = function(){};
   t.src = src;
 }
 
