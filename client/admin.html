@@ -2403,7 +2403,7 @@
         <path id="adm-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
       </svg>
     </button>
-    <button class="btn-preview" id="adm-menu-btn" onclick="window.open('index.html?rid='+_RID+'&table=1','_blank')" title="Voir le menu en ligne">
+    <button class="btn-preview" id="adm-menu-btn" onclick="openMenuPreview()" title="Voir le menu en ligne">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       <span id="adm-menu-btn-txt">Menu</span>
     </button>
@@ -2462,7 +2462,7 @@
           <span id="btn-del-photo-lbl">Supprimer</span>
         </button>
       </div>
-      <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format portrait, min. 900×1600 px</div>
+      <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format paysage (horizontal), min. 1600×900 px</div>
       <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;">
         <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -2751,6 +2751,15 @@
   </div>
 </div>
 
+<!-- ── MODAL APERÇU DU MENU (intégré, jamais de nouvel onglet — le bouton retour ferme l'aperçu et revient à l'admin) ── -->
+<div id="menu-preview-modal" style="display:none;position:fixed;inset:0;z-index:10011;background:#0a0806;flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;flex-shrink:0;background:#120e0a;border-bottom:1px solid rgba(200,164,78,0.18);">
+    <div style="font-family:'Crimson Pro',Georgia,serif;font-size:1.0rem;font-weight:600;color:#c8a44e;" data-uitxt="previewTitle">Aperçu du menu</div>
+    <button id="menu-preview-close-btn" title="Fermer" style="width:34px;height:34px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:1.05rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+  </div>
+  <iframe id="menu-preview-iframe" src="" title="Aperçu du menu" style="flex:1;min-height:0;width:100%;border:none;background:#0a0806;"></iframe>
+</div>
+
 <!-- ── MODAL PAIEMENT ── -->
 <div id="pay-modal" style="display:none;position:fixed;inset:0;z-index:10006;background:rgba(0,0,0,0.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px">
   <div style="width:100%;max-width:360px;background-color:#120e0a;border:1px solid rgba(200,164,78,0.3);border-radius:22px;padding:28px 22px 22px;box-shadow:0 0 0 1px rgba(200,164,78,0.1),0 24px 64px rgba(0,0,0,0.6)">
@@ -3020,7 +3029,7 @@ const ADMIN_UI = {
   el: {
     admSub:        'Διαχείριση μενού',
     btnPreview:    '👁 Προβολή μενού',
-    btnViewMenu:   'Μενού',
+    btnViewMenu:   'Μενού', previewTitle: 'Προεπισκόπηση μενού',
     btnLogout:     'Αποσύνδεση',
     btnTranslate:  '🌐 Μετάφραση όλων των άλλων γλωσσών',
     secInfo:       'Πληροφορίες',
@@ -3088,7 +3097,7 @@ const ADMIN_UI = {
     badgeFooter:   'Υποσέλιδο',
     btnChoosePhoto:'Επιλογή φωτογραφίας',
     btnDelPhoto:   'Διαγραφή',
-    heroHint:      'Συνιστώμενη: κατακόρυφος προσανατολισμός, ελάχ. 900×1600 px',
+    heroHint:      'Συνιστώμενη: οριζόντιος προσανατολισμός (τοπίο), ελάχ. 1600×900 px',
     noteShown:     'Εμφανίζεται στο μενού',
     noteHidden:    'Κρυφό στο μενού',
     notePh:        'Κείμενο σε {L}',
@@ -3172,7 +3181,7 @@ const ADMIN_UI = {
   fr: {
     admSub:        'Administration du menu',
     btnPreview:    '👁 Voir le menu',
-    btnViewMenu:   'Menu',
+    btnViewMenu:   'Menu', previewTitle: 'Aperçu du menu',
     btnLogout:     'Déconnexion',
     secInfo:       'Infos',
     secCats:       'Catégories',
@@ -3237,7 +3246,7 @@ const ADMIN_UI = {
     badgeFooter:   'Bas de page',
     btnChoosePhoto:'Choisir une photo',
     btnDelPhoto:   'Supprimer',
-    heroHint:      'Photo recommandée : format portrait, min. 900×1600 px',
+    heroHint:      'Photo recommandée : format paysage (horizontal), min. 1600×900 px',
     noteShown:     'Affichée dans le menu',
     noteHidden:    'Masquée dans le menu',
     notePh:        'Texte de la note en {L}',
@@ -3321,7 +3330,7 @@ const ADMIN_UI = {
   en: {
     admSub:        'Menu administration',
     btnPreview:    '👁 View menu',
-    btnViewMenu:   'Menu',
+    btnViewMenu:   'Menu', previewTitle: 'Menu preview',
     btnLogout:     'Logout',
     secInfo:       'Info',
     secCats:       'Categories',
@@ -3386,7 +3395,7 @@ const ADMIN_UI = {
     badgeFooter:   'Footer',
     btnChoosePhoto:'Choose a photo',
     btnDelPhoto:   'Delete',
-    heroHint:      'Recommended: portrait format, min. 900×1600 px',
+    heroHint:      'Recommended: landscape format (horizontal), min. 1600×900 px',
     noteShown:     'Visible in menu',
     noteHidden:    'Hidden in menu',
     notePh:        'Note in {L}',
@@ -3470,7 +3479,7 @@ const ADMIN_UI = {
   de: {
     admSub:        'Menüverwaltung',
     btnPreview:    '👁 Menü anzeigen',
-    btnViewMenu:   'Menü',
+    btnViewMenu:   'Menü', previewTitle: 'Menüvorschau',
     btnLogout:     'Abmelden',
     secInfo:       'Infos',
     secCats:       'Kategorien',
@@ -3535,7 +3544,7 @@ const ADMIN_UI = {
     badgeFooter:   'Fußzeile',
     btnChoosePhoto:'Foto auswählen',
     btnDelPhoto:   'Löschen',
-    heroHint:      'Empfohlen: Hochformat, min. 900×1600 px',
+    heroHint:      'Empfohlen: Querformat (horizontal), min. 1600×900 px',
     noteShown:     'Im Menü sichtbar',
     noteHidden:    'Im Menü ausgeblendet',
     notePh:        'Notiz auf {L}',
@@ -3619,7 +3628,7 @@ const ADMIN_UI = {
   es: {
     admSub:        'Gestión del menú',
     btnPreview:    '👁 Ver el menú',
-    btnViewMenu:   'El menú',
+    btnViewMenu:   'El menú', previewTitle: 'Vista previa del menú',
     btnLogout:     'Cerrar sesión',
     secInfo:       'Información',
     secCats:       'Categorías',
@@ -3684,7 +3693,7 @@ const ADMIN_UI = {
     badgeFooter:   'Pie de página',
     btnChoosePhoto:'Elegir imagen',
     btnDelPhoto:   'Eliminar',
-    heroHint:      'Recomendado: vertical, mínimo 900×1600 px',
+    heroHint:      'Recomendado: formato horizontal (paisaje), mínimo 1600×900 px',
     noteShown:     'Visible en el menú',
     noteHidden:    'Oculto en el menú',
     notePh:        'Nota en {L}',
@@ -4936,6 +4945,8 @@ function _fallbackResizeBlob(dataUrl, cb) {
 }
 
 let _heroCropper = null;
+let _heroCropOpen = false;
+let _heroCropForceClose = null; // pointeur vers le "annuler" du popup ouvert, appelé par le retour téléphone
 function openHeroCropModal(dataUrl, onConfirm) {
   const modal    = document.getElementById('crop-modal');
   const imgEl    = document.getElementById('crop-img');
@@ -4946,6 +4957,8 @@ function openHeroCropModal(dataUrl, onConfirm) {
   imgEl.src = dataUrl;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  _heroCropOpen = true;
+  history.pushState({ heroCrop: true }, '', location.href);
 
   function destroyCropper() {
     if (_heroCropper) { _heroCropper.destroy(); _heroCropper = null; }
@@ -4958,23 +4971,30 @@ function openHeroCropModal(dataUrl, onConfirm) {
     imgEl.src = '';
     confirmBtn.removeEventListener('click', onConfirmClick);
     cancelBtn.removeEventListener('click', onCancelClick);
+    _heroCropOpen = false;
+    _heroCropForceClose = null;
   }
 
+  // Appelé par le bouton retour du téléphone : ferme le popup et annule le recadrage,
+  // sans re-déclencher history.back() (le retour a déjà été consommé par le navigateur)
+  _heroCropForceClose = () => { cleanup(); onConfirm(null); };
+
   function onConfirmClick() {
-    if (!_heroCropper) { cleanup(); _fallbackResizeBlob(dataUrl, onConfirm); return; }
+    if (!_heroCropper) { cleanup(); history.back(); _fallbackResizeBlob(dataUrl, onConfirm); return; }
     const canvas = _heroCropper.getCroppedCanvas({
-      width: 1080, height: 1920,
+      width: 1600, height: 900,
       imageSmoothingEnabled: true, imageSmoothingQuality: 'high'
     });
     cleanup();
+    history.back();
     canvas.toBlob(blob => onConfirm(blob), 'image/jpeg', 0.85);
   }
-  function onCancelClick() { cleanup(); onConfirm(null); }
+  function onCancelClick() { cleanup(); history.back(); onConfirm(null); }
 
   destroyCropper();
   imgEl.onload = () => {
     _heroCropper = new Cropper(imgEl, {
-      aspectRatio: 9 / 16,
+      aspectRatio: 16 / 9,
       viewMode: 1,
       dragMode: 'move',
       autoCropArea: 1,
@@ -4992,6 +5012,37 @@ function openHeroCropModal(dataUrl, onConfirm) {
   confirmBtn.addEventListener('click', onConfirmClick);
   cancelBtn.addEventListener('click', onCancelClick);
 }
+
+/* ─── APERÇU DU MENU (iframe intégré, jamais de nouvel onglet) ───
+   Le bouton retour du téléphone doit revenir à l'admin, jamais fermer le navigateur :
+   on utilise l'API History (pushState/popstate) au lieu de window.open, pour que
+   "retour" ferme toujours l'aperçu et ramène sur cette même page admin. */
+let _menuPreviewOpen = false;
+function openMenuPreview() {
+  const modal  = document.getElementById('menu-preview-modal');
+  const iframe = document.getElementById('menu-preview-iframe');
+  if (!modal || !iframe) return;
+  iframe.src = 'index.html?rid=' + encodeURIComponent(_RID) + '&table=1';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  _menuPreviewOpen = true;
+  history.pushState({ menuPreview: true }, '', location.href);
+}
+function closeMenuPreview(fromPopState) {
+  const modal  = document.getElementById('menu-preview-modal');
+  const iframe = document.getElementById('menu-preview-iframe');
+  if (!_menuPreviewOpen) return;
+  _menuPreviewOpen = false;
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+  if (iframe) iframe.src = 'about:blank';
+  if (!fromPopState) history.back();
+}
+window.addEventListener('popstate', () => {
+  if (_menuPreviewOpen) closeMenuPreview(true);
+  if (_heroCropOpen && _heroCropForceClose) _heroCropForceClose();
+});
+document.getElementById('menu-preview-close-btn')?.addEventListener('click', () => closeMenuPreview(false));
 
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
