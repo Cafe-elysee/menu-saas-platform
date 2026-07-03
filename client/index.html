@@ -2026,6 +2026,9 @@
       font-size:0.76rem; font-weight:700; color:var(--bg);
       background:var(--gold); padding:3px 16px; border-radius:20px;
     }
+    /* Prix doré sur pastille dorée = illisible en Happy Hour → contraste inversé */
+    html[data-menu-theme="livre-rose"] .fp-item-price .price-now.price-hh { color:var(--bg); }
+    html[data-menu-theme="livre-rose"] .fp-item-price .price-off-hh { background:var(--bg); color:var(--gold); }
 
     /* ═══════════════════════════════════════════════════════════════════
        LIVRE-ANTIQUE — Codex Illuminé (Manuscrit Ancien)
@@ -2164,6 +2167,9 @@
       font-size:0.76rem; font-weight:700; color:var(--bg);
       background:var(--gold); padding:2px 9px; border-radius:12px;
     }
+    /* Prix doré sur pastille dorée = illisible en Happy Hour → contraste inversé */
+    html[data-menu-theme="livre-indigo"] .fp-item-price .price-now.price-hh { color:var(--bg); }
+    html[data-menu-theme="livre-indigo"] .fp-item-price .price-off-hh { background:var(--bg); color:var(--gold); }
 
     /* ═══════════════════════════════════════════════════════════════════
        LIVRE-FORET — Carnet de Terrain (Field Notes Typewriter)
