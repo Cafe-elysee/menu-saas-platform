@@ -5533,10 +5533,7 @@
   /* Le flip-wrap position:fixed couvre tout — hero + hero-card inutiles et causent le carré blanc */
   body[data-style="paper"] #hero,
   body[data-style="paper"] #hero-card { display:none !important; }
-  /* ── Système de remise produit — fix #176 ── */
-  .price-promo { color:#e85050; font-weight:700; }
-  html.light .price-promo { color:#c02020; }
-  .price-old { text-decoration:line-through; opacity:0.45; font-size:0.82em; margin-left:4px; font-weight:400; }
+  /* .price-promo / .price-old : styles portés par .price-wrap (Fix #201) — voir plus haut dans le fichier */
 </style>
 <div id="demo-banner">🔒 Mode démo · Navigation uniquement — aucune action n'est enregistrée</div>
 
