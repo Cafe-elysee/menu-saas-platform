@@ -15,6 +15,8 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/gr.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
   <style>
     :root {
       --bg:     #0c0a08;
@@ -2732,6 +2734,23 @@
   </div>
 </div>
 
+<!-- ── MODAL RECADRAGE PHOTO D'ACCUEIL ── -->
+<div id="crop-modal" style="display:none;position:fixed;inset:0;z-index:10010;background:#0a0806;flex-direction:column;">
+  <div style="padding:calc(16px + env(safe-area-inset-top,0px)) 20px 12px;text-align:center;flex-shrink:0;">
+    <div style="font-family:'Crimson Pro',Georgia,serif;font-size:1.15rem;font-weight:600;color:#c8a44e;" data-uitxt="cropTitle">Cadrez votre photo</div>
+    <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);margin-top:4px;" data-uitxt="cropHint">Faites glisser l'image et pincez pour zoomer</div>
+  </div>
+  <div style="flex:1;min-height:0;position:relative;">
+    <div id="crop-img-wrap" style="position:absolute;inset:0;">
+      <img id="crop-img" src="" alt="" style="display:block;max-width:100%;">
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;padding:14px 20px calc(18px + env(safe-area-inset-bottom,0px));flex-shrink:0;">
+    <button id="crop-cancel-btn" data-uitxt="cropCancel" style="flex:1;padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.7);font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer;">Annuler</button>
+    <button id="crop-confirm-btn" data-uitxt="cropConfirm" style="flex:2;padding:13px;border-radius:14px;border:none;background:#c8a44e;color:#0c0a08;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Valider le cadrage</button>
+  </div>
+</div>
+
 <!-- ── MODAL PAIEMENT ── -->
 <div id="pay-modal" style="display:none;position:fixed;inset:0;z-index:10006;background:rgba(0,0,0,0.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px">
   <div style="width:100%;max-width:360px;background-color:#120e0a;border:1px solid rgba(200,164,78,0.3);border-radius:22px;padding:28px 22px 22px;box-shadow:0 0 0 1px rgba(200,164,78,0.1),0 24px 64px rgba(0,0,0,0.6)">
@@ -3080,6 +3099,7 @@ const ADMIN_UI = {
     visBtnNote:    'Σημείωμα πελατών',
     secEvents:'Ενεργή Γιορτή', badgeEventsNone:'Καμία',
     secTables:'Τραπέζια & QR Codes', taglineLabel:'Σύνθημα (κάτω από το όνομα)', descLabel:'Περιγραφή (παράγραφος)', socialLabel:'Κοινωνικά δίκτυα',
+    cropTitle:'Πλαισιώστε τη φωτογραφία σας', cropHint:'Σύρετε την εικόνα και τσιμπήστε για ζουμ', cropCancel:'Άκυρο', cropConfirm:'Επιβεβαίωση πλαισίου',
     secTheme:'Σχεδίαση', badgeTheme:'Design',
     secOrders:'Παραγγελίες',
     scDesign:'🎨 Σχεδίαση', scHero:'🖼️ Εικόνα', scInfos:'ℹ️ Πληροφορίες',
@@ -3228,6 +3248,7 @@ const ADMIN_UI = {
     visBtnNote:    'Note clients',
     secEvents:'Fête active', badgeEventsNone:'Aucune',
     secTables:'Tables & QR Codes', taglineLabel:'Slogan (sous le nom)', descLabel:'Description (paragraphe)', socialLabel:'Réseaux sociaux',
+    cropTitle:'Cadrez votre photo', cropHint:'Faites glisser l\'image et pincez pour zoomer', cropCancel:'Annuler', cropConfirm:'Valider le cadrage',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Commandes',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -3376,6 +3397,7 @@ const ADMIN_UI = {
     visBtnNote:    'Customer note',
     secEvents:'Active Event', badgeEventsNone:'None',
     secTables:'Tables & QR Codes', taglineLabel:'Tagline (below the name)', descLabel:'Description (paragraph)', socialLabel:'Social networks',
+    cropTitle:'Crop your photo', cropHint:'Drag the image and pinch to zoom', cropCancel:'Cancel', cropConfirm:'Confirm crop',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Orders',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Info',
@@ -3524,6 +3546,7 @@ const ADMIN_UI = {
     visBtnNote:    'Kunden-Notiz',
     secEvents:'Aktives Fest', badgeEventsNone:'Kein',
     secTables:'Tische & QR-Codes', taglineLabel:'Slogan (unter dem Namen)', descLabel:'Beschreibung (Absatz)', socialLabel:'Soziale Netzwerke',
+    cropTitle:'Foto zuschneiden', cropHint:'Bild ziehen und zum Zoomen zusammenziehen', cropCancel:'Abbrechen', cropConfirm:'Zuschnitt bestätigen',
     secTheme:'Design', badgeTheme:'Design',
     secOrders:'Bestellungen',
     scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
@@ -3672,6 +3695,7 @@ const ADMIN_UI = {
     visBtnNote:    'Nota clientes',
     secEvents:'Evento activo', badgeEventsNone:'Ninguno',
     secTables:'Mesas y códigos QR', taglineLabel:'Lema (bajo el nombre)', descLabel:'Descripción (párrafo)', socialLabel:'Redes sociales',
+    cropTitle:'Encuadra tu foto', cropHint:'Arrastra la imagen y pellizca para hacer zoom', cropCancel:'Cancelar', cropConfirm:'Confirmar encuadre',
     secTheme:'Diseño', badgeTheme:'Design',
     secOrders:'Pedidos',
     scDesign:'🎨 Diseño', scHero:'🖼️ Imagen', scInfos:'ℹ️ Información',
@@ -4894,6 +4918,81 @@ function _updateHeroSectionForTheme() {
   }
 }
 
+/* ─── RECADRAGE PHOTO D'ACCUEIL (Cropper.js) ─── */
+// Repli si Cropper.js n'a pas pu charger (CDN bloqué / hors-ligne) : redimensionnement simple, sans cadrage manuel
+function _fallbackResizeBlob(dataUrl, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 1600;
+    let w = img.width, h = img.height;
+    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    canvas.toBlob(blob => cb(blob), 'image/jpeg', 0.82);
+  };
+  img.onerror = () => cb(null);
+  img.src = dataUrl;
+}
+
+let _heroCropper = null;
+function openHeroCropModal(dataUrl, onConfirm) {
+  const modal    = document.getElementById('crop-modal');
+  const imgEl    = document.getElementById('crop-img');
+  const cancelBtn = document.getElementById('crop-cancel-btn');
+  const confirmBtn = document.getElementById('crop-confirm-btn');
+  if (!modal || !imgEl || typeof Cropper === 'undefined') { _fallbackResizeBlob(dataUrl, onConfirm); return; }
+
+  imgEl.src = dataUrl;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  function destroyCropper() {
+    if (_heroCropper) { _heroCropper.destroy(); _heroCropper = null; }
+  }
+
+  function cleanup() {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    destroyCropper();
+    imgEl.src = '';
+    confirmBtn.removeEventListener('click', onConfirmClick);
+    cancelBtn.removeEventListener('click', onCancelClick);
+  }
+
+  function onConfirmClick() {
+    if (!_heroCropper) { cleanup(); _fallbackResizeBlob(dataUrl, onConfirm); return; }
+    const canvas = _heroCropper.getCroppedCanvas({
+      width: 1080, height: 1920,
+      imageSmoothingEnabled: true, imageSmoothingQuality: 'high'
+    });
+    cleanup();
+    canvas.toBlob(blob => onConfirm(blob), 'image/jpeg', 0.85);
+  }
+  function onCancelClick() { cleanup(); onConfirm(null); }
+
+  destroyCropper();
+  imgEl.onload = () => {
+    _heroCropper = new Cropper(imgEl, {
+      aspectRatio: 9 / 16,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 1,
+      background: false,
+      responsive: true,
+      guides: false,
+      center: false,
+      highlight: false,
+      cropBoxMovable: false,
+      cropBoxResizable: false,
+      toggleDragModeOnDblclick: false
+    });
+  };
+
+  confirmBtn.addEventListener('click', onConfirmClick);
+  cancelBtn.addEventListener('click', onCancelClick);
+}
+
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
   const delBtn    = document.getElementById('hero-del-btn');
@@ -4918,7 +5017,7 @@ function renderHeroImageSection() {
   setPhoneBg(adminData.heroImage || '');
   _updateHeroSectionForTheme();
 
-  // Upload fichier → compression canvas → Cloudinary
+  // Upload fichier → recadrage (Cropper.js) → compression canvas → Cloudinary
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
     if (!file) return;
@@ -4926,37 +5025,28 @@ function renderHeroImageSection() {
     const origLabel   = uploadLabel ? uploadLabel.innerHTML : '';
     const reader = new FileReader();
     reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 1600;
-        let w = img.width, h = img.height;
-        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      openHeroCropModal(e.target.result, croppedBlob => {
+        if (!croppedBlob) return; // annulé par le client
 
         // Aperçu local immédiat
-        const localPreview = canvas.toDataURL('image/jpeg', 0.82);
+        const localPreview = URL.createObjectURL(croppedBlob);
         setPhoneBg(localPreview);
 
         if (uploadLabel) { uploadLabel.innerHTML = `<span style="opacity:.6">⏳ Upload…</span>`; uploadLabel.style.pointerEvents = 'none'; }
 
-        canvas.toBlob(blob => {
-          uploadToCloudinary(blob)
-            .then(url => {
-              adminData.heroImage = url;
-              setPhoneBg(url);
-              markUnsaved();
-              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-            })
-            .catch(err => {
-              console.error('Hero upload error:', err);
-              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
-              showToast('❌ Erreur upload image — réessayez');
-            });
-        }, 'image/jpeg', 0.82);
-      };
-      img.src = e.target.result;
+        uploadToCloudinary(croppedBlob)
+          .then(url => {
+            adminData.heroImage = url;
+            setPhoneBg(url);
+            markUnsaved();
+            if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+          })
+          .catch(err => {
+            console.error('Hero upload error:', err);
+            if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+            showToast('❌ Erreur upload image — réessayez');
+          });
+      });
     };
     reader.readAsDataURL(file);
     fileInput.value = '';
