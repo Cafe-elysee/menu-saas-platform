@@ -2463,7 +2463,7 @@
       <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;">
         <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span data-uitxt="btnLogo">Logo (optionnel)</span>
+          <span data-uitxt="btnLogo">Logo</span>
         </label>
         <input type="file" id="logo-file-input" accept="image/*" style="display:none">
         <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
@@ -3177,7 +3177,7 @@ const ADMIN_UI = {
     delIcon:       '✕ Διαγραφή εικονιδίου',
     noneIco:       '— Καμία —',
     noPhoto:       'Καμία φωτογραφία',
-    btnLogo:       'Λογότυπο (προαιρετικό)',
+    btnLogo:       'Λογότυπο',
     logoGreenTitle:'Φόντο λογοτύπου',
     logoGreenMsg:  'Αν θέλετε το φόντο του λογοτύπου σας να αφαιρεθεί, ανεβάστε ένα λογότυπο με <strong style="color:var(--gold)">Διαφανές</strong> φόντο (PNG). Θα αφαιρεθεί αυτόματα. Διαφορετικά, το λογότυπο θα εμφανιστεί όπως είναι, με το φόντο του.',
     logoGreenOk:   'Επιλογή λογοτύπου',
@@ -3207,6 +3207,7 @@ const ADMIN_UI = {
     loginErrIncorrect:'Λανθασμένος κωδικός',
     pdfDownloaded: '✅ PDF ληφθέν',
     logoReceivedTitle:'✅ Λογότυπο μεταφορτώθηκε!', logoReceivedMsg:'Το λογότυπό σας εμφανίζεται τώρα στο μενού σας.', logoReceivedClose:'Τέλεια, ευχαριστώ', logoBgRemoved:'✨ Φόντο Διαφανές ανιχνεύθηκε και αφαιρέθηκε αυτόματα',
+    heroReceivedTitle:'✅ Φωτογραφία ανέβηκε!', heroReceivedMsg:'Η φωτογραφία εξωφύλλου σας εμφανίζεται τώρα στο μενού σας.', heroReceivedClose:'Τέλεια, ευχαριστώ',
     menuSetupTitle:'Το μενού σας ετοιμάζεται', menuSetupMsg:'Η ομάδα μας διαμορφώνει τον χώρο σας τις επόμενες 24 ώρες. Επιστρέψτε σύντομα!',
   },
   fr: {
@@ -3325,7 +3326,7 @@ const ADMIN_UI = {
     delIcon:       '✕ Supprimer l\'icône',
     noneIco:       '— Aucune —',
     noPhoto:       'Aucune photo',
-    btnLogo:       'Logo (optionnel)',
+    btnLogo:       'Logo',
     logoGreenTitle:'Fond du logo',
     logoGreenMsg:  'Si vous voulez que le fond de votre logo ne s\'affiche pas, uploadez un logo avec un fond <strong style="color:var(--gold)">Transparent</strong> (PNG). Il sera supprimé automatiquement. Sinon, le logo sera affiché tel quel, avec son fond.',
     logoGreenOk:   'Choisir le logo',
@@ -3355,6 +3356,7 @@ const ADMIN_UI = {
     loginErrIncorrect:'Mot de passe incorrect',
     pdfDownloaded: '✅ PDF téléchargé',
     logoReceivedTitle:'✅ Logo uploadé !', logoReceivedMsg:'Votre logo s\'affiche maintenant dans votre menu.', logoReceivedClose:'Parfait, merci !', logoBgRemoved:'✨ Fond Transparent supprimé automatiquement',
+    heroReceivedTitle:'✅ Photo envoyée !', heroReceivedMsg:'Votre photo de couverture s\'affiche maintenant dans votre menu.', heroReceivedClose:'Parfait, merci !',
     menuSetupTitle:'Votre menu est en cours de création', menuSetupMsg:'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !',
   },
   en: {
@@ -3473,7 +3475,7 @@ const ADMIN_UI = {
     delIcon:       '✕ Remove icon',
     noneIco:       '— None —',
     noPhoto:       'No photo',
-    btnLogo:       'Logo (optional)',
+    btnLogo:       'Logo',
     logoGreenTitle:'Logo background',
     logoGreenMsg:  'If you want your logo\'s background to be removed, upload a logo with a <strong style="color:var(--gold)">Transparent</strong> background (PNG). It will be removed automatically. Otherwise, the logo will be displayed as is, with its background.',
     logoGreenOk:   'Choose logo',
@@ -3503,6 +3505,7 @@ const ADMIN_UI = {
     loginErrIncorrect:'Incorrect password',
     pdfDownloaded: '✅ PDF downloaded',
     logoReceivedTitle:'✅ Logo uploaded!', logoReceivedMsg:'Your logo is now displayed in your menu.', logoReceivedClose:'Perfect, thank you!', logoBgRemoved:'✨ Transparent background removed automatically',
+    heroReceivedTitle:'✅ Photo uploaded!', heroReceivedMsg:'Your cover photo is now displayed in your menu.', heroReceivedClose:'Perfect, thank you!',
     menuSetupTitle:'Your menu is being created', menuSetupMsg:'Our team is setting up your space within the next 24 hours. Check back soon!',
   },
   de: {
@@ -3621,7 +3624,7 @@ const ADMIN_UI = {
     delIcon:       '✕ Symbol entfernen',
     noneIco:       '— Keines —',
     noPhoto:       'Kein Foto',
-    btnLogo:       'Logo (optional)',
+    btnLogo:       'Logo',
     logoGreenTitle:'Logo-Hintergrund',
     logoGreenMsg:  'Wenn der Hintergrund Ihres Logos entfernt werden soll, laden Sie ein Logo mit einem <strong style="color:var(--gold)">Transparenten</strong> Hintergrund hoch (PNG). Er wird automatisch entfernt. Andernfalls wird das Logo so angezeigt, wie es ist, mit seinem Hintergrund.',
     logoGreenOk:   'Logo auswählen',
@@ -3651,6 +3654,7 @@ const ADMIN_UI = {
     loginErrIncorrect:'Falsches Passwort',
     pdfDownloaded: '✅ PDF heruntergeladen',
     logoReceivedTitle:'✅ Logo hochgeladen!', logoReceivedMsg:'Ihr Logo wird jetzt in Ihrem Menü angezeigt.', logoReceivedClose:'Prima, danke!', logoBgRemoved:'✨ Transparenter Hintergrund automatisch entfernt',
+    heroReceivedTitle:'✅ Foto hochgeladen!', heroReceivedMsg:'Ihr Titelbild wird jetzt in Ihrem Menü angezeigt.', heroReceivedClose:'Prima, danke!',
     menuSetupTitle:'Ihr Menü wird erstellt', menuSetupMsg:'Unser Team richtet Ihren Bereich in den nächsten 24 Stunden ein. Schauen Sie bald wieder vorbei!',
   },
   es: {
@@ -3769,7 +3773,7 @@ const ADMIN_UI = {
     delIcon:       '✕ Quitar icono',
     noneIco:       '— Ninguno —',
     noPhoto:       'Sin imagen',
-    btnLogo:       'Logo (opcional)',
+    btnLogo:       'Logo',
     logoGreenTitle:'Fondo del logo',
     logoGreenMsg:  'Si desea eliminar el fondo de su logo, suba un logo con fondo <strong style="color:var(--gold)">Transparente</strong> (PNG). Se eliminará automáticamente. De lo contrario, el logo se mostrará tal cual.',
     logoGreenOk:   'Elegir logo',
@@ -3799,6 +3803,7 @@ const ADMIN_UI = {
     loginErrIncorrect:'Contraseña incorrecta',
     pdfDownloaded: '✅ PDF descargado',
     logoReceivedTitle:'✅ ¡Logo subido!', logoReceivedMsg:'Su logo se muestra ahora en su menú.', logoReceivedClose:'¡Perfecto, gracias!', logoBgRemoved:'✨ Fondo Transparente eliminado automáticamente',
+    heroReceivedTitle:'✅ ¡Foto subida!', heroReceivedMsg:'Su foto de portada se muestra ahora en su menú.', heroReceivedClose:'¡Perfecto, gracias!',
     menuSetupTitle:'Su menú está siendo creado', menuSetupMsg:'Nuestro equipo configurará su espacio en las próximas 24 horas. ¡Vuelva pronto!',
   },
 };
@@ -5123,6 +5128,15 @@ function renderHeroImageSection() {
             setPhoneBg(url);
             markUnsaved();
             if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+            // Popup de confirmation (même pattern que le logo, Fix #171)
+            const _tC = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+            _showAdmConfirm(
+              _tC.heroReceivedTitle || '✅ Photo envoyée !',
+              `<div style="text-align:center"><div style="margin:0 auto 14px;padding:8px;border-radius:12px;background:rgba(200,164,78,0.06);border:1px solid rgba(200,164,78,0.18);display:inline-block"><img src="${localPreview}" style="width:220px;max-width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:6px"></div></div><div style="font-size:0.84rem;color:var(--muted);line-height:1.75;text-align:center">${_tC.heroReceivedMsg || 'Votre photo de couverture s\'affiche maintenant dans votre menu.'}</div>`,
+              _tC.heroReceivedClose || 'Parfait, merci !',
+              null,
+              () => {}
+            );
           })
           .catch(err => {
             console.error('Hero upload error:', err);
