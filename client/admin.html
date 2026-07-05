@@ -3851,6 +3851,13 @@ function updateMockupText() {
 let adminData = null;  // { cats, items, info }
 let PRIMARY_LANG = 'fr'; // mis à jour en temps réel par Firebase /config/primaryLang
 let currentLang = localStorage.getItem(_PFX+'admin_lang') || PRIMARY_LANG;
+// true dès que l'utilisateur choisit explicitement une langue sur l'écran de
+// connexion (_loginPickLang) — ce choix, plus récent et explicite, doit
+// primer sur profile/orderLang (figé à la commande) pour tout ce qui
+// s'affiche juste après le login, ex: overlay "menu en cours de création"
+// (Fix #227b). Sans ce flag, un client (ou Malek en test) qui change la
+// langue au login juste avant de voir cet écran voyait son choix ignoré.
+let _loginLangTouched = false;
 let unsaved = false;
 let adminEnabledLangs = {};
 const pendingPhotos = new Map();
@@ -4314,10 +4321,14 @@ function showAdmin() {
       if (!isEmpty) return; // menu déjà configuré (Malek a fini) → rien
       const overlay = document.getElementById('menu-setup-overlay');
       if (overlay) {
-        // Langue choisie par le client à la commande (profile/orderLang) — fiable
-        // dès le tout premier login, contrairement à currentLang qui vaut encore
-        // le défaut 'fr' tant que le client n'a pas lui-même réglé sa langue admin.
-        const _tM = ADMIN_UI[langSnap.val()] || ADMIN_UI[currentLang] || ADMIN_UI.fr;
+        // Priorité : 1) langue choisie explicitement à l'écran de connexion
+        // JUSTE AVANT ce login (_loginLangTouched, Fix #227b — plus récente et
+        // plus explicite que la langue de la commande) ; 2) langue choisie par
+        // le client à la commande (profile/orderLang) — fiable dès le tout
+        // premier login, contrairement à currentLang qui vaut encore le défaut
+        // 'fr' tant que personne n'a rien choisi ; 3) repli français.
+        const _tM = (_loginLangTouched && ADMIN_UI[currentLang])
+                  || ADMIN_UI[langSnap.val()] || ADMIN_UI[currentLang] || ADMIN_UI.fr;
         document.getElementById('mso-title').textContent = _tM.menuSetupTitle || 'Votre menu est en cours de création';
         document.getElementById('mso-msg').textContent   = _tM.menuSetupMsg   || 'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !';
         overlay.style.display = 'flex';
@@ -9451,6 +9462,7 @@ function _loginPickLang(l) {
   localStorage.setItem('saas_ui_lang', l);
   if (_RID) {
     currentLang = l;
+    _loginLangTouched = true;
     localStorage.setItem(_PFX + 'admin_lang', l);
   }
   const t = _LOGIN_UI[l] || _LOGIN_UI.fr;
