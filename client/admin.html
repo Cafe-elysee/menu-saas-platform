@@ -4292,24 +4292,36 @@ function showAdmin() {
     // Sauvegarder l'ID dans la liste mémorisée après login réussi
     _addSavedId(_RID);
   }
-  // Overlay "Menu en cours de création" : créé < 24h ET aucune catégorie, jamais si ctrl=1 ou demo
+  // Overlay "Menu en cours de création" (Fix #222) : affiché uniquement si les
+  // 3 conditions sont réunies — créé < 24h, le client A ENVOYÉ des fichiers menu
+  // à traiter (profile/menuFilesPending, posé par /api/menu-upload à la commande),
+  // ET aucune catégorie configurée pour l'instant (si Malek a déjà fini avant les
+  // 24h, l'overlay se ferme immédiatement, pas besoin d'attendre l'échéance).
+  // Un client qui n'a RIEN envoyé n'a pas besoin d'attendre Malek : accès admin
+  // immédiat pour configurer son menu lui-même. Jamais affiché si ctrl=1 ou demo.
   if (new URLSearchParams(location.search).get('ctrl') !== '1' && !document.body.classList.contains('demo-mode')) {
-    _rref('profile/createdAt').once('value').then(snap => {
-      const ct = snap.val();
+    Promise.all([
+      _rref('profile/createdAt').once('value'),
+      _rref('profile/menuFilesPending').once('value'),
+      _rref('profile/orderLang').once('value'),
+      _rref('menu/cats').once('value')
+    ]).then(([ctSnap, pendSnap, langSnap, cSnap]) => {
+      const ct = ctSnap.val();
       if (!ct || Date.now() - ct >= 86400000) return; // plus de 24h → rien
-      // Vérifier si le menu est vide (aucune catégorie)
-      return _rref('menu/cats').once('value').then(cSnap => {
-        const cats = cSnap.val();
-        const isEmpty = !cats || (Array.isArray(cats) ? cats.length === 0 : Object.keys(cats).length === 0);
-        if (!isEmpty) return; // menu déjà configuré → rien
-        const overlay = document.getElementById('menu-setup-overlay');
-        if (overlay) {
-          const _tM = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-          document.getElementById('mso-title').textContent = _tM.menuSetupTitle || 'Votre menu est en cours de création';
-          document.getElementById('mso-msg').textContent   = _tM.menuSetupMsg   || 'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !';
-          overlay.style.display = 'flex';
-        }
-      });
+      if (!pendSnap.val()) return; // aucun fichier menu envoyé à la commande → accès immédiat
+      const cats = cSnap.val();
+      const isEmpty = !cats || (Array.isArray(cats) ? cats.length === 0 : Object.keys(cats).length === 0);
+      if (!isEmpty) return; // menu déjà configuré (Malek a fini) → rien
+      const overlay = document.getElementById('menu-setup-overlay');
+      if (overlay) {
+        // Langue choisie par le client à la commande (profile/orderLang) — fiable
+        // dès le tout premier login, contrairement à currentLang qui vaut encore
+        // le défaut 'fr' tant que le client n'a pas lui-même réglé sa langue admin.
+        const _tM = ADMIN_UI[langSnap.val()] || ADMIN_UI[currentLang] || ADMIN_UI.fr;
+        document.getElementById('mso-title').textContent = _tM.menuSetupTitle || 'Votre menu est en cours de création';
+        document.getElementById('mso-msg').textContent   = _tM.menuSetupMsg   || 'Notre équipe configure votre espace dans les prochaines 24 heures. Revenez bientôt !';
+        overlay.style.display = 'flex';
+      }
     }).catch(() => {});
   }
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
