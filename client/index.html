@@ -3118,6 +3118,17 @@
     .price-wrap .price-promo { color:#e85050; }
     html.light .price-wrap .price-promo { color:#c02020; }
     .price-wrap .price-hh { color:var(--gold); }
+    /* Prix Happy Hour sur pastille pleine dorée (fond var(--gold) ou dégradé
+       var(--gold-lt/gold/gold-dk)) : le texte doré générique ci-dessus devient
+       invisible (doré sur doré, contraste ~1:1). Concerne .c-price (thème par
+       défaut + GeNext + Prestige) et .ard-prix-pill (Carte Ardoise) — les seuls
+       conteneurs de prix à fond plein/dégradé doré non déjà couverts par le
+       correctif Livre Rose/Indigo/Carte Journal. Texte foncé identique au prix
+       normal de ces pastilles : lisible dans tous les cas (dark/light, toute
+       couleur de thème choisie par le client). */
+    .c-price .price-hh { color:#0c0a08; }
+    .ard-prix-pill .price-hh { color:var(--bg); }
+    html.light .ard-prix-pill .price-hh { color:var(--bg2); }
     /* Thèmes Carte : police de prix compacte (0.78-1rem) — l'ancien prix barré à
        0.68em devenait illisible. Agrandi + plus opaque, tout en restant plus
        petit que le nouveau prix (hiérarchie visuelle préservée). */
