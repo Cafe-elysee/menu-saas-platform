@@ -1227,6 +1227,21 @@
     }
 
     /* ═══════════════════════════════
+       TAB PAGE DÉMO — galerie de thèmes (photo + nom + catégorie)
+    ═══════════════════════════════ */
+    .th-item { display: flex; flex-direction: column; gap: 0.5rem; }
+    .th-inp {
+      width: 100%; padding: 0.5rem 0.65rem;
+      background: rgba(200,164,78,0.07); border: 1px solid rgba(200,164,78,0.28);
+      border-radius: 8px; color: var(--text); font-family: inherit;
+      font-size: 0.8rem; outline: none; transition: border-color 0.2s;
+    }
+    .th-inp:focus { border-color: #c8a44e; }
+    .th-name-inp { font-weight: 700; }
+    .th-fam-inp { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .th-saved-flash { border-color: rgba(120,200,120,0.6) !important; }
+
+    /* ═══════════════════════════════
        TAB PAGE DÉMO — cartes fonctionnalités (cadre bureau + mobile)
     ═══════════════════════════════ */
     .cp-item {
@@ -1903,6 +1918,14 @@
       </div>
 
       <div class="settings-section">
+        <div class="settings-title">🎨 Galerie de thèmes</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
+          Photo, nom et catégorie de chaque thème affiché dans le carrousel "Plus de 15 thèmes" de la page démo.
+        </div>
+        <div class="dp-grid" id="theme-gallery-grid"></div>
+      </div>
+
+      <div class="settings-section">
         <div class="settings-title">🧭 Pourquoi passer au Menu QR Code</div>
         <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
           Photo affichée (cadre bureau + mobile) quand ce point est développé sur la page démo.
@@ -2530,6 +2553,8 @@ function initFirebase() {
   loadDemoPhotos();
   buildContentPhotosUI();
   loadContentPhotos();
+  buildThemeGalleryUI();
+  loadThemeGallery();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
   _checkControlTokenInFirebase();
   setTimeout(refreshNotifStatus, 2000);
@@ -5206,6 +5231,137 @@ function loadContentPhotos() {
       const entry = data[item.key] || {};
       showContentPhoto(item.key, 'desktop', entry.desktop || '');
       showContentPhoto(item.key, 'mobile', entry.mobile || '');
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════
+// PAGE DÉMO — Galerie de thèmes (photo + nom + catégorie)
+// Firebase demoPage/themes/{themeId}/{img|name|family}
+// ════════════════════════════════════════════════════
+const THEME_ITEMS = [
+  { id: 'gold-noir',     name: 'Gold Noir',        family: 'Classique' },
+  { id: 'prestige',      name: 'Prestige',          family: 'Classique' },
+  { id: 'velvet-luxe',   name: 'Velvet Luxe',       family: 'Classique' },
+  { id: 'midnight-luxe', name: 'Enseigne',          family: 'Classique' },
+  { id: 'neon-tokyo',    name: 'Neon Pulse',        family: 'Moderne' },
+  { id: 'midnight',      name: 'Minuit Violet',     family: 'Moderne' },
+  { id: 'botanical',     name: 'Botanical Forest',  family: 'Nature' },
+  { id: 'forest',        name: 'Forest',            family: 'Nature' },
+  { id: 'rose-parisien', name: 'Rose Parisien',     family: 'Romantique' },
+  { id: 'santorin',      name: 'Santorin',          family: 'Méditerranée' }
+];
+
+function _thItemHtml(item) {
+  const domId = 'theme-' + item.id;
+  return '<div class="dp-item th-item">' +
+    '<div class="dp-num">' + item.name + '</div>' +
+    '<div class="dp-preview" id="dp-prev-' + domId + '">' +
+      '<img id="dp-img-' + domId + '" alt="">' +
+      '<div class="dp-cam">' + CP_CAM_SVG + '</div>' +
+      '<div class="dp-loading" id="dp-load-' + domId + '"><div class="dp-spinner"></div></div>' +
+    '</div>' +
+    '<div class="dp-btns">' +
+      '<label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadThemePhoto(\'' + item.id + '\',this)"></label>' +
+      '<button class="dp-del-btn" onclick="deleteThemePhoto(\'' + item.id + '\')" title="Supprimer">✕</button>' +
+    '</div>' +
+    '<input type="text" class="th-inp th-name-inp" id="th-name-' + item.id + '" placeholder="Nom du thème" value="' + item.name + '" ' +
+      'onchange="_saveThemeText(\'' + item.id + '\',\'name\',this.value,this)" ' +
+      'onkeydown="if(event.key===\'Enter\'){this.blur();}">' +
+    '<input type="text" class="th-inp th-fam-inp" id="th-fam-' + item.id + '" placeholder="Catégorie" value="' + item.family + '" ' +
+      'onchange="_saveThemeText(\'' + item.id + '\',\'family\',this.value,this)" ' +
+      'onkeydown="if(event.key===\'Enter\'){this.blur();}">' +
+  '</div>';
+}
+function buildThemeGalleryUI() {
+  const grid = document.getElementById('theme-gallery-grid');
+  if (grid) grid.innerHTML = THEME_ITEMS.map(_thItemHtml).join('');
+}
+function showThemePhoto(id, url) {
+  const domId = 'theme-' + id;
+  const img  = document.getElementById('dp-img-' + domId);
+  const prev = document.getElementById('dp-prev-' + domId);
+  const load = document.getElementById('dp-load-' + domId);
+  if (!img || !prev) return;
+  if (load) load.classList.remove('active');
+  if (!url) {
+    img.src = ''; img.style.display = 'none';
+    prev.classList.remove('has-photo');
+    const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = '';
+    return;
+  }
+  img.src = url; img.style.display = 'block';
+  prev.classList.add('has-photo');
+  const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = 'none';
+}
+function _thSetLoading(id, on) {
+  const load = document.getElementById('dp-load-theme-' + id);
+  if (load) load.classList.toggle('active', on);
+}
+function uploadThemePhoto(id, input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > DP_MAX_W) { h = Math.round(h * DP_MAX_W / w); w = DP_MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      showThemePhoto(id, canvas.toDataURL('image/jpeg', 0.82));
+      _thSetLoading(id, true);
+      showToast('Upload en cours…');
+
+      canvas.toBlob(async blob => {
+        try {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', DP_PRESET);
+          const res  = await fetch('https://api.cloudinary.com/v1_1/' + DP_CLOUD + '/image/upload', { method:'POST', body:fd });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+          showThemePhoto(id, json.secure_url);
+          await _saasDb.ref('demoPage/themes/' + id + '/img').set(json.secure_url);
+          showToast('Photo enregistrée ✓');
+        } catch(err) {
+          showThemePhoto(id, '');
+          showToast('Erreur upload : ' + err.message);
+        }
+      }, 'image/jpeg', 0.82);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+async function deleteThemePhoto(id) {
+  await _saasDb.ref('demoPage/themes/' + id + '/img').set(null);
+  showThemePhoto(id, '');
+  showToast('Photo supprimée');
+}
+async function _saveThemeText(id, field, value, inputEl) {
+  const val = (value || '').trim();
+  if (!val) { showToast('⚠ Le champ ne peut pas être vide'); return; }
+  await _saasDb.ref('demoPage/themes/' + id + '/' + field).set(val);
+  if (inputEl) {
+    inputEl.classList.add('th-saved-flash');
+    setTimeout(() => inputEl.classList.remove('th-saved-flash'), 900);
+  }
+  showToast('Enregistré ✓');
+}
+function loadThemeGallery() {
+  if (!_saasDb) return;
+  _saasDb.ref('demoPage/themes').once('value').then(snap => {
+    const data = snap.val() || {};
+    THEME_ITEMS.forEach(item => {
+      const entry = data[item.id] || {};
+      showThemePhoto(item.id, entry.img || '');
+      if (entry.name) { const el = document.getElementById('th-name-' + item.id); if (el && document.activeElement !== el) el.value = entry.name; }
+      if (entry.family) { const el = document.getElementById('th-fam-' + item.id); if (el && document.activeElement !== el) el.value = entry.family; }
     });
   });
 }
