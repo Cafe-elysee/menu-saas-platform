@@ -1819,9 +1819,13 @@
       <div id="exclients-list"></div>
     </div>
 
-    <!-- TAB RÉGLAGES -->
-    <div class="tab-pane" id="pane-reglages">
-      <div class="section-title">Réglages</div>
+    <!-- TAB PAGE DÉMO -->
+    <div class="tab-pane" id="pane-demopage">
+      <div class="section-title">Page Démo</div>
+
+      <div class="settings-section">
+        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
+      </div>
 
       <!-- Section Tarification / Prix publics -->
       <div class="settings-section" id="settings-pricing">
@@ -1862,53 +1866,6 @@
         <div style="font-size:0.7rem;color:var(--muted);margin-top:10px;line-height:1.5;">
           ⚠ Ces prix sont publics (page Démo). Le prix par client reste modifiable depuis la carte client.
         </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-title">Sécurité — Mot de passe</div>
-        <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
-          Modifier le mot de passe d'accès à l'application.
-        </div>
-        <div class="pw-row" style="margin-bottom:0.5rem;">
-          <div class="pw-wrap pw-wrap-row">
-            <input type="password" id="set-pw-new" placeholder="Nouveau mot de passe">
-            <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
-              <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="pw-row">
-          <div class="pw-wrap pw-wrap-row">
-            <input type="password" id="set-pw-conf" placeholder="Confirmer">
-            <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
-              <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            </button>
-          </div>
-          <button class="btn-update" onclick="changeAppPassword()">Enregistrer</button>
-        </div>
-        <div class="pw-feedback" id="set-pw-fb"></div>
-      </div>
-
-      <div class="settings-section" id="notif-status-section">
-        <div class="settings-title">🔔 Notifications</div>
-        <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
-          Chargement…
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-          <button class="btn-update" onclick="forceTokenRenewal()">Renouveler le token</button>
-        </div>
-        <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
-      </div>
-    </div>
-
-    <!-- TAB PAGE DÉMO -->
-    <div class="tab-pane" id="pane-demopage">
-      <div class="section-title">Page Démo</div>
-
-      <div class="settings-section">
-        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
       </div>
 
       <div class="settings-section">
@@ -1961,6 +1918,49 @@
         <div id="cp-group-gx"></div>
       </div>
     </div>
+
+    <!-- TAB RÉGLAGES -->
+    <div class="tab-pane" id="pane-reglages">
+      <div class="section-title">Réglages</div>
+
+      <div class="settings-section">
+        <div class="settings-title">Sécurité — Mot de passe</div>
+        <div style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.5;">
+          Modifier le mot de passe d'accès à l'application.
+        </div>
+        <div class="pw-row" style="margin-bottom:0.5rem;">
+          <div class="pw-wrap pw-wrap-row">
+            <input type="password" id="set-pw-new" placeholder="Nouveau mot de passe">
+            <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
+              <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pw-row">
+          <div class="pw-wrap pw-wrap-row">
+            <input type="password" id="set-pw-conf" placeholder="Confirmer">
+            <button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1" aria-label="Afficher/masquer">
+              <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+          <button class="btn-update" onclick="changeAppPassword()">Enregistrer</button>
+        </div>
+        <div class="pw-feedback" id="set-pw-fb"></div>
+      </div>
+
+      <div class="settings-section" id="notif-status-section">
+        <div class="settings-title">🔔 Notifications</div>
+        <div id="notif-status-info" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.6;">
+          Chargement…
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          <button class="btn-update" onclick="forceTokenRenewal()">Renouveler le token</button>
+        </div>
+        <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
+      </div>
+    </div>
   </div><!-- /.tabs-track -->
   </div><!-- /.tab-scroll -->
 
@@ -2006,15 +2006,6 @@
     </div>
     <span class="nav-label">Ex-Clients</span>
   </button>
-  <button class="nav-btn" id="nav-reglages" onclick="switchTab('reglages')">
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    </div>
-    <span class="nav-label">Réglages</span>
-  </button>
   <button class="nav-btn" id="nav-demopage" onclick="switchTab('demopage')">
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2024,6 +2015,15 @@
       </svg>
     </div>
     <span class="nav-label">Page Démo</span>
+  </button>
+  <button class="nav-btn" id="nav-reglages" onclick="switchTab('reglages')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Réglages</span>
   </button>
 </nav>
 
@@ -2463,7 +2463,7 @@ function showApp() {
 // ════════════════════════════════════════════════════
 // TAB NAVIGATION
 // ════════════════════════════════════════════════════
-const TABS = ['clients', 'paiements', 'exclients', 'reglages', 'demopage'];
+const TABS = ['clients', 'paiements', 'exclients', 'demopage', 'reglages'];
 let _currentTab = 'clients';
 
 function switchTab(tab) {
