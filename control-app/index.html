@@ -313,12 +313,12 @@
     }
     .tabs-track {
       display: flex; height: 100%;
-      width: 400%;
+      width: 500%;
       will-change: transform;
       transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-pane {
-      width: 25%; flex-shrink: 0;
+      width: 20%; flex-shrink: 0;
       overflow-y: auto; overflow-x: hidden;
       padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
     }
@@ -1227,6 +1227,23 @@
     }
 
     /* ═══════════════════════════════
+       TAB PAGE DÉMO — cartes fonctionnalités (cadre bureau + mobile)
+    ═══════════════════════════════ */
+    .cp-item {
+      display: flex; flex-direction: column; gap: 0.6rem;
+      padding: 0.85rem 0; border-bottom: 1px solid rgba(200,164,78,0.1);
+    }
+    .cp-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .cp-item:first-child { padding-top: 0; }
+    .cp-item-head { display: flex; align-items: center; gap: 0.55rem; }
+    .cp-item-icon { font-size: 1.05rem; flex-shrink: 0; }
+    .cp-item-title { font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .cp-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .cp-slot { display: flex; flex-direction: column; gap: 0.4rem; }
+    .dp-preview-sm { height: 78px; }
+    .dp-preview-sm .dp-cam svg { width: 18px; height: 18px; }
+
+    /* ═══════════════════════════════
        TAB RÉGLAGES
     ═══════════════════════════════ */
     .settings-section {
@@ -1806,41 +1823,6 @@
     <div class="tab-pane" id="pane-reglages">
       <div class="section-title">Réglages</div>
 
-      <div class="settings-section">
-        <div class="settings-title">📸 Photos — Page Démo</div>
-        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
-        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:1rem; line-height:1.6;">
-          Ces 5 photos apparaissent dans le diaporama de la page de démonstration publique.
-        </div>
-        <div class="dp-grid">
-          <div class="dp-item">
-            <div class="dp-num">Photo 1</div>
-            <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-1"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',1,'demo')" title="Supprimer">✕</button></div>
-          </div>
-          <div class="dp-item">
-            <div class="dp-num">Photo 2</div>
-            <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-2"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',2,'demo')" title="Supprimer">✕</button></div>
-          </div>
-          <div class="dp-item">
-            <div class="dp-num">Photo 3</div>
-            <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-3"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',3,'demo')" title="Supprimer">✕</button></div>
-          </div>
-          <div class="dp-item">
-            <div class="dp-num">Photo 4</div>
-            <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-4"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',4,'demo')" title="Supprimer">✕</button></div>
-          </div>
-          <div class="dp-item">
-            <div class="dp-num">Photo 5</div>
-            <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-5"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer">✕</button></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Section Tarification / Prix publics -->
       <div class="settings-section" id="settings-pricing">
         <div class="settings-title">💶 Tarification — Prix publics</div>
@@ -1920,6 +1902,65 @@
         <div id="notif-renewal-fb" style="font-size:0.78rem; margin-top:0.5rem;"></div>
       </div>
     </div>
+
+    <!-- TAB PAGE DÉMO -->
+    <div class="tab-pane" id="pane-demopage">
+      <div class="section-title">Page Démo</div>
+
+      <div class="settings-section">
+        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">📸 Photos d'accueil (diaporama)</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:1rem; line-height:1.6;">
+          Ces 5 photos apparaissent dans le diaporama de la page de démonstration publique.
+        </div>
+        <div class="dp-grid">
+          <div class="dp-item">
+            <div class="dp-num">Photo 1</div>
+            <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-1"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',1,'demo')" title="Supprimer">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 2</div>
+            <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-2"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',2,'demo')" title="Supprimer">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 3</div>
+            <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-3"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',3,'demo')" title="Supprimer">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 4</div>
+            <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-4"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',4,'demo')" title="Supprimer">✕</button></div>
+          </div>
+          <div class="dp-item">
+            <div class="dp-num">Photo 5</div>
+            <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-5"><div class="dp-spinner"></div></div></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer">✕</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">🧭 Pourquoi passer au Menu QR Code</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
+          Photo affichée (cadre bureau + mobile) quand ce point est développé sur la page démo.
+        </div>
+        <div id="cp-group-qr"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">⭐ Pourquoi choisir GeNext</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
+          Photo affichée (cadre bureau + mobile) quand cette fonctionnalité est développée sur la page démo.
+        </div>
+        <div id="cp-group-gx"></div>
+      </div>
+    </div>
   </div><!-- /.tabs-track -->
   </div><!-- /.tab-scroll -->
 
@@ -1973,6 +2014,16 @@
       </svg>
     </div>
     <span class="nav-label">Réglages</span>
+  </button>
+  <button class="nav-btn" id="nav-demopage" onclick="switchTab('demopage')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <span class="nav-label">Page Démo</span>
   </button>
 </nav>
 
@@ -2412,13 +2463,13 @@ function showApp() {
 // ════════════════════════════════════════════════════
 // TAB NAVIGATION
 // ════════════════════════════════════════════════════
-const TABS = ['clients', 'paiements', 'exclients', 'reglages'];
+const TABS = ['clients', 'paiements', 'exclients', 'reglages', 'demopage'];
 let _currentTab = 'clients';
 
 function switchTab(tab) {
   _currentTab = tab;
   const idx = TABS.indexOf(tab);
-  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 25) + '%)';
+  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 20) + '%)';
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _navEl = document.getElementById('nav-' + tab);
   if (_navEl) _navEl.classList.add('active');
@@ -2477,6 +2528,8 @@ function initFirebase() {
   loadArchivedClients();
   loadClientsFromFirebase();
   loadDemoPhotos();
+  buildContentPhotosUI();
+  loadContentPhotos();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
   _checkControlTokenInFirebase();
   setTimeout(refreshNotifStatus, 2000);
@@ -5025,6 +5078,135 @@ function loadDemoPhotos() {
   _saasDb.ref('demoPage/heroSlides').once('value').then(snap => {
     const photos = snap.val() || {};
     [1,2,3,4,5].forEach(n => { showDemoPhoto('demo', n, photos[n] || ''); });
+  });
+}
+
+// ════════════════════════════════════════════════════
+// PAGE DÉMO — Photos des cartes accordéon (bureau + mobile)
+// Firebase demoPage/content/{itemKey}/{desktop|mobile} — même pattern que demoPage/heroSlides
+// ════════════════════════════════════════════════════
+const CONTENT_ITEMS = {
+  qr: [
+    { key: 'qr-hygiene',   icon: '🧼', title: 'Hygiène et zéro contact' },
+    { key: 'qr-instant',   icon: '⚡', title: 'Mise à jour instantanée' },
+    { key: 'qr-multilang', icon: '🌐', title: 'Accessible dans leur langue' },
+    { key: 'qr-eco',       icon: '🌱', title: 'Économique et écologique' },
+    { key: 'qr-image',     icon: '✨', title: 'Image moderne, confiance immédiate' },
+    { key: 'qr-autonomy',  icon: '📱', title: 'Autonomie client, service plus fluide' }
+  ],
+  gx: [
+    { key: 'gx-themes', icon: '🎨', title: 'Plus de 15 thèmes' },
+    { key: 'gx-order',  icon: '🔔', title: 'Commande & appel serveur' },
+    { key: 'gx-server', icon: '📲', title: 'Application serveur temps réel' },
+    { key: 'gx-admin',  icon: '✏️', title: 'Administration simple' },
+    { key: 'gx-lang',   icon: '🌍', title: 'Menu en 5 langues' },
+    { key: 'gx-stats',  icon: '📊', title: 'Statistiques d\'activité' }
+  ]
+};
+const CP_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span>';
+
+function _cpSlotHtml(itemKey, slot, label) {
+  const domId = itemKey + '-' + slot;
+  return '<div class="cp-slot">' +
+    '<div class="dp-num">' + label + '</div>' +
+    '<div class="dp-preview dp-preview-sm" id="dp-prev-content-' + domId + '">' +
+      '<img id="dp-img-content-' + domId + '" alt="">' +
+      '<div class="dp-cam">' + CP_CAM_SVG + '</div>' +
+      '<div class="dp-loading" id="dp-load-content-' + domId + '"><div class="dp-spinner"></div></div>' +
+    '</div>' +
+    '<div class="dp-btns">' +
+      '<label class="dp-upload-btn">📷<input type="file" accept="image/*" style="display:none" onchange="uploadContentPhoto(\'' + itemKey + '\',\'' + slot + '\',this)"></label>' +
+      '<button class="dp-del-btn" onclick="deleteContentPhoto(\'' + itemKey + '\',\'' + slot + '\')" title="Supprimer">✕</button>' +
+    '</div>' +
+  '</div>';
+}
+function _cpItemHtml(item) {
+  return '<div class="cp-item">' +
+    '<div class="cp-item-head"><span class="cp-item-icon">' + item.icon + '</span><span class="cp-item-title">' + item.title + '</span></div>' +
+    '<div class="cp-slots">' + _cpSlotHtml(item.key, 'desktop', 'Bureau') + _cpSlotHtml(item.key, 'mobile', 'Mobile') + '</div>' +
+  '</div>';
+}
+function buildContentPhotosUI() {
+  const qrEl = document.getElementById('cp-group-qr');
+  const gxEl = document.getElementById('cp-group-gx');
+  if (qrEl) qrEl.innerHTML = CONTENT_ITEMS.qr.map(_cpItemHtml).join('');
+  if (gxEl) gxEl.innerHTML = CONTENT_ITEMS.gx.map(_cpItemHtml).join('');
+}
+function showContentPhoto(itemKey, slot, url) {
+  const domId = itemKey + '-' + slot;
+  const img  = document.getElementById('dp-img-content-' + domId);
+  const prev = document.getElementById('dp-prev-content-' + domId);
+  const load = document.getElementById('dp-load-content-' + domId);
+  if (!img || !prev) return;
+  if (load) load.classList.remove('active');
+  if (!url) {
+    img.src = ''; img.style.display = 'none';
+    prev.classList.remove('has-photo');
+    const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = '';
+    return;
+  }
+  img.src = url; img.style.display = 'block';
+  prev.classList.add('has-photo');
+  const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = 'none';
+}
+function _cpSetLoading(itemKey, slot, on) {
+  const load = document.getElementById('dp-load-content-' + itemKey + '-' + slot);
+  if (load) load.classList.toggle('active', on);
+}
+function uploadContentPhoto(itemKey, slot, input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > DP_MAX_W) { h = Math.round(h * DP_MAX_W / w); w = DP_MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      showContentPhoto(itemKey, slot, canvas.toDataURL('image/jpeg', 0.82));
+      _cpSetLoading(itemKey, slot, true);
+      showToast('Upload en cours…');
+
+      canvas.toBlob(async blob => {
+        try {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', DP_PRESET);
+          const res  = await fetch('https://api.cloudinary.com/v1_1/' + DP_CLOUD + '/image/upload', { method:'POST', body:fd });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+          showContentPhoto(itemKey, slot, json.secure_url);
+          await _saasDb.ref('demoPage/content/' + itemKey + '/' + slot).set(json.secure_url);
+          showToast('Photo enregistrée ✓');
+        } catch(err) {
+          showContentPhoto(itemKey, slot, '');
+          showToast('Erreur upload : ' + err.message);
+        }
+      }, 'image/jpeg', 0.82);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+async function deleteContentPhoto(itemKey, slot) {
+  await _saasDb.ref('demoPage/content/' + itemKey + '/' + slot).set(null);
+  showContentPhoto(itemKey, slot, '');
+  showToast('Photo supprimée');
+}
+function loadContentPhotos() {
+  if (!_saasDb) return;
+  _saasDb.ref('demoPage/content').once('value').then(snap => {
+    const data = snap.val() || {};
+    [...CONTENT_ITEMS.qr, ...CONTENT_ITEMS.gx].forEach(item => {
+      const entry = data[item.key] || {};
+      showContentPhoto(item.key, 'desktop', entry.desktop || '');
+      showContentPhoto(item.key, 'mobile', entry.mobile || '');
+    });
   });
 }
 
