@@ -20,7 +20,7 @@
         document.documentElement.dataset.menuTheme = themeId;
         // Doit rester identique à _LIGHT_DEFAULT_THEMES (plus bas dans le fichier) —
         // toute divergence entre les deux listes provoque un flash clair/sombre au chargement.
-        var LIGHT_DEFAULTS = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white'];
+        var LIGHT_DEFAULTS = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white','prestige','prestige-silver','prestige-bronze','prestige-emerald','prestige-sapphire','prestige-ruby'];
         var mode;
         if (urlDark !== null && urlDark !== undefined) {
           mode = urlDark === '0' ? 'light' : 'dark';
@@ -6560,7 +6560,7 @@ let activeCat  = 'all';
 
 // Doit rester identique à LIGHT_DEFAULTS dans le script inline du <head> (anti-flash pré-rendu) —
 // toute divergence entre les deux listes provoque un flash clair/sombre au chargement.
-const _LIGHT_DEFAULT_THEMES = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white'];
+const _LIGHT_DEFAULT_THEMES = ['botanical','botanical-autumn','botanical-sage','botanical-earth','botanical-olive','botanical-sand','santorin','santorin-sunset','santorin-sand','santorin-sea','santorin-coral','santorin-white','prestige','prestige-silver','prestige-bronze','prestige-emerald','prestige-sapphire','prestige-ruby'];
 function _defaultThemeMode(vt) { return _LIGHT_DEFAULT_THEMES.includes(vt) ? 'light' : 'dark'; }
 function _loadThemeMode(themeId) { return localStorage.getItem(_RID + '_theme_mode_' + themeId) || _defaultThemeMode(themeId); }
 function _saveThemeMode(themeId, mode) { localStorage.setItem(_PFX+'theme_mode_' + themeId, mode); }
