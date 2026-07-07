@@ -7657,7 +7657,8 @@ function pdInitHomeBtn() {
   btn.style.display = 'flex';
   pdRefreshTexts();
   requestAnimationFrame(() => btn.classList.add('show'));
-  btn.addEventListener('click', () => { location.href = 'https://menu-pro-demo.vercel.app/#themes'; });
+  // ?instant=1 : demo-page saute son splash de chargement (1400ms+2000ms) pour un retour immédiat
+  btn.addEventListener('click', () => { location.href = 'https://menu-pro-demo.vercel.app/?instant=1#themes'; });
 }
 
 function pdInitFab() {
