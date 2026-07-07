@@ -7546,10 +7546,12 @@ function pdSaveVisitorChoice(themeId, colorHex) {
   if (_tIco) _tIco.innerHTML = '<use href="#' + (theme === 'light' ? 'ico-moon' : 'ico-sun') + '"/>';
 }
 
+let _pdModalJustOpened = 0;
 function pdOpenThemeModal() {
   pdRefreshTexts();
   pdRenderThemeGrid();
   document.getElementById('pd-theme-modal').classList.add('show');
+  _pdModalJustOpened = Date.now();
 }
 function pdCloseThemeModal() { document.getElementById('pd-theme-modal').classList.remove('show'); }
 
@@ -7584,9 +7586,13 @@ function pdInitFab() {
     setTimeout(() => fab.classList.remove('tip-show'), 4800);
   });
 
-  let startX, startY, origX, origY, moved = false, pointerId = null;
+  let startX, startY, origX, origY, moved = false, pointerId = null, tapSlop = 6;
   fab.addEventListener('pointerdown', e => {
     moved = false; pointerId = e.pointerId;
+    // Un doigt réel tremble naturellement de quelques px même sur un tap immobile
+    // (contrairement à une souris, précise au pixel près) — seuil plus tolérant
+    // pour touch/pen, sinon un simple tap est à tort interprété comme un glissement.
+    tapSlop = (e.pointerType === 'mouse') ? 6 : 16;
     fab.setPointerCapture(pointerId);
     const r = fab.getBoundingClientRect();
     startX = e.clientX; startY = e.clientY; origX = r.left; origY = r.top;
@@ -7595,7 +7601,7 @@ function pdInitFab() {
   fab.addEventListener('pointermove', e => {
     if (e.pointerId !== pointerId || startX === undefined) return;
     const dx = e.clientX - startX, dy = e.clientY - startY;
-    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+    if (Math.hypot(dx, dy) > tapSlop) moved = true;
     if (!moved) return;
     _pdSetFabPos(fab, origX + dx, origY + dy);
   });
@@ -7620,7 +7626,12 @@ function pdInitFab() {
   });
 
   document.getElementById('pd-theme-close').addEventListener('click', pdCloseThemeModal);
-  document.getElementById('pd-theme-modal').addEventListener('click', e => { if (e.target.id === 'pd-theme-modal') pdCloseThemeModal(); });
+  document.getElementById('pd-theme-modal').addEventListener('click', e => {
+    // Ignore le clic fantôme de compatibilité qu'un navigateur tactile déclenche
+    // juste après le tap ayant ouvert ce popup (sinon il se referme aussitôt).
+    if (Date.now() - _pdModalJustOpened < 400) return;
+    if (e.target.id === 'pd-theme-modal') pdCloseThemeModal();
+  });
   document.getElementById('pd-color-modal-close').addEventListener('click', pdCloseColorModal);
   document.getElementById('pd-color-modal-overlay').addEventListener('click', e => { if (e.target.id === 'pd-color-modal-overlay') pdCloseColorModal(); });
 }
