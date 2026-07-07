@@ -6236,13 +6236,13 @@
     <div class="cart-handle"></div>
     <div class="pd-theme-head">
       <div class="pd-theme-title" id="pd-theme-title"></div>
-      <button class="pd-theme-close" id="pd-theme-close" aria-label="Close">&#10005;</button>
+      <button class="pd-theme-close" id="pd-theme-close" aria-label="Fermer">&#10005;</button>
     </div>
     <div id="pd-theme-grid"></div>
   </div>
 </div>
 
-<div id="pd-color-modal-overlay">
+<div id="pd-color-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pd-color-modal-title">
   <div id="pd-color-modal-box">
     <div id="pd-color-modal-title"></div>
     <div id="pd-color-modal-body"></div>
@@ -7437,6 +7437,8 @@ function pdRefreshTexts() {
   if (title) title.textContent = PD_T('title');
   const closeBtn = document.getElementById('pd-color-modal-close');
   if (closeBtn) closeBtn.textContent = PD_T('close');
+  const themeCloseBtn = document.getElementById('pd-theme-close');
+  if (themeCloseBtn) themeCloseBtn.setAttribute('aria-label', PD_T('close'));
   if (document.getElementById('pd-theme-modal')?.classList.contains('show')) pdRenderThemeGrid();
 }
 
