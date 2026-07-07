@@ -14,7 +14,9 @@
         var urlDark  = _p.get('demo_dark');
         var cached = localStorage.getItem(_rid + '_admin_data_v1');
         var themeId = urlTheme || 'gold-noir';
-        if (!urlTheme && cached) { var d = JSON.parse(cached); if (d.menuTheme) themeId = d.menuTheme; }
+        var _pdOverrideTheme = (_rid === 'pagedemo') ? localStorage.getItem('pagedemo_visitor_theme') : null;
+        if (!urlTheme && _pdOverrideTheme) { themeId = _pdOverrideTheme; }
+        else if (!urlTheme && cached) { var d = JSON.parse(cached); if (d.menuTheme) themeId = d.menuTheme; }
         document.documentElement.dataset.menuTheme = themeId;
         // Doit rester identique à _LIGHT_DEFAULT_THEMES (plus bas dans le fichier) —
         // toute divergence entre les deux listes provoque un flash clair/sombre au chargement.
@@ -5604,6 +5606,105 @@
   body[data-style="paper"] #hero,
   body[data-style="paper"] #hero-card { display:none !important; }
   /* .price-promo / .price-old : styles portés par .price-wrap (Fix #201) — voir plus haut dans le fichier */
+
+  /* ══════════════════════════════════════════════════════════
+     BOUTON THÈME FLOTTANT — exclusif client "Page Demo" (pagedemo)
+     Permet à chaque visiteur de choisir son thème/couleur pour
+     lui-même uniquement (localStorage, jamais Firebase).
+  ══════════════════════════════════════════════════════════ */
+  #pd-theme-fab {
+    position:fixed; top:100px; right:16px; z-index:500;
+    width:56px; height:56px; border-radius:50%;
+    align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
+    background-size:250% 250%;
+    animation:lightFlow 5s ease infinite;
+    border:none; cursor:grab; color:#0c0a08;
+    box-shadow:0 4px 20px rgba(200,164,78,0.55);
+    opacity:0; transform:scale(0.5);
+    transition:opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+    touch-action:none; -webkit-tap-highlight-color:transparent;
+  }
+  #pd-theme-fab.show { opacity:1; transform:scale(1); }
+  #pd-theme-fab.dragging { cursor:grabbing; transition:none; box-shadow:0 8px 32px rgba(200,164,78,0.8); }
+  #pd-theme-fab .pdfab-ico { width:24px; height:24px; pointer-events:none; }
+  #pd-theme-fab::before {
+    content:''; position:absolute; inset:-8px; border-radius:50%;
+    border:2px solid var(--gold); opacity:0;
+    animation:pdFabRing 2.6s ease-out infinite; pointer-events:none;
+  }
+  #pd-theme-fab.dragging::before { animation:none; opacity:0; }
+  @keyframes pdFabRing {
+    0%   { transform:scale(0.85); opacity:0.65; }
+    70%  { transform:scale(1.35); opacity:0; }
+    100% { transform:scale(1.35); opacity:0; }
+  }
+  #pd-theme-fab .pdfab-tip {
+    position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%);
+    background:rgba(12,10,8,0.92); color:var(--cream); font-size:0.74rem; font-weight:600;
+    padding:6px 12px; border-radius:10px; white-space:nowrap;
+    border:1px solid var(--border2); pointer-events:none;
+    opacity:0; transition:opacity 0.5s ease; font-family:'Outfit',sans-serif;
+  }
+  #pd-theme-fab.tip-show .pdfab-tip { opacity:1; }
+  html.light #pd-theme-fab .pdfab-tip { background:rgba(255,255,255,0.96); color:#1c1710; }
+  html[dir="rtl"] #pd-theme-fab .pdfab-tip { right:auto; left:calc(100% + 10px); }
+  @media(hover:hover) { #pd-theme-fab:hover { box-shadow:0 6px 26px rgba(200,164,78,0.7); } }
+  @media(prefers-reduced-motion:reduce) {
+    #pd-theme-fab { animation:none; }
+    #pd-theme-fab::before { display:none; }
+  }
+
+  #pd-theme-modal {
+    position:fixed; inset:0; z-index:9992;
+    background:rgba(0,0,0,0.72); backdrop-filter:blur(8px);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity 0.3s;
+  }
+  #pd-theme-modal.show { opacity:1; pointer-events:auto; }
+  #pd-theme-box {
+    background:var(--bg2); border-radius:24px 24px 0 0;
+    border-top:1px solid var(--border);
+    padding:20px 20px 28px; width:100%; max-width:520px;
+    max-height:80vh; overflow-y:auto;
+    overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+    transform:translateY(100%); transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  }
+  #pd-theme-modal.show #pd-theme-box { transform:translateY(0); }
+  .pd-theme-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .pd-theme-title { font-family:'Cormorant',serif; font-size:1.25rem; color:var(--cream); font-weight:600; }
+  .pd-theme-close { background:none; border:none; color:var(--muted); font-size:1rem; cursor:pointer; padding:4px 6px; line-height:1; }
+  .pd-theme-sep { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:14px 2px 8px; grid-column:1/-1; }
+  .pd-theme-sep:first-child { margin-top:0; }
+  #pd-theme-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(126px,1fr)); gap:10px; }
+  .pd-theme-card {
+    position:relative; display:flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius:14px;
+    background:var(--card); border:1.5px solid var(--border);
+    cursor:pointer; transition:border-color 0.2s, transform 0.15s;
+  }
+  .pd-theme-card:active { transform:scale(0.97); }
+  .pd-theme-card.active { border-color:var(--pdc-accent, var(--gold)); box-shadow:0 0 0 1px var(--pdc-accent, var(--gold)); }
+  .pdc-dot { width:16px; height:16px; border-radius:50%; background:var(--pdc-accent, var(--gold)); flex-shrink:0; }
+  .pdc-name { font-size:0.76rem; color:var(--cream); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pdc-check { display:none; color:var(--pdc-accent, var(--gold)); font-size:0.8rem; }
+  .pd-theme-card.active .pdc-check { display:block; }
+  .pdc-color-btn { background:none; border:none; font-size:0.85rem; cursor:pointer; padding:2px; flex-shrink:0; }
+
+  #pd-color-modal-overlay {
+    position:fixed; inset:0; z-index:9993;
+    background:rgba(0,0,0,0.72); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity 0.25s; padding:20px;
+  }
+  #pd-color-modal-overlay.show { opacity:1; pointer-events:auto; }
+  #pd-color-modal-box { background:var(--bg2); border:1px solid var(--border2); border-radius:20px; padding:20px; width:100%; max-width:340px; }
+  #pd-color-modal-title { font-family:'Cormorant',serif; font-size:1.05rem; color:var(--cream); margin-bottom:14px; text-align:center; }
+  .pd-color-grid { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; justify-content:center; }
+  .pd-color-swatch { width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform 0.15s; }
+  .pd-color-swatch:active { transform:scale(0.9); }
+  .pd-color-swatch.active { border-color:var(--gold); box-shadow:0 0 0 2px var(--bg2), 0 0 0 4px var(--gold); }
+  .pd-color-modal-close { width:100%; margin-top:6px; padding:11px; background:none; border:1px solid var(--border2); border-radius:12px; color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.82rem; cursor:pointer; }
 </style>
 <div id="demo-banner">🔒 Mode démo · Navigation uniquement — aucune action n'est enregistrée</div>
 
@@ -5727,6 +5828,7 @@
   <symbol id="ico-crown" viewBox="0 0 24 24"><path d="M2 20h20M5 20L3 8l4.5 4L12 4l4.5 8L21 8l-2 12H5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
   <symbol id="ico-gift" viewBox="0 0 24 24"><path d="M20 12v10H4V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 7h20v5H2z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="22" x2="12" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
   <symbol id="ico-cocktail" viewBox="0 0 24 24"><path d="M8 22h8M12 11v11M3 3l9 8 9-8H3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 6l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="ico-palette" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1 .8-1.8 1.8-1.8H16a4 4 0 004-4c0-5-4.5-9.5-8-9.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/><circle cx="7" cy="11" r="1.3" fill="currentColor"/><circle cx="9.5" cy="7" r="1.3" fill="currentColor"/><circle cx="14.5" cy="7" r="1.3" fill="currentColor"/><circle cx="17" cy="11" r="1.3" fill="currentColor"/></symbol>
 </svg>
 
 <!-- ================================================
@@ -6090,6 +6192,35 @@
     <div class="dose-label" id="dose-lbl-sugar"></div>
     <div class="dose-btns" id="dose-btns-sugar"></div>
     <button class="dose-cancel-btn" id="dose-cancel-btn"></button>
+  </div>
+</div>
+
+<!-- ================================================
+     BOUTON THÈME FLOTTANT — exclusif client "Page Demo"
+     (rid=pagedemo) — masqué par défaut, activé en JS
+     uniquement pour ce restaurant précis (voir pdInitFab)
+================================================ -->
+<button id="pd-theme-fab" aria-label="Thème" style="display:none">
+  <span class="pdfab-tip" id="pd-theme-fab-tip"></span>
+  <svg class="pdfab-ico" viewBox="0 0 24 24"><use href="#ico-palette"/></svg>
+</button>
+
+<div id="pd-theme-modal" role="dialog" aria-modal="true" aria-label="Thème">
+  <div id="pd-theme-box">
+    <div class="cart-handle"></div>
+    <div class="pd-theme-head">
+      <div class="pd-theme-title" id="pd-theme-title"></div>
+      <button class="pd-theme-close" id="pd-theme-close" aria-label="Close">&#10005;</button>
+    </div>
+    <div id="pd-theme-grid"></div>
+  </div>
+</div>
+
+<div id="pd-color-modal-overlay">
+  <div id="pd-color-modal-box">
+    <div id="pd-color-modal-title"></div>
+    <div id="pd-color-modal-body"></div>
+    <button class="pd-color-modal-close" id="pd-color-modal-close"></button>
   </div>
 </div>
 
@@ -6514,9 +6645,11 @@ function loadAdminData() {
       setupEventsOverlay();
     }
   } catch(_) {}
+  if (_RID === _PD_RID) _pdApplyVisitorOverride();
   applyStyle(menuStyle);
   _applyDemoParams(); // URL params override Firebase/cache
   init_after_data();
+  if (_RID === _PD_RID) pdInitFab();
 
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
   // Appliquer le cache immédiatement pour éviter le décalage d'affichage
@@ -6649,7 +6782,8 @@ function loadAdminData() {
     }
     try { localStorage.setItem(_PFX+'admin_data_v1', JSON.stringify(data)); } catch(_) {}
     // Appliquer le thème visuel avant de re-rendre les cards
-    if (data.menuTheme && data.menuTheme !== menuTheme && !_demo_theme) {
+    var _pdSkipFirebaseTheme = (_RID === _PD_RID && _pdHasVisitorOverride());
+    if (data.menuTheme && data.menuTheme !== menuTheme && !_demo_theme && !_pdSkipFirebaseTheme) {
       menuTheme = data.menuTheme;
       document.documentElement.dataset.menuTheme = menuTheme;
       document.body.dataset.theme = menuTheme;
@@ -6666,8 +6800,8 @@ function loadAdminData() {
         applyStyle(menuStyle);
       }
     }
-    // Couleur d'accentuation
-    applyMenuColor(data.menuColor || null);
+    // Couleur d'accentuation (jamais si le visiteur pagedemo a son propre choix local)
+    if (!_pdSkipFirebaseTheme) applyMenuColor(data.menuColor || null);
     // Fête active (overlay indépendant du thème)
     const newEvent = data.activeEvent || '';
     if (newEvent) document.body.dataset.activeEvent = newEvent;
@@ -7160,6 +7294,337 @@ function _hsl2hex(h,s,l) {
   }
   return '#'+[r,g,b].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
 }
+
+/* ══════════════════════════════════════════════════════════
+   BOUTON THÈME FLOTTANT — EXCLUSIF AU CLIENT "Page Demo" (pagedemo)
+   Malek utilise ce restaurant pour la démo publique (page demo,
+   bouton "Explorer la galerie complète"). Chaque visiteur peut
+   choisir son propre thème/couleur pour lui-même uniquement —
+   stocké en localStorage, jamais écrit en Firebase, donc invisible
+   pour les autres visiteurs et sans effet sur le choix de Malek.
+   Rien de ceci n'existe pour aucun autre restaurant client.
+══════════════════════════════════════════════════════════ */
+const _PD_RID       = 'pagedemo';
+const _PD_THEME_KEY = 'pagedemo_visitor_theme';
+const _PD_COLOR_KEY = 'pagedemo_visitor_color';
+
+function _pdHasVisitorOverride() {
+  return _RID === _PD_RID && !!localStorage.getItem(_PD_THEME_KEY);
+}
+
+function _pdApplyVisitorOverride() {
+  const t = localStorage.getItem(_PD_THEME_KEY);
+  if (!t) return;
+  const c = localStorage.getItem(_PD_COLOR_KEY) || null;
+  menuTheme = t;
+  document.documentElement.dataset.menuTheme = t;
+  document.body.dataset.theme = t;
+  theme = _loadThemeMode(t);
+  document.documentElement.classList.toggle('light', theme === 'light');
+  applyMenuColor(c);
+}
+
+// Copie fidèle des données du sélecteur de thèmes admin (client/admin.html
+// THEMES_DATA/LAYOUTS_DATA/MENU_COLORS) — mêmes ids, noms 5 langues, couleurs.
+const PD_THEMES_DATA = [
+  { id:'gold-noir',     names:{el:'Χρυσό Μαύρο',  fr:'Gold Noir',         en:'Gold Noir',         de:'Gold Noir',              es:'Gold Noir'},    accent:'#c8a44e' },
+  { id:'neon-tokyo',    names:{el:'Νέον Παλμός',   fr:'Neon Pulse',        en:'Neon Pulse',        de:'Neon Puls',              es:'Neon Pulse'},   accent:'#00f5d4' },
+  { id:'botanical',     names:{el:'Βοτανικό Δάσος', fr:'Botanical Forest',  en:'Botanical Forest',  de:'Botanischer Wald',       es:'Botanical Forest'}, accent:'#7acc5a' },
+  { id:'rose-parisien', names:{el:'Παρισινό Ρόδο', fr:'Rose Parisien',     en:'Parisian Rose',     de:'Pariser Rose',           es:'Parisian Rose'}, accent:'#e890b0' },
+  { id:'midnight-luxe', names:{el:'Ταμπέλα',       fr:'Enseigne',          en:'Signboard',         de:'Schild',                 es:'Signboard'},       accent:'#f0d060' },
+  { id:'velvet-luxe',   names:{el:'Βελούδινη Πολυτέλεια', fr:'Velvet Luxe', en:'Velvet Luxe',      de:'Samt-Luxus',             es:'Velvet Luxe'}, accent:'#d4af37' },
+  { id:'prestige',      names:{el:'Κύρος',         fr:'Prestige',          en:'Prestige',          de:'Prestige',               es:'Prestige'},      accent:'#c8a44e' },
+  { id:'santorin',      names:{el:'Σαντορίνη',     fr:'Santorini',         en:'Santorini',         de:'Santorini',              es:'Santorini'},     accent:'#4db8ff' },
+  { id:'carte-classique', names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       es:'Classic Menu'}, accent:'#d4b896' },
+  { id:'paper-elegant', names:{el:'Χρυσό Βιβλίο',         fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch',          es:'Book of Gold'},       accent:'#e8e0d0' },
+  { id:'carte-sommelier',  names:{el:'Σομελιέ',        fr:'Sommelier',          en:'Sommelier',          de:'Sommelier',             es:'Sommelier'},       accent:'#b8a8c8' },
+  { id:'carte-bento',      names:{el:'Μπέντο',         fr:'Bento Moderne',      en:'Modern Bento',       de:'Modernes Bento',        es:'Modern Bento'},     accent:'#00c8d8' },
+  { id:'carte-telegraphe', names:{el:'Τηλεγράφος',     fr:'Télégraphe',         en:'Telegraph',          de:'Telegraf',              es:'Telegraph'},         accent:'#c8a070' },
+  { id:'carte-couture',    names:{el:'Ωτ Κουτύρ',      fr:'Haute Couture',      en:'Haute Couture',      de:'Haute Couture',         es:'Haute Couture'},      accent:'#d8d8d8' },
+  { id:'carte-journal',    names:{el:'Βιτρίνα',         fr:'Devanture',          en:'Showcase',           de:'Schaufenster',          es:'Showcase'},    accent:'#c0baa8' },
+  { id:'carte-voyage',     names:{el:'Ταξίδι',         fr:'Carnet de Voyage',   en:'Travel Journal',     de:'Reisetagebuch',         es:'Travel Journal'},     accent:'#d44040' },
+  { id:'carte-artisan',    names:{el:'Τεχνίτης',       fr:"L'Atelier",         en:'The Workshop',       de:'Die Werkstatt',         es:'The Workshop'},         accent:'#c08040' },
+  { id:'carte-ardoise',    names:{el:'Πλακάκι',        fr:'Ardoise Bistrot',    en:'Bistro Slate',       de:'Bistro-Tafel',          es:'Bistro Slate'},   accent:'#e8e4dc' },
+  { id:'carte-maroc',      names:{el:'Μαροκινό',       fr:'Maroc & Épices',     en:'Morocco & Spice',    de:'Marokko & Gewürze',     es:'Morocco & Spice'},accent:'#d4902c' },
+  { id:'livre-noir',       names:{el:'Μαύρο Βιβλίο',   fr:'Livre Noir',         en:'Black Book',         de:'Schwarzes Buch',        es:'Black Book'},  accent:'#c0c0cc' },
+  { id:'livre-botanique',  names:{el:'Βοτανικό',       fr:'Livre Botanique',    en:'Botanical Book',     de:'Botanisches Buch',      es:'Botanical Book'}, accent:'#7ec878' },
+  { id:'livre-azure',      names:{el:'Γαλάζιο Βιβλίο', fr:'Livre Azur',         en:'Azure Book',         de:'Azurbuch',              es:'Azure Book'}, accent:'#40a8d8' },
+  { id:'livre-rose',       names:{el:'Ρόζ Βιβλίο',    fr:'Livre Rose',         en:'Rose Book',          de:'Rosenbuch',             es:'Rose Book'}, accent:'#e880b0' },
+  { id:'livre-antique',    names:{el:'Αντίκα',         fr:'Livre Antique',      en:'Antique Book',       de:'Antikes Buch',          es:'Antique Book'}, accent:'#d4b870' },
+  { id:'livre-epure',      names:{el:'Καθαρό',         fr:'Livre Épuré',        en:'Pure Book',          de:'Pures Buch',            es:'Pure Book'},  accent:'#d0d0d8' },
+  { id:'livre-cerise',     names:{el:'Κεράσι',         fr:'Livre Cerise',       en:'Cherry Book',        de:'Kirschbuch',            es:'Cherry Book'},accent:'#e83040' },
+  { id:'livre-indigo',     names:{el:'Ινδιγό',         fr:'Livre Indigo',       en:'Indigo Book',        de:'Indigobuch',            es:'Indigo Book'}, accent:'#8080e8' },
+  { id:'livre-foret',      names:{el:'Δάσος',          fr:'Livre Forêt',        en:'Forest Book',        de:'Waldbuch',              es:'Forest Book'},   accent:'#c0b060' },
+  { id:'dyn-bento',     names:{el:'Ταμπλό Bento',       fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento',        es:'Bento Board'},    accent:'#ffffff' },
+  { id:'aurora',        names:{el:'Αυρόρα',             fr:'Aurora',             en:'Aurora',             de:'Aurora',                 es:'Aurora'},         accent:'#9070f8' },
+];
+const PD_LAYOUTS_DATA = [
+  { family:'gold-noir', names:{el:'Χρυσό Μαύρο', fr:'Gold Noir', en:'Gold Noir', de:'Gold Noir', es:'Gold Noir'},
+    variants:[{id:'gold-noir',accent:'#c8a44e'},{id:'midnight',accent:'#a67cff'},{id:'forest',accent:'#5ebd85'},{id:'ruby',accent:'#ff6b6b'},{id:'sapphire',accent:'#4dabf5'},{id:'pearl',accent:'#f5f5f5'}] },
+  { family:'neon-tokyo', names:{el:'Νέον Παλμός', fr:'Neon Pulse', en:'Neon Pulse', de:'Neon Puls', es:'Neon Pulse'},
+    variants:[{id:'neon-tokyo',accent:'#00f5d4'},{id:'neon-pink',accent:'#ff0080'},{id:'neon-purple',accent:'#9d4edd'},{id:'neon-green',accent:'#39ff14'},{id:'neon-orange',accent:'#ff6d00'},{id:'neon-yellow',accent:'#e9ff70'}] },
+  { family:'botanical', names:{el:'Βοτανικό Δάσος', fr:'Botanical Forest', en:'Botanical Forest', de:'Botanischer Wald', es:'Botanical Forest'},
+    variants:[{id:'botanical',accent:'#7acc5a'},{id:'botanical-autumn',accent:'#d08c38'},{id:'botanical-sage',accent:'#879f84'},{id:'botanical-earth',accent:'#8b5a2b'},{id:'botanical-olive',accent:'#556b2f'},{id:'botanical-sand',accent:'#d2b48c'}] },
+  { family:'rose-parisien', names:{el:'Παρισινό Ρόδο', fr:'Rose Parisien', en:'Parisian Rose', de:'Pariser Rose', es:'Parisian Rose'},
+    variants:[{id:'rose-parisien',accent:'#e890b0'},{id:'rose-blue',accent:'#80ccff'},{id:'rose-lavender',accent:'#9d50db'},{id:'rose-peach',accent:'#e87055'},{id:'rose-mint',accent:'#1ac4a8'},{id:'rose-lemon',accent:'#f0c040'}] },
+  { family:'midnight-luxe', names:{el:'Ταμπέλα', fr:'Enseigne', en:'Signboard', de:'Schild', es:'Signboard'},
+    variants:[{id:'midnight-luxe',accent:'#f0d060'},{id:'enseigne-silver',accent:'#c0c0c0'},{id:'enseigne-copper',accent:'#b87333'},{id:'enseigne-emerald',accent:'#50c878'},{id:'enseigne-sapphire',accent:'#4488ee'},{id:'enseigne-ruby',accent:'#e0115f'}] },
+  { family:'velvet-luxe', names:{el:'Βελούδινη Πολυτέλεια', fr:'Velvet Luxe', en:'Velvet Luxe', de:'Samt-Luxus', es:'Velvet Luxe'},
+    variants:[{id:'velvet-luxe',accent:'#d4af37'},{id:'velvet-red',accent:'#c0102a'},{id:'velvet-blue',accent:'#2040c0'},{id:'velvet-green',accent:'#1a7040'},{id:'velvet-purple',accent:'#8040a0'},{id:'velvet-black',accent:'#888888'}] },
+  { family:'prestige', names:{el:'Κύρος', fr:'Prestige', en:'Prestige', de:'Prestige', es:'Prestige'},
+    variants:[{id:'prestige',accent:'#c8a44e'},{id:'prestige-silver',accent:'#c0c0c0'},{id:'prestige-bronze',accent:'#cd7f32'},{id:'prestige-emerald',accent:'#28a030'},{id:'prestige-sapphire',accent:'#3366cc'},{id:'prestige-ruby',accent:'#c42028'}] },
+  { family:'santorin', names:{el:'Σαντορίνη', fr:'Santorini', en:'Santorini', de:'Santorini', es:'Santorini'},
+    variants:[{id:'santorin',accent:'#4db8ff'},{id:'santorin-sunset',accent:'#ff9944'},{id:'santorin-sand',accent:'#c9a84c'},{id:'santorin-sea',accent:'#2e8b57'},{id:'santorin-coral',accent:'#c0446c'},{id:'santorin-white',accent:'#f8f8f8'}] },
+  { family:'editorial', names:{fr:'Éditorial', en:'Editorial', de:'Editorial', el:'Εκδοτικό', es:'Editorial'},
+    variants:[{id:'editorial',accent:'#c0ccd8'},{id:'editorial-azure',accent:'#4a90d9'},{id:'editorial-terracotta',accent:'#e07050'},{id:'editorial-sage',accent:'#6aaa72'},{id:'editorial-plum',accent:'#9a5aa0'},{id:'editorial-pearl',accent:'#d8ccc0'}] },
+  { family:'dyn-bento', names:{el:'Ταμπλό Bento', fr:'Dashboard Bento', en:'Bento Board', de:'Dashboard Bento', es:'Bento Board'},
+    variants:[{id:'dyn-bento',accent:'#ffffff'},{id:'dyn-bento-gold',accent:'#c8a44e'},{id:'dyn-bento-neon',accent:'#00f5d4'},{id:'dyn-bento-blue',accent:'#1e90ff'},{id:'dyn-bento-green',accent:'#00fa9a'},{id:'dyn-bento-pink',accent:'#ff69b4'}] },
+  { family:'aurora', names:{el:'Αυρόρα', fr:'Aurora', en:'Aurora', de:'Aurora', es:'Aurora'},
+    variants:[{id:'aurora',accent:'#9070f8'},{id:'aurora-brume',accent:'#40c8e0'},{id:'aurora-aube',accent:'#f06858'},{id:'aurora-lime',accent:'#4ade80'},{id:'aurora-ambre',accent:'#f59e0b'},{id:'aurora-sel',accent:'#c8d0e8'}] },
+];
+const PD_MENU_COLORS = [
+  { hex:'#C8A44E', name:'Or' }, { hex:'#E8D5A0', name:'Champagne' }, { hex:'#F0F0EB', name:'Crème' },
+  { hex:'#4A4A4A', name:'Anthracite' }, { hex:'#1E3A5F', name:'Marine' }, { hex:'#2B7FBE', name:'Bleu royal' },
+  { hex:'#47A3A3', name:'Turquoise' }, { hex:'#2E7D52', name:'Vert forêt' }, { hex:'#9B4DCA', name:'Violet' },
+  { hex:'#E91E8C', name:'Rose vif' }, { hex:'#D4A090', name:'Rose poudré' }, { hex:'#E87B3A', name:'Terracotta' },
+  { hex:'#C73535', name:'Rouge' }, { hex:'#8B6914', name:'Brun doré' }, { hex:'#5D4037', name:'Brun profond' },
+];
+const _PD_CARTE_IDS = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
+
+const PD_I18N = {
+  fr:{ btn:'Thème', title:'Choisir un thème', carte:'Carte', livre:'Livre', elegant:'Élégant', standard:'Standard', close:'Fermer' },
+  en:{ btn:'Theme', title:'Choose a theme',   carte:'Basic', livre:'Book',  elegant:'Elegant', standard:'Standard', close:'Close' },
+  el:{ btn:'Θέμα',  title:'Επιλέξτε θέμα',    carte:'Κλασικό', livre:'Βιβλίο', elegant:'Κομψό', standard:'Βασικό', close:'Κλείσιμο' },
+  de:{ btn:'Design', title:'Design wählen',    carte:'Karte', livre:'Buch',  elegant:'Elegant', standard:'Standard', close:'Schließen' },
+  es:{ btn:'Tema',  title:'Elegir tema',       carte:'Carta', livre:'Libro', elegant:'Elegante', standard:'Estándar', close:'Cerrar' },
+};
+function PD_T(key) { return (PD_I18N[lang] || PD_I18N.fr)[key] || key; }
+
+function pdRefreshTexts() {
+  const fabTip = document.getElementById('pd-theme-fab-tip');
+  if (fabTip) fabTip.textContent = PD_T('btn');
+  const fab = document.getElementById('pd-theme-fab');
+  if (fab) fab.setAttribute('aria-label', PD_T('btn'));
+  const title = document.getElementById('pd-theme-title');
+  if (title) title.textContent = PD_T('title');
+  const closeBtn = document.getElementById('pd-color-modal-close');
+  if (closeBtn) closeBtn.textContent = PD_T('close');
+  if (document.getElementById('pd-theme-modal')?.classList.contains('show')) pdRenderThemeGrid();
+}
+
+function _pdColorDist(h1, h2) {
+  const p = h => { const s = h.replace('#',''); return [parseInt(s.slice(0,2),16), parseInt(s.slice(2,4),16), parseInt(s.slice(4,6),16)]; };
+  const [r1,g1,b1] = p(h1), [r2,g2,b2] = p(h2);
+  return Math.sqrt((r1-r2)**2 + (g1-g2)**2 + (b1-b2)**2);
+}
+function _pdColorCount(themeId) {
+  const tv = PD_LAYOUTS_DATA.find(l => l.family === themeId);
+  let count = tv ? tv.variants.length : 1;
+  const themeEntry = PD_THEMES_DATA.find(t => t.id === themeId);
+  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
+  PD_MENU_COLORS.forEach(c => { if (!refColors.some(rc => _pdColorDist(c.hex, rc) < 55)) count++; });
+  return count;
+}
+
+function pdRenderThemeGrid() {
+  const grid = document.getElementById('pd-theme-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const layoutFamilies = new Set(PD_LAYOUTS_DATA.map(l => l.family));
+  const activeColor = localStorage.getItem(_PD_COLOR_KEY) || null;
+
+  function getAccent(id) {
+    const tv = PD_LAYOUTS_DATA.find(l => l.family === id);
+    if (tv) { const v = tv.variants.find(x => x.id === menuTheme); return v ? (activeColor || v.accent) : tv.variants[0].accent; }
+    const th = PD_THEMES_DATA.find(t => t.id === id);
+    return id === menuTheme ? (activeColor || th?.accent || '#c8a44e') : (th?.accent || '#c8a44e');
+  }
+  function makeSep(txt) { const d = document.createElement('div'); d.className = 'pd-theme-sep'; d.textContent = txt; return d; }
+  function makeCard(id, nameStr, isActive) {
+    const card = document.createElement('div');
+    card.className = 'pd-theme-card' + (isActive ? ' active' : '');
+    card.style.setProperty('--pdc-accent', getAccent(id));
+    const dot = document.createElement('span'); dot.className = 'pdc-dot';
+    const nm  = document.createElement('span'); nm.className  = 'pdc-name'; nm.textContent = nameStr;
+    const chk = document.createElement('span'); chk.className = 'pdc-check'; chk.textContent = '✓';
+    card.appendChild(dot); card.appendChild(nm); card.appendChild(chk);
+    card.addEventListener('click', () => pdApplyTheme(id));
+    if (_pdColorCount(id) > 1) {
+      const btn = document.createElement('button');
+      btn.className = 'pdc-color-btn'; btn.textContent = '🎨'; btn.type = 'button';
+      btn.addEventListener('click', e => { e.stopPropagation(); pdOpenColorModal(id); });
+      card.appendChild(btn);
+    }
+    return card;
+  }
+
+  const staticThemes = PD_THEMES_DATA.filter(t => !layoutFamilies.has(t.id));
+  const carteThemes  = staticThemes.filter(t => _PD_CARTE_IDS.has(t.id));
+  const livreThemes  = staticThemes.filter(t => !_PD_CARTE_IDS.has(t.id));
+
+  if (carteThemes.length) {
+    grid.appendChild(makeSep(PD_T('carte')));
+    carteThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
+  }
+  if (livreThemes.length) {
+    grid.appendChild(makeSep(PD_T('livre')));
+    livreThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
+  }
+  grid.appendChild(makeSep(PD_T('elegant')));
+  PD_LAYOUTS_DATA.forEach(layout => {
+    const isActive = layout.variants.some(v => v.id === menuTheme);
+    grid.appendChild(makeCard(layout.family, layout.names[lang] || layout.names.fr, isActive));
+  });
+}
+
+function pdApplyTheme(id) {
+  const tv = PD_LAYOUTS_DATA.find(l => l.family === id);
+  const themeId = tv ? tv.variants[0].id : id;
+  pdSaveVisitorChoice(themeId, null);
+  pdRenderThemeGrid();
+}
+
+function pdOpenColorModal(themeId) {
+  const tv = PD_LAYOUTS_DATA.find(l => l.family === themeId);
+  const themeEntry = PD_THEMES_DATA.find(t => t.id === themeId);
+  const name = tv ? (tv.names[lang] || tv.names.fr) : (themeEntry?.names[lang] || themeEntry?.names.fr || themeId);
+  document.getElementById('pd-color-modal-title').textContent = name;
+  const body = document.getElementById('pd-color-modal-body');
+  body.innerHTML = '';
+  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
+  const stdAccent = tv ? tv.variants[0].accent : (themeEntry?.accent || '#c8a44e');
+  const activeColor = localStorage.getItem(_PD_COLOR_KEY);
+  const activeThemeMatches = tv ? tv.variants.some(v => v.id === menuTheme) : menuTheme === themeId;
+  const isStandard = activeThemeMatches && !activeColor;
+
+  const grid1 = document.createElement('div'); grid1.className = 'pd-color-grid';
+  const stdSw = document.createElement('div');
+  stdSw.className = 'pd-color-swatch' + (isStandard ? ' active' : '');
+  stdSw.style.cssText = 'background:' + stdAccent + ';outline:2px dashed rgba(255,255,255,0.4);outline-offset:2px;';
+  stdSw.title = PD_T('standard');
+  stdSw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, null); pdCloseColorModal(); pdRenderThemeGrid(); });
+  grid1.appendChild(stdSw); body.appendChild(grid1);
+
+  const grid2 = document.createElement('div'); grid2.className = 'pd-color-grid';
+  if (tv) {
+    tv.variants.slice(1).forEach(v => {
+      const isActive = menuTheme === v.id && !activeColor;
+      const sw = document.createElement('div');
+      sw.className = 'pd-color-swatch' + (isActive ? ' active' : '');
+      sw.style.background = v.accent; sw.title = v.id;
+      sw.addEventListener('click', () => { pdSaveVisitorChoice(v.id, null); pdCloseColorModal(); pdRenderThemeGrid(); });
+      grid2.appendChild(sw);
+    });
+  }
+  PD_MENU_COLORS.forEach(c => {
+    if (refColors.some(rc => _pdColorDist(c.hex, rc) < 55)) return;
+    const isActive = activeColor === c.hex;
+    const sw = document.createElement('div');
+    sw.className = 'pd-color-swatch' + (isActive ? ' active' : '');
+    sw.style.background = c.hex; sw.title = c.name;
+    sw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, c.hex); pdCloseColorModal(); pdRenderThemeGrid(); });
+    grid2.appendChild(sw);
+  });
+  if (grid2.children.length) body.appendChild(grid2);
+  document.getElementById('pd-color-modal-overlay').classList.add('show');
+}
+function pdCloseColorModal() { document.getElementById('pd-color-modal-overlay').classList.remove('show'); }
+
+function pdSaveVisitorChoice(themeId, colorHex) {
+  localStorage.setItem(_PD_THEME_KEY, themeId);
+  if (colorHex) localStorage.setItem(_PD_COLOR_KEY, colorHex);
+  else localStorage.removeItem(_PD_COLOR_KEY);
+  menuTheme = themeId;
+  document.documentElement.dataset.menuTheme = themeId;
+  document.body.dataset.theme = themeId;
+  theme = _loadThemeMode(themeId);
+  document.documentElement.classList.toggle('light', theme === 'light');
+  applyMenuColor(colorHex || null);
+  renderMenu();
+  updateCardBadges();
+  const _tIco = document.getElementById('theme-ico');
+  if (_tIco) _tIco.innerHTML = '<use href="#' + (theme === 'light' ? 'ico-moon' : 'ico-sun') + '"/>';
+}
+
+function pdOpenThemeModal() {
+  pdRefreshTexts();
+  pdRenderThemeGrid();
+  document.getElementById('pd-theme-modal').classList.add('show');
+}
+function pdCloseThemeModal() { document.getElementById('pd-theme-modal').classList.remove('show'); }
+
+/* ── Bouton flottant déplaçable (façon bulle Messenger) ── */
+function _pdClampPos(fab, x, y) {
+  const w = fab.offsetWidth || 56, h = fab.offsetHeight || 56;
+  const maxX = Math.max(8, window.innerWidth - w - 8);
+  const maxY = Math.max(8, window.innerHeight - h - 8);
+  return { x: Math.min(Math.max(8, x), maxX), y: Math.min(Math.max(8, y), maxY) };
+}
+function _pdSetFabPos(fab, x, y) {
+  const p = _pdClampPos(fab, x, y);
+  fab.style.left = p.x + 'px'; fab.style.top = p.y + 'px';
+  fab.style.right = 'auto'; fab.style.bottom = 'auto';
+}
+
+function pdInitFab() {
+  const fab = document.getElementById('pd-theme-fab');
+  if (!fab) return;
+  fab.style.display = 'flex';
+  pdRefreshTexts();
+
+  let savedPos = null;
+  try { savedPos = JSON.parse(localStorage.getItem('pagedemo_fab_pos') || 'null'); } catch(_) {}
+  requestAnimationFrame(() => {
+    if (savedPos && typeof savedPos.x === 'number' && typeof savedPos.y === 'number') {
+      _pdSetFabPos(fab, savedPos.x, savedPos.y);
+    }
+    fab.classList.add('show');
+    // Info-bulle d'accueil visible quelques secondes, puis disparaît (découvrabilité sans gêner)
+    setTimeout(() => fab.classList.add('tip-show'), 550);
+    setTimeout(() => fab.classList.remove('tip-show'), 4800);
+  });
+
+  let startX, startY, origX, origY, moved = false, pointerId = null;
+  fab.addEventListener('pointerdown', e => {
+    moved = false; pointerId = e.pointerId;
+    fab.setPointerCapture(pointerId);
+    const r = fab.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY; origX = r.left; origY = r.top;
+    fab.classList.add('dragging'); fab.classList.remove('tip-show');
+  });
+  fab.addEventListener('pointermove', e => {
+    if (e.pointerId !== pointerId || startX === undefined) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+    if (!moved) return;
+    _pdSetFabPos(fab, origX + dx, origY + dy);
+  });
+  function endDrag() {
+    if (startX === undefined) return;
+    startX = undefined;
+    fab.classList.remove('dragging');
+    if (moved) {
+      const r = fab.getBoundingClientRect();
+      try { localStorage.setItem('pagedemo_fab_pos', JSON.stringify({ x:r.left, y:r.top })); } catch(_) {}
+    } else {
+      pdOpenThemeModal();
+    }
+  }
+  fab.addEventListener('pointerup', endDrag);
+  fab.addEventListener('pointercancel', endDrag);
+
+  window.addEventListener('resize', () => {
+    if (fab.style.display === 'none') return;
+    const r = fab.getBoundingClientRect();
+    _pdSetFabPos(fab, r.left, r.top);
+  });
+
+  document.getElementById('pd-theme-close').addEventListener('click', pdCloseThemeModal);
+  document.getElementById('pd-theme-modal').addEventListener('click', e => { if (e.target.id === 'pd-theme-modal') pdCloseThemeModal(); });
+  document.getElementById('pd-color-modal-close').addEventListener('click', pdCloseColorModal);
+  document.getElementById('pd-color-modal-overlay').addEventListener('click', e => { if (e.target.id === 'pd-color-modal-overlay') pdCloseColorModal(); });
+}
+
 function applyMenuColor(hex) {
   const root = document.documentElement;
   if (hex) {
@@ -9039,6 +9504,7 @@ function changeLang(l) {
   updateCardBadges();
   filterItems();
   updateNoteBar();
+  if (_RID === _PD_RID) pdRefreshTexts();
 }
 
 function applyTranslations() {
