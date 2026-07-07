@@ -4666,6 +4666,12 @@ function syncVisToggles() {
   if (callBtn)   callBtn.classList.toggle('on',   showCall);
   if (photosBtn) photosBtn.classList.toggle('on', showPhotos);
   if (orderBtn)  orderBtn.classList.toggle('on',  showOrder);
+  const themeFabRow = document.getElementById('theme-fab-row');
+  if (themeFabRow) {
+    // "Page Demo" (pagedemo) a ce bouton toujours actif d'office côté client,
+    // indépendamment de ce réglage — l'afficher ici serait trompeur (aucun effet réel).
+    themeFabRow.style.display = (_RID === 'pagedemo') ? 'none' : '';
+  }
   const themeFabToggle = document.getElementById('theme-fab-toggle');
   if (themeFabToggle) themeFabToggle.checked = adminData.info.themeFabEnabled === true;
   // Section commandes / listener pilotés par showOrderUI (indépendant du style)
@@ -5656,6 +5662,8 @@ function applyAdminUI(l) {
   if (themeHd) themeHd.firstChild.textContent = (t.secTheme || 'Thème visuel') + ' ';
   const badgeThemeEl = $('badge-theme');
   if (badgeThemeEl) badgeThemeEl.textContent = t.badgeTheme || 'Design';
+  const themeFabToggleAria = $('theme-fab-toggle');
+  if (themeFabToggleAria && t.themeFabTitle) themeFabToggleAria.setAttribute('aria-label', t.themeFabTitle);
 
   // Orders section title
   const ordersHd = $('sec-hd-orders');
