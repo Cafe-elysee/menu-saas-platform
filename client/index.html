@@ -7442,6 +7442,27 @@ function _pdDeduceStyle(themeId) {
   return (isLayout || _PD_CARTE_IDS.has(themeId) || themeId === 'genext') ? 'simple' : 'paper';
 }
 
+// Déplace les boutons Accueil/Thème (jamais dupliqués, un seul jeu d'éléments)
+// vers leur ancre active du moment — #hero pour le style simple, la couverture
+// du flipbook pour le style paper (Livre). appendChild() détache automatiquement
+// l'élément de son ancien parent, aucune duplication d'id possible.
+function _pdMountThemeButtons(container) {
+  if (!container) return;
+  const home = document.getElementById('pd-home-btn');
+  const fab = document.getElementById('pd-theme-fab');
+  if (home) container.appendChild(home);
+  if (fab) container.appendChild(fab);
+}
+// Sécurise les 2 boutons sur <body> AVANT tout `innerHTML=''` qui les détruirait
+// s'ils se trouvaient nichés dans le sous-arbre effacé (ex. reconstruction du
+// flipbook alors qu'ils étaient dans la couverture précédente).
+function _pdParkThemeButtons() {
+  const home = document.getElementById('pd-home-btn');
+  const fab = document.getElementById('pd-theme-fab');
+  if (home) document.body.appendChild(home);
+  if (fab) document.body.appendChild(fab);
+}
+
 const PD_I18N = {
   fr:{ btn:'Thème', title:'Choisir un thème', carte:'Carte', livre:'Livre', elegant:'Élégant', standard:'Standard', close:'Fermer', home:'Accueil' },
   en:{ btn:'Theme', title:'Choose a theme',   carte:'Basic', livre:'Book',  elegant:'Elegant', standard:'Standard', close:'Close', home:'Home' },
@@ -7811,6 +7832,9 @@ function applyStyle(style) {
     if (menuWrap) menuWrap.style.display = '';
     if (flipWrap) flipWrap.classList.remove('active');
     if (cartBar)  cartBar.classList.remove('show');
+    // Reparente les boutons Accueil/Thème sur la vraie photo d'accueil —
+    // ils peuvent venir de la couverture du flipbook (thème Livre précédent).
+    if (_RID === _PD_RID) _pdMountThemeButtons(document.getElementById('hero'));
   }
 
   // Recalcule hauteur hero + cadrage photo après changement de style
@@ -7836,6 +7860,10 @@ function buildFlipBook() {
   const book = document.getElementById('flip-wrap');
   const track = document.getElementById('flip-book');
   if (!track) return;
+  // Sécuriser les boutons Accueil/Thème AVANT le innerHTML='' ci-dessous —
+  // sinon ils seraient détruits s'ils étaient nichés dans une ancienne
+  // couverture de flipbook (2 thèmes Livre choisis à la suite, par ex.).
+  if (_RID === _PD_RID) _pdParkThemeButtons();
   track.innerHTML = '';
 
   const u = UI[lang] || UI.fr;
@@ -7884,6 +7912,10 @@ function buildFlipBook() {
         </div>` : ''}
       </div>` : ''}
     </div>`;
+
+  // Boutons Accueil/Thème (pagedemo) — remontés sur la couverture du flipbook,
+  // exactement comme sur la photo d'accueil des thèmes non-Livre (Fix #234).
+  if (_RID === _PD_RID) _pdMountThemeButtons(hero.querySelector('.fp-hero-strip'));
 
   // ── Build category pages ───────────────────────
   // For Arabic: categories are in REVERSE DOM order (rightmost = hero, leftmost = last cat)
