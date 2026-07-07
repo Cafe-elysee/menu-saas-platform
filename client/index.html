@@ -6610,6 +6610,14 @@ function _applyDemoParams() {
     document.body.dataset.theme = _demo_theme;
     theme = (_demo_dark !== null) ? (_demo_dark === '0' ? 'light' : 'dark') : _defaultThemeMode(_demo_theme);
     document.documentElement.classList.toggle('light', theme === 'light');
+    // Si `demo_style` n'est pas fourni explicitement dans l'URL, déduire le bon
+    // style (paper/simple) depuis le thème prévisualisé — sinon un thème Livre
+    // prévisualisé via ?demo_theme= restait affiché avec le style hérité par
+    // défaut (Gold Noir/simple), même bug que pdSaveVisitorChoice().
+    if (!_demo_style) {
+      const ds = _pdDeduceStyle(_demo_theme);
+      if (ds !== menuStyle) { menuStyle = ds; applyStyle(menuStyle); }
+    }
   }
   if (_demo_style) {
     const ns = _normalizeStyle(_demo_style);
@@ -6822,8 +6830,10 @@ function loadAdminData() {
       const _tIco = document.getElementById('theme-ico');
       if (_tIco) _tIco.innerHTML = `<use href="${theme === 'light' ? '#ico-moon' : '#ico-sun'}"/>`;
     }
-    // Appliquer le style d'affichage (papier ou photo)
-    if (!_demo_style) {
+    // Appliquer le style d'affichage (papier ou photo) — jamais si le visiteur
+    // pagedemo a son propre choix local (sinon le style Firebase de Malek
+    // écraserait le style requis par le thème choisi par ce visiteur).
+    if (!_demo_style && !_pdSkipFirebaseTheme) {
       const newStyle = _normalizeStyle(data.menuStyle || 'paper');
       if (newStyle !== menuStyle) {
         menuStyle = newStyle;
@@ -7351,6 +7361,10 @@ function _pdApplyVisitorOverride() {
   document.body.dataset.theme = t;
   theme = _loadThemeMode(t);
   document.documentElement.classList.toggle('light', theme === 'light');
+  // Recalcule le style d'affichage (paper/simple) pour CE thème — sans ça la ligne
+  // `applyStyle(menuStyle)` juste après (dans le flux d'init) rejouerait encore le
+  // style Firebase par défaut, pas celui du thème choisi par le visiteur.
+  menuStyle = _pdDeduceStyle(t);
   applyMenuColor(c);
 }
 
@@ -7420,6 +7434,13 @@ const PD_MENU_COLORS = [
   { hex:'#C73535', name:'Rouge' }, { hex:'#8B6914', name:'Brun doré' }, { hex:'#5D4037', name:'Brun profond' },
 ];
 const _PD_CARTE_IDS = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc']);
+
+// Déduit le style d'affichage (paper=flipbook Livre | simple=cartes) à partir du themeId choisi —
+// même logique exacte que saveMenuTheme() dans admin.html (_CARTE_IDS_SET), à maintenir synchronisée.
+function _pdDeduceStyle(themeId) {
+  const isLayout = PD_LAYOUTS_DATA.some(l => l.variants.some(v => v.id === themeId));
+  return (isLayout || _PD_CARTE_IDS.has(themeId) || themeId === 'genext') ? 'simple' : 'paper';
+}
 
 const PD_I18N = {
   fr:{ btn:'Thème', title:'Choisir un thème', carte:'Carte', livre:'Livre', elegant:'Élégant', standard:'Standard', close:'Fermer', home:'Accueil' },
@@ -7577,6 +7598,12 @@ function pdSaveVisitorChoice(themeId, colorHex) {
   document.body.dataset.theme = themeId;
   theme = _loadThemeMode(themeId);
   document.documentElement.classList.toggle('light', theme === 'light');
+  // Bascule le style d'affichage (paper=flipbook Livre | simple=cartes) selon le
+  // thème choisi — sans ça un thème Livre restait affiché avec le style simple
+  // (hérité du thème par défaut Firebase), qui n'a pas d'habillage pour ces
+  // thèmes et retombait visuellement sur l'apparence de base (Gold Noir).
+  const newStyle = _pdDeduceStyle(themeId);
+  if (newStyle !== menuStyle) { menuStyle = newStyle; applyStyle(menuStyle); }
   applyMenuColor(colorHex || null);
   renderMenu();
   updateCardBadges();
