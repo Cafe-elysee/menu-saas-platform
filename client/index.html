@@ -6683,11 +6683,12 @@ function loadAdminData() {
       setupEventsOverlay();
     }
   } catch(_) {}
-  if (_RID === _PD_RID) _pdApplyVisitorOverride();
+  if (_pdFabActive) _pdApplyVisitorOverride();
   applyStyle(menuStyle);
   _applyDemoParams(); // URL params override Firebase/cache
   init_after_data();
-  if (_RID === _PD_RID) { pdInitFab(); pdInitHomeBtn(); }
+  if (_RID === _PD_RID) pdInitHomeBtn();
+  _pdEnsureFabInit();
 
   // Charger le nom du restaurant depuis profile/name (créé par Control App)
   // Appliquer le cache immédiatement pour éviter le décalage d'affichage
@@ -6820,7 +6821,7 @@ function loadAdminData() {
     }
     try { localStorage.setItem(_PFX+'admin_data_v1', JSON.stringify(data)); } catch(_) {}
     // Appliquer le thème visuel avant de re-rendre les cards
-    var _pdSkipFirebaseTheme = (_RID === _PD_RID && _pdHasVisitorOverride());
+    var _pdSkipFirebaseTheme = _pdHasVisitorOverride();
     if (data.menuTheme && data.menuTheme !== menuTheme && !_demo_theme && !_pdSkipFirebaseTheme) {
       menuTheme = data.menuTheme;
       document.documentElement.dataset.menuTheme = menuTheme;
@@ -7285,6 +7286,19 @@ function applyAdminData(data) {
       // Visibilité globale des photos
       showPhotos = data.info.showPhotos !== false;
 
+      // Bouton thème visiteurs (généralisé à tout client, cf. pagedemo) —
+      // pagedemo reste toujours actif d'office, jamais désactivé ici.
+      if (_RID !== _PD_RID) {
+        if (data.info.themeFabEnabled === true) {
+          _pdFabActive = true;
+          _pdEnsureFabInit();
+        } else if (_pdFabActive) {
+          _pdFabActive = false;
+          const themeFab = document.getElementById('pd-theme-fab');
+          if (themeFab) { themeFab.classList.remove('show'); themeFab.style.display = 'none'; }
+        }
+      }
+
       // Barre de note / annonce
       _adminInfo = data.info;
       updateNoteBar();
@@ -7336,20 +7350,32 @@ function _hsl2hex(h,s,l) {
 }
 
 /* ══════════════════════════════════════════════════════════
-   BOUTON THÈME FLOTTANT — EXCLUSIF AU CLIENT "Page Demo" (pagedemo)
-   Malek utilise ce restaurant pour la démo publique (page demo,
-   bouton "Explorer la galerie complète"). Chaque visiteur peut
-   choisir son propre thème/couleur pour lui-même uniquement —
-   stocké en localStorage, jamais écrit en Firebase, donc invisible
-   pour les autres visiteurs et sans effet sur le choix de Malek.
-   Rien de ceci n'existe pour aucun autre restaurant client.
+   BOUTON THÈME FLOTTANT (palette) — pour "Page Demo" (pagedemo, toujours
+   actif) ET pour tout restaurant client ayant activé l'option "Bouton
+   thème visiteurs" dans l'onglet Design de son admin (menu/info/
+   themeFabEnabled). Chaque visiteur peut choisir son propre thème/couleur
+   pour lui-même uniquement — stocké en localStorage (clé propre à CE
+   restaurant : `${rid}_visitor_theme`), jamais écrit en Firebase, donc
+   invisible pour les autres visiteurs et sans effet sur le choix par
+   défaut configuré par le restaurateur en admin.
+   Le bouton Accueil (retour vers demo-page) reste exclusif à pagedemo —
+   il n'a pas de sens pour un vrai restaurant.
 ══════════════════════════════════════════════════════════ */
 const _PD_RID       = 'pagedemo';
-const _PD_THEME_KEY = 'pagedemo_visitor_theme';
-const _PD_COLOR_KEY = 'pagedemo_visitor_color';
+const _PD_THEME_KEY = _RID + '_visitor_theme';
+const _PD_COLOR_KEY = _RID + '_visitor_color';
+// Actif d'office pour pagedemo ; activé pour tout autre client via le
+// toggle admin (menu/info/themeFabEnabled), lu dans applyAdminData().
+let _pdFabActive = (_RID === _PD_RID);
+let _pdFabInitialized = false;
+function _pdEnsureFabInit() {
+  if (!_pdFabActive || _pdFabInitialized) return;
+  _pdFabInitialized = true;
+  pdInitFab();
+}
 
 function _pdHasVisitorOverride() {
-  return _RID === _PD_RID && !!localStorage.getItem(_PD_THEME_KEY);
+  return _pdFabActive && !!localStorage.getItem(_PD_THEME_KEY);
 }
 
 function _pdApplyVisitorOverride() {
@@ -7448,19 +7474,15 @@ function _pdDeduceStyle(themeId) {
 // l'élément de son ancien parent, aucune duplication d'id possible.
 function _pdMountThemeButtons(container) {
   if (!container) return;
-  const home = document.getElementById('pd-home-btn');
-  const fab = document.getElementById('pd-theme-fab');
-  if (home) container.appendChild(home);
-  if (fab) container.appendChild(fab);
+  if (_RID === _PD_RID) { const home = document.getElementById('pd-home-btn'); if (home) container.appendChild(home); }
+  if (_pdFabActive) { const fab = document.getElementById('pd-theme-fab'); if (fab) container.appendChild(fab); }
 }
-// Sécurise les 2 boutons sur <body> AVANT tout `innerHTML=''` qui les détruirait
+// Sécurise les boutons sur <body> AVANT tout `innerHTML=''` qui les détruirait
 // s'ils se trouvaient nichés dans le sous-arbre effacé (ex. reconstruction du
 // flipbook alors qu'ils étaient dans la couverture précédente).
 function _pdParkThemeButtons() {
-  const home = document.getElementById('pd-home-btn');
-  const fab = document.getElementById('pd-theme-fab');
-  if (home) document.body.appendChild(home);
-  if (fab) document.body.appendChild(fab);
+  if (_RID === _PD_RID) { const home = document.getElementById('pd-home-btn'); if (home) document.body.appendChild(home); }
+  if (_pdFabActive) { const fab = document.getElementById('pd-theme-fab'); if (fab) document.body.appendChild(fab); }
 }
 
 const PD_I18N = {
@@ -7834,7 +7856,7 @@ function applyStyle(style) {
     if (cartBar)  cartBar.classList.remove('show');
     // Reparente les boutons Accueil/Thème sur la vraie photo d'accueil —
     // ils peuvent venir de la couverture du flipbook (thème Livre précédent).
-    if (_RID === _PD_RID) _pdMountThemeButtons(document.getElementById('hero'));
+    _pdMountThemeButtons(document.getElementById('hero'));
   }
 
   // Recalcule hauteur hero + cadrage photo après changement de style
@@ -7863,7 +7885,7 @@ function buildFlipBook() {
   // Sécuriser les boutons Accueil/Thème AVANT le innerHTML='' ci-dessous —
   // sinon ils seraient détruits s'ils étaient nichés dans une ancienne
   // couverture de flipbook (2 thèmes Livre choisis à la suite, par ex.).
-  if (_RID === _PD_RID) _pdParkThemeButtons();
+  _pdParkThemeButtons();
   track.innerHTML = '';
 
   const u = UI[lang] || UI.fr;
@@ -7913,9 +7935,9 @@ function buildFlipBook() {
       </div>` : ''}
     </div>`;
 
-  // Boutons Accueil/Thème (pagedemo) — remontés sur la couverture du flipbook,
+  // Boutons Accueil/Thème — remontés sur la couverture du flipbook,
   // exactement comme sur la photo d'accueil des thèmes non-Livre (Fix #234).
-  if (_RID === _PD_RID) _pdMountThemeButtons(hero.querySelector('.fp-hero-strip'));
+  _pdMountThemeButtons(hero.querySelector('.fp-hero-strip'));
 
   // ── Build category pages ───────────────────────
   // For Arabic: categories are in REVERSE DOM order (rightmost = hero, leftmost = last cat)
@@ -9680,7 +9702,7 @@ function changeLang(l) {
   updateCardBadges();
   filterItems();
   updateNoteBar();
-  if (_RID === _PD_RID) pdRefreshTexts();
+  if (_pdFabActive) pdRefreshTexts();
 }
 
 function applyTranslations() {
