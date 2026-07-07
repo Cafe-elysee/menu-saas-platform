@@ -7599,24 +7599,20 @@ function pdCloseThemeModal() {
   if (_pdThemeModalInHistory) { _pdThemeModalInHistory = false; history.back(); }
 }
 
-/* ── Glisser la poignée du popup Thème : fermer en glissant vers le bas,
-   effet élastique (rubber-band + léger rétrécissement) en tirant vers le haut ── */
+/* ── Fermeture par glissement du popup Thème ──
+   1) Poignée (.cart-handle) : glisser vers le bas ferme, actif à tout moment.
+   2) Contenu (#pd-theme-grid, etc.) : une fois le scroll interne arrivé tout
+      en haut (scrollTop<=0), continuer à tirer vers le bas ferme aussi le
+      popup — comme les feuilles natives iOS/Android (scroll normal tant
+      qu'il reste du contenu, puis "pull to dismiss" une fois en haut). */
 function _pdSetupSheetDrag() {
   const box = document.getElementById('pd-theme-box');
   const handle = box && box.querySelector('.cart-handle');
   if (!handle) return;
   const CLOSE_THRESHOLD = 110; // px glissés vers le bas avant de fermer
-  const MAX_SHRINK = 0.06;     // rétrécissement max en tirant vers le haut
-  let startY = 0, dy = 0, dragging = false, pointerId = null;
+  const MAX_SHRINK = 0.06;     // rétrécissement max en tirant vers le haut (poignée uniquement)
 
-  handle.addEventListener('pointerdown', e => {
-    dragging = true; pointerId = e.pointerId; dy = 0; startY = e.clientY;
-    handle.setPointerCapture(pointerId);
-    box.classList.add('pd-dragging');
-  });
-  handle.addEventListener('pointermove', e => {
-    if (!dragging || e.pointerId !== pointerId) return;
-    dy = e.clientY - startY;
+  function applyDrag(dy) {
     if (dy >= 0) {
       box.style.transform = 'translateY(' + dy + 'px)';
     } else {
@@ -7625,11 +7621,10 @@ function _pdSetupSheetDrag() {
       const shrink = 1 - Math.min(Math.abs(dy) / 900, MAX_SHRINK);
       box.style.transform = 'translateY(' + resisted + 'px) scale(' + shrink + ')';
     }
-  });
-  function endSheetDrag() {
-    if (!dragging) return;
-    dragging = false;
+  }
+  function releaseDrag(dy, restoreOverflow) {
     box.classList.remove('pd-dragging');
+    if (restoreOverflow) box.style.overflowY = '';
     if (dy > CLOSE_THRESHOLD) {
       box.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
       box.style.transform = 'translateY(100%)';
@@ -7640,8 +7635,61 @@ function _pdSetupSheetDrag() {
       setTimeout(() => { box.style.transition = ''; box.style.transform = ''; }, 420);
     }
   }
-  handle.addEventListener('pointerup', endSheetDrag);
-  handle.addEventListener('pointercancel', endSheetDrag);
+
+  // ── 1) Poignée : glisser toujours actif, quel que soit l'état du scroll ──
+  let hStartY = 0, hDy = 0, hDragging = false, hPointerId = null;
+  handle.addEventListener('pointerdown', e => {
+    hDragging = true; hPointerId = e.pointerId; hDy = 0; hStartY = e.clientY;
+    handle.setPointerCapture(hPointerId);
+    box.classList.add('pd-dragging');
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!hDragging || e.pointerId !== hPointerId) return;
+    hDy = e.clientY - hStartY;
+    applyDrag(hDy);
+  });
+  function endHandleDrag() {
+    if (!hDragging) return;
+    hDragging = false;
+    releaseDrag(hDy, false);
+  }
+  handle.addEventListener('pointerup', endHandleDrag);
+  handle.addEventListener('pointercancel', endHandleDrag);
+
+  // ── 2) Contenu : "pull to dismiss" une fois arrivé en haut du scroll ──
+  let cStartY = 0, cDy = 0, cPointerId = null, cTracking = false, cEngaged = false;
+  box.addEventListener('pointerdown', e => {
+    if (handle.contains(e.target)) return; // déjà géré par la poignée ci-dessus
+    cPointerId = e.pointerId; cStartY = e.clientY; cDy = 0;
+    cTracking = true; cEngaged = false;
+  });
+  box.addEventListener('pointermove', e => {
+    if (!cTracking || e.pointerId !== cPointerId || hDragging) return;
+    const rawDy = e.clientY - cStartY;
+    if (!cEngaged) {
+      // N'engage la fermeture que si on tire vers le bas ET qu'il n'y a plus
+      // rien à faire défiler au-dessus (sinon on laisse le scroll natif agir).
+      if (rawDy > 4 && box.scrollTop <= 0) {
+        cEngaged = true;
+        cStartY = e.clientY; // repart de zéro ici, pas de saut visuel au moment du relais
+        box.style.overflowY = 'hidden'; // verrouille le scroll natif le temps du geste
+        box.setPointerCapture(cPointerId);
+        box.classList.add('pd-dragging');
+      } else {
+        return;
+      }
+    }
+    cDy = Math.max(0, e.clientY - cStartY);
+    applyDrag(cDy);
+  });
+  function endContentDrag() {
+    cTracking = false;
+    if (!cEngaged) return;
+    cEngaged = false;
+    releaseDrag(cDy, true);
+  }
+  box.addEventListener('pointerup', endContentDrag);
+  box.addEventListener('pointercancel', endContentDrag);
 }
 
 /* ── Bouton flottant déplaçable (façon bulle Messenger) ── */
