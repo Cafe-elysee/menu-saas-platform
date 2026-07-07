@@ -5671,6 +5671,10 @@
     transform:translateY(100%); transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
   }
   #pd-theme-modal.show #pd-theme-box { transform:translateY(0); }
+  #pd-theme-box .cart-handle { position:relative; cursor:grab; touch-action:none; }
+  #pd-theme-box .cart-handle::before { content:''; position:absolute; inset:-16px -50px; }
+  #pd-theme-box .cart-handle:active { cursor:grabbing; }
+  #pd-theme-box.pd-dragging { transition:none !important; }
   .pd-theme-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
   .pd-theme-title { font-family:'Cormorant',serif; font-size:1.25rem; color:var(--cream); font-weight:600; }
   .pd-theme-close { background:none; border:none; color:var(--muted); font-size:1rem; cursor:pointer; padding:4px 6px; line-height:1; }
@@ -7462,26 +7466,26 @@ function pdRenderThemeGrid() {
   const carteThemes  = staticThemes.filter(t => _PD_CARTE_IDS.has(t.id));
   const livreThemes  = staticThemes.filter(t => !_PD_CARTE_IDS.has(t.id));
 
-  if (carteThemes.length) {
-    grid.appendChild(makeSep(PD_T('carte')));
-    carteThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
-  }
-  if (livreThemes.length) {
-    grid.appendChild(makeSep(PD_T('livre')));
-    livreThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
-  }
   grid.appendChild(makeSep(PD_T('elegant')));
   PD_LAYOUTS_DATA.forEach(layout => {
     const isActive = layout.variants.some(v => v.id === menuTheme);
     grid.appendChild(makeCard(layout.family, layout.names[lang] || layout.names.fr, isActive));
   });
+  if (livreThemes.length) {
+    grid.appendChild(makeSep(PD_T('livre')));
+    livreThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
+  }
+  if (carteThemes.length) {
+    grid.appendChild(makeSep(PD_T('carte')));
+    carteThemes.forEach(th => grid.appendChild(makeCard(th.id, th.names[lang] || th.names.fr, th.id === menuTheme)));
+  }
 }
 
 function pdApplyTheme(id) {
   const tv = PD_LAYOUTS_DATA.find(l => l.family === id);
   const themeId = tv ? tv.variants[0].id : id;
   pdSaveVisitorChoice(themeId, null);
-  pdRenderThemeGrid();
+  pdCloseThemeModal();
 }
 
 function pdOpenColorModal(themeId) {
@@ -7502,7 +7506,7 @@ function pdOpenColorModal(themeId) {
   stdSw.className = 'pd-color-swatch' + (isStandard ? ' active' : '');
   stdSw.style.cssText = 'background:' + stdAccent + ';outline:2px dashed rgba(255,255,255,0.4);outline-offset:2px;';
   stdSw.title = PD_T('standard');
-  stdSw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, null); pdCloseColorModal(); pdRenderThemeGrid(); });
+  stdSw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, null); pdCloseColorModal(); pdCloseThemeModal(); });
   grid1.appendChild(stdSw); body.appendChild(grid1);
 
   const grid2 = document.createElement('div'); grid2.className = 'pd-color-grid';
@@ -7512,7 +7516,7 @@ function pdOpenColorModal(themeId) {
       const sw = document.createElement('div');
       sw.className = 'pd-color-swatch' + (isActive ? ' active' : '');
       sw.style.background = v.accent; sw.title = v.id;
-      sw.addEventListener('click', () => { pdSaveVisitorChoice(v.id, null); pdCloseColorModal(); pdRenderThemeGrid(); });
+      sw.addEventListener('click', () => { pdSaveVisitorChoice(v.id, null); pdCloseColorModal(); pdCloseThemeModal(); });
       grid2.appendChild(sw);
     });
   }
@@ -7522,13 +7526,17 @@ function pdOpenColorModal(themeId) {
     const sw = document.createElement('div');
     sw.className = 'pd-color-swatch' + (isActive ? ' active' : '');
     sw.style.background = c.hex; sw.title = c.name;
-    sw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, c.hex); pdCloseColorModal(); pdRenderThemeGrid(); });
+    sw.addEventListener('click', () => { pdSaveVisitorChoice(tv ? tv.variants[0].id : themeId, c.hex); pdCloseColorModal(); pdCloseThemeModal(); });
     grid2.appendChild(sw);
   });
   if (grid2.children.length) body.appendChild(grid2);
   document.getElementById('pd-color-modal-overlay').classList.add('show');
+  if (!_pdColorModalInHistory) { history.pushState({ modal: 'pd-color-modal' }, ''); _pdColorModalInHistory = true; }
 }
-function pdCloseColorModal() { document.getElementById('pd-color-modal-overlay').classList.remove('show'); }
+function pdCloseColorModal() {
+  document.getElementById('pd-color-modal-overlay').classList.remove('show');
+  if (_pdColorModalInHistory) { _pdColorModalInHistory = false; history.back(); }
+}
 
 function pdSaveVisitorChoice(themeId, colorHex) {
   localStorage.setItem(_PD_THEME_KEY, themeId);
@@ -7547,13 +7555,64 @@ function pdSaveVisitorChoice(themeId, colorHex) {
 }
 
 let _pdModalJustOpened = 0;
+let _pdThemeModalInHistory = false;
+let _pdColorModalInHistory = false;
 function pdOpenThemeModal() {
   pdRefreshTexts();
   pdRenderThemeGrid();
   document.getElementById('pd-theme-modal').classList.add('show');
   _pdModalJustOpened = Date.now();
+  if (!_pdThemeModalInHistory) { history.pushState({ modal: 'pd-theme-modal' }, ''); _pdThemeModalInHistory = true; }
 }
-function pdCloseThemeModal() { document.getElementById('pd-theme-modal').classList.remove('show'); }
+function pdCloseThemeModal() {
+  document.getElementById('pd-theme-modal').classList.remove('show');
+  if (_pdThemeModalInHistory) { _pdThemeModalInHistory = false; history.back(); }
+}
+
+/* ── Glisser la poignée du popup Thème : fermer en glissant vers le bas,
+   effet élastique (rubber-band + léger rétrécissement) en tirant vers le haut ── */
+function _pdSetupSheetDrag() {
+  const box = document.getElementById('pd-theme-box');
+  const handle = box && box.querySelector('.cart-handle');
+  if (!handle) return;
+  const CLOSE_THRESHOLD = 110; // px glissés vers le bas avant de fermer
+  const MAX_SHRINK = 0.06;     // rétrécissement max en tirant vers le haut
+  let startY = 0, dy = 0, dragging = false, pointerId = null;
+
+  handle.addEventListener('pointerdown', e => {
+    dragging = true; pointerId = e.pointerId; dy = 0; startY = e.clientY;
+    handle.setPointerCapture(pointerId);
+    box.classList.add('pd-dragging');
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!dragging || e.pointerId !== pointerId) return;
+    dy = e.clientY - startY;
+    if (dy >= 0) {
+      box.style.transform = 'translateY(' + dy + 'px)';
+    } else {
+      // Tiré au-delà du haut du popup — résistance élastique + léger rétrécissement
+      const resisted = dy * 0.28;
+      const shrink = 1 - Math.min(Math.abs(dy) / 900, MAX_SHRINK);
+      box.style.transform = 'translateY(' + resisted + 'px) scale(' + shrink + ')';
+    }
+  });
+  function endSheetDrag() {
+    if (!dragging) return;
+    dragging = false;
+    box.classList.remove('pd-dragging');
+    if (dy > CLOSE_THRESHOLD) {
+      box.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
+      box.style.transform = 'translateY(100%)';
+      setTimeout(() => { box.style.transition = ''; box.style.transform = ''; pdCloseThemeModal(); }, 320);
+    } else {
+      box.style.transition = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
+      box.style.transform = 'translateY(0) scale(1)';
+      setTimeout(() => { box.style.transition = ''; box.style.transform = ''; }, 420);
+    }
+  }
+  handle.addEventListener('pointerup', endSheetDrag);
+  handle.addEventListener('pointercancel', endSheetDrag);
+}
 
 /* ── Bouton flottant déplaçable (façon bulle Messenger) ── */
 function _pdClampPos(fab, x, y) {
@@ -7625,6 +7684,7 @@ function pdInitFab() {
     _pdSetFabPos(fab, r.left, r.top);
   });
 
+  _pdSetupSheetDrag();
   document.getElementById('pd-theme-close').addEventListener('click', pdCloseThemeModal);
   document.getElementById('pd-theme-modal').addEventListener('click', e => {
     // Ignore le clic fantôme de compatibilité qu'un navigateur tactile déclenche
@@ -8246,12 +8306,13 @@ function _showDosePopup(item, onConfirm) {
   ).join('');
   sugarContainer.innerHTML = sugarOpts.map(o => `<button class="dose-opt-btn" data-val="${o.val}">${o.lbl}</button>`).join('');
 
-  let selDose = null, selSugar = null, _closed = false;
+  let selDose = null, selSugar = null, _closed = false, _doseInHistory = false;
 
   const close = (confirm) => {
     if (_closed) return;
     _closed = true;
     modal.classList.remove('show');
+    if (_doseInHistory) { _doseInHistory = false; history.back(); }
     if (confirm && selDose && selSugar) onConfirm(selDose, selSugar);
   };
 
@@ -8280,8 +8341,9 @@ function _showDosePopup(item, onConfirm) {
   // Show
   modal.classList.add('show');
   history.pushState({ doseModal: true }, '');
+  _doseInHistory = true;
 
-  const onPop = () => { if (!_closed) { _closed = true; modal.classList.remove('show'); } };
+  const onPop = () => { if (!_closed) { _closed = true; _doseInHistory = false; modal.classList.remove('show'); } };
   window.addEventListener('popstate', onPop, { once: true });
 }
 
@@ -8923,11 +8985,21 @@ let _tblPromptGoingBack = false; // true quand on appelle history.back() program
 let _sheetInHistory     = false; // true quand le sheet produit est dans l'historique
 
 // ── Listener unifié bouton retour ─────────────────────────────────────────
-// Ordre de priorité : table-modal > cart-modal > hist-modal > sheet produit
+// Ordre de priorité : popup couleur/thème Page Demo > table-modal > cart-modal > hist-modal > sheet produit
 window.addEventListener('popstate', () => {
   if (_tblPromptGoingBack) { _tblPromptGoingBack = false; return; }
   if (_tblPromptDone) { const cb = _tblPromptDone; _tblPromptDone = null; cb(null); return; }
 
+  if (_pdColorModalInHistory) {
+    _pdColorModalInHistory = false;
+    document.getElementById('pd-color-modal-overlay').classList.remove('show');
+    return;
+  }
+  if (_pdThemeModalInHistory) {
+    _pdThemeModalInHistory = false;
+    document.getElementById('pd-theme-modal').classList.remove('show');
+    return;
+  }
   if (_tableModalInHistory) {
     _tableModalInHistory = false;
     document.getElementById('table-modal').classList.remove('on');
