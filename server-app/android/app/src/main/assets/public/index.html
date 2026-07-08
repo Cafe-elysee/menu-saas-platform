@@ -354,8 +354,24 @@
       border-top:1px solid rgba(255,255,255,0.05);
     }
     html.light .order-body-pad { border-top-color:rgba(200,164,78,0.1); }
-    .order-items-lbl { font-size:0.74rem; color:var(--muted); margin-bottom:10px; line-height:1.7; padding-top:12px; }
-    .order-total-lbl { font-size:0.8rem; color:var(--cream); font-weight:600; margin-bottom:13px; }
+    .order-items-list { display:flex; flex-direction:column; gap:0; padding-top:12px; margin-bottom:0; }
+    .order-item-row {
+      display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+      padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    html.light .order-item-row { border-bottom-color:rgba(0,0,0,0.05); }
+    .order-item-row:last-child { border-bottom:none; }
+    .order-item-left { display:flex; flex-direction:column; flex:1; min-width:0; }
+    .order-item-name { font-size:0.8rem; color:var(--cream); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .order-item-extras { font-size:0.7rem; color:var(--muted); margin-top:1px; }
+    .order-item-price { font-size:0.78rem; color:var(--gold); font-weight:600; flex-shrink:0; white-space:nowrap; }
+    .order-total-line {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:10px; padding-top:8px; border-top:1px solid rgba(200,164,78,0.25);
+      margin-bottom:13px;
+    }
+    .order-total-lbl { font-size:0.78rem; color:var(--muted); font-weight:500; }
+    .order-total-val { font-size:0.88rem; color:var(--cream); font-weight:700; }
     .order-status-btns { display:flex; gap:7px; }
     .order-st-btn {
       flex:1; padding:9px 4px; border-radius:12px; font-size:0.69rem; font-weight:500;
@@ -1761,6 +1777,16 @@ function cleanupOrders() {
   }
 }
 
+function _lineTotal(priceStr, qty) {
+  if (!priceStr || !qty) return '—';
+  var m = String(priceStr).match(/([\s\S]*?)([\d]+[.,][\d]{2})([\s\S]*)/);
+  if (!m) return '—';
+  var num = parseFloat(m[2].replace(',', '.'));
+  if (!num) return '—';
+  var total = (num * qty).toFixed(2).replace('.', ',');
+  return m[1] + total + m[3];
+}
+
 function renderOrders() {
   var list = document.getElementById('orders-list');
   var noEl = document.getElementById('no-orders-msg');
@@ -1800,16 +1826,21 @@ function renderOrders() {
     }
     var stClass  = o.status === 'done' ? 'st-done' : o.status === 'in_progress' ? 'st-progress' : 'st-pending';
     var stLabel  = o.status === 'done' ? t.ordDone : o.status === 'in_progress' ? t.ordProgress : t.ordPending;
-    var itemsHtml = (o.items || []).map(function(it) {
+    var tl = T[lang] || T.fr;
+    var itemsHtml = '<div class="order-items-list">' + (o.items || []).map(function(it) {
       var live = menuItemsMap[it.id];
       var name = live ? (live.name && (live.name[lang] || live.name.fr) || it.name) : it.name;
-      var tl = T[lang] || T.fr;
       var ex = [];
       if (it.dose)  ex.push(it.dose === 'double' ? (tl.doseDouble||'Double') : (tl.doseSingle||'Single'));
       if (it.sugar) ex.push(it.sugar === 'none' ? (tl.sugarNone||'Sans sucre') : it.sugar === 'medium' ? (tl.sugarMedium||'Sucre moyen') : (tl.sugarSweet||'Sucré'));
-      var label = escapeHtml(name) + (ex.length ? ' <small style="opacity:0.65">— ' + escapeHtml(ex.join(', ')) + '</small>' : '');
-      return it.qty + '× ' + label;
-    }).join(' · ');
+      return '<div class="order-item-row">' +
+        '<div class="order-item-left">' +
+          '<span class="order-item-name">' + escapeHtml(it.qty + '×') + ' ' + escapeHtml(name || '—') + '</span>' +
+          (ex.length ? '<span class="order-item-extras">' + escapeHtml(ex.join(' · ')) + '</span>' : '') +
+        '</div>' +
+        '<span class="order-item-price">' + escapeHtml(_lineTotal(it.price, it.qty)) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
     var timeStr  = _d ? (formatDay(_d, t) + ' ' + _d.toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit' })) : '';
     var isNum    = o.tableNum && /^\d+$/.test(String(o.tableNum));
     var tableLabel = isNum ? (t.ordTable + ' ' + o.tableNum) : t.ordTakeaway;
@@ -1826,8 +1857,11 @@ function renderOrders() {
         '<span class="order-chevron">' + chevSvg + '</span>' +
       '</div>' +
       '<div class="order-body"><div class="order-body-inner"><div class="order-body-pad">' +
-        '<div class="order-items-lbl">' + itemsHtml + '</div>' +
-        '<div class="order-total-lbl">' + t.ordTotal + ' : ' + escapeHtml(String(o.total || '—')) + '</div>' +
+        itemsHtml +
+        '<div class="order-total-line">' +
+          '<span class="order-total-lbl">' + t.ordTotal + '</span>' +
+          '<span class="order-total-val">' + escapeHtml(String(o.total || '—')) + '</span>' +
+        '</div>' +
         '<div class="order-status-btns">' +
           '<button class="order-st-btn '      + (o.status==='pending'     ?'active':'') + '" data-st="pending">'     + t.ordPending  + '</button>' +
           '<button class="order-st-btn prog ' + (o.status==='in_progress' ?'active':'') + '" data-st="in_progress">' + t.ordProgress + '</button>' +
