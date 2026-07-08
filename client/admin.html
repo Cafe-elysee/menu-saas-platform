@@ -2816,7 +2816,7 @@
 <div id="menu-preview-modal">
   <div class="mpv-topbar">
     <div class="mpv-title" data-uitxt="previewTitle">Aperçu du menu</div>
-    <button id="menu-preview-close-btn" class="mpv-close-btn" title="Fermer">✕</button>
+    <button id="menu-preview-close-btn" class="mpv-close-btn" aria-label="Fermer" title="Fermer">✕</button>
   </div>
   <div class="mpv-phone">
     <div class="mpv-notch"></div>
@@ -5696,6 +5696,8 @@ function applyAdminUI(l) {
   if (heroDelBtn && t.btnDelPhoto) { heroDelBtn.setAttribute('aria-label', t.btnDelPhoto); heroDelBtn.title = t.btnDelPhoto; }
   const logoDelBtnLbl = $('logo-del-btn');
   if (logoDelBtnLbl && t.btnDelLogo) { logoDelBtnLbl.setAttribute('aria-label', t.btnDelLogo); logoDelBtnLbl.title = t.btnDelLogo; }
+  const mpvCloseBtn = $('menu-preview-close-btn');
+  if (mpvCloseBtn && t.close) { mpvCloseBtn.setAttribute('aria-label', t.close); mpvCloseBtn.title = t.close; }
   document.querySelectorAll('[data-uitxt]').forEach(el => {
     const key = el.getAttribute('data-uitxt');
     if (t[key] !== undefined) el.textContent = t[key];
