@@ -2268,35 +2268,26 @@
     body.option-commande-active[data-style="simple"] .card-editorial .edt-body { padding-bottom:50px; }
 
     /* ── Events overlay fête (indépendant du thème) ──
-       Panneau verre dépoli SOMBRE derrière icône+texte+date : garantit la
+       Panneau verre dépoli SOMBRE derrière texte+date : garantit la
        lisibilité quelle que soit la photo d'accueil (claire, foncée, dorée...)
        ou le thème (dynamique/papier, clair/sombre) — on ne compte plus
-       uniquement sur un text-shadow, qui ne suffit pas sur certaines photos. */
+       uniquement sur un text-shadow, qui ne suffit pas sur certaines photos.
+       Pas d'icône (retirée) : panneau compact pour laisser voir la photo. */
     .hero-events-overlay { display:none; }
     body[data-active-event] .hero-events-overlay {
       display:flex; flex-direction:column; align-items:center;
       position:absolute;
       top:calc(env(safe-area-inset-top,0px) + 12px);
       left:50%; transform:translateX(-50%);
-      max-width:min(88vw, 340px);
+      max-width:min(88vw, 320px);
       text-align:center; pointer-events:none; z-index:4;
-      padding:14px 24px 12px;
+      padding:11px 22px 10px;
       background:rgba(8,6,4,0.55);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       border:1px solid rgba(200,164,78,0.28);
-      border-radius:22px;
+      border-radius:18px;
       box-shadow:0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
     }
-    .ev-icon-ring {
-      width:52px; height:52px; margin:0 auto 7px;
-      border-radius:50%;
-      border:1.5px solid var(--gold);
-      background:rgba(0,0,0,0.42);
-      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 0 18px rgba(200,164,78,0.22), inset 0 0 10px rgba(0,0,0,0.3);
-    }
-    .ev-icon-ring svg { width:26px; height:26px; }
     .ev-text {
       font-family:'Cormorant',serif;
       font-size:1.15rem; font-weight:600; font-style:italic;
@@ -2320,29 +2311,22 @@
     /* ── Panel fête fixe — mode papier ──
        Même principe que .hero-events-overlay : panneau verre dépoli sombre
        obligatoire, car les thèmes Livre ont souvent une page parchemin/crème —
-       du texte doré sans fond serait illisible dessus. */
+       du texte doré sans fond serait illisible dessus. Pas d'icône (retirée). */
     #fp-ev-panel {
       display:none;
       position:fixed; pointer-events:none; z-index:13;
       left:50%; transform:translateX(-50%);
-      top:40%; max-width:78%;
+      top:40%; max-width:70%;
       flex-direction:column; align-items:center; gap:6px;
       text-align:center;
-      padding:14px 22px 12px;
+      padding:12px 20px 11px;
       background:rgba(8,6,4,0.62);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       border:1px solid rgba(200,164,78,0.3);
-      border-radius:22px;
+      border-radius:18px;
       box-shadow:0 10px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
     }
     body[data-style="paper"][data-active-event] #fp-ev-panel { display:flex; }
-    #fp-ev-panel .ev-icon-ring {
-      width:44px; height:44px;
-      background:rgba(0,0,0,0.55); border:1.5px solid rgba(var(--gold-rgb,201,168,76),0.55);
-      border-radius:50%; display:flex; align-items:center; justify-content:center;
-      backdrop-filter:blur(6px);
-    }
-    #fp-ev-panel .ev-icon-ring svg { width:22px; height:22px; }
     #fp-ev-panel .ev-text {
       font-size:1.05rem; font-weight:600; font-style:italic;
       color:#f1ead9; letter-spacing:0.04em;
@@ -7187,7 +7171,6 @@ function setupEventsOverlay() {
   var txt  = cfg.text[l] || cfg.text.el || cfg.text.fr || '';
   var date = cfg.date[l] || cfg.date.el || cfg.date.fr || '';
   var inner =
-    '<div class="ev-icon-ring">' + cfg.svg + '</div>' +
     '<div class="ev-text">' + txt + '</div>' +
     '<div class="ev-date">' + date + '</div>';
 
@@ -7786,6 +7769,12 @@ function _pdSetupSheetDrag() {
 function pdInitHomeBtn() {
   const btn = document.getElementById('pd-home-btn');
   if (!btn) return;
+  // Affiché dans un popup (admin.html/demo-page, cadre téléphone desktop) : fermer
+  // le popup revient déjà à la page d'origine — le bouton Accueil y est redondant.
+  // Uniquement affiché en visite directe (page top-level, pas dans un iframe).
+  let inIframe = false;
+  try { inIframe = window.self !== window.top; } catch (e) { inIframe = false; }
+  if (inIframe) return;
   btn.style.display = 'flex';
   pdRefreshTexts();
   requestAnimationFrame(() => btn.classList.add('show'));

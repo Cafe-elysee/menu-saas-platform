@@ -2777,12 +2777,19 @@
      les clients sur mobile, quelle que soit la taille de l'écran de l'ordinateur.
      Sur mobile, "Voir le menu" navigue directement (pas de popup) — voir openMenuPreview(). -->
 <style>
+  /* Cadre dimensionné sur un vrai téléphone (393×852 CSS, réf. iPhone 14/15 —
+     proche aussi des Android courants type Redmi Note 13). --mpv-w calcule la
+     largeur EXTÉRIEURE (bordure incluse, box-sizing:border-box) en respectant
+     toujours ce ratio réel (413:872, bordure 10px incluse) : jamais la largeur
+     et la hauteur contraintes indépendamment (c'est ce qui rognait le menu
+     affiché avant — le cadre n'avait pas les proportions d'un vrai écran). */
   #menu-preview-modal {
+    --mpv-w: min(413px, 92vw, calc((100vh - 110px) * 413 / 872));
     display:none; position:fixed; inset:0; z-index:10011;
     background:rgba(8,6,4,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     align-items:center; justify-content:center; flex-direction:column; padding:24px;
   }
-  .mpv-topbar { display:flex; align-items:center; justify-content:space-between; width:390px; max-width:100%; margin-bottom:14px; }
+  .mpv-topbar { display:flex; align-items:center; justify-content:space-between; width:var(--mpv-w); max-width:100%; margin-bottom:14px; }
   .mpv-title { font-family:'Crimson Pro',Georgia,serif; font-size:1.0rem; font-weight:600; color:#c8a44e; }
   .mpv-close-btn {
     width:36px; height:36px; flex-shrink:0; border-radius:50%;
@@ -2793,8 +2800,9 @@
   .mpv-close-btn:hover { background:rgba(255,255,255,0.16); }
   .mpv-close-btn:active { transform:scale(0.92); }
   .mpv-phone {
-    position:relative; width:390px; max-width:92vw;
-    height:min(844px, calc(100vh - 130px));
+    position:relative; box-sizing:border-box;
+    width:var(--mpv-w); max-width:92vw;
+    aspect-ratio:413/872;
     background:#000; border:10px solid #131110; border-radius:46px;
     box-shadow:0 34px 90px rgba(0,0,0,0.65), 0 0 0 1.5px rgba(255,255,255,0.07), inset 0 0 0 2px rgba(0,0,0,0.4);
     overflow:hidden;
