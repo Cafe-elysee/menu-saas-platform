@@ -8515,6 +8515,17 @@ function _showPaymentReminderPopup(sub, t) {
   });
 }
 
+// Prix réel du forfait/mode donné — même lecture que les boutons de la grille
+// (_renderSubSection) : prix per-combo Firebase (_subData.prices) en priorité,
+// sinon le prix standard. Ne jamais utiliser un prix codé en dur seul, sinon
+// le popup de confirmation affiche un prix différent de celui vu sur la carte.
+function _subPriceFor(forfait, mode) {
+  const isCS = forfait === 'commandes-services';
+  const key = (isCS ? 'srv' : 'qr') + '-' + (mode === 'annual' ? 'annual' : 'monthly');
+  const fallback = isCS ? (mode === 'annual' ? 990 : 99) : (mode === 'annual' ? 490 : 49);
+  return (_subData?.prices && _subData.prices[key] != null) ? _subData.prices[key] : fallback;
+}
+
 async function _changeSubscription(newForfait, newMode) {
   const t          = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const curForfait = _subData?.forfait      || 'menu-qr';
@@ -8558,7 +8569,7 @@ async function _changeSubscription(newForfait, newMode) {
 
   // Confirmation normale
   const isCSNew = newForfait === 'commandes-services';
-  const newPrice = isCSNew ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
+  const newPrice = _subPriceFor(newForfait, newMode);
   const newFLbl  = isCSNew ? (t.subForfaitCS || 'Commandes & Services') : (t.subForfaitMenuQR || 'Menu QR');
   const newMLbl  = newMode === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
   const isUpgrade = newForfait === 'commandes-services' && curForfait !== 'commandes-services';
@@ -8581,11 +8592,11 @@ async function _doChangeSubscription(newForfait, newMode, t) {
   if (fb) fb.textContent = t.subChanging || 'Mise à jour…';
   try {
     const isCS       = newForfait === 'commandes-services';
-    const stdPrice   = isCS ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
+    const stdPrice   = _subPriceFor(newForfait, newMode);
     // Conserver le prix custom si l'utilisateur en a saisi un, sinon prix standard du forfait
     const inpEl      = document.getElementById('sub-price-inp');
     const customP    = inpEl ? parseInt(inpEl.value, 10) : NaN;
-    const newPrice   = (customP > 0 && customP !== (isCS ? (newMode==='annual'?990:99):(newMode==='annual'?490:49)) ? customP : stdPrice);
+    const newPrice   = (customP > 0 && customP !== stdPrice ? customP : stdPrice);
     const newFeats   = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
     const now        = Date.now();
     await Promise.all([
