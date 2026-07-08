@@ -2777,19 +2777,25 @@
      les clients sur mobile, quelle que soit la taille de l'écran de l'ordinateur.
      Sur mobile, "Voir le menu" navigue directement (pas de popup) — voir openMenuPreview(). -->
 <style>
-  /* Cadre dimensionné sur un vrai téléphone (393×852 CSS, réf. iPhone 14/15 —
-     proche aussi des Android courants type Redmi Note 13). --mpv-w calcule la
-     largeur EXTÉRIEURE (bordure incluse, box-sizing:border-box) en respectant
-     toujours ce ratio réel (413:872, bordure 10px incluse) : jamais la largeur
-     et la hauteur contraintes indépendamment (c'est ce qui rognait le menu
-     affiché avant — le cadre n'avait pas les proportions d'un vrai écran). */
+  /* Simule un VRAI téléphone (393×852 CSS px de contenu, réf. iPhone 14/15 —
+     proche des Android courants type Redmi Note 13, ~393 CSS px). L'iframe
+     est TOUJOURS rendue à cette taille fixe réelle — le site à l'intérieur
+     voit donc EXACTEMENT le même viewport qu'un vrai téléphone (mêmes
+     media queries, mêmes tailles de police, mêmes proportions). Si la
+     fenêtre du navigateur est trop petite pour l'afficher à 100%, on
+     réduit l'AFFICHAGE VISUEL avec transform:scale() (calculé en JS,
+     voir _mpvApplyScale) — exactement la technique utilisée par les
+     outils de simulation d'appareil professionnels (Chrome DevTools,
+     Responsively...). Ne JAMAIS revenir à une largeur d'iframe variable
+     (min()/aspect-ratio) : cela change le viewport réel vu par le site et
+     fausse ses points de rupture responsive — c'est ce qui donnait un
+     rendu "trop grand, avec moins de détails" que sur un vrai téléphone. */
   #menu-preview-modal {
-    --mpv-w: min(413px, 92vw, calc((100vh - 110px) * 413 / 872));
     display:none; position:fixed; inset:0; z-index:10011;
     background:rgba(8,6,4,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     align-items:center; justify-content:center; flex-direction:column; padding:24px;
   }
-  .mpv-topbar { display:flex; align-items:center; justify-content:space-between; width:var(--mpv-w); max-width:100%; margin-bottom:14px; }
+  .mpv-topbar { display:flex; align-items:center; justify-content:space-between; width:393px; max-width:92vw; margin-bottom:14px; }
   .mpv-title { font-family:'Crimson Pro',Georgia,serif; font-size:1.0rem; font-weight:600; color:#c8a44e; }
   .mpv-close-btn {
     width:36px; height:36px; flex-shrink:0; border-radius:50%;
@@ -2799,10 +2805,11 @@
   }
   .mpv-close-btn:hover { background:rgba(255,255,255,0.16); }
   .mpv-close-btn:active { transform:scale(0.92); }
+  .mpv-scale-wrap { position:relative; }
   .mpv-phone {
     position:relative; box-sizing:border-box;
-    width:var(--mpv-w); max-width:92vw;
-    aspect-ratio:413/872;
+    width:413px; height:872px;
+    transform-origin:top center;
     background:#000; border:10px solid #131110; border-radius:46px;
     box-shadow:0 34px 90px rgba(0,0,0,0.65), 0 0 0 1.5px rgba(255,255,255,0.07), inset 0 0 0 2px rgba(0,0,0,0.4);
     overflow:hidden;
@@ -2818,9 +2825,11 @@
     <div class="mpv-title" data-uitxt="previewTitle">Aperçu du menu</div>
     <button id="menu-preview-close-btn" class="mpv-close-btn" aria-label="Fermer" title="Fermer">✕</button>
   </div>
-  <div class="mpv-phone">
-    <div class="mpv-notch"></div>
-    <iframe id="menu-preview-iframe" src="" title="Aperçu du menu"></iframe>
+  <div class="mpv-scale-wrap" id="mpv-scale-wrap">
+    <div class="mpv-phone" id="mpv-phone">
+      <div class="mpv-notch"></div>
+      <iframe id="menu-preview-iframe" src="" title="Aperçu du menu"></iframe>
+    </div>
   </div>
 </div>
 
@@ -5123,6 +5132,18 @@ function openHeroCropModal(dataUrl, onConfirm) {
    Mobile : comportement d'origine (nouvel onglet) — l'appareil EST déjà un téléphone,
    pas besoin de simulation, et on évite toute complexité de popup sur petit écran. */
 let _menuPreviewOpen = false;
+const MPV_PHONE_W = 413, MPV_PHONE_H = 872; // taille réelle fixe (contenu 393x852 + bordure 10px)
+function _mpvApplyScale() {
+  const wrap  = document.getElementById('mpv-scale-wrap');
+  const phone = document.getElementById('mpv-phone');
+  if (!wrap || !phone) return;
+  const availW = Math.min(window.innerWidth * 0.92, window.innerWidth - 48);
+  const availH = window.innerHeight - 110;
+  const scale = Math.min(1, availW / MPV_PHONE_W, availH / MPV_PHONE_H);
+  phone.style.transform = 'scale(' + scale + ')';
+  wrap.style.width  = (MPV_PHONE_W * scale) + 'px';
+  wrap.style.height = (MPV_PHONE_H * scale) + 'px';
+}
 function openMenuPreview() {
   const url = 'index.html?rid=' + encodeURIComponent(_RID) + '&table=1';
   const isDesktop = window.matchMedia('(min-width:900px)').matches;
@@ -5133,6 +5154,7 @@ function openMenuPreview() {
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   _menuPreviewOpen = true;
+  _mpvApplyScale();
   history.pushState({ menuPreview: true }, '', location.href);
 }
 function closeMenuPreview(fromPopState) {
@@ -5149,6 +5171,7 @@ window.addEventListener('popstate', () => {
   if (_menuPreviewOpen) closeMenuPreview(true);
   if (_heroCropOpen && _heroCropForceClose) _heroCropForceClose();
 });
+window.addEventListener('resize', () => { if (_menuPreviewOpen) _mpvApplyScale(); });
 document.getElementById('menu-preview-close-btn')?.addEventListener('click', () => closeMenuPreview(false));
 
 /* ─── SECTION HERO IMAGE ─── */
