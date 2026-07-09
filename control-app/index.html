@@ -5113,6 +5113,7 @@ function loadDemoPhotos() {
 const CP_SLOTS_1  = [{ slot: 'img1', label: 'Photo' }];
 const CP_SLOTS_2  = [{ slot: 'img1', label: 'Photo 1' }, { slot: 'img2', label: 'Photo 2' }];
 const CP_SLOTS_3  = [{ slot: 'img1', label: 'Photo 1' }, { slot: 'img2', label: 'Photo 2' }, { slot: 'img3', label: 'Photo 3' }];
+const CP_SLOTS_5  = [1,2,3,4,5].map(n => ({ slot: 'img' + n, label: 'Photo ' + n }));
 const CP_SLOTS_DM = [{ slot: 'desktop', label: 'Bureau' }, { slot: 'mobile', label: 'Mobile' }];
 const CONTENT_ITEMS = {
   qr: [
@@ -5124,12 +5125,18 @@ const CONTENT_ITEMS = {
     { key: 'qr-autonomy',  icon: '🏅', title: 'L\'image de marque : votre professionnalisme',            slots: CP_SLOTS_2 }
   ],
   gx: [
-    { key: 'gx-themes', icon: '🎨', title: 'Plus de 15 thèmes', slots: CP_SLOTS_DM },
-    { key: 'gx-order',  icon: '🔔', title: 'Commande & appel serveur', slots: CP_SLOTS_DM },
-    { key: 'gx-server', icon: '📲', title: 'Application serveur temps réel', slots: CP_SLOTS_DM },
-    { key: 'gx-admin',  icon: '✏️', title: 'Administration simple', slots: CP_SLOTS_DM },
-    { key: 'gx-lang',   icon: '🌍', title: 'Menu en 5 langues', slots: CP_SLOTS_DM },
-    { key: 'gx-stats',  icon: '📊', title: 'Statistiques d\'activité', slots: CP_SLOTS_DM }
+    { key: 'gx-identity', icon: '🪪', title: 'A1 · Interface premium (identité visuelle)',      slots: CP_SLOTS_2 },
+    { key: 'gx-themes',   icon: '🎨', title: 'A2 · 31 thèmes, 15 couleurs',                      slots: CP_SLOTS_DM },
+    { key: 'gx-lang',     icon: '🌍', title: 'A3 · Menu multilingue interactif',                 slots: CP_SLOTS_5 },
+    { key: 'gx-nav',      icon: '🔍', title: 'A4 · Organisation & recherche',                    slots: CP_SLOTS_DM },
+    { key: 'gx-promo',    icon: '🏷️', title: 'A5 · Gestion commerciale & promotions',            slots: CP_SLOTS_DM },
+    { key: 'gx-options',  icon: '⚙️', title: 'A6 · Options avancées (dose & sucre)',              slots: CP_SLOTS_DM },
+    { key: 'gx-notif',    icon: '📢', title: 'A7 · Communication & programmation',                slots: CP_SLOTS_DM },
+    { key: 'gx-digital',  icon: '🔳', title: 'A8 · Digitalisation & QR Code',                     slots: CP_SLOTS_3 },
+    { key: 'gx-order',    icon: '🔔', title: 'B1 · Commande & appel serveur',                     slots: CP_SLOTS_3 },
+    { key: 'gx-qrtable',  icon: '🔲', title: 'B2 · QR Code par table',                            slots: CP_SLOTS_DM },
+    { key: 'gx-server',   icon: '📲', title: 'B3 · Application serveur & suivi client',           slots: CP_SLOTS_2 },
+    { key: 'gx-stats',    icon: '📊', title: 'B4 · Statistiques & analyse',                       slots: CP_SLOTS_DM }
   ]
 };
 const CP_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span>';
