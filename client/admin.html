@@ -8599,6 +8599,28 @@ async function _changeSubscription(newForfait, newMode) {
   const newMLbl  = newMode === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
   const isUpgrade = newForfait === 'commandes-services' && curForfait !== 'commandes-services';
   const isDownForfait = curForfait === 'commandes-services' && newForfait !== 'commandes-services';
+
+  // Downgrade Commande & Appels → Menu QR Code alors que l'abonnement annuel est déjà
+  // payé d'avance : proposer d'attendre la fin de la période payée (report programmé,
+  // appliqué automatiquement par le cron BP) plutôt que de perdre le reste déjà réglé.
+  // Ne concerne pas le passage inverse (upgrade) ni un client en période d'essai
+  // (aucun paiement engagé) ni un mode mensuel (rien à "perdre" en changeant tout de suite).
+  if (isDownForfait && !isInTrial && curMode === 'annual') {
+    const bs = 'display:inline-block;margin:6px 4px 0;padding:8px 14px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;';
+    _showAdmConfirm(
+      t.subAnnualWarnTitle || 'Changement de forfait annuel',
+      (t.subAnnualWarnMsg || 'Votre abonnement annuel a été réglé en avance à tarif réduit. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin.') +
+      '<div style="margin-top:14px;text-align:center">' +
+        '<button onclick="_hideAdmConfirm();_doScheduleForfait(\'' + newForfait + '\')" style="' + bs + 'background:rgba(200,164,78,.18);color:#c8a44e;border:1px solid #c8a44e">' + (t.subAnnualWarnKeep || '✓ Garder jusqu\'à la fin') + '</button>' +
+        '<button onclick="_hideAdmConfirm();_doChangeSubscription(\'' + newForfait + '\',\'' + newMode + '\')" style="' + bs + 'background:rgba(220,80,80,.15);color:#e07070;border:1px solid #e07070">' + (t.subAnnualWarnNow || 'Changer maintenant') + '</button>' +
+      '</div>',
+      '',
+      t.subConfirmCancel || 'Annuler',
+      null
+    );
+    return;
+  }
+
   const confirmTitle = isUpgrade ? (t.subUpgradeTitle || 'Passer à Commandes & Services ?')
                      : isDownForfait ? (t.subDowngradeTitle || 'Revenir à Menu QR ?')
                      : (t.subModeUpgradeTitle || 'Changer le mode de paiement ?');
@@ -8651,176 +8673,10 @@ async function _doChangeSubscription(newForfait, newMode, t) {
   }
 }
 
-/* ── DEPRECATED — kept for backward compat (called from pendingChange flow only) ── */
-async function _changeSubscriptionForfait(newForfait) {
-  const t         = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const isUpgrade = newForfait === 'commandes-services';
-  const payMode   = _subData?.paymentMode || 'annual';
-
-  // 1. Anti-spam : pas plus d'un changement par mois
-  const lastChange = _subData?.lastForfaitChange || 0;
-  if (lastChange && (Date.now() - lastChange) < 30 * 24 * 60 * 60 * 1000) {
-    const contactUrl = 'https://menu-pro-demo.vercel.app/#contact';
-    _showAdmConfirm(
-      t.subSpamTitle || 'Changement déjà effectué',
-      (t.subSpamMsg || 'Vous avez déjà modifié votre forfait ce mois-ci. Veuillez nous contacter.') +
-        ' <a href="' + contactUrl + '" onclick="window.open(this.href,\'_system\');return false;" style="color:#c8a44e;text-decoration:underline">' + (t.subSpamContact || 'Nous contacter') + '</a>',
-      t.subSpamContact || 'Nous contacter',
-      t.subSpamClose   || 'Fermer',
-      () => { window.open(contactUrl, '_system'); }
-    );
-    return;
-  }
-
-  // 2. Avertissement annuel (downgrade uniquement)
-  if (payMode === 'annual' && !isUpgrade) {
-    const btnStyle = 'display:inline-block;margin:6px 4px 0;padding:8px 14px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;';
-    _showAdmConfirm(
-      t.subAnnualWarnTitle || 'Changement de forfait annuel',
-      (t.subAnnualWarnMsg || 'Votre abonnement annuel a été réglé en avance à tarif réduit. Nous vous recommandons de profiter de votre forfait actuel jusqu\'à la fin.') +
-      '<div style="margin-top:14px;text-align:center">' +
-        '<button onclick="_hideAdmConfirm();_doScheduleForfait(\'' + newForfait + '\')" style="' + btnStyle + 'background:rgba(200,164,78,.18);color:#c8a44e;border:1px solid #c8a44e">' + (t.subAnnualWarnKeep || '✓ Garder jusqu\'à la fin') + '</button>' +
-        '<button onclick="_hideAdmConfirm();_doChangeForfait(\'' + newForfait + '\')" style="' + btnStyle + 'background:rgba(220,80,80,.15);color:#e07070;border:1px solid #e07070">' + (t.subAnnualWarnNow || 'Changer maintenant') + '</button>' +
-      '</div>',
-      '',
-      t.subConfirmCancel || 'Annuler',
-      null
-    );
-    return;
-  }
-
-  // 3. Confirmation normale
-  const title = isUpgrade ? (t.subUpgradeTitle || 'Passer à Commandes & Services ?') : (t.subDowngradeTitle || 'Revenir à Menu QR ?');
-  const msg   = isUpgrade ? (t.subUpgradeMsg   || 'Votre forfait passera à Commandes & Services.') : (t.subDowngradeMsg || 'Votre forfait passera à Menu QR.');
-  _showAdmConfirm(title, msg, t.subConfirmOk || 'Confirmer', t.subConfirmCancel || 'Annuler',
-    () => _doChangeForfait(newForfait, t)
-  );
-}
-
-async function _doChangeForfait(newForfait, t) {
-  if (!t) t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const btn = document.getElementById('sub-change-btn');
-  const fb  = document.getElementById('sub-change-fb');
-  if (btn) btn.disabled = true;
-  if (fb)  fb.textContent = t.subChanging || 'Mise à jour…';
-  try {
-    const isCS     = newForfait === 'commandes-services';
-    const payMode  = _subData?.paymentMode || 'annual';
-    const newPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
-    const newFeats = { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true };
-    const now      = Date.now();
-    await Promise.all([
-      _rref('/config/features').set(newFeats),
-      _rref('/config/subscription/forfait').set(newForfait),
-      _rref('/config/subscription/price').set(newPrice),
-      _rref('/config/subscription/lastForfaitChange').set(now)
-    ]);
-    const nameSnap = await _rref('profile/name').once('value');
-    const restName = nameSnap.val() || _RID;
-    fetch('/api/notify-forfait', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        rid: _RID, name: restName,
-        oldForfait: _subData?.forfait || 'menu-qr', newForfait,
-        email: _subData?.email || null, lang: currentLang, paymentMode: payMode,
-        isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt)
-      })
-    }).catch(() => {});
-    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subChanged || '✅ Forfait mis à jour'; }
-    setTimeout(() => _loadSubscriptionSection(), 1800);
-  } catch(e) {
-    if (btn) btn.disabled = false;
-    if (fb)  { fb.style.color = 'var(--red)'; fb.textContent = '❌ Erreur'; }
-  }
-}
-
-async function _changeSubscriptionPaymentMode(newMode) {
-  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const currentMode = _subData?.paymentMode || 'annual';
-  if (currentMode === newMode) return;
-
-  // 1. Anti-spam : pas plus d'un changement par mois
-  const lastChange = _subData?.lastPaymentModeChange || 0;
-  if (lastChange && (Date.now() - lastChange) < 30 * 24 * 60 * 60 * 1000) {
-    const contactUrl = 'https://menu-pro-demo.vercel.app/#contact';
-    _showAdmConfirm(
-      t.subSpamTitle || 'Changement déjà effectué',
-      (t.subSpamMsg || 'Vous avez déjà modifié votre forfait ce mois-ci. Veuillez nous contacter.') +
-        ' <a href="' + contactUrl + '" onclick="window.open(this.href,\'_system\');return false;" style="color:#c8a44e;text-decoration:underline">' + (t.subSpamContact || 'Nous contacter') + '</a>',
-      t.subSpamContact || 'Nous contacter',
-      t.subSpamClose   || 'Fermer',
-      () => { window.open(contactUrl, '_system'); }
-    );
-    return;
-  }
-
-  // 2. Avertissement annuel (downgrade vers mensuel uniquement)
-  if (currentMode === 'annual' && newMode === 'monthly') {
-    const btnStyle = 'display:inline-block;margin:6px 4px 0;padding:8px 14px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;';
-    _showAdmConfirm(
-      t.subModeAnnualWarnTitle || 'Changement de mode de paiement annuel',
-      (t.subModeAnnualWarnMsg || 'Votre abonnement annuel a été réglé en avance à tarif préférentiel.') +
-      '<div style="margin-top:14px;text-align:center">' +
-        '<button onclick="_hideAdmConfirm()" style="' + btnStyle + 'background:rgba(200,164,78,.18);color:#c8a44e;border:1px solid #c8a44e">' + (t.subModeAnnualWarnKeep || '✓ Garder jusqu\'à la fin') + '</button>' +
-        '<button onclick="_hideAdmConfirm();_doChangePaymentMode(\'' + newMode + '\')" style="' + btnStyle + 'background:rgba(220,80,80,.15);color:#e07070;border:1px solid #e07070">' + (t.subModeAnnualWarnNow || 'Changer maintenant') + '</button>' +
-      '</div>',
-      '',
-      t.subConfirmCancel || 'Annuler',
-      null
-    );
-    return;
-  }
-
-  // 3. Confirmation normale (passage en annuel)
-  const title = t.subModeUpgradeTitle || 'Passer en paiement annuel ?';
-  const msg   = t.subModeUpgradeMsg   || 'Votre abonnement passera en facturation annuelle.';
-  _showAdmConfirm(title, msg, t.subConfirmOk || 'Confirmer', t.subConfirmCancel || 'Annuler',
-    () => _doChangePaymentMode(newMode, t)
-  );
-}
-
-async function _doChangePaymentMode(newMode, t) {
-  if (!t) t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const btn  = document.getElementById('sub-change-mode-btn');
-  const fb   = document.getElementById('sub-change-fb');
-  if (btn) btn.disabled = true;
-  if (fb)  fb.textContent = t.subChanging || 'Mise à jour…';
-  try {
-    const forfait  = _subData?.forfait || 'menu-qr';
-    const isCS     = forfait === 'commandes-services';
-    const newPrice = isCS ? (newMode === 'annual' ? 990 : 99) : (newMode === 'annual' ? 490 : 49);
-    const now      = Date.now();
-    await Promise.all([
-      _rref('/config/subscription/paymentMode').set(newMode),
-      _rref('/config/subscription/price').set(newPrice),
-      _rref('/config/subscription/lastPaymentModeChange').set(now)
-    ]);
-    const nameSnap = await _rref('profile/name').once('value');
-    const restName = nameSnap.val() || _RID;
-    fetch('/api/notify-forfait', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        rid: _RID, name: restName,
-        oldForfait: forfait, newForfait: forfait,
-        email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
-        onlyPaymentMode: true
-      })
-    }).catch(() => {});
-    if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subModeChanged || '✅ Mode de paiement mis à jour'; }
-    setTimeout(() => _loadSubscriptionSection(), 1800);
-  } catch(e) {
-    if (btn) btn.disabled = false;
-    if (fb)  { fb.style.color = 'var(--red)'; fb.textContent = '❌ Erreur'; }
-  }
-}
-
 async function _doScheduleForfait(newForfait) {
   const t    = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const isCS = newForfait === 'commandes-services';
   const payMode = _subData?.paymentMode || 'annual';
-  const price   = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
+  const price   = _subPriceFor(newForfait, payMode);
   try {
     await Promise.all([
       _rref('/config/subscription/pendingChange').set({ forfait: newForfait, price }),
