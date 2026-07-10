@@ -1,6 +1,6 @@
 {
   "appId": "com.menupro.serveur",
-  "appName": "Menu Pro Serveur",
+  "appName": "GeNext Staff",
   "webDir": ".",
   "plugins": {
     "PushNotifications": {
