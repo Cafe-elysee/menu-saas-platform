@@ -1646,7 +1646,9 @@
     .theme-fab-row-title { font-size:0.85rem; color:var(--cream); font-weight:600; margin-bottom:3px; }
     .theme-fab-row-desc { font-size:0.74rem; color:var(--muted); line-height:1.4; }
     .theme-fab-row-switch { position:relative; cursor:pointer; flex-shrink:0; }
-    .theme-grid-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
+    .theme-grid-sep-wrap { width:100%; flex-basis:100%; }
+    .theme-grid-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .1rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; }
+    .theme-grid-sep-desc { width:100%; font-size:.7rem; font-weight:400; letter-spacing:normal; text-transform:none; color:var(--muted); padding:0 0 .4rem; }
     .tc-color-btn { background:none; border:1px solid rgba(200,164,78,0.3); border-radius:6px; color:rgba(200,164,78,0.7); cursor:pointer; font-size:0.78rem; padding:3px 8px; margin-left:auto; flex-shrink:0; transition:border-color 0.18s, color 0.18s; font-family:inherit; }
     .tc-color-btn:hover { border-color:var(--gold); color:var(--gold); }
     .adm-color-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:900; align-items:flex-end; justify-content:center; padding:0.75rem; }
@@ -7918,7 +7920,13 @@ function renderThemeSelector() {
   const hiddenData = hiddenThemesData || {};
   const layoutFamilies = new Set(LAYOUTS_DATA.map(l => l.family));
 
-  const makeSep = txt => { const d=document.createElement('div'); d.className='theme-grid-sep'; d.textContent=txt; return d; };
+  const makeSep = (txt, desc) => {
+    const wrap = document.createElement('div'); wrap.className = 'theme-grid-sep-wrap';
+    const d = document.createElement('div'); d.className = 'theme-grid-sep'; d.textContent = txt;
+    wrap.appendChild(d);
+    if (desc) { const p = document.createElement('div'); p.className = 'theme-grid-sep-desc'; p.textContent = desc; wrap.appendChild(p); }
+    return wrap;
+  };
 
   function getActiveAccent(id) {
     const tv = LAYOUTS_DATA.find(l => l.family === id);
@@ -7950,9 +7958,16 @@ function renderThemeSelector() {
   const carteThemes = staticThemes.filter(t => CARTE_IDS.has(t.id));
   const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id));
 
+  const _THEME_GROUP_T = {
+    carte:   { fr:'Carte',   en:'Basic',   el:'Κάρτα',   de:'Einfach', es:'Carta',   desc:{ fr:'Sans photo de produits',              en:'No product photos',                el:'Χωρίς φωτογραφίες προϊόντων',        de:'Ohne Produktfotos',              es:'Sin fotos de productos' } },
+    livre:   { fr:'Livre',   en:'Book',    el:'Βιβλίο',  de:'Buch',    es:'Libro',   desc:{ fr:'3 photos par catégorie',               en:'3 photos per category',            el:'3 φωτογραφίες ανά κατηγορία',        de:'3 Fotos pro Kategorie',          es:'3 fotos por categoría' } },
+    elegant: { fr:'Élégant', en:'Elegant', el:'Κομψό',   de:'Elegant', es:'Elegante',desc:{ fr:'1 photo pour chaque produit',          en:'1 photo per product',              el:'1 φωτογραφία ανά προϊόν',            de:'1 Foto pro Produkt',             es:'1 foto por producto' } }
+  };
+  const _tgtLbl = g => _THEME_GROUP_T[g][currentLang] || _THEME_GROUP_T[g].fr;
+  const _tgtDesc = g => _THEME_GROUP_T[g].desc[currentLang] || _THEME_GROUP_T[g].desc.fr;
+
   if (carteThemes.length > 0) {
-    const lbl = currentLang==='en'?'Basic':currentLang==='de'?'Einfach':currentLang==='es'?'Carta':'Carte';
-    grid.appendChild(makeSep(lbl));
+    grid.appendChild(makeSep(_tgtLbl('carte'), _tgtDesc('carte')));
     carteThemes.forEach(th => {
       const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
       grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
@@ -7960,8 +7975,7 @@ function renderThemeSelector() {
   }
 
   if (livreThemes.length > 0) {
-    const lbl = currentLang==='en'?'Book':currentLang==='de'?'Buch':currentLang==='es'?'Libro':'Livre';
-    grid.appendChild(makeSep(lbl));
+    grid.appendChild(makeSep(_tgtLbl('livre'), _tgtDesc('livre')));
     livreThemes.forEach(th => {
       const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
       grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
@@ -7970,8 +7984,7 @@ function renderThemeSelector() {
 
   const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenData[l.family]);
   if (visibleLayouts.length > 0) {
-    const lbl = currentLang==='en'?'Elegant':currentLang==='de'?'Elegant':currentLang==='es'?'Elegante':'Élégant';
-    grid.appendChild(makeSep(lbl));
+    grid.appendChild(makeSep(_tgtLbl('elegant'), _tgtDesc('elegant')));
     visibleLayouts.forEach(layout => {
       const isActive = layout.variants.some(v => v.id === currentMenuTheme);
       const name = layout.names[currentLang] || layout.names.fr || layout.names.en || '';
