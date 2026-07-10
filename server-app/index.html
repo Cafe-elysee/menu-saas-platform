@@ -107,11 +107,12 @@
     /* ── HEADER ── */
     .app-header {
       flex-shrink:0;
-      height:var(--hdr-h);
+      height:calc(var(--hdr-h) + env(safe-area-inset-top,0px));
       background-color: #080604;
       border-bottom:1px solid rgba(200,164,78,0.28);
       box-shadow:0 1px 0 rgba(200,164,78,0.10), 0 6px 28px rgba(0,0,0,0.32);
       padding:0 18px;
+      padding-top:env(safe-area-inset-top,0px);
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       position:relative; z-index:50; overflow:hidden;
     }

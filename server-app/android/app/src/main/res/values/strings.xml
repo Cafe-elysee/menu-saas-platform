@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GeNext Staff</string>
+    <string name="title_activity_main">GeNext Staff</string>
+    <string name="package_name">com.menupro.serveur</string>
+    <string name="custom_url_scheme">com.menupro.serveur</string>
+</resources>
