@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Politique de confidentialité — Menu Pro Serveur</title>
+<meta name="robots" content="index,follow">
+<style>
+  :root{
+    --bg:#0c0a08; --card:#151109; --line:rgba(200,164,78,.22); --gold:#c8a44e; --gold-l:#e2c278;
+    --text:#f1ead9; --muted:rgba(241,234,217,.68); --muted2:rgba(241,234,217,.45);
+  }
+  html.light{
+    --bg:#f5f0e8; --card:#ffffff; --line:rgba(140,110,45,.24);
+    --text:#1a1208; --muted:rgba(26,18,8,.72); --muted2:rgba(26,18,8,.48);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.7;transition:background .3s,color .3s;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:3rem 1.5rem 5rem}
+  header{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:1.1rem;letter-spacing:.02em}
+  .brand svg{width:26px;height:26px;color:var(--gold)}
+  .toolbar{display:flex;gap:.5rem}
+  .toolbar button{
+    font:inherit;font-size:.78rem;font-weight:600;padding:.5rem .9rem;border-radius:20px;
+    border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:.25s;
+  }
+  .toolbar button:hover,.toolbar button.on{border-color:var(--gold);color:var(--gold-l);background:rgba(200,164,78,.1)}
+  h1{font-size:clamp(1.5rem,4vw,2.1rem);margin:0 0 .4rem;letter-spacing:-.01em}
+  .updated{color:var(--muted2);font-size:.85rem;margin-bottom:2.5rem}
+  h2{font-size:1.15rem;color:var(--gold-l);margin:2.4rem 0 .8rem;letter-spacing:.01em}
+  p,li{color:var(--muted);font-size:.95rem}
+  ul{padding-left:1.3rem;margin:.6rem 0}
+  li{margin-bottom:.5rem}
+  strong{color:var(--text)}
+  a{color:var(--gold-l);text-decoration:none;border-bottom:1px solid rgba(200,164,78,.35)}
+  a:hover{border-color:var(--gold-l)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.5rem;margin-top:2.5rem}
+  .card p{margin:.3rem 0}
+  footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--muted2);font-size:.8rem}
+  [data-lang]{display:none}
+  [data-lang].on{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>GeNext</span>
+    </div>
+    <div class="toolbar">
+      <button id="btn-fr" class="on" onclick="setLang('fr')">FR</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+      <button id="btn-theme" onclick="toggleTheme()">🌓</button>
+    </div>
+  </header>
+
+  <div data-lang="fr" class="on">
+    <h1>Politique de confidentialité — Menu Pro Serveur</h1>
+    <p class="updated">Application Android « Menu Pro Serveur » (<code>com.menupro.serveur</code>) — dernière mise à jour : 10 juillet 2026.</p>
+
+    <p>Cette page explique simplement quelles informations l'application <strong>Menu Pro Serveur</strong> utilise, pourquoi, et comment elles sont protégées. Cette application est un outil professionnel destiné au <strong>personnel des restaurants</strong> utilisant la plateforme GeNext — elle n'est pas destinée au grand public.</p>
+
+    <h2>Ce que fait l'application</h2>
+    <p>Menu Pro Serveur permet au personnel d'un restaurant de recevoir en temps réel, sur son téléphone, les commandes passées par les clients via le menu QR code, ainsi que les appels serveur (demande d'aide à table).</p>
+
+    <h2>Informations utilisées</h2>
+    <ul>
+      <li><strong>Identifiant du restaurant</strong> (saisi une fois à l'installation) — permet de relier l'appareil au bon établissement, aucune information personnelle n'est demandée.</li>
+      <li><strong>Jeton de notification (Firebase Cloud Messaging)</strong> — identifiant technique généré par Google, utilisé uniquement pour envoyer les notifications de commandes/appels à l'appareil concerné.</li>
+      <li><strong>Commandes et appels du restaurant</strong> (numéro de table, contenu de la commande) — données opérationnelles du restaurant, pas d'informations sur l'identité des clients finaux (pas de nom, téléphone ou email collecté côté client via le menu).</li>
+      <li><strong>Préférences locales</strong> (langue, thème clair/sombre) — enregistrées uniquement sur l'appareil, jamais transmises.</li>
+    </ul>
+    <p>L'application <strong>ne collecte ni ne demande</strong> : localisation, contacts, photos, microphone, historique de navigation, ou tout identifiant publicitaire. Aucune donnée n'est vendue, louée ou partagée à des fins publicitaires.</p>
+
+    <h2>Où sont stockées les données</h2>
+    <p>Les données transitent par <strong>Firebase</strong> (Google Cloud), sous-traitant technique utilisé uniquement pour synchroniser les commandes/appels en temps réel et acheminer les notifications. Chaque restaurant est isolé des autres — le personnel d'un établissement ne peut jamais voir les données d'un autre établissement.</p>
+
+    <h2>Permissions techniques demandées</h2>
+    <ul>
+      <li><strong>Internet</strong> — nécessaire pour recevoir les commandes/appels en temps réel.</li>
+      <li><strong>Notifications</strong> — pour alerter le personnel d'une nouvelle commande ou d'un appel.</li>
+      <li><strong>Vibration</strong> — signal d'alerte physique lors d'une notification.</li>
+      <li><strong>Démarrage automatique</strong> — permet de rester connecté aux notifications après redémarrage du téléphone.</li>
+    </ul>
+
+    <h2>Conservation et suppression</h2>
+    <p>Les jetons de notification sont automatiquement invalidés en cas de désinstallation de l'application. Un restaurant qui cesse d'utiliser le service peut demander la suppression complète de ses données à tout moment (voir contact ci-dessous).</p>
+
+    <h2>Vos droits</h2>
+    <p>Pour toute question, demande d'accès ou de suppression de données, contactez-nous directement — voir la carte de contact ci-dessous.</p>
+
+    <div class="card">
+      <p><strong>Contact</strong></p>
+      <p>Email : <a href="mailto:gennextcontact@gmail.com">gennextcontact@gmail.com</a></p>
+      <p>Site : <a href="https://menu-pro-demo.vercel.app" target="_blank" rel="noopener">menu-pro-demo.vercel.app</a></p>
+    </div>
+  </div>
+
+  <div data-lang="en">
+    <h1>Privacy Policy — Menu Pro Serveur</h1>
+    <p class="updated">Android app "Menu Pro Serveur" (<code>com.menupro.serveur</code>) — last updated: July 10, 2026.</p>
+
+    <p>This page explains, in plain language, what information the <strong>Menu Pro Serveur</strong> app uses, why, and how it is protected. This app is a professional tool for <strong>restaurant staff</strong> using the GeNext platform — it is not intended for the general public.</p>
+
+    <h2>What the app does</h2>
+    <p>Menu Pro Serveur lets restaurant staff receive, in real time on their phone, orders placed by customers through the QR code menu, as well as table-service calls (help requests).</p>
+
+    <h2>Information used</h2>
+    <ul>
+      <li><strong>Restaurant ID</strong> (entered once during setup) — links the device to the correct establishment; no personal information is requested.</li>
+      <li><strong>Notification token (Firebase Cloud Messaging)</strong> — technical identifier generated by Google, used only to deliver order/call notifications to the relevant device.</li>
+      <li><strong>Restaurant orders and calls</strong> (table number, order content) — operational restaurant data, no identifying information about end customers is collected (no name, phone, or email collected via the menu itself).</li>
+      <li><strong>Local preferences</strong> (language, light/dark theme) — stored on-device only, never transmitted.</li>
+    </ul>
+    <p>The app <strong>does not collect or request</strong>: location, contacts, photos, microphone, browsing history, or any advertising identifier. No data is sold, rented, or shared for advertising purposes.</p>
+
+    <h2>Where data is stored</h2>
+    <p>Data flows through <strong>Firebase</strong> (Google Cloud), a technical processor used solely to sync orders/calls in real time and deliver notifications. Each restaurant is isolated from the others — staff at one establishment can never see another establishment's data.</p>
+
+    <h2>Technical permissions requested</h2>
+    <ul>
+      <li><strong>Internet</strong> — required to receive orders/calls in real time.</li>
+      <li><strong>Notifications</strong> — to alert staff of a new order or call.</li>
+      <li><strong>Vibration</strong> — physical alert signal on notification.</li>
+      <li><strong>Auto-start on boot</strong> — keeps the device connected to notifications after a phone restart.</li>
+    </ul>
+
+    <h2>Retention and deletion</h2>
+    <p>Notification tokens are automatically invalidated when the app is uninstalled. A restaurant that stops using the service may request full deletion of its data at any time (see contact below).</p>
+
+    <h2>Your rights</h2>
+    <p>For any question, or to request access to or deletion of data, please contact us directly — see the contact card below.</p>
+
+    <div class="card">
+      <p><strong>Contact</strong></p>
+      <p>Email: <a href="mailto:gennextcontact@gmail.com">gennextcontact@gmail.com</a></p>
+      <p>Website: <a href="https://menu-pro-demo.vercel.app" target="_blank" rel="noopener">menu-pro-demo.vercel.app</a></p>
+    </div>
+  </div>
+
+  <footer>© 2026 GeNext — Menu Pro Serveur</footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  function setLang(l){
+    document.querySelectorAll('[data-lang]').forEach(function(el){ el.classList.toggle('on', el.getAttribute('data-lang')===l); });
+    document.getElementById('btn-fr').classList.toggle('on', l==='fr');
+    document.getElementById('btn-en').classList.toggle('on', l==='en');
+    try{ localStorage.setItem('privacy_lang', l); }catch(e){}
+  }
+  window.setLang = setLang;
+  function toggleTheme(){
+    var isLight = document.documentElement.classList.toggle('light');
+    try{ localStorage.setItem('privacy_theme', isLight ? 'light' : 'dark'); }catch(e){}
+  }
+  window.toggleTheme = toggleTheme;
+  try{
+    var savedTheme = localStorage.getItem('privacy_theme');
+    if (savedTheme === 'light') document.documentElement.classList.add('light');
+    var savedLang = localStorage.getItem('privacy_lang');
+    if (savedLang === 'en') setLang('en');
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
