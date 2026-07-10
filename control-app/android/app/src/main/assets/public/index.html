@@ -1940,6 +1940,23 @@
         </div>
         <div id="cp-group-gx"></div>
       </div>
+
+      <div class="settings-section">
+        <div class="settings-title">📖 Guide utilisateur — Photos des articles</div>
+        <button class="dp-open-demo-btn" style="margin-bottom:1rem" onclick="window.open('https://menu-pro-demo.vercel.app/guide.html','_system')">🔗 Ouvrir le Guide</button>
+        <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
+          Une photo par article. Sans photo ajoutée ici, l'article utilise sa capture d'écran par défaut (ou reste sans photo).
+        </div>
+
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">🛠️ Panneau d'administration</div>
+        <div id="cp-group-guide-admin" style="margin-bottom:1.1rem"></div>
+
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📱 Application Serveur</div>
+        <div id="cp-group-guide-serveur" style="margin-bottom:1.1rem"></div>
+
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">🍽️ Menu client</div>
+        <div id="cp-group-guide-menu"></div>
+      </div>
     </div>
 
     <!-- TAB RÉGLAGES -->
@@ -2553,6 +2570,8 @@ function initFirebase() {
   loadDemoPhotos();
   buildContentPhotosUI();
   loadContentPhotos();
+  buildGuidePhotosUI();
+  loadGuidePhotos();
   buildThemeGalleryUI();
   loadThemeGallery();
   if (_pendingFcmToken) { saveControlToken(_pendingFcmToken); _pendingFcmToken = null; }
@@ -5243,6 +5262,138 @@ function loadContentPhotos() {
     [...CONTENT_ITEMS.qr, ...CONTENT_ITEMS.gx].forEach(item => {
       const entry = data[item.key] || {};
       item.slots.forEach(s => showContentPhoto(item.key, s.slot, entry[s.slot] || ''));
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════
+// PAGE DÉMO — Photos des articles du Guide (une photo par article)
+// Firebase demoPage/guideContent/{articleId} — URL directe (pas de sous-slot)
+// ════════════════════════════════════════════════════
+const GUIDE_ITEMS = {
+  admin: [
+    { key: 'adm-connexion',   title: "Se connecter à l'administration" },
+    { key: 'adm-dashboard',   title: "Vue d'ensemble du panneau" },
+    { key: 'adm-categories',  title: 'Créer et organiser vos catégories' },
+    { key: 'adm-produits',    title: 'Ajouter et modifier un produit' },
+    { key: 'adm-happyhour',   title: 'Happy Hour et réductions' },
+    { key: 'adm-themes',      title: 'Changer de thème et de couleur' },
+    { key: 'adm-couleur',     title: "Personnaliser la couleur d'accent" },
+    { key: 'adm-fete',        title: 'Animation pour les fêtes' },
+    { key: 'adm-commandes',   title: 'Suivre commandes et appels' },
+    { key: 'adm-statistiques',title: 'Consulter vos statistiques' },
+    { key: 'adm-qrcodes',     title: 'Générer vos codes QR de table' },
+    { key: 'adm-reglages',    title: 'Accès, mot de passe et langues' },
+    { key: 'adm-abonnement',  title: 'Abonnement, paiement et assistance' }
+  ],
+  serveur: [
+    { key: 'srv-installation',      title: "Installer l'application Serveur" },
+    { key: 'srv-appels-commandes',  title: 'Recevoir appel de table et commande' },
+    { key: 'srv-astuces',           title: 'Astuces pour une équipe sereine' }
+  ],
+  menu: [
+    { key: 'menu-decouverte', title: 'Scanner le QR code et découvrir le menu' },
+    { key: 'menu-recherche',  title: 'Rechercher et filtrer un plat' },
+    { key: 'menu-produit',    title: "La fiche détaillée d'un produit" },
+    { key: 'menu-commander',  title: 'Commander et appeler le serveur' },
+    { key: 'menu-langues',    title: 'Changer de langue et de thème (client)' }
+  ]
+};
+function _guSlotHtml(item) {
+  return '<div class="cp-item">' +
+    '<div class="cp-item-head"><span class="cp-item-title">' + item.title + '</span></div>' +
+    '<div class="cp-slots"><div class="cp-slot">' +
+      '<div class="dp-preview dp-preview-sm" id="dp-prev-guide-' + item.key + '">' +
+        '<img id="dp-img-guide-' + item.key + '" alt="">' +
+        '<div class="dp-cam">' + CP_CAM_SVG + '</div>' +
+        '<div class="dp-loading" id="dp-load-guide-' + item.key + '"><div class="dp-spinner"></div></div>' +
+      '</div>' +
+      '<div class="dp-btns">' +
+        '<label class="dp-upload-btn">📷<input type="file" accept="image/*" style="display:none" onchange="uploadGuidePhoto(\'' + item.key + '\',this)"></label>' +
+        '<button class="dp-del-btn" onclick="deleteGuidePhoto(\'' + item.key + '\')" title="Supprimer">✕</button>' +
+      '</div>' +
+    '</div></div>' +
+  '</div>';
+}
+function buildGuidePhotosUI() {
+  const adminEl   = document.getElementById('cp-group-guide-admin');
+  const serveurEl = document.getElementById('cp-group-guide-serveur');
+  const menuEl    = document.getElementById('cp-group-guide-menu');
+  if (adminEl)   adminEl.innerHTML   = GUIDE_ITEMS.admin.map(_guSlotHtml).join('');
+  if (serveurEl) serveurEl.innerHTML = GUIDE_ITEMS.serveur.map(_guSlotHtml).join('');
+  if (menuEl)    menuEl.innerHTML    = GUIDE_ITEMS.menu.map(_guSlotHtml).join('');
+}
+function showGuidePhoto(key, url) {
+  const img  = document.getElementById('dp-img-guide-' + key);
+  const prev = document.getElementById('dp-prev-guide-' + key);
+  const load = document.getElementById('dp-load-guide-' + key);
+  if (!img || !prev) return;
+  if (load) load.classList.remove('active');
+  if (!url) {
+    img.src = ''; img.style.display = 'none';
+    prev.classList.remove('has-photo');
+    const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = '';
+    return;
+  }
+  img.src = url; img.style.display = 'block';
+  prev.classList.add('has-photo');
+  const cam = prev.querySelector('.dp-cam'); if (cam) cam.style.display = 'none';
+}
+function _guSetLoading(key, on) {
+  const load = document.getElementById('dp-load-guide-' + key);
+  if (load) load.classList.toggle('active', on);
+}
+function uploadGuidePhoto(key, input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > DP_MAX_W) { h = Math.round(h * DP_MAX_W / w); w = DP_MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      showGuidePhoto(key, canvas.toDataURL('image/jpeg', 0.82));
+      _guSetLoading(key, true);
+      showToast('Upload en cours…');
+
+      canvas.toBlob(async blob => {
+        try {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', DP_PRESET);
+          const res  = await fetch('https://api.cloudinary.com/v1_1/' + DP_CLOUD + '/image/upload', { method:'POST', body:fd });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+          showGuidePhoto(key, json.secure_url);
+          await _saasDb.ref('demoPage/guideContent/' + key).set(json.secure_url);
+          showToast('Photo enregistrée ✓');
+        } catch(err) {
+          showGuidePhoto(key, '');
+          showToast('Erreur upload : ' + err.message);
+        }
+      }, 'image/jpeg', 0.82);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+async function deleteGuidePhoto(key) {
+  await _saasDb.ref('demoPage/guideContent/' + key).set(null);
+  showGuidePhoto(key, '');
+  showToast('Photo supprimée');
+}
+function loadGuidePhotos() {
+  if (!_saasDb) return;
+  _saasDb.ref('demoPage/guideContent').once('value').then(snap => {
+    const data = snap.val() || {};
+    [...GUIDE_ITEMS.admin, ...GUIDE_ITEMS.serveur, ...GUIDE_ITEMS.menu].forEach(item => {
+      showGuidePhoto(item.key, data[item.key] || '');
     });
   });
 }
