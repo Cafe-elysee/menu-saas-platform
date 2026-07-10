@@ -50,7 +50,13 @@
 
     "demoPage": {
       ".read": true,
-      ".write": true
+      ".write": true,
+
+      "guideContent": {
+        "$articleId": {
+          ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 500)"
+        }
+      }
     }
   }
 }
