@@ -149,17 +149,22 @@ module.exports = async function handler(req, res) {
   const safeAmt  = Number(amount) || 0;
 
   try {
-    let subject, html;
+    let subject, html, text;
     if (type === 'reactivation') {
       ({ subject, html } = buildReactivationEmail(safeLang, safeName));
+      text = safeName + ' — Compte GeNext réactivé\n\nGeNext — ' + process.env.GMAIL_USER;
     } else {
       ({ subject, html } = buildPaymentEmail(safeLang, safeName, safeAmt, paymentMode, Number(nextDue)));
+      text = safeName + ' — Paiement GeNext reçu : ' + safeAmt + '€\nProchain renouvellement : ' + new Date(Number(nextDue)).toISOString().slice(0, 10) + '\n\nGeNext — ' + process.env.GMAIL_USER;
     }
     await createTransport().sendMail({
-      from: `"GeNext" <${process.env.GMAIL_USER}>`,
-      to: email,
+      from:    `"GeNext" <${process.env.GMAIL_USER}>`,
+      replyTo: process.env.GMAIL_USER,
+      to:      email,
       subject,
       html,
+      text,
+      headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
       attachments: [LOGO_ATTACHMENT]
     });
     return res.status(200).json({ ok: true, email: 'sent' });

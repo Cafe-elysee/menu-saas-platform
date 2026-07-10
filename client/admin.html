@@ -8762,7 +8762,8 @@ async function _doChangeSubscription(newForfait, newMode, t) {
         rid: _RID, name: restName,
         oldForfait: _subData?.forfait || 'menu-qr', newForfait,
         email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
-        isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt)
+        isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt),
+        sid: sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess') || ''
       })
     }).catch(() => {});
     if (_subData) _subData.lastForfaitChange = now; // anti-spam immédiat (avant rechargement)
@@ -8791,7 +8792,8 @@ async function _doScheduleForfait(newForfait) {
         rid: _RID, name: restName,
         oldForfait: _subData?.forfait || 'menu-qr', newForfait,
         email: _subData?.email || null, lang: currentLang,
-        paymentMode: payMode, pending: true
+        paymentMode: payMode, pending: true,
+        sid: sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess') || ''
       })
     }).catch(() => {});
     const t2 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
@@ -8811,7 +8813,8 @@ async function _cancelScheduledForfait() {
       body: JSON.stringify({
         rid: _RID, name: '', oldForfait: '', newForfait: _subData?.forfait || 'menu-qr',
         email: null, lang: currentLang, paymentMode: _subData?.paymentMode || 'annual',
-        pending: 'cancel'
+        pending: 'cancel',
+        sid: sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess') || ''
       })
     }).catch(() => {});
     setTimeout(() => _loadSubscriptionSection(), 400);

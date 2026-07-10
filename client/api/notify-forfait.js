@@ -109,6 +109,32 @@ async function getAccessToken(sa) {
     req.on('error', reject); req.write(body); req.end();
   });
 }
+// Vérifie qu'une session admin valide existe pour ce rid (restaurants/{rid}/sessions/{sid})
+// avant d'honorer un changement de forfait — sans ça, n'importe qui connaissant un rid réel
+// pouvait forger une requête et modifier la facturation d'un client sans authentification.
+// Dégradation gracieuse si le service account est absent (même posture que fetchSaasPricing
+// ci-dessous) : ne bloque jamais le flux si l'infra de vérification elle-même est indisponible,
+// seulement si la session est explicitement absente/invalide.
+async function verifySession(rid, sid) {
+  if (!sid) return false;
+  try {
+    const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (!raw) return true; // infra de vérification indisponible — ne pas casser le flux existant
+    const sa = JSON.parse(raw);
+    const token = await getAccessToken(sa);
+    const url = SAAS_DB + '/restaurants/' + encodeURIComponent(rid) + '/sessions/' + encodeURIComponent(sid) + '.json?access_token=' + token;
+    return new Promise(resolve => {
+      const u = new URL(url);
+      const opts = { hostname: u.hostname, path: u.pathname + u.search, method: 'GET' };
+      const r2 = https.request(opts, r => {
+        let d = ''; r.on('data', c => d += c);
+        r.on('end', () => { try { resolve(JSON.parse(d) !== null); } catch(e) { resolve(false); } });
+      });
+      r2.on('error', () => resolve(true)); // erreur réseau de vérification — ne pas casser le flux
+      r2.end();
+    });
+  } catch(e) { return true; }
+}
 async function fetchSaasPricing() {
   try {
     const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -395,11 +421,16 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode, isTrial } = req.body || {};
+  const { rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode, isTrial, sid } = req.body || {};
   if (!rid || !newForfait) return res.status(400).json({ error: 'Missing rid or newForfait' });
 
   const VALID_FORFAITS = ['menu-qr', 'commandes-services'];
   if (!VALID_FORFAITS.includes(newForfait)) return res.status(400).json({ error: 'Invalid newForfait' });
+
+  // Exige une session admin valide pour ce rid — empêche un tiers connaissant un rid réel
+  // de modifier la facturation d'un client sans être authentifié sur son espace admin.
+  const sessionValid = await verifySession(rid, sid);
+  if (!sessionValid) return res.status(401).json({ error: 'Invalid or expired session' });
 
   const safeLang  = ['fr','en','el','de','es'].includes(lang) ? lang : 'fr';
   const safeMode  = paymentMode === 'annual' ? 'annual' : 'monthly';
@@ -450,8 +481,11 @@ module.exports = async function handler(req, res) {
       try {
         const { subject, html } = buildPaymentModeEmail(safeLang, safeName, safeMode, newForfait, effectivePriceObj);
         await createTransport().sendMail({
-          from: `"GeNext" <${process.env.GMAIL_USER}>`,
+          from:    `"GeNext" <${process.env.GMAIL_USER}>`,
+          replyTo: process.env.GMAIL_USER,
           to: email, subject, html,
+          text:    safeName + ' — Mode de paiement mis à jour : ' + (safeMode === 'annual' ? 'Annuel' : 'Mensuel') + '\n\nGeNext — ' + process.env.GMAIL_USER,
+          headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
           attachments: [LOGO_ATTACHMENT]
         });
         results.email = 'sent';
@@ -497,8 +531,11 @@ module.exports = async function handler(req, res) {
       try {
         const { subject, html } = buildPendingEmail(safeLang, safeName, newForfait, safeMode, effectivePriceObj);
         await createTransport().sendMail({
-          from: `"GeNext" <${process.env.GMAIL_USER}>`,
+          from:    `"GeNext" <${process.env.GMAIL_USER}>`,
+          replyTo: process.env.GMAIL_USER,
           to: email, subject, html,
+          text:    safeName + ' — Changement de forfait programmé vers ' + forfaitLabel + ' (fin de période)\n\nGeNext — ' + process.env.GMAIL_USER,
+          headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
           attachments: [LOGO_ATTACHMENT]
         });
         results.email = 'sent';
@@ -522,8 +559,11 @@ module.exports = async function handler(req, res) {
       try {
         const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, effectivePriceObj, !!isTrial);
         await createTransport().sendMail({
-          from: `"GeNext" <${process.env.GMAIL_USER}>`,
+          from:    `"GeNext" <${process.env.GMAIL_USER}>`,
+          replyTo: process.env.GMAIL_USER,
           to: email, subject, html,
+          text:    safeName + ' — Forfait ' + (isUpgrade ? 'mis à niveau' : 'modifié') + ' vers ' + forfaitLabel + '\n\nGeNext — ' + process.env.GMAIL_USER,
+          headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
           attachments: [LOGO_ATTACHMENT]
         });
         results.email = 'sent';
