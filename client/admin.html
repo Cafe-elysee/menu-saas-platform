@@ -4695,9 +4695,10 @@ function syncVisToggles() {
   if (orderBtn)  orderBtn.classList.toggle('on',  showOrder);
   const themeFabRow = document.getElementById('theme-fab-row');
   if (themeFabRow) {
-    // "Page Demo" (pagedemo) a ce bouton toujours actif d'office côté client,
-    // indépendamment de ce réglage — l'afficher ici serait trompeur (aucun effet réel).
-    themeFabRow.style.display = (_RID === 'pagedemo') ? 'none' : '';
+    // Visible pour tout client, y compris pagedemo/GeNext — le flag Firebase
+    // (menu/info/themeFabEnabled) pilote désormais aussi pagedemo, comme n'importe
+    // quel autre client (plus de comportement "toujours actif d'office").
+    themeFabRow.style.display = '';
   }
   const themeFabToggle = document.getElementById('theme-fab-toggle');
   if (themeFabToggle) themeFabToggle.checked = adminData.info.themeFabEnabled === true;

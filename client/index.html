@@ -7289,17 +7289,15 @@ function applyAdminData(data) {
       // Visibilité globale des photos
       showPhotos = data.info.showPhotos !== false;
 
-      // Bouton thème visiteurs (généralisé à tout client, cf. pagedemo) —
-      // pagedemo reste toujours actif d'office, jamais désactivé ici.
-      if (_RID !== _PD_RID) {
-        if (data.info.themeFabEnabled === true) {
-          _pdFabActive = true;
-          _pdEnsureFabInit();
-        } else if (_pdFabActive) {
-          _pdFabActive = false;
-          const themeFab = document.getElementById('pd-theme-fab');
-          if (themeFab) { themeFab.classList.remove('show'); themeFab.style.display = 'none'; }
-        }
+      // Bouton thème visiteurs — piloté par menu/info/themeFabEnabled pour TOUT
+      // client, y compris pagedemo/GeNext (plus de forçage "toujours actif d'office").
+      if (data.info.themeFabEnabled === true) {
+        _pdFabActive = true;
+        _pdEnsureFabInit();
+      } else if (_pdFabActive) {
+        _pdFabActive = false;
+        const themeFab = document.getElementById('pd-theme-fab');
+        if (themeFab) { themeFab.classList.remove('show'); themeFab.style.display = 'none'; }
       }
 
       // Barre de note / annonce
@@ -7367,9 +7365,10 @@ function _hsl2hex(h,s,l) {
 const _PD_RID       = 'pagedemo';
 const _PD_THEME_KEY = _RID + '_visitor_theme';
 const _PD_COLOR_KEY = _RID + '_visitor_color';
-// Actif d'office pour pagedemo ; activé pour tout autre client via le
-// toggle admin (menu/info/themeFabEnabled), lu dans applyAdminData().
-let _pdFabActive = (_RID === _PD_RID);
+// Activé pour tout client (y compris pagedemo/GeNext) via le toggle admin
+// (menu/info/themeFabEnabled), lu dans applyAdminData() — valeur initiale
+// neutre, corrigée dès que les données admin (cache ou Firebase) arrivent.
+let _pdFabActive = false;
 let _pdFabInitialized = false;
 function _pdEnsureFabInit() {
   if (!_pdFabActive || _pdFabInitialized) return;
