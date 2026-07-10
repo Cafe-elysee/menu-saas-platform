@@ -7925,7 +7925,7 @@ function buildFlipBook() {
       <div class="fp-menu-capsule"><div class="fp-menu-dot"></div></div>
       <svg class="fp-swipe-hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="${isAr ? '9,18 15,12 9,6' : '15,18 9,12 15,6'}"/></svg>
     </div>
-    ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_logoUrl}" alt="" style="border-radius:${_logoRadius}"></div>` : ''}
+    ${_logoUrl ? `<div class="fp-hc-logo-wrap"><img class="fp-hc-logo" src="${_esc(_logoUrl)}" alt="" style="border-radius:${_logoRadius}"></div>` : ''}
     <div class="fp-hc-card" style="${_logoUrl ? '' : 'padding-top:30px'}">
       <div class="fp-hc-name">${_esc(_restaurantName)}</div>
       ${u.tagline ? `<div class="fp-hc-tagline">${_esc(u.tagline)}</div>` : ''}
@@ -9977,7 +9977,7 @@ function _cardCinema(item) {
   card.style.transitionDelay = '0s';
   if (src) {
     card.innerHTML = `
-      <div class="cinema-bg" style="background-image:url('${src}')"></div>
+      <div class="cinema-bg" style="background-image:url('${_esc(src)}')"></div>
       <div class="cinema-overlay"></div>
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
@@ -10006,7 +10006,7 @@ function _cardStrip(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="strip-thumb"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="strip-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="strip-no-photo">${_camSvg}</div>`
       : '';
@@ -10039,7 +10039,7 @@ function _cardForest(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="forest-img-wrap"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="forest-img-wrap"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="forest-no-photo">${_camSvg}</div>`
       : '';
@@ -10066,7 +10066,7 @@ function _cardRose(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="por-img-w"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="por-img-w"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="por-no-photo">${_camSvg}</div>`
       : '';
@@ -10090,7 +10090,7 @@ function _cardEnseigne(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="ens-thumb"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="ens-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="ens-no-thumb">${_camSvg}</div>`
       : '';
@@ -10122,7 +10122,7 @@ function _cardVelvet(item, idx) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="vel-img-w"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="vel-img-w"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="vel-no-photo">${_camSvg}</div>`
       : '';
@@ -10152,7 +10152,7 @@ function _cardAurora(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const photoCol = src
-    ? `<div class="aurora-photo-col"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="aurora-photo-col"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="aurora-photo-col"><div class="aurora-no-photo">${_camSvg}</div></div>`
       : '';
@@ -10188,7 +10188,7 @@ function _cardPrestige(item) {
   card.innerHTML = `
     <div class="card-top">
       ${src
-        ? `<div class="c-img-w"><img class="c-img" src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+        ? `<div class="c-img-w"><img class="c-img" src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
         : photoEnabled
           ? `<div class="c-img-empty">${_camSvg}</div>`
           : ''}
@@ -10216,7 +10216,7 @@ function _cardSantorin(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="san-thumb"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="san-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="san-no-thumb">${_camSvg}</div>`
       : '';
@@ -10448,7 +10448,7 @@ function _cardEditorial(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="edt-thumb"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="edt-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="edt-no-thumb">${_camSvg}</div>`
       : '';
