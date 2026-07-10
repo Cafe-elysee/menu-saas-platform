@@ -8390,9 +8390,7 @@ function _subPayCash() {
   const tpay = _PAY_T[currentLang] || _PAY_T.fr;
   const rid  = _RID || '';
   const sub  = _subData || {};
-  const _isCS = (sub.forfait || '') === 'commandes-services';
-  const _subPrice = sub.price != null ? sub.price : (_isCS ? 99 : 49);
-  const price = _subPrice;
+  const price = sub.price != null ? sub.price : _subPriceFor(sub.forfait || 'menu-qr', sub.paymentMode || 'annual');
   const msgTemplate = tpay.cashMsg || 'Bonjour GeNext 👋\nID restaurant : {rid}\nMontant : {amt}€\nAdresse : \nDate et heure souhaitée : ';
   const msg  = msgTemplate.replace('{rid}', rid).replace('{amt}', price);
   const text = encodeURIComponent(msg);
@@ -8623,9 +8621,7 @@ function _checkPaymentReminderPopup(sub, t) {
 
 function _showPaymentReminderPopup(sub, t) {
   if (!t) t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const isCS = (sub.forfait || '') === 'commandes-services';
-  const pr = sub.price != null ? sub.price : (isCS ? 99 : 49);
-  const amt = pr;
+  const amt = sub.price != null ? sub.price : _subPriceFor(sub.forfait || 'menu-qr', sub.paymentMode || 'annual');
   const lbl = t.subMonthly || 'Abonnement';
   const title = t.payReminderTitle || '💳 Paiement en attente';
   const msg   = t.payReminderMsg   || 'Vous avez un paiement en attente de <strong style="color:#c8a44e">' + amt + '€</strong> (' + lbl + '). Réglez-le depuis la section <strong>Réglages → Mon abonnement</strong>.';
