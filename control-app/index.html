@@ -3351,7 +3351,8 @@ function _toggleSuspend(key) {
                 email: emailAddr,
                 name: d.restaurant || '',
                 lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                type: 'reactivation'
+                type: 'reactivation',
+                secret: 'GnCtrl_9f3kLp2QzR7mW4hT'
               })
             }).catch(function() {});
           }
@@ -3571,7 +3572,8 @@ function _markPaid(key) {
                 lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
                 amount: price,
                 paymentMode: d.paymentMode || 'monthly',
-                nextDue: update.nextReminderAt
+                nextDue: update.nextReminderAt,
+                secret: 'GnCtrl_9f3kLp2QzR7mW4hT'
               })
             }).catch(function() {});
           }
