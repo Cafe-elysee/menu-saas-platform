@@ -4280,6 +4280,12 @@ let _adminActiveWatching = false;
 
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
+  // Lien Guide : passe le rid + l'origine pour que le bouton Retour du Guide
+  // ramène vers CET admin, pas vers la page démo (voir demo-page/guide.html).
+  const _guideBtn = document.getElementById('adm-guide-btn');
+  if (_guideBtn && !document.body.classList.contains('demo-mode')) {
+    _guideBtn.href = 'https://menu-pro-demo.vercel.app/guide.html?from=admin&rid=' + encodeURIComponent(_RID);
+  }
   // Skeleton pendant le chargement Firebase initial
   const _catsList = document.getElementById('cats-list');
   if (_catsList && !_catsList.innerHTML.trim()) {
