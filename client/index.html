@@ -5706,9 +5706,12 @@
   .hc-ig { color:#e1306c; border-color:rgba(225,48,108,0.40); background:rgba(225,48,108,0.12); }
   .hc-fb { color:#1877f2; border-color:rgba(24,119,242,0.40); background:rgba(24,119,242,0.12); }
   .hc-tt { color:#00b4d8; border-color:rgba(0,180,216,0.40); background:rgba(0,180,216,0.12); }
+  .hc-review { color:#f9ab00; border-color:rgba(249,171,0,0.40); background:rgba(249,171,0,0.12); }
+  .hc-review svg { fill:currentColor; stroke:none; }
   html.light .hc-ig { color:#c2185b; border-color:rgba(194,24,91,0.45); background:rgba(194,24,91,0.09); }
   html.light .hc-fb { color:#1565c0; border-color:rgba(21,101,192,0.45); background:rgba(21,101,192,0.09); }
   html.light .hc-tt { color:#0097b2; border-color:rgba(0,151,178,0.45); background:rgba(0,151,178,0.09); }
+  html.light .hc-review { color:#b37c00; border-color:rgba(179,124,0,0.45); background:rgba(179,124,0,0.09); }
   .hc-wifi {
     font-size:0.72rem; color:var(--muted);
     margin:16px auto 0; display:flex; flex-direction:column; gap:5px; align-items:center;
@@ -6136,6 +6139,9 @@
     </a>
     <a id="hc-tt" class="hc-social-btn hc-tt" href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" style="display:none">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
+    </a>
+    <a id="hc-review" class="hc-social-btn hc-review" href="#" target="_blank" rel="noopener noreferrer" aria-label="Google" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     </a>
   </div>
   <div id="hc-wifi" class="hc-wifi" style="display:none">
@@ -7389,10 +7395,16 @@ function applyAdminData(data) {
         if (data.info.description?.[l])  UI[l].description = data.info.description[l];
       });
       // Réseaux sociaux et description dans hero-card
+      // Avis Google : masqué par défaut, actif uniquement si le restaurateur a coché
+      // le bouton ET renseigné un lien (opt-in — contrairement à showPhotos/showCallBtn
+      // qui sont actifs par défaut, cette fonctionnalité ne doit jamais apparaître
+      // avant une action explicite de configuration).
+      const _reviewActive = data.info.showGoogleReview === true && data.info.googleReviewUrl;
       applyHeroCardExtras(
         data.info.instagram || '',
         data.info.facebook  || '',
-        data.info.tiktok    || ''
+        data.info.tiktok    || '',
+        _reviewActive ? data.info.googleReviewUrl : ''
       );
 
       // Visibilité bouton serveur — pilotée uniquement par le toggle, indépendante du style
@@ -7457,6 +7469,7 @@ const _ARIA_LABELS = {
   remove:     { fr:'Retirer',           en:'Remove',            de:'Entfernen',          el:'Αφαίρεση',              es:'Remove'          },
   addCart:    { fr:'Ajouter au panier', en:'Add to cart',       de:'In den Warenkorb',   el:'Προσθήκη στο καλάθι',   es:'Add to cart'  },
   removeCart: { fr:'Retirer du panier', en:'Remove from cart',  de:'Aus dem Warenkorb',  el:'Αφαίρεση από το καλάθι',es:'Remove from cart' },
+  googleReview: { fr:'Laisser un avis Google', en:'Leave a Google review', de:'Google-Bewertung abgeben', el:'Αφήστε μια κριτική στο Google', es:'Dejar una reseña en Google' },
 };
 function _aria(key) { const m=_ARIA_LABELS[key]||{}; return m[lang]||m.fr||''; }
 
@@ -8026,12 +8039,13 @@ function buildFlipBook() {
   const isAr = false;
 
   const _fpDesc = u.description || '';
-  const _fpIgSrc = _igSrc, _fpFbSrc = _fbSrc, _fpTtSrc = _ttSrc;
-  const _fpSocialsHtml = (_fpIgSrc || _fpFbSrc || _fpTtSrc) ? `
+  const _fpIgSrc = _igSrc, _fpFbSrc = _fbSrc, _fpTtSrc = _ttSrc, _fpReviewSrc = _reviewSrc;
+  const _fpSocialsHtml = (_fpIgSrc || _fpFbSrc || _fpTtSrc || _fpReviewSrc) ? `
     <div class="hc-socials" style="margin-top:14px">
-      ${_fpIgSrc ? `<a class="hc-social-btn hc-ig" href="${_fpIgSrc}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>` : ''}
-      ${_fpFbSrc ? `<a class="hc-social-btn hc-fb" href="${_fpFbSrc}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>` : ''}
-      ${_fpTtSrc ? `<a class="hc-social-btn hc-tt" href="${_fpTtSrc}" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg></a>` : ''}
+      ${_fpIgSrc ? `<a class="hc-social-btn hc-ig" href="${_esc(_fpIgSrc)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>` : ''}
+      ${_fpFbSrc ? `<a class="hc-social-btn hc-fb" href="${_esc(_fpFbSrc)}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>` : ''}
+      ${_fpTtSrc ? `<a class="hc-social-btn hc-tt" href="${_esc(_fpTtSrc)}" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.54V6.79a4.85 4.85 0 01-1.04-.1z"/></svg></a>` : ''}
+      ${_fpReviewSrc ? `<a class="hc-social-btn hc-review" href="${_esc(_fpReviewSrc)}" target="_blank" rel="noopener noreferrer" aria-label="${_esc(_aria('googleReview'))}" title="${_esc(_aria('googleReview'))}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></a>` : ''}
     </div>` : '';
 
   const hero = document.createElement('div');
@@ -9532,16 +9546,23 @@ function _detectLogoShape(src) {
 }
 
 /* Réseaux sociaux hero-card */
-function applyHeroCardExtras(ig, fb, tt) {
-  _igSrc = ig || ''; _fbSrc = fb || ''; _ttSrc = tt || '';
+function applyHeroCardExtras(ig, fb, tt, review) {
+  _igSrc = ig || ''; _fbSrc = fb || ''; _ttSrc = tt || ''; _reviewSrc = review || '';
   const igEl = document.getElementById('hc-ig');
   const fbEl = document.getElementById('hc-fb');
   const ttEl = document.getElementById('hc-tt');
+  const reviewEl = document.getElementById('hc-review');
   const socials = document.getElementById('hc-socials');
   if (igEl) { igEl.style.display = ig ? '' : 'none'; if (ig) igEl.href = ig; }
   if (fbEl) { fbEl.style.display = fb ? '' : 'none'; if (fb) fbEl.href = fb; }
   if (ttEl) { ttEl.style.display = tt ? '' : 'none'; if (tt) ttEl.href = tt; }
-  if (socials) socials.style.display = (ig || fb || tt) ? '' : 'none';
+  if (reviewEl) {
+    reviewEl.style.display = review ? '' : 'none';
+    if (review) reviewEl.href = review;
+    reviewEl.setAttribute('aria-label', _aria('googleReview'));
+    reviewEl.title = _aria('googleReview');
+  }
+  if (socials) socials.style.display = (ig || fb || tt || review) ? '' : 'none';
 }
 
 /* ================================================
@@ -9577,7 +9598,7 @@ function _priceHtml(item) {
    HERO IMAGE
 ================================================ */
 let _heroImageSrc = '';
-let _igSrc = '', _fbSrc = '', _ttSrc = '';
+let _igSrc = '', _fbSrc = '', _ttSrc = '', _reviewSrc = '';
 
 function applyHeroImage(src) {
   _heroImageSrc = src || '';
