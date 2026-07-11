@@ -10771,13 +10771,27 @@ function createCard(item, idx) {
 
 /* ================================================
    SEARCH / FILTER
+   Recherche insensible aux accents/casse, par mots (chaque mot tapé
+   doit être trouvé quelque part — ordre indifférent, comme les
+   moteurs de recherche modernes), sur nom + description + catégorie.
 ================================================ */
+function _searchNorm(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+function _searchTokens(q) {
+  return _searchNorm(q).split(/\s+/).filter(Boolean);
+}
 function setupSearch() {
-  document.getElementById('search').addEventListener('input', filterItems);
+  var _searchDebounceT = null;
+  document.getElementById('search').addEventListener('input', function () {
+    clearTimeout(_searchDebounceT);
+    _searchDebounceT = setTimeout(filterItems, 120);
+  });
 }
 
 function filterItems() {
-  const q = document.getElementById('search').value.toLowerCase().trim();
+  const tokens = _searchTokens(document.getElementById('search').value);
+  const t = UI[lang];
   const secs = document.querySelectorAll('.cat-sec');
   let total = 0;
 
@@ -10785,15 +10799,17 @@ function filterItems() {
     const ci = sec.dataset.cat;
     const showCat = activeCat === 'all' || activeCat === ci;
     if (!showCat) { sec.classList.add('hide'); return; }
+    const catName = _searchNorm((t.cats && t.cats[ci]) || '');
 
     let secHits = 0;
     sec.querySelectorAll('.card').forEach(card => {
       const itemId = parseInt(card.dataset.item);
       const item = ITEMS.find(i => i.id === itemId);
       if (!item) { card.classList.add('hide'); return; }
-      const name = ((item.name && item.name[lang]) || '').toLowerCase();
-      const desc = ((item.desc && item.desc[lang]) || '').toLowerCase();
-      const match = !q || name.includes(q) || desc.includes(q);
+      const name = _searchNorm(item.name && item.name[lang]);
+      const desc = _searchNorm(item.desc && item.desc[lang]);
+      const haystack = name + ' ' + desc + ' ' + catName;
+      const match = tokens.length === 0 || tokens.every(tok => haystack.indexOf(tok) !== -1);
       card.classList.toggle('hide', !match);
       if (match) secHits++;
     });
