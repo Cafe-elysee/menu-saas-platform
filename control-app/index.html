@@ -1839,7 +1839,7 @@
       <div class="section-title">Page Démo</div>
 
       <div class="settings-section">
-        <button class="dp-open-demo-btn" onclick="window.open('https://menu-pro-demo.vercel.app/','_system')">🔗 Ouvrir la page Démo</button>
+        <button class="dp-open-demo-btn" onclick="window.open('https://genext-qr.com/','_system')">🔗 Ouvrir la page Démo</button>
       </div>
 
       <!-- Section Tarification / Prix publics -->
@@ -1943,7 +1943,7 @@
 
       <div class="settings-section">
         <div class="settings-title">📖 Guide utilisateur — Photos des articles</div>
-        <button class="dp-open-demo-btn" style="margin-bottom:1rem" onclick="window.open('https://menu-pro-demo.vercel.app/guide.html','_system')">🔗 Ouvrir le Guide</button>
+        <button class="dp-open-demo-btn" style="margin-bottom:1rem" onclick="window.open('https://genext-qr.com/guide.html','_system')">🔗 Ouvrir le Guide</button>
         <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.9rem; line-height:1.6;">
           Une photo par article. Sans photo ajoutée ici, l'article utilise sa capture d'écran par défaut (ou reste sans photo).
         </div>
@@ -2619,7 +2619,7 @@ function loadClientsFromFirebase() {
   if (!_saasDb) return;
   _saasDb.ref('restaurants').on('value', snap => {
     const data = snap.val() || {};
-    const SAAS_URL = 'https://menu-saas-platform.vercel.app';
+    const SAAS_URL = 'https://genext-qr.com';
     const loaded = Object.entries(data).filter(([slug]) => slug !== 'demo').map(([slug, r]) => ({
       name:     (r.profile && r.profile.name)     || slug,
       slug,
@@ -2757,8 +2757,8 @@ function _paySection(lang) {
 }
 
 function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
-  const adminUrl = 'https://menu-saas-platform.vercel.app/admin.html';
-  const menuUrl  = 'https://menu-saas-platform.vercel.app/?rid=' + rid + '&table=1';
+  const adminUrl = 'https://genext-qr.com/admin';
+  const menuUrl  = 'https://genext-qr.com/menu?rid=' + rid + '&table=1';
   const apkUrl   = 'https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk';
   const isCS     = forfait === 'Commandes & Services';
   const m = {
@@ -4238,7 +4238,7 @@ function buildClientCard(client) {
     '<div class="card-body"><div class="card-body-inner">'+
     '<div class="card-section"><div class="card-section-header">&#128100; Informations client</div>'+
       '<div class="card-links">'+
-        '<span class="card-link" onclick="window.open(\'https://menu-saas-platform.vercel.app/?rid='+s+'&table=1\',\'_system\')">Menu &#8599;</span>'+
+        '<span class="card-link" onclick="window.open(\'https://genext-qr.com/menu?rid='+s+'&table=1\',\'_system\')">Menu &#8599;</span>'+
         '<span class="card-link" onclick="openAdmin(event,\'' + s + '\')">Admin &#8599;</span>'+
       '</div>'+
       '<div class="info-edit-row">'+
@@ -4305,7 +4305,7 @@ function toggleCard(id) {
 }
 
 function copyAdminLink() {
-  const url = 'https://menu-saas-platform.vercel.app/admin.html';
+  const url = 'https://genext-qr.com/admin';
   navigator.clipboard.writeText(url).then(function() {
     const btn = document.querySelector('.btn-lien-admin');
     if (!btn) return;
@@ -4321,7 +4321,7 @@ function copyAdminLink() {
 async function openAdmin(e, slug) {
   e.preventDefault();
   await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
-  window.open('https://menu-saas-platform.vercel.app/admin.html?ctrl=1#rid=' + encodeURIComponent(slug), '_system');
+  window.open('https://genext-qr.com/admin?ctrl=1#rid=' + encodeURIComponent(slug), '_system');
 }
 
 async function toggleClientActive(slug) {

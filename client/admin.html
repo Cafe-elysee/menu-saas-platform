@@ -2371,7 +2371,7 @@
     <div class="global-progress" id="global-progress"></div>
   </div>
   <div class="adm-right">
-    <a class="btn-theme" id="adm-guide-btn" href="https://menu-pro-demo.vercel.app/guide.html" target="_blank" rel="noopener" title="Guide d'utilisation complet">
+    <a class="btn-theme" id="adm-guide-btn" href="https://genext-qr.com/guide.html" target="_blank" rel="noopener" title="Guide d'utilisation complet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </a>
     <button class="btn-theme" id="adm-theme-btn" title="Changer le thème">
@@ -4295,7 +4295,7 @@ function showAdmin() {
   // ramène vers CET admin, pas vers la page démo (voir demo-page/guide.html).
   const _guideBtn = document.getElementById('adm-guide-btn');
   if (_guideBtn && !document.body.classList.contains('demo-mode')) {
-    _guideBtn.href = 'https://menu-pro-demo.vercel.app/guide.html?from=admin&rid=' + encodeURIComponent(_RID);
+    _guideBtn.href = 'https://genext-qr.com/guide.html?from=admin&rid=' + encodeURIComponent(_RID);
   }
   // Skeleton pendant le chargement Firebase initial
   const _catsList = document.getElementById('cats-list');
@@ -8174,7 +8174,7 @@ async function _loadSubscriptionSection() {
 }
 
 function _copyReferLink(btn) {
-  const url = 'https://menu-pro-demo.vercel.app/';
+  const url = 'https://genext-qr.com/';
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const lbl = document.getElementById('refer-copy-lbl');
   navigator.clipboard.writeText(url).then(() => {
@@ -8264,7 +8264,7 @@ function _renderSubSection(el, t, sub) {
   }
   const creationHistRow = ''; // frais de création supprimés — démarrage 100% gratuit
 
-  const DEMO_URL = 'https://menu-pro-demo.vercel.app/';
+  const DEMO_URL = 'https://genext-qr.com/';
   const referBlock = `<div style="margin-top:14px;border:1px solid rgba(200,164,78,0.22);border-radius:14px;overflow:hidden;background:rgba(200,164,78,0.04)">
     <div style="padding:14px 16px 14px">
       <div style="font-size:0.85rem;font-weight:700;color:#c8a44e;margin-bottom:5px;display:flex;align-items:center;gap:6px">
@@ -8282,7 +8282,7 @@ function _renderSubSection(el, t, sub) {
       </button>
     </div>
   </div>`;
-  const contactUrl = 'https://menu-pro-demo.vercel.app/#contact';
+  const contactUrl = 'https://genext-qr.com/#contact';
   const contactBtn = `<div style="margin-top:10px;text-align:center">
     <button onclick="window.open('${contactUrl}','_system')" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:1px solid rgba(200,164,78,0.3);background:rgba(200,164,78,0.07);color:#c8a44e;font-size:0.81rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s" onmouseover="this.style.background='rgba(200,164,78,0.14)'" onmouseout="this.style.background='rgba(200,164,78,0.07)'">
       ${t.subContactBtn || '💬 Nous contacter'}
@@ -8591,7 +8591,7 @@ async function _changeSubscription(newForfait, newMode) {
   // Anti-spam : 1 changement max par mois (uniquement hors période d'essai)
   const lastChange = _subData?.lastForfaitChange || 0;
   if (!isInTrial && lastChange && (Date.now() - lastChange) < 30 * 24 * 60 * 60 * 1000) {
-    const contactUrl = 'https://menu-pro-demo.vercel.app/#contact';
+    const contactUrl = 'https://genext-qr.com/#contact';
     _showAdmConfirm(
       t.subSpamTitle || 'Changement déjà effectué',
       (t.subSpamMsg || 'Vous avez déjà modifié votre forfait ce mois-ci. Veuillez nous contacter.') +
