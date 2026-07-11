@@ -2306,6 +2306,13 @@
       border-radius:2px; border:1px dotted var(--border2);
     }
 
+    /* ── LIVRE D'OR (paper-elegant) ── */
+    html[data-menu-theme="paper-elegant"] .fp-item-right { flex-direction:row; align-items:center; gap:8px; }
+    /* Vignette « médaillon doré » — cercle fin bordé or, écho au relief d'un livre d'or */
+    html[data-menu-theme="paper-elegant"] .fp-item-thumb {
+      border-radius:50%; border:1px solid var(--gold);
+    }
+
     /* ── ÉDITORIAL: grande photo pleine hauteur gauche + texte droite ── */
     .card-editorial { display:flex; align-items:stretch; padding:0 !important; gap:0; }
     .edt-thumb { width:130px; flex-shrink:0; overflow:hidden; background:var(--bg2); }
