@@ -953,39 +953,6 @@
     .cat-row:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 2px 14px rgba(0,0,0,0.3); }
     .cat-row-ico { color:var(--gold); flex-shrink:0; }
     .cat-row-ico svg { width:18px; height:18px; }
-    /* Photos catégorie — 3 slots sous la ligne de catégorie */
-    .cat-photos-row {
-      flex-basis:100%; display:flex; align-items:flex-start; gap:10px;
-      padding-top:10px; margin-top:6px; border-top:1px solid var(--border);
-    }
-    .cat-photos-slots { display:flex; gap:10px; flex:1; }
-    /* Slot vertical : boutons en haut, image en dessous */
-    .cat-photo-slot {
-      display:flex; flex-direction:column; align-items:center; gap:5px;
-      flex:1; min-width:0;
-    }
-    .cat-photo-actions {
-      display:flex; gap:5px; align-items:center; justify-content:center; width:100%;
-    }
-    .cat-photo-thumb {
-      width:100%; max-width:80px; height:52px; border-radius:8px; object-fit:cover;
-      border:1px solid var(--border); display:block;
-    }
-    .cat-photo-btn {
-      flex:1; height:30px; border-radius:6px; border:1px dashed var(--border);
-      background:var(--bg3); color:var(--muted); font-size:0.85rem;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
-      transition:border-color 0.2s, color 0.2s;
-    }
-    .cat-photo-btn:hover { border-color:var(--gold); color:var(--gold); }
-    .cat-photo-clear {
-      width:26px; height:30px; border-radius:6px; border:1px solid rgba(224,82,82,0.3);
-      color:var(--red,#e05252); cursor:pointer; background:none;
-      opacity:0.75; display:flex; align-items:center; justify-content:center;
-      font-size:0.75rem; flex-shrink:0;
-    }
-    .cat-photo-clear:hover { opacity:1; background:rgba(224,82,82,0.08); }
-    input.cat-photo-input { display:none; }
     .inline-input {
       flex:1; min-width:100px; background:transparent; border:none; border-bottom:1px solid transparent;
       color:var(--cream); font-size:0.88rem; padding:6px 2px; outline:none; transition:border-color 0.2s;
@@ -1384,15 +1351,6 @@
     html.light .adm-sel-popup button { color:var(--cream); }
     html.light .adm-sel-popup button:hover { background:rgba(200,164,78,0.1); }
     /* ── Panneau Commandes (visibility managed by tab panel) ── */
-    /* En mode papier (flipbook) : cacher les photos produits — le flipbook n'utilise que les photos catégorie */
-    body[data-style="paper"] .photo-form-group { display:none !important; }
-    /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
-    body[data-style="paper"] .prod-thumb,
-    body[data-style="paper"] .prod-thumb-empty { display:none !important; }
-    /* En thème Carte : même comportement que Livre pour la section photo produits */
-    body[data-theme^="carte-"] .photo-form-group { display:none !important; }
-    body[data-theme^="carte-"] .prod-thumb,
-    body[data-theme^="carte-"] .prod-thumb-empty { display:none !important; }
     /* Dose & Sucre row dans le formulaire produit */
     .prod-vis-row { margin-top:12px; padding:8px 12px; background:rgba(200,164,78,0.06); border-radius:8px; border:1px solid rgba(200,164,78,0.14); }
     html.light .prod-vis-row { background:rgba(200,164,78,0.08); border-color:rgba(200,164,78,0.20); }
@@ -1432,9 +1390,6 @@
     .cat-vis-btn.on:hover { background:rgba(200,164,78,0.08); }
     .cat-vis-btn:not(.on) { opacity:0.5; }
     .cat-vis-btn:not(.on):hover { opacity:0.8; border-color:var(--red); color:var(--red); background:rgba(224,82,82,0.05); }
-    /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
-    .cat-photos-row { display:none; }
-    body[data-style="paper"] .cat-photos-row { display:flex !important; }
     .order-adm-card {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       overflow:hidden; margin-bottom:12px; transition:border-color 0.2s, box-shadow 0.2s;
@@ -5916,22 +5871,6 @@ function renderCatsSection() {
       ? (parts.length > 1 ? parts.slice(1).join(' ') : icoLabelFull)
       : _tCat.noneIco;
 
-    // Migration : flipPhoto (ancien) → flipPhotos (nouveau, 3 slots)
-    const rawPhotos = cat.flipPhotos || (cat.flipPhoto ? [cat.flipPhoto] : []);
-    const flipPhotos = [rawPhotos[0]||'', rawPhotos[1]||'', rawPhotos[2]||''];
-
-    const slotsHtml = flipPhotos.map((url, si) => `
-      <div class="cat-photo-slot">
-        <div class="cat-photo-actions">
-          <label class="cat-photo-btn" title="Photo ${si+1}/3">
-            ${url ? '🔄' : '📷'}
-            <input type="file" class="cat-photo-input" accept="image/*" data-ci="${ci}" data-slot="${si}">
-          </label>
-          ${url ? `<button class="cat-photo-clear" data-ci="${ci}" data-slot="${si}" title="Supprimer">✕</button>` : ''}
-        </div>
-        ${url ? `<img class="cat-photo-thumb" src="${esc(url)}" alt="">` : ''}
-      </div>`).join('');
-
     row.innerHTML = `
       <div class="drag-handle" title="${_tCat.btnMove}" draggable="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
@@ -5954,9 +5893,6 @@ function renderCatsSection() {
           }
         </button>
         <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
-      </div>
-      <div class="cat-photos-row">
-        <div class="cat-photos-slots">${slotsHtml}</div>
       </div>
       <div class="cat-sched-panel">
         <div class="cat-sched-header">
@@ -6115,57 +6051,6 @@ function renderCatsSection() {
       );
     });
 
-    // Photos flipbook — upload (3 slots)
-    row.querySelectorAll('.cat-photo-input').forEach(input => {
-      input.addEventListener('change', e => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const i  = parseInt(e.target.dataset.ci);
-        const si = parseInt(e.target.dataset.slot);
-        const label = e.target.closest('label');
-        const reader = new FileReader();
-        reader.onload = ev => {
-          const img = new Image();
-          img.onload = () => {
-            const MAX = 1200;
-            let w = img.width, h = img.height;
-            if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-            const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            const localUrl = canvas.toDataURL('image/jpeg', 0.82);
-            if (!adminData.cats[i].flipPhotos) adminData.cats[i].flipPhotos = ['','',''];
-            adminData.cats[i].flipPhotos[si] = localUrl;
-            markUnsaved();
-            label.innerHTML = `<span style="opacity:.6">⏳</span><input type="file" class="cat-photo-input" accept="image/*" data-ci="${i}" data-slot="${si}">`;
-            canvas.toBlob(blob => {
-              uploadToCloudinary(blob)
-                .then(url => {
-                  adminData.cats[i].flipPhotos[si] = url;
-                  markUnsaved();
-                  renderCatsSection();
-                })
-                .catch(() => { renderCatsSection(); });
-            }, 'image/jpeg', 0.82);
-          };
-          img.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-        e.target.value = '';
-      });
-    });
-
-    // Photos flipbook — supprimer (3 slots)
-    row.querySelectorAll('.cat-photo-clear').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const i  = parseInt(e.target.dataset.ci);
-        const si = parseInt(e.target.dataset.slot);
-        if (!adminData.cats[i].flipPhotos) adminData.cats[i].flipPhotos = ['','',''];
-        adminData.cats[i].flipPhotos[si] = '';
-        markUnsaved();
-        renderCatsSection();
-      });
-    });
   });
 }
 

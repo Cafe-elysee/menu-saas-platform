@@ -7241,9 +7241,7 @@ function applyAdminData(data) {
     CATS.length = 0;
     if (Array.isArray(data.cats) && data.cats.length > 0) {
       data.cats.forEach(c => {
-        // Migration flipPhoto → flipPhotos (3 slots)
-        const fp = c.flipPhotos || (c.flipPhoto ? [c.flipPhoto] : []);
-        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), flipPhotos: [fp[0]||'', fp[1]||'', fp[2]||''], visible: c.visible !== false, schedule: c.schedule || null });
+        CATS.push({ key: c.key, ico: c.ico, sub: buildSubFromNames(c.names), visible: c.visible !== false, schedule: c.schedule || null });
         // Injecter le nom dans UI[lang].cats pour chaque langue
         Object.keys(UI).forEach(l => {
           if (!UI[l].cats) UI[l].cats = [];
