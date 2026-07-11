@@ -7988,7 +7988,7 @@ function buildFlipBook() {
     }).join('');
 
     const photosHtml = activePhotos.length
-      ? `<div class="fp-cat-photos">${activePhotos.map(p => `<img src="${p}" alt="${_esc(catName)}" loading="lazy">`).join('')}</div>`
+      ? `<div class="fp-cat-photos">${activePhotos.map(p => `<img src="${_esc(p)}" alt="${_esc(catName)}" loading="lazy">`).join('')}</div>`
       : '';
 
     const page = document.createElement('div');

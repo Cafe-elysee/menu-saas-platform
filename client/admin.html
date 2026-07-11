@@ -5930,7 +5930,7 @@ function renderCatsSection() {
           </label>
           ${url ? `<button class="cat-photo-clear" data-ci="${ci}" data-slot="${si}" title="Supprimer">✕</button>` : ''}
         </div>
-        ${url ? `<img class="cat-photo-thumb" src="${url}" alt="">` : ''}
+        ${url ? `<img class="cat-photo-thumb" src="${esc(url)}" alt="">` : ''}
       </div>`).join('');
 
     row.innerHTML = `
@@ -6260,7 +6260,7 @@ function renderProdCard(container, item, ci) {
     : '';
 
   const thumbHTML = imgSrc
-    ? `<img class="prod-thumb" src="${imgSrc}" alt="" onerror="_admThumbErr(this)">`
+    ? `<img class="prod-thumb" src="${esc(imgSrc)}" alt="" onerror="_admThumbErr(this)">`
     : `<div class="prod-thumb-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <rect x="3" y="5" width="18" height="14" rx="2"/>
@@ -6724,7 +6724,7 @@ function buildProdForm(item) {
           <button type="button" class="btn-clear-photo" title="✕">✕</button>
         </div>
         ${photoSrc
-          ? `<img class="photo-preview" src="${photoSrc}" alt="" onerror="_admPreviewErr(this)">`
+          ? `<img class="photo-preview" src="${esc(photoSrc)}" alt="" onerror="_admPreviewErr(this)">`
           : `<div class="photo-preview-empty">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
