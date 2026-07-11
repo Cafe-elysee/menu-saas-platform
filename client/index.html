@@ -1776,10 +1776,14 @@
     .ben-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:6px; }
     .ben-badges { display:flex; gap:3px; flex-wrap:wrap; }
     .ben-price { font-size:0.88rem; color:var(--gold); font-weight:700; white-space:nowrap; }
-    .card-bento.has-thumb { flex-direction:row !important; align-items:stretch !important; gap:10px; }
+    /* Bento est en grille 2 colonnes (carte ~moitié largeur écran) : la photo se place
+       en bandeau PLEINE LARGEUR au-dessus du texte (jamais à côté), sinon elle grignote
+       une part disproportionnée d'une carte déjà étroite et fait déborder badges/prix. */
+    .card-bento.has-thumb { flex-direction:column !important; gap:8px; }
     .ben-body { flex:1; min-width:0; display:flex; flex-direction:column; }
-    .ben-thumb { width:60px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+    .ben-thumb { width:100%; height:84px; border-radius:8px; overflow:hidden; flex-shrink:0; }
     .ben-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .ben-price { flex-shrink:0; }
 
     /* — Télégraphe (points de conduite) — */
     html[data-menu-theme="carte-telegraphe"] .cat-name { font-family:'Courier New',monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; font-style:normal; color:var(--gold); }
@@ -2035,7 +2039,8 @@
       border-bottom:1px solid var(--border); padding:14px 0;
     }
     html[data-menu-theme="livre-azure"] .fp-item-right {
-      order:-1; margin-left:0; margin-bottom:4px; align-items:flex-start;
+      order:-1; margin-left:0; margin-bottom:4px;
+      flex-direction:row; align-items:center; gap:10px;
     }
     html[data-menu-theme="livre-azure"] .fp-item-price {
       font-family:'Outfit',sans-serif; font-size:1.45rem; font-weight:700;
