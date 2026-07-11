@@ -1,28 +1,30 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)",      "destination": "/api/$1" },
-    { "source": "/menu",          "destination": "/index.html" },
-    { "source": "/admin",         "destination": "/admin.html" },
-    { "source": "/site-api/(.*)", "destination": "https://menu-pro-demo.vercel.app/api/$1" },
-    { "source": "/(.*)",          "destination": "https://menu-pro-demo.vercel.app/$1" }
-  ],
-  "headers": [
+  "routes": [
+    { "src": "^/api/(.*)$",      "dest": "/api/$1" },
+    { "src": "^/menu$",          "dest": "/index.html" },
+    { "src": "^/admin$",         "dest": "/admin.html" },
+    { "src": "^/site-api/(.*)$","dest": "https://menu-pro-demo.vercel.app/api/$1" },
+    { "src": "^/$",              "dest": "https://menu-pro-demo.vercel.app/" },
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Frame-Options",           "value": "SAMEORIGIN" },
-        { "key": "Content-Security-Policy",   "value": "frame-ancestors 'self' https://menu-pro-demo.vercel.app https://genext-qr.com" },
-        { "key": "X-Content-Type-Options",    "value": "nosniff" },
-        { "key": "Referrer-Policy",           "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy",        "value": "camera=(), microphone=(), geolocation=()" }
-      ]
+      "src": "/(.*)",
+      "headers": {
+        "X-Frame-Options":         "SAMEORIGIN",
+        "Content-Security-Policy": "frame-ancestors 'self' https://menu-pro-demo.vercel.app https://genext-qr.com",
+        "X-Content-Type-Options":  "nosniff",
+        "Referrer-Policy":         "strict-origin-when-cross-origin",
+        "Permissions-Policy":      "camera=(), microphone=(), geolocation=()"
+      },
+      "continue": true
     },
     {
-      "source": "/MenuProServeur-SaaS-v1.0.apk",
-      "headers": [
-        { "key": "Content-Type",        "value": "application/vnd.android.package-archive" },
-        { "key": "Content-Disposition", "value": "attachment; filename=\"MenuProServeur-SaaS-v1.0.apk\"" }
-      ]
-    }
+      "src": "^/MenuProServeur-SaaS-v1\\.0\\.apk$",
+      "headers": {
+        "Content-Type":        "application/vnd.android.package-archive",
+        "Content-Disposition": "attachment; filename=\"MenuProServeur-SaaS-v1.0.apk\""
+      },
+      "continue": true
+    },
+    { "handle": "filesystem" },
+    { "src": "^/(.*)$", "dest": "https://menu-pro-demo.vercel.app/$1" }
   ]
 }
