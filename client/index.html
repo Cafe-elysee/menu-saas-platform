@@ -1402,6 +1402,11 @@
       font-weight:500; white-space:nowrap; flex-shrink:0;
     }
     .cls-desc { font-size:0.79rem; color:var(--muted); margin-top:4px; line-height:1.42; }
+    /* Photo produit (optionnelle) — n'apparaît que si l'admin a uploadé une photo */
+    .card-classique.has-thumb { display:flex; align-items:center; gap:12px; }
+    .cls-body { flex:1; min-width:0; }
+    .cls-thumb { width:52px; height:52px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+    .cls-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     /* WiFi dans cc-header */
     .cc-wifi { margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:4px; }
     .cc-wifi-row { font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px; letter-spacing:0.02em; }
@@ -1754,6 +1759,8 @@
     .som-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
     .som-price-col { width:72px; flex-shrink:0; border-left:1px solid var(--border2); padding:0 0 0 14px; display:flex; align-items:center; justify-content:flex-end; }
     .som-price { font-family:'Cormorant',serif; font-size:0.98rem; font-weight:500; color:var(--gold); white-space:nowrap; }
+    .som-thumb { width:56px; height:56px; border-radius:6px; overflow:hidden; flex-shrink:0; align-self:center; }
+    .som-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-sommelier"] .card-sommelier .card-qty-ctrl { top:50%; bottom:auto; transform:translateY(-50%); right:0; }
     html[data-menu-theme="carte-sommelier"] body.option-commande-active .card-sommelier { padding-right:54px !important; }
     html[data-menu-theme="carte-sommelier"] body.option-commande-active .card-sommelier.card-has-qty { padding-right:98px !important; }
@@ -1769,6 +1776,10 @@
     .ben-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:6px; }
     .ben-badges { display:flex; gap:3px; flex-wrap:wrap; }
     .ben-price { font-size:0.88rem; color:var(--gold); font-weight:700; white-space:nowrap; }
+    .card-bento.has-thumb { flex-direction:row !important; align-items:stretch !important; gap:10px; }
+    .ben-body { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .ben-thumb { width:60px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+    .ben-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 
     /* — Télégraphe (points de conduite) — */
     html[data-menu-theme="carte-telegraphe"] .cat-name { font-family:'Courier New',monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; font-style:normal; color:var(--gold); }
@@ -1781,6 +1792,10 @@
     .tel-price { font-family:'Courier New',monospace; font-size:0.88rem; color:var(--gold); font-weight:400; flex-shrink:0; letter-spacing:0.02em; }
     .tel-desc { font-size:0.75rem; color:var(--muted); margin-top:3px; line-height:1.4; font-family:'Courier New',monospace; }
     .tel-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    .card-telegraphe.has-thumb { display:flex; align-items:center; gap:12px; }
+    .tel-body { flex:1; min-width:0; }
+    .tel-thumb { width:46px; height:46px; border-radius:3px; overflow:hidden; flex-shrink:0; border:1px solid var(--border2); }
+    .tel-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-telegraphe"] body.option-commande-active .card-telegraphe { padding-right:52px !important; }
     html[data-menu-theme="carte-telegraphe"] body.option-commande-active .card-telegraphe.card-has-qty { padding-right:96px !important; }
 
@@ -1796,6 +1811,10 @@
     .cou-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .cou-badges { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
     .cou-price { font-family:'Outfit',sans-serif; font-size:0.78rem; color:var(--gold); font-weight:300; letter-spacing:0.10em; white-space:nowrap; }
+    .card-couture.has-thumb { display:flex; align-items:center; gap:14px; }
+    .cou-body { flex:1; min-width:0; }
+    .cou-thumb { width:54px; height:54px; border-radius:4px; overflow:hidden; flex-shrink:0; }
+    .cou-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-couture"] body.option-commande-active .card-couture { padding-right:52px !important; }
     html[data-menu-theme="carte-couture"] body.option-commande-active .card-couture.card-has-qty { padding-right:96px !important; }
 
@@ -1814,6 +1833,8 @@
     .dva-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:600; color:var(--cream); line-height:1.3; }
     .dva-desc { font-size:0.76rem; color:var(--muted); margin-top:3px; line-height:1.42; }
     .dva-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    .dva-thumb { width:50px; align-self:stretch; border-radius:4px; overflow:hidden; flex-shrink:0; margin:2px 0 2px 8px; }
+    .dva-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-journal"] .card-dva .card-qty-ctrl { top:50%; bottom:auto; transform:translateY(-50%); right:0; }
     html[data-menu-theme="carte-journal"] body.option-commande-active .card-dva { padding-right:52px !important; }
     html[data-menu-theme="carte-journal"] body.option-commande-active .card-dva.card-has-qty { padding-right:96px !important; }
@@ -1830,6 +1851,8 @@
     .voy-tag.voy-tag-wide { width:auto; height:auto; min-width:54px; min-height:54px; border-radius:27px; padding:7px 13px; }
     .voy-price { font-family:'Cormorant',serif; font-size:1.0rem; font-weight:700; color:var(--gold); line-height:1.1; }
     .voy-currency { font-size:0.65rem; color:var(--gold); line-height:1; opacity:0.8; }
+    .voy-thumb { width:54px; height:54px; border-radius:8px; overflow:hidden; flex-shrink:0; align-self:center; border:1px solid var(--border2); }
+    .voy-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-voyage"] body.option-commande-active .card-voyage { padding-right:54px !important; }
     html[data-menu-theme="carte-voyage"] body.option-commande-active .card-voyage.card-has-qty { padding-right:98px !important; }
 
@@ -1844,6 +1867,10 @@
     .art-bottom { display:flex; align-items:center; gap:8px; }
     .art-dash { flex:1; height:1px; background:var(--border2); }
     .art-price { font-family:'Outfit',sans-serif; font-size:0.92rem; color:var(--gold); font-weight:600; white-space:nowrap; flex-shrink:0; }
+    .card-artisan.has-thumb { display:flex; align-items:center; gap:12px; }
+    .art-body { flex:1; min-width:0; }
+    .art-thumb { width:50px; height:50px; border-radius:10px; overflow:hidden; flex-shrink:0; }
+    .art-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-artisan"] body.option-commande-active .card-artisan { padding-right:52px !important; }
     html[data-menu-theme="carte-artisan"] body.option-commande-active .card-artisan.card-has-qty { padding-right:96px !important; }
 
@@ -1882,6 +1909,10 @@
     .ard-desc { font-size:0.76rem; color:var(--muted); margin-top:4px; line-height:1.42; font-style:italic; }
     /* Mode light : pill en sombre sur fond clair */
     html.light .ard-prix-pill { color:var(--bg2); }
+    .card-ardoise.has-thumb { display:flex; align-items:center; gap:12px; }
+    .ard-body { flex:1; min-width:0; }
+    .ard-thumb { width:52px; height:52px; border-radius:6px; overflow:hidden; flex-shrink:0; }
+    .ard-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     /* Commande : padding-right pour que la desc n'aille pas sous le bouton +/- */
     html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise { padding-right:52px !important; }
     html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise.card-has-qty { padding-right:96px !important; }
@@ -1897,6 +1928,10 @@
     .marc-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
     .marc-price { font-size:0.92rem; color:var(--gold); font-weight:700; white-space:nowrap; flex-shrink:0; padding:1px 8px; border:1px solid var(--border2); border-radius:3px; }
     .marc-desc { font-size:0.78rem; color:var(--muted); margin-top:4px; line-height:1.44; }
+    .card-maroc.has-thumb { display:flex; align-items:center; gap:12px; }
+    .marc-body { flex:1; min-width:0; }
+    .marc-thumb { width:54px; height:54px; border-radius:50%; overflow:hidden; flex-shrink:0; border:2px solid var(--gold); }
+    .marc-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     html[data-menu-theme="carte-maroc"] body.option-commande-active .card-maroc { padding-right:52px !important; }
     html[data-menu-theme="carte-maroc"] body.option-commande-active .card-maroc.card-has-qty { padding-right:96px !important; }
 
@@ -2034,6 +2069,7 @@
     }
     html[data-menu-theme="livre-rose"] .fp-item:last-child::after { display:none; }
     html[data-menu-theme="livre-rose"] .fp-item-left { width:100%; display:flex; flex-direction:column; align-items:center; }
+    html[data-menu-theme="livre-rose"] .fp-item-thumb { border-radius:50%; margin-bottom:2px; }
     html[data-menu-theme="livre-rose"] .fp-item-name {
       font-family:'Cormorant',serif; font-size:1.08rem; font-style:italic; font-weight:500; text-align:center;
     }
@@ -4992,9 +5028,18 @@
       font-size:0.85rem; font-weight:700; color:var(--gold);
       white-space:nowrap; flex-shrink:0;
     }
-    /* Photo strip */
-    .fp-cat-photos { height:160px; overflow:hidden; display:flex; gap:2px; margin-bottom:0; }
-    .fp-cat-photos img { flex:1; min-width:0; height:100%; object-fit:cover; }
+    /* Photo produit (optionnelle, par article) — imbriquée DANS .fp-item-left (jamais
+       comme sibling au niveau de .fp-item) pour ne jamais perturber les mises en page
+       grid/flex à colonnes fixes que certains thèmes Livre appliquent à .fp-item
+       (ex: livre-noir, grid-template-columns:44px 1fr auto). N'apparaît que si l'admin
+       a uploadé une photo pour ce produit. */
+    .fp-item-left.has-thumb { display:flex; align-items:center; gap:10px; }
+    .fp-item-text { min-width:0; flex:1; }
+    .fp-item-thumb {
+      width:44px; height:44px; border-radius:9px; overflow:hidden;
+      flex-shrink:0;
+    }
+    .fp-item-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 
     /* ═══════════════════════════════════
        STYLE PAPIER — Quantité (commande)
@@ -7956,7 +8001,6 @@ function buildFlipBook() {
     if (!catItems.length) return null;
 
     const catName = u.cats[ci] || cat.sub[lang] || '';
-    const activePhotos = showPhotos ? (cat.flipPhotos || []).filter(p => p) : [];
 
     const itemsHtml = catItems.map(item => {
       const name = _esc(item.name[lang] || item.name.fr || '');
@@ -7964,6 +8008,9 @@ function buildFlipBook() {
       const c = cartItems.find(ci => ci.id === item.id);
       const qty = c ? c.qty : 0;
       const qtyClass = qty > 0 ? ' has-qty' : '';
+      const photoEnabled = showPhotos && (item.showPhoto !== false);
+      const src = photoEnabled ? _getPhotoSrc(item) : '';
+      const thumbHtml = src ? `<div class="fp-item-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>` : '';
       // Bloc qty rendu inconditionnellement ; le CSS le masque si showOrderUI est off.
       const qtyHtml = `
         <div class="fp-item-qty${qtyClass}" data-fp-qty="${item.id}" aria-label="${_aria('qty')}">
@@ -7972,13 +8019,16 @@ function buildFlipBook() {
           <button class="fp-qty-btn fp-qty-plus" aria-label="${_aria('add')}" onclick="event.stopPropagation();window._fpAdd(${item.id})">+</button>
         </div>`;
       const arrowSvg = `<svg viewBox="0 0 10 6" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,1 5,5 9,1"/></svg>`;
-      return `<div class="fp-item${desc ? ' has-desc' : ''}"${desc ? ` onclick="this.classList.toggle('expanded')"` : ''}>
-        <div class="fp-item-left">
+      const leftInner = `
           <div class="fp-item-name-row">
             <div class="fp-item-name">${name}</div>
             ${desc ? `<span class="fp-item-arrow">${arrowSvg}</span>` : ''}
           </div>
-          ${desc ? `<div class="fp-item-desc">${desc}</div>` : ''}
+          ${desc ? `<div class="fp-item-desc">${desc}</div>` : ''}`;
+      return `<div class="fp-item${desc ? ' has-desc' : ''}"${desc ? ` onclick="this.classList.toggle('expanded')"` : ''}>
+        <div class="fp-item-left${src ? ' has-thumb' : ''}">
+          ${thumbHtml}
+          ${src ? `<div class="fp-item-text">${leftInner}</div>` : leftInner}
         </div>
         <div class="fp-item-right">
           <div class="fp-item-price">${_priceHtml(item)}</div>
@@ -7987,14 +8037,9 @@ function buildFlipBook() {
       </div>`;
     }).join('');
 
-    const photosHtml = activePhotos.length
-      ? `<div class="fp-cat-photos">${activePhotos.map(p => `<img src="${_esc(p)}" alt="${_esc(catName)}" loading="lazy">`).join('')}</div>`
-      : '';
-
     const page = document.createElement('div');
     page.className = 'flip-page fp-cat-page';
     page.innerHTML = `
-      ${photosHtml}
       <div class="fp-cat-header">
         <div class="fp-cat-name">${_esc(catName)}</div>
         <div class="fp-cat-count">${catItems.length} ${catItems.length > 1 ? (lang === 'fr' ? 'articles' : lang === 'en' ? 'items' : lang === 'es' ? 'artículos' : lang === 'de' ? 'Artikel' : 'είδη') : (lang === 'fr' ? 'article' : lang === 'en' ? 'item' : lang === 'es' ? 'artículo' : lang === 'de' ? 'Artikel' : 'είδος')}</div>
@@ -10240,12 +10285,15 @@ function _cardSantorin(item) {
 /* ── Thème : Carte Classique — liste papier plate ── */
 function _cardClassique(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-classique';
+  card.className = 'card card-classique' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML = `
+  const thumbBlock = src ? `<div class="cls-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>` : '';
+  const body = `
     <div class="cls-row">
       <div class="cls-name-cell">
         <span class="cls-name">${_esc(item.name[lang]||item.name.fr||'')}</span>
@@ -10254,6 +10302,7 @@ function _cardClassique(item) {
       <div class="cls-price">${_priceHtml(item)}</div>
     </div>
     ${desc ? `<div class="cls-desc">${desc}</div>` : ''}`;
+  card.innerHTML = thumbBlock ? `${thumbBlock}<div class="cls-body">${body}</div>` : body;
   _setupCardEvents(card, item);
   return card;
 }
@@ -10262,12 +10311,16 @@ function _cardClassique(item) {
 
 function _cardSommelier(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   card.className = 'card card-sommelier';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
+  const thumbBlock = src ? '<div class="som-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
+    thumbBlock +
     '<div class="som-main">' +
       '<div class="som-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="som-desc">' + desc + '</div>' : '') +
@@ -10280,30 +10333,37 @@ function _cardSommelier(item) {
 
 function _cardBento(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-bento';
+  card.className = 'card card-bento' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="ben-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
     (desc ? '<div class="ben-desc">' + desc + '</div>' : '<div class="ben-desc"></div>') +
     '<div class="ben-bottom">' +
       (badges ? '<div class="ben-badges">' + badges + '</div>' : '<div class="ben-badges"></div>') +
       '<div class="ben-price">' + _priceHtml(item) + '</div>' +
     '</div>';
+  card.innerHTML = src
+    ? '<div class="ben-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="ben-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
 
 function _cardTelegraphe(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-telegraphe';
+  card.className = 'card card-telegraphe' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="tel-row">' +
       '<span class="tel-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
       '<span class="tel-dots"></span>' +
@@ -10311,19 +10371,24 @@ function _cardTelegraphe(item) {
     '</div>' +
     (desc ? '<div class="tel-desc">' + desc + '</div>' : '') +
     (badges ? '<div class="tel-badges">' + badges + '</div>' : '');
+  card.innerHTML = src
+    ? '<div class="tel-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="tel-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
 
 function _cardCouture(item, idx) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   const num = String((idx||0) + 1).padStart(2, '0');
-  card.className = 'card card-couture';
+  card.className = 'card card-couture' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="cou-header">' +
       '<span class="cou-num">' + num + '</span>' +
       '<span class="cou-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
@@ -10333,6 +10398,9 @@ function _cardCouture(item, idx) {
       (badges ? '<div class="cou-badges">' + badges + '</div>' : '<div class="cou-badges"></div>') +
       '<div class="cou-price">' + _priceHtml(item) + '</div>' +
     '</div>';
+  card.innerHTML = src
+    ? '<div class="cou-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="cou-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
@@ -10340,14 +10408,18 @@ function _cardCouture(item, idx) {
 /* ── Thème : Devanture — prix-bloc gauche ── */
 function _cardJournal(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   const priceWide = _priceHasDiscount(item) ? ' dva-price-block-wide' : '';
   card.className = 'card card-dva';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
+  const thumbBlock = src ? '<div class="dva-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
     '<div class="dva-price-block' + priceWide + '"><div class="dva-price">' + _priceHtml(item) + '</div></div>' +
+    thumbBlock +
     '<div class="dva-body">' +
       '<div class="dva-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="dva-desc">' + desc + '</div>' : '') +
@@ -10359,6 +10431,8 @@ function _cardJournal(item) {
 
 function _cardVoyage(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
   const _dp = item.salePrice || item.price;
@@ -10369,7 +10443,9 @@ function _cardVoyage(item) {
   card.className = 'card card-voyage';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
+  const thumbBlock = src ? '<div class="voy-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
+    thumbBlock +
     '<div class="voy-main">' +
       '<div class="voy-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
       (desc ? '<div class="voy-desc">' + desc + '</div>' : '') +
@@ -10382,18 +10458,23 @@ function _cardVoyage(item) {
 
 function _cardArtisan(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-artisan';
+  card.className = 'card card-artisan' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="art-top">' +
       '<span class="art-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</span>' +
       (badges ? '<span class="art-badges">' + badges + '</span>' : '') +
     '</div>' +
     (desc ? '<div class="art-desc">' + desc + '</div>' : '') +
     '<div class="art-bottom"><div class="art-dash"></div><div class="art-price">' + _priceHtml(item) + '</div></div>';
+  card.innerHTML = src
+    ? '<div class="art-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="art-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
@@ -10401,30 +10482,37 @@ function _cardArtisan(item) {
 /* ── Ardoise Bistrot : prix-pill en haut, nom en dessous ── */
 function _cardArdoise(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-ardoise';
+  card.className = 'card card-ardoise' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="ard-top">' +
       '<span class="ard-prix-pill">' + _priceHtml(item) + '</span>' +
       (badges ? '<span class="ard-badges">' + badges + '</span>' : '<span></span>') +
     '</div>' +
     '<div class="ard-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
     (desc ? '<div class="ard-desc">' + desc + '</div>' : '');
+  card.innerHTML = src
+    ? '<div class="ard-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="ard-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
 
 function _cardMaroc(item) {
   const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
   const badges = _getBadges(item);
   const desc = _esc((item.desc && item.desc[lang]) || item.desc?.fr || '');
-  card.className = 'card card-maroc';
+  card.className = 'card card-maroc' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  card.innerHTML =
+  const body =
     '<div class="marc-row">' +
       '<div class="marc-left">' +
         '<div class="marc-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
@@ -10433,6 +10521,9 @@ function _cardMaroc(item) {
       '<div class="marc-price">' + _priceHtml(item) + '</div>' +
     '</div>' +
     (desc ? '<div class="marc-desc">' + desc + '</div>' : '');
+  card.innerHTML = src
+    ? '<div class="marc-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="marc-body">' + body + '</div>'
+    : body;
   _setupCardEvents(card, item);
   return card;
 }
