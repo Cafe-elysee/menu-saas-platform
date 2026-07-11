@@ -2566,13 +2566,23 @@
     }
 
     /* ═══ OVERRIDES STRUCTURELS PAR THÈME ═══ */
-    /* Simple exclusifs — Bento */
+    /* Simple exclusifs — Bento
+       NOTE (Fix #298) : ces règles ciblaient à tort .flex-direction sur .card (simple
+       conteneur block, jamais en display:flex) au lieu de .card-top (le vrai enfant flex
+       généré par _cardPrestige, réutilisée pour ce thème). Sans effet réel jusqu'ici car
+       ce thème n'était jamais branché dans createCard() (voir Fix #298) — corrigé en même
+       temps que le branchement, sinon la mosaïque bento se serait affichée cassée (photo
+       plein cadre, nom/prix invisibles car écrasés en largeur nulle) dès la mise en ligne. */
     body[data-style="simple"][data-theme^="dyn-bento"] .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    body[data-style="simple"][data-theme^="dyn-bento"] .card { flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--bg-card); }
-    body[data-style="simple"][data-theme^="dyn-bento"] .c-img-w { width: 100%; height: 120px; margin: 0; border-radius: 0; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .card { border-radius: 20px; overflow: hidden; background: var(--bg-card); padding: 0; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .card-top { flex-direction: column; gap: 0; align-items: stretch; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .c-img-w,
+    body[data-style="simple"][data-theme^="dyn-bento"] .c-img-empty { width: 100%; height: 120px; margin: 0; border-radius: 0; }
     body[data-style="simple"][data-theme^="dyn-bento"] .c-info { padding: 12px; text-align: left; }
-    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) { grid-column: span 2; flex-direction: row; }
-    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) .c-img-w { width: 40%; height: 100%; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) { grid-column: span 2; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) .card-top { flex-direction: row; gap: 13px; align-items: stretch; }
+    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) .c-img-w,
+    body[data-style="simple"][data-theme^="dyn-bento"] .card:nth-child(3n) .c-img-empty { width: 40%; height: auto; }
 
     /* =================== OVERRIDES LIGHT MODE (Nouveaux Thèmes) =================== */
     /* Dashboard Bento (Dynamique) */
@@ -10662,6 +10672,7 @@ function createCard(item, idx) {
     case 'carte-maroc':     card = _cardMaroc(item);      break;
     case 'editorial':       card = _cardEditorial(item);  break;
     case 'genext':          card = _cardPrestige(item);   break;
+    case 'dyn-bento':       card = _cardPrestige(item);   break;
     default:                card = _cardCinema(item);     break;
   }
   // Contrôle quantité (− qty +) pour Mode Commande
