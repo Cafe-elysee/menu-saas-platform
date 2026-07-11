@@ -9107,7 +9107,7 @@ function renderTableURLs(n) {
   if (!list) return;
   if (n === 0) { list.innerHTML = ''; return; }
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  const base = location.origin + '/menu';
   const rows = [];
   const _safeRID = encodeURIComponent(_RID);
   for (let i = 1; i <= n; i++) {
@@ -10411,7 +10411,7 @@ function _qrInjectSVG(containerId, url, size) {
 function qrUpdatePreview() {
   if (!_QR.libsReady) return;
   _QR.centerText = document.getElementById('qr-center-text')?.value || '';
-  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  const base = location.origin + '/menu';
   const url = base + '?rid=' + _RID + '&table=1';
   _qrInjectSVG('qr-svg-prev', url, 300);
   _qrInjectSVG('qr-svg-prev-mob', url, 300);
@@ -10443,7 +10443,7 @@ async function qrDownloadPDF() {
   btns.forEach(b => { b.disabled = true; b.innerHTML = '⏳ Génération…'; });
   sts.forEach(s => { s.textContent = ''; s.className = 'qr-dl-st'; });
 
-  const base = location.href.replace(/admin\.html.*$/, 'index.html');
+  const base = location.origin + '/menu';
   const { jsPDF } = window.jspdf;
   const RNAME = adminData?.info?.name || '';
   const PNG_SIZE = 600;
