@@ -1431,7 +1431,7 @@ function buildLangBtns() {
   sel.onchange = function() {
     lang = sel.value;
     localStorage.setItem(_PFX+'app_lang', lang);
-    _rref('devices/' + getDeviceId() + '/lang').set(lang).catch(function() {});
+    _syncDeviceLang(lang);
     applyLang();
   };
   if (enabledLangs[lang] === false) {
@@ -1440,10 +1440,19 @@ function buildLangBtns() {
       lang = first;
       sel.value = lang;
       localStorage.setItem(_PFX+'app_lang', first);
-      _rref('devices/' + getDeviceId() + '/lang').set(first).catch(function() {});
+      _syncDeviceLang(first);
       applyLang();
     }
   }
+}
+
+// N'écrit /lang seul que si le nœud devices/$deviceId a déjà token+ts (règle Firebase l'exige
+// ensemble) — sinon la préférence sera envoyée au prochain saveNativeToken() une fois le token connu.
+function _syncDeviceLang(l) {
+  var ref = _rref('devices/' + getDeviceId());
+  ref.once('value').then(function(snap) {
+    if (snap.exists() && snap.hasChild('token')) ref.child('lang').set(l).catch(function() {});
+  }).catch(function() {});
 }
 
 /* ── CONNECTION ── */
