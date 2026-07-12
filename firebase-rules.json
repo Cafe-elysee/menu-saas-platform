@@ -38,6 +38,13 @@
       }
     },
 
+    "archivedClients": {
+      ".read": true,
+      "$slug": {
+        ".write": true
+      }
+    },
+
     "control": {
       "fcm_tokens": {
         "$deviceId": {

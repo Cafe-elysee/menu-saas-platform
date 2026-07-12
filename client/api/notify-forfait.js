@@ -577,22 +577,27 @@ function buildUpgradeQuoteEmail(lang, name, prorata, deadline) {
     fr: { subject:'🚀 Mise à niveau — calcul de votre montant à payer', greeting:`Bonjour ${safeName} 👋`,
       intro:`Vous passez à <strong>Commandes &amp; Services</strong>. Voici le détail du calcul, en tenant compte de ce que vous avez déjà payé :`,
       deadline:`Vous avez <strong>7 jours</strong> (jusqu'au ${dlStr}) pour régler ce montant, ou annuler ce changement pour revenir à votre forfait actuel sans aucun impact sur votre abonnement en cours.`,
+      already:`Le changement sera appliqué dès réception de votre paiement. Vous avez déjà effectué le virement et souhaitez une activation immédiate ? Répondez directement à cet email avec une preuve (capture d'écran) et votre <strong>ID restaurant</strong> — nous activerons votre forfait sans attendre sa réception.`,
       closing:`L'équipe GeNext` },
     en: { subject:'🚀 Upgrade — your amount due, explained', greeting:`Hello ${safeName} 👋`,
       intro:`You're upgrading to <strong>Orders &amp; Services</strong>. Here is the detailed calculation, taking into account what you've already paid:`,
       deadline:`You have <strong>7 days</strong> (until ${dlStr}) to pay this amount, or cancel this change to return to your current plan with no impact on your active subscription.`,
+      already:`The change will be applied once we receive your payment. Already made the bank transfer and want immediate activation? Reply directly to this email with proof (a screenshot) and your <strong>restaurant ID</strong> — we'll activate your plan without waiting for it to arrive.`,
       closing:`The GeNext Team` },
     el: { subject:'🚀 Αναβάθμιση — υπολογισμός οφειλόμενου ποσού', greeting:`Γεια σας ${safeName} 👋`,
       intro:`Αναβαθμίζετε σε <strong>Παραγγελίες &amp; Υπηρεσίες</strong>. Δείτε τον αναλυτικό υπολογισμό, λαμβάνοντας υπόψη ό,τι έχετε ήδη πληρώσει:`,
       deadline:`Έχετε <strong>7 ημέρες</strong> (έως ${dlStr}) για να πληρώσετε το ποσό, ή να ακυρώσετε την αλλαγή και να επιστρέψετε στο τρέχον πλάνο σας χωρίς καμία επίπτωση.`,
+      already:`Η αλλαγή θα εφαρμοστεί μόλις λάβουμε την πληρωμή σας. Έχετε ήδη κάνει το τραπεζικό έμβασμα και θέλετε άμεση ενεργοποίηση; Απαντήστε απευθείας σε αυτό το email με απόδειξη (στιγμιότυπο) και το <strong>ID εστιατορίου</strong> σας — θα ενεργοποιήσουμε το πλάνο σας χωρίς να περιμένουμε τη λήψη του.`,
       closing:`Η ομάδα GeNext` },
     de: { subject:'🚀 Upgrade — Ihr fälliger Betrag im Detail', greeting:`Guten Tag ${safeName} 👋`,
       intro:`Sie wechseln zu <strong>Bestellungen &amp; Services</strong>. Hier die genaue Berechnung unter Berücksichtigung des bereits Bezahlten:`,
       deadline:`Sie haben <strong>7 Tage</strong> (bis ${dlStr}) Zeit, diesen Betrag zu zahlen, oder die Änderung zu stornieren und ohne Auswirkung zu Ihrem aktuellen Plan zurückzukehren.`,
+      already:`Die Änderung wird angewendet, sobald wir Ihre Zahlung erhalten haben. Haben Sie die Überweisung bereits getätigt und wünschen eine sofortige Aktivierung? Antworten Sie direkt auf diese E-Mail mit einem Nachweis (Screenshot) und Ihrer <strong>Restaurant-ID</strong> — wir aktivieren Ihren Plan, ohne auf den Zahlungseingang zu warten.`,
       closing:`Das GeNext Team` },
     es: { subject:'🚀 Mejora de plan — cálculo de su importe', greeting:`¡Hola ${safeName} 👋`,
       intro:`Está pasando a <strong>Pedidos &amp; Servicios</strong>. Aquí tiene el cálculo detallado, teniendo en cuenta lo ya pagado:`,
       deadline:`Tiene <strong>7 días</strong> (hasta el ${dlStr}) para pagar este importe, o cancelar este cambio y volver a su plan actual sin ningún impacto.`,
+      already:`El cambio se aplicará en cuanto recibamos su pago. ¿Ya ha realizado la transferencia y desea una activación inmediata? Responda directamente a este email con un comprobante (una captura de pantalla) y su <strong>ID de restaurante</strong> — activaremos su plan sin esperar a que se reciba.`,
       closing:`El equipo GeNext` }
   };
   const t = T[lang] || T.fr;
@@ -604,7 +609,8 @@ function buildUpgradeQuoteEmail(lang, name, prorata, deadline) {
   const card = `
     <p style="color:#4a3728;font-size:0.9rem;line-height:1.6;margin:0 0 14px">${t.intro}</p>
     <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-radius:8px"><tr><td style="padding:14px 18px"><table width="100%" cellpadding="0" cellspacing="0">${tableRows}</table></td></tr></table>
-    <p style="color:#7a6555;font-size:0.85rem;line-height:1.6;margin:14px 0 0">${t.deadline}</p>`;
+    <p style="color:#7a6555;font-size:0.85rem;line-height:1.6;margin:14px 0 0">${t.deadline}</p>
+    <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-left:3px solid #c8a44e;border-radius:0 8px 8px 0;margin-top:12px"><tr><td style="padding:12px 16px;font-size:0.82rem;color:#2a1f10;line-height:1.6">${t.already}</td></tr></table>`;
   return { subject: t.subject, html: _emailShell(t.greeting, card, t.closing) };
 }
 
