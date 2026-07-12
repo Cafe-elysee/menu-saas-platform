@@ -3454,7 +3454,7 @@ function _toggleSuspend(key) {
                 name: d.restaurant || '',
                 lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
                 type: 'reactivation',
-                secret: 'GnCtrl_9f3kLp2QzR7mW4hT'
+                secret: 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY'
               })
             }).catch(function() {});
           }
@@ -3512,7 +3512,7 @@ function _saveCommandePrice(key, rawVal) {
 // ── Appel centralisé à l'API de facturation — seule autorité d'écriture (Refonte abonnement) ──
 // Miroir exact de la fonction équivalente dans client/admin.html (duplication volontaire,
 // projet vanilla JS sans module partagé — voir feedback_regles_travail).
-const CONTROL_APP_SECRET = 'GnCtrl_9f3kLp2QzR7mW4hT';
+const CONTROL_APP_SECRET = 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY';
 async function _callNotifyForfait(payload) {
   const resp = await fetch('https://menu-saas-platform.vercel.app/api/notify-forfait', {
     method: 'POST',
@@ -3747,7 +3747,7 @@ function _markPaid(key) {
                 amount: price,
                 paymentMode: d.paymentMode || 'monthly',
                 nextDue: update.nextReminderAt,
-                secret: 'GnCtrl_9f3kLp2QzR7mW4hT'
+                secret: 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY'
               })
             }).catch(function() {});
           }
