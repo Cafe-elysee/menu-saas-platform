@@ -576,7 +576,7 @@ module.exports = async function handler(req, res) {
     if (cmdKey && secret) {
       try {
         const update = { forfait: newForfait, price, paymentMode: safeMode };
-        if (isUpgrade) {
+        if (isUpgrade && !isTrial) {
           update.nextReminderAt = Date.now() + 7 * 24 * 3600 * 1000;
           update.lastReminderSent = null;
         }
