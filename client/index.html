@@ -10872,6 +10872,8 @@ function openSheet(item) {
   const c = cartItems.find(ci => ci.id === item.id);
   const shQtyNum = document.getElementById('sh-qty-num');
   if (shQtyNum) shQtyNum.textContent = c ? c.qty : 0;
+  const shQtyMinus = document.getElementById('sh-qty-minus');
+  if (shQtyMinus) shQtyMinus.setAttribute('aria-label', _aria('removeCart'));
 
   document.getElementById('overlay').classList.add('on');
   document.getElementById('sheet').classList.add('on');

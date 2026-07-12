@@ -762,11 +762,15 @@ module.exports = async function handler(req, res) {
       if (actor !== 'malek') return res.status(403).json({ error: 'forbidden' });
       if (!cmdData || !cmdData.pendingUpgrade) return res.status(400).json({ error: 'no-pending-upgrade' });
       const pu = cmdData.pendingUpgrade;
-      const newNextReminderAt = Date.now() + (curMode === 'annual' ? 365 : 30) * 24 * 3600 * 1000;
+      // Le mode (mensuel/annuel) choisi au moment de l'upgrade est celui figé dans le devis
+      // (pu.newMode) — jamais curMode (l'ANCIEN mode), sinon le mode de facturation réel
+      // (paymentMode) n'est jamais mis à jour et le cron réclame/suspend au mauvais rythme.
+      const upgradeMode = pu.newMode || curMode;
+      const newNextReminderAt = Date.now() + (upgradeMode === 'annual' ? 365 : 30) * 24 * 3600 * 1000;
       if (cmdKey && secret) {
         try {
           await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, {
-            forfait: pu.forfait, price: pu.prorata.newFullPrice, paidAt: Date.now(),
+            forfait: pu.forfait, price: pu.prorata.newFullPrice, paymentMode: upgradeMode, paidAt: Date.now(),
             nextReminderAt: newNextReminderAt, pendingUpgrade: null
           });
         } catch(e) {}
@@ -777,12 +781,12 @@ module.exports = async function handler(req, res) {
           await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken,
             { callBtn: true, orderUI: true, tableSystem: true, qrOrdering: true });
           await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken,
-            { forfait: pu.forfait, price: pu.prorata.newFullPrice, endDate: newNextReminderAt, pendingUpgrade: null, lastForfaitChange: Date.now() });
+            { forfait: pu.forfait, price: pu.prorata.newFullPrice, paymentMode: upgradeMode, endDate: newNextReminderAt, pendingUpgrade: null, lastForfaitChange: Date.now() });
         } catch(e) {}
       }
       if (email) {
         try {
-          const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, pu.forfait, true, curMode, effectivePriceObj, false);
+          const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, pu.forfait, true, upgradeMode, effectivePriceObj, false);
           await createTransport().sendMail({
             from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
             text: safeName + ' — Forfait mis à niveau (paiement confirmé)\n\nGeNext — ' + process.env.GMAIL_USER,
@@ -795,7 +799,7 @@ module.exports = async function handler(req, res) {
         ok: true, case: 'upgrade-confirmed', newEndDate: newNextReminderAt,
         mainWrite: {
           features: { callBtn: true, orderUI: true, tableSystem: true, qrOrdering: true },
-          subscription: { forfait: pu.forfait, price: pu.prorata.newFullPrice, endDate: newNextReminderAt, pendingUpgrade: null, lastForfaitChange: Date.now() }
+          subscription: { forfait: pu.forfait, price: pu.prorata.newFullPrice, paymentMode: upgradeMode, endDate: newNextReminderAt, pendingUpgrade: null, lastForfaitChange: Date.now() }
         }
       });
     }
@@ -902,7 +906,7 @@ module.exports = async function handler(req, res) {
       }
       const deadline = Date.now() + 7 * 24 * 3600 * 1000;
       const pendingUpFull = {
-        forfait: newForfait, fromForfait: oldForfait, prorata, deadline, createdAt: Date.now(),
+        forfait: newForfait, fromForfait: oldForfait, newMode: safeMode, prorata, deadline, createdAt: Date.now(),
         oldEndDate: prorata.oldEndDate, oldNextReminderAt: prorata.oldNextReminderAt
       };
       if (cmdKey && secret) {

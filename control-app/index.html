@@ -2022,7 +2022,7 @@
 
   <!-- Bottom nav -->
   <!-- Quick Nav FAB -->
-  <button class="quick-nav-fab" id="quick-nav-fab" onclick="openQuickNav()">≡</button>
+  <button class="quick-nav-fab" id="quick-nav-fab" onclick="openQuickNav()" aria-label="Navigation rapide" title="Navigation rapide">≡</button>
   <div class="quick-nav-overlay" id="quick-nav-overlay" onclick="closeQuickNav()"></div>
   <div class="quick-nav-sheet" id="quick-nav-sheet">
     <div class="quick-nav-title">Aller vers…</div>
@@ -5421,6 +5421,7 @@ const GUIDE_ITEMS = {
     { key: 'adm-statistiques',title: 'Consulter vos statistiques' },
     { key: 'adm-qrcodes',     title: 'Générer vos codes QR de table' },
     { key: 'adm-reglages',    title: 'Accès, mot de passe et langues' },
+    { key: 'adm-langue-ia',   title: 'Langue principale et traduction IA' },
     { key: 'adm-abonnement',  title: 'Abonnement, paiement et assistance' }
   ],
   serveur: [
@@ -5750,6 +5751,11 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function _openNotifSettings() {
+  var NS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativeSettings;
+  if (NS) NS.openNotifications();
 }
 
 function refreshNotifStatus() {
