@@ -715,11 +715,13 @@ module.exports = async function handler(req, res) {
       if (cmdKey && secret) {
         try { await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { pendingForfaitChange: null }); } catch(e) {}
       }
+      // Écriture MAIN_DB best-effort côté serveur (service account) — en secours du
+      // mainWrite renvoyé ci-dessous, appliqué de façon fiable côté client.
       const mainTokenCancel = await getMainDbToken();
       if (mainTokenCancel) {
         try { await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainTokenCancel, { pendingChange: null }); } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: 'downgrade-cancelled' });
+      return res.status(200).json({ ok: true, case: 'downgrade-cancelled', mainWrite: { subscription: { pendingChange: null } } });
     }
 
     // ── Annulation d'un upgrade en attente de paiement — retour à l'ancien forfait ──
@@ -742,7 +744,7 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: 'upgrade-cancelled' });
+      return res.status(200).json({ ok: true, case: 'upgrade-cancelled', mainWrite: { subscription: { pendingUpgrade: null } } });
     }
 
     // ── Confirmation de paiement d'un upgrade en attente (Malek uniquement, après réception) ──
@@ -779,7 +781,13 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: 'upgrade-confirmed', newEndDate: newNextReminderAt });
+      return res.status(200).json({
+        ok: true, case: 'upgrade-confirmed', newEndDate: newNextReminderAt,
+        mainWrite: {
+          features: { callBtn: true, orderUI: true, tableSystem: true, qrOrdering: true },
+          subscription: { forfait: pu.forfait, price: pu.prorata.newFullPrice, endDate: newNextReminderAt, pendingUpgrade: null, lastForfaitChange: Date.now() }
+        }
+      });
     }
 
     const cls = classifyForfaitChange({
@@ -800,17 +808,17 @@ module.exports = async function handler(req, res) {
       const update = { forfait: newForfait, price, paymentMode: safeMode };
       if (isWindow) update.firstChangeUsedAt = Date.now();
       if (cmdKey && secret) { try { await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, update); } catch(e) {} }
+      const isCS = newForfait === 'commandes-services';
+      const mainWrite = {
+        features: { callBtn: isCS, orderUI: isCS, tableSystem: isCS, qrOrdering: isCS },
+        subscription: { forfait: newForfait, price, paymentMode: safeMode }
+      };
       const mainToken = await getMainDbToken();
-      let _dbgMainWrite = 'no-token';
       if (mainToken) {
         try {
-          const isCS = newForfait === 'commandes-services';
-          const r1 = await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken,
-            { callBtn: isCS, orderUI: isCS, tableSystem: isCS, qrOrdering: isCS });
-          const r2 = await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken,
-            { forfait: newForfait, price, paymentMode: safeMode });
-          _dbgMainWrite = JSON.stringify({ r1, r2 });
-        } catch(e) { _dbgMainWrite = 'error: ' + e.message; }
+          await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken, mainWrite.features);
+          await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken, mainWrite.subscription);
+        } catch(e) {}
       }
       if (isWindow && email) {
         try {
@@ -823,7 +831,7 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: cls.case, applied: { forfait: newForfait, price }, _dbgMainWrite });
+      return res.status(200).json({ ok: true, case: cls.case, applied: { forfait: newForfait, price }, mainWrite });
     }
 
     if (cls.case === 'mid-cycle-downgrade') {
@@ -844,7 +852,13 @@ module.exports = async function handler(req, res) {
               { forfait: newForfait, price, paymentMode: safeMode, endDate: newNextReminderAt, pendingChange: null, lastForfaitChange: Date.now() });
           } catch(e) {}
         }
-        return res.status(200).json({ ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: newNextReminderAt });
+        return res.status(200).json({
+          ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: newNextReminderAt,
+          mainWrite: {
+            features: { callBtn: false, orderUI: false, tableSystem: false, qrOrdering: false },
+            subscription: { forfait: newForfait, price, paymentMode: safeMode, endDate: newNextReminderAt, pendingChange: null, lastForfaitChange: Date.now() }
+          }
+        });
       }
       // Programmation en fin de période — le forfait actif ne change pas maintenant.
       const scheduledAt = (cmdData && cmdData.nextReminderAt) || null;
@@ -865,7 +879,10 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: 'mid-cycle-downgrade', scheduledFor: scheduledAt, newPrice: price });
+      return res.status(200).json({
+        ok: true, case: 'mid-cycle-downgrade', scheduledFor: scheduledAt, newPrice: price,
+        mainWrite: { subscription: { pendingChange: pendingC, pendingUpgrade: null } }
+      });
     }
 
     if (cls.case === 'mid-cycle-upgrade-prorata') {
@@ -899,7 +916,10 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: 'mid-cycle-upgrade-prorata-pending', prorata, deadline });
+      return res.status(200).json({
+        ok: true, case: 'mid-cycle-upgrade-prorata-pending', prorata, deadline,
+        mainWrite: { subscription: { pendingUpgrade: { forfait: newForfait, prorata, deadline, createdAt: Date.now() }, pendingChange: null } }
+      });
     }
   }
   // ══════════════════════════════════════════════════════════════════════════
@@ -949,7 +969,7 @@ module.exports = async function handler(req, res) {
       results.fcm = 'sent';
     } catch(e) { results.fcm = 'error'; }
 
-    return res.status(200).json({ ok: true, onlyPaymentMode: true, ...results });
+    return res.status(200).json({ ok: true, onlyPaymentMode: true, ...results, mainWrite: { subscription: { paymentMode: safeMode, price } } });
   }
 
   // ── Mode annulation de pendingForfaitChange ─────────────────────────────────

@@ -8597,7 +8597,17 @@ async function _callNotifyForfait(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  return resp.json();
+  const result = await resp.json();
+  // Le serveur décide QUOI écrire (calculs/règles) mais l'écriture MAIN_DB elle-même se
+  // fait ici, côté client déjà authentifié — canal fiable, indépendant de la disponibilité
+  // du compte de service serveur (best-effort côté serveur en secours si actif).
+  if (result && result.ok && result.mainWrite) {
+    try {
+      if (result.mainWrite.features)     await _rref('/config/features').update(result.mainWrite.features);
+      if (result.mainWrite.subscription) await _rref('/config/subscription').update(result.mainWrite.subscription);
+    } catch(e) { console.error('_callNotifyForfait mainWrite error', e); }
+  }
+  return result;
 }
 function _sessionId() {
   return sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess') || '';
