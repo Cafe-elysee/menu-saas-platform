@@ -138,13 +138,16 @@ async function verifySession(rid, sid) {
     });
   } catch(e) { return true; }
 }
+// Lecture publique (mêmes règles Firebase que demoPage/*, déjà lisibles sans authentification
+// ailleurs dans le projet — voir autoCreateRestaurant dans demo-page/api/notify-commande.js,
+// même source, même forme de données). Ne dépend d'aucun compte de service.
+// BUG CORRIGÉ : cette fonction lisait une forme imbriquée p['menu-qr'].monthly qui n'a jamais
+// existé dans Firebase — la vraie forme est prices['qr-monthly'] (clé combo à plat), exactement
+// celle utilisée par notify-commande.js. Résultat avant correction : toujours le prix de secours
+// codé en dur (49/99/490/990), jamais le prix réellement configuré dans Réglages control-app.
 async function fetchSaasPricing() {
   try {
-    const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (!raw) return null;
-    const sa = JSON.parse(raw);
-    const token = await getAccessToken(sa);
-    const url = SAAS_DB + '/demoPage/pricing.json?access_token=' + token;
+    const url = SAAS_DB + '/demoPage/pricing.json';
     return new Promise(resolve => {
       const u = new URL(url);
       const opts = { hostname:u.hostname, path:u.pathname+u.search, method:'GET' };
@@ -153,15 +156,16 @@ async function fetchSaasPricing() {
         r.on('end', () => {
           try {
             const p = JSON.parse(d);
-            if (!p || typeof p !== 'object') { resolve(null); return; }
+            const prices = p && p.prices;
+            if (!prices || typeof prices !== 'object') { resolve(null); return; }
             resolve({
               monthly: {
-                'menu-qr':            Number(p['menu-qr']?.monthly)            || PRICE.monthly['menu-qr'],
-                'commandes-services': Number(p['commandes-services']?.monthly) || PRICE.monthly['commandes-services']
+                'menu-qr':            Number(prices['qr-monthly'])  || PRICE.monthly['menu-qr'],
+                'commandes-services': Number(prices['srv-monthly']) || PRICE.monthly['commandes-services']
               },
               annual: {
-                'menu-qr':            Number(p['menu-qr']?.annual)             || PRICE.annual['menu-qr'],
-                'commandes-services': Number(p['commandes-services']?.annual)  || PRICE.annual['commandes-services']
+                'menu-qr':            Number(prices['qr-annual'])   || PRICE.annual['menu-qr'],
+                'commandes-services': Number(prices['srv-annual'])  || PRICE.annual['commandes-services']
               }
             });
           } catch(e) { resolve(null); }
