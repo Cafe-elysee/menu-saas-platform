@@ -707,6 +707,21 @@ module.exports = async function handler(req, res) {
   if (actor === 'client' || actor === 'malek') {
     const curMode = (cmdData && cmdData.paymentMode) || 'annual';
 
+    // ── Annulation d'un downgrade programmé en fin de période ────────────────────
+    // (équivalent à la branche historique pending:'cancel', nécessaire ici pour que
+    // control-app — authentifié par secret, sans session admin — puisse l'utiliser
+    // via actor:'malek', qui route toujours dans ce bloc.)
+    if (pending === 'cancel') {
+      if (cmdKey && secret) {
+        try { await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { pendingForfaitChange: null }); } catch(e) {}
+      }
+      const mainTokenCancel = await getMainDbToken();
+      if (mainTokenCancel) {
+        try { await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainTokenCancel, { pendingChange: null }); } catch(e) {}
+      }
+      return res.status(200).json({ ok: true, case: 'downgrade-cancelled' });
+    }
+
     // ── Annulation d'un upgrade en attente de paiement — retour à l'ancien forfait ──
     if (cancelUpgrade === true) {
       if (cmdKey && secret) {
@@ -898,6 +913,12 @@ module.exports = async function handler(req, res) {
       } catch(e) { results.sync = 'error: ' + e.message; }
     } else {
       results.sync = cmdKey ? 'no-secret' : 'commande-not-found';
+    }
+    // Écriture MAIN_DB — auparavant faite uniquement côté navigateur par admin.html.
+    // Nécessaire maintenant que ce fichier devient la seule autorité d'écriture.
+    const mainTokenPM = await getMainDbToken();
+    if (mainTokenPM) {
+      try { await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainTokenPM, { paymentMode: safeMode, price }); } catch(e) {}
     }
 
     if (email) {

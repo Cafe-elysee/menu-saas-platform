@@ -3116,7 +3116,7 @@ function _cancelScheduledDowngrade(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, pending: 'cancel', actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
     if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3139,7 +3139,7 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, cancelUpgrade: true, actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
     if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
