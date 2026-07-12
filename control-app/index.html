@@ -698,6 +698,22 @@
       background: rgba(200,164,78,0.06); border: 1.5px solid rgba(200,164,78,0.22);
       border-radius: 12px; padding: 9px 12px; margin-bottom: 10px;
     }
+    /* ── Badges changement en attente (Refonte abonnement) ── */
+    .f4-pending-badge {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: var(--text); line-height: 1.5;
+      background: rgba(200,164,78,0.08); border: 1.5px solid rgba(200,164,78,0.28);
+      border-radius: 12px; padding: 9px 12px; margin-bottom: 10px;
+    }
+    .f4-pending-badge.f4-pending-upgrade { background: rgba(217,148,64,0.1); border-color: rgba(217,148,64,0.35); }
+    .f4-pending-btn {
+      font-size: 0.66rem; font-weight: 600; padding: 3px 9px; border-radius: 8px;
+      background: rgba(200,164,78,0.15); border: 1px solid rgba(200,164,78,0.35);
+      color: var(--gold); cursor: pointer; font-family: inherit;
+    }
+    .f4-pending-btn:hover { background: rgba(200,164,78,0.25); }
+    .f4-pending-btn-ok { background: rgba(90,180,110,0.18); border-color: rgba(90,180,110,0.4); color: #5ab46e; }
+    .f4-pending-btn-ok:hover { background: rgba(90,180,110,0.28); }
     .f4-creation-label { font-size: 0.74rem; font-weight: 700; color: var(--gold); }
     .f4-creation-tag {
       font-size: 0.6rem; font-weight: 600; padding: 1px 6px; border-radius: 8px;
@@ -3065,10 +3081,68 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
+  // ── Visibilité des changements en attente (invisible auparavant — bug d'audit) ──
+  var pendingHtml = '';
+  if (d.pendingForfaitChange) {
+    var pfc = d.pendingForfaitChange;
+    var pfcLabel = pfc.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+    var pfcDate = pfc.scheduledAt ? new Date(pfc.scheduledAt).toLocaleDateString('fr-FR') : '—';
+    pendingHtml += '<div class="f4-pending-badge">' +
+      '&#128197; Downgrade programm&#233; &#8594; ' + escapeHtml(pfcLabel) + ' le ' + pfcDate +
+      ' &#183; ' + pfc.price + '&#8364;' +
+      ' <button class="f4-pending-btn" onclick="_cancelScheduledDowngrade(\'' + cmdKey + '\')">Annuler</button>' +
+      ' <button class="f4-pending-btn" onclick="_forceApplyDowngrade(\'' + cmdKey + '\')">Forcer maintenant</button>' +
+    '</div>';
+  }
+  if (d.pendingUpgrade) {
+    var pu = d.pendingUpgrade;
+    var puDate = pu.deadline ? new Date(pu.deadline).toLocaleDateString('fr-FR') : '—';
+    pendingHtml += '<div class="f4-pending-badge f4-pending-upgrade">' +
+      '&#9203; Upgrade en attente de paiement &#8212; <b>' + pu.prorata.amountDue + '&#8364;</b> avant le ' + puDate +
+      ' <button class="f4-pending-btn f4-pending-btn-ok" onclick="_confirmUpgradePaid(\'' + cmdKey + '\')">&#9989; Marqu&#233; pay&#233;</button>' +
+      ' <button class="f4-pending-btn" onclick="_cancelPendingUpgradeCtrl(\'' + cmdKey + '\')">Annuler</button>' +
+    '</div>';
+  }
+
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
+    pendingHtml +
     '<div class="f4-grid">' + gridHtml + '</div>' +
     birthdateRow +
   '</div>';
+}
+
+// ── Actions sur les changements en attente (badges ci-dessus) ───────────────────
+function _cancelScheduledDowngrade(cmdKey) {
+  var d = _commandesCache[cmdKey];
+  if (!d) return;
+  var rid = _getSlugFromCmdKey(cmdKey);
+  _callNotifyForfait({ rid: rid, pending: 'cancel', actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+    if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); }
+    else { showToast('❌ Erreur'); }
+  }).catch(function() { showToast('❌ Erreur réseau'); });
+}
+function _confirmUpgradePaid(cmdKey) {
+  var d = _commandesCache[cmdKey];
+  if (!d) return;
+  var rid = _getSlugFromCmdKey(cmdKey);
+  _callNotifyForfait({
+    rid: rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
+    newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
+    email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
+    paymentMode: d.paymentMode || 'annual', actor: 'malek', controlSecret: CONTROL_APP_SECRET, confirmUpgradePayment: true
+  }).then(function(r) {
+    if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+    else { showToast('❌ Erreur'); }
+  }).catch(function() { showToast('❌ Erreur réseau'); });
+}
+function _cancelPendingUpgradeCtrl(cmdKey) {
+  var d = _commandesCache[cmdKey];
+  if (!d) return;
+  var rid = _getSlugFromCmdKey(cmdKey);
+  _callNotifyForfait({ rid: rid, cancelUpgrade: true, actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+    if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); }
+    else { showToast('❌ Erreur'); }
+  }).catch(function() { showToast('❌ Erreur réseau'); });
 }
 
 function _buildPaymentHistoryInlineHTML(cmdKey, d) {
@@ -3358,6 +3432,15 @@ function _toggleSuspend(key) {
             _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: false, suspendu: true });
           } else {
             _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false });
+            // Si la date de renouvellement est déjà dans le passé, la recalculer au
+            // moment de la réactivation — sinon le cron B4 re-suspend automatiquement
+            // ce client au run suivant, annulant silencieusement le geste de Malek.
+            if (d.nextReminderAt && Date.now() >= d.nextReminderAt) {
+              const newNextReminderAt = _addMonths(Date.now(), (d.paymentMode === 'annual') ? 12 : 1);
+              _controlDb.ref('/commandes/' + key + '/nextReminderAt').set(newNextReminderAt);
+              _saasDb.ref('restaurants/' + ridSync + '/config/subscription/endDate').set(newNextReminderAt);
+              if (_commandesCache[key]) _commandesCache[key].nextReminderAt = newNextReminderAt;
+            }
           }
         }
         if (!willSuspend) {
@@ -3426,40 +3509,95 @@ function _saveCommandePrice(key, rawVal) {
 }
 
 // ── Activer une formule (forfait + mode) et synchroniser partout ────────────
-function _setActiveCombo(cmdKey, forfait, mode) {
+// ── Appel centralisé à l'API de facturation — seule autorité d'écriture (Refonte abonnement) ──
+// Miroir exact de la fonction équivalente dans client/admin.html (duplication volontaire,
+// projet vanilla JS sans module partagé — voir feedback_regles_travail).
+const CONTROL_APP_SECRET = 'GnCtrl_9f3kLp2QzR7mW4hT';
+async function _callNotifyForfait(payload) {
+  const resp = await fetch('https://menu-saas-platform.vercel.app/api/notify-forfait', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return resp.json();
+}
+
+async function _setActiveCombo(cmdKey, forfait, mode) {
   const d = _commandesCache[cmdKey];
   if (!d) return;
   const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
   const normMode    = (mode === 'annual') ? 'annual' : 'monthly';
   if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'monthly')) return;
 
-  // Prix correspondant à la combo sélectionnée
-  const comboPrice = _getComboPrice(d, normForfait, normMode);
-  const prevMode = d.paymentMode || 'monthly';
-  const modeChanged = normMode !== prevMode;
-  const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
-  const baseTs = isInTrial ? null : (d.paidAt || d.trialEndAt || d.firstOpenAt || null);
-  const newNextReminderAt = (!isInTrial && modeChanged && baseTs) ? _addMonths(baseTs, normMode === 'annual' ? 12 : 1) : d.nextReminderAt;
-  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode, price: comboPrice, nextReminderAt: newNextReminderAt });
+  const rid = _getSlugFromCmdKey(cmdKey);
+  const prevState = Object.assign({}, d);
+  // Mise à jour optimiste locale (réactivité immédiate) — rollback si l'API échoue
+  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
+  _rerenderClientBillingSection(cmdKey);
 
-  // Mettre à jour les features si changement de forfait
-  const slug = _getSlugFromCmdKey(cmdKey);
-  if (slug) {
-    const isServices = normForfait === 'commandes-services';
-    const db = getClientDb(slug);
-    db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
-    const subUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
-    if (!isInTrial && modeChanged && newNextReminderAt) subUpdate.endDate = newNextReminderAt;
-    db.ref('/config/subscription').update(subUpdate);
-    _saasDb.ref('restaurants/' + slug + '/config/subscription').update(subUpdate);
+  const payload = {
+    rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
+    email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
+    paymentMode: normMode, actor: 'malek', controlSecret: CONTROL_APP_SECRET
+  };
+
+  let result;
+  try {
+    result = await _callNotifyForfait(payload);
+  } catch(e) {
+    _commandesCache[cmdKey] = prevState;
+    _rerenderClientBillingSection(cmdKey);
+    showToast('❌ Erreur réseau');
+    return;
   }
-  const controlUpdate = { forfait: normForfait, paymentMode: normMode, price: comboPrice };
-  if (!isInTrial && modeChanged && newNextReminderAt) controlUpdate.nextReminderAt = newNextReminderAt;
-  _controlDb.ref('/commandes/' + cmdKey).update(controlUpdate);
+
+  if (!result || !result.ok) {
+    _commandesCache[cmdKey] = prevState;
+    _rerenderClientBillingSection(cmdKey);
+    showToast(result && result.case === 'window-already-used' ? '❌ Déjà changé une fois cette fenêtre' : '❌ Erreur');
+    return;
+  }
+
+  // Upgrade en cours de cycle payé : devis reçu, RIEN n'a encore été écrit — on demande
+  // confirmation à Malek avec le montant exact avant de créer le paiement en attente.
+  if (result.case === 'mid-cycle-upgrade-prorata') {
+    _commandesCache[cmdKey] = prevState;
+    _rerenderClientBillingSection(cmdKey);
+    const q = result.quote;
+    _showCtrlConfirm(
+      'Upgrade au prorata',
+      'Montant dû : <b>' + q.amountDue + '€</b><br>(prix plein ' + q.newFullPrice + '€ − valeur non utilisée ' + q.unusedValue + '€ sur ' + q.daysRemaining + 'j restants du forfait actuel)<br><br>Confirmer et créer un paiement en attente de 7 jours ?',
+      'Confirmer',
+      function() {
+        _callNotifyForfait(Object.assign({}, payload, { confirm: true })).then(function(r2) {
+          if (r2 && r2.ok) { showToast('⏳ Upgrade en attente de paiement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+          else { showToast('❌ Erreur'); }
+        }).catch(function() { showToast('❌ Erreur réseau'); });
+      }
+    );
+    return;
+  }
 
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
-  showToast('&#9989; Formule mise à jour');
+  showToast(result.case === 'mid-cycle-downgrade' ? '📅 Changement programmé en fin de période' : '&#9989; Formule mise à jour');
+}
+
+// ── Forcer l'application immédiate d'un downgrade programmé (cas support exceptionnel) ──
+async function _forceApplyDowngrade(cmdKey) {
+  const d = _commandesCache[cmdKey];
+  if (!d || !d.pendingForfaitChange) return;
+  const rid = _getSlugFromCmdKey(cmdKey);
+  const pfc = d.pendingForfaitChange;
+  try {
+    const result = await _callNotifyForfait({
+      rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: pfc.forfait,
+      email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
+      paymentMode: d.paymentMode || 'annual', actor: 'malek', controlSecret: CONTROL_APP_SECRET, immediate: true
+    });
+    if (result && result.ok) { showToast('✅ Changement appliqué immédiatement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+    else { showToast('❌ Erreur'); }
+  } catch(e) { showToast('❌ Erreur réseau'); }
 }
 
 // ── Enregistrer le prix d'une formule spécifique ────────────────────────────
@@ -3848,6 +3986,19 @@ async function restoreClient(slug, d) {
       firstOpen: false
     });
     await _saasDb.ref('/archivedClients/'+rid).remove();
+    // Créer l'entrée control Firebase manquante — sans elle, ce client restauré était
+    // invisible du cron (plus aucun rappel/suspension automatique). Reproduit les mêmes
+    // champs qu'une création normale, sans firstOpenAt/nextReminderAt : le cycle d'essai
+    // redémarre normalement au prochain login réel via _watchFirstOpen, comme un nouveau client.
+    var cmdRef = _controlDb.ref('/commandes').push();
+    var commandeKey = cmdRef.key;
+    await cmdRef.set({
+      statut: 'traite', lu: true, ts: Date.now(),
+      restaurant: d.name || slug, email: d.email || null, langue: 'fr',
+      forfait: d.forfait || 'menu-qr', paymentMode: paymentMode, price: price,
+      emailData: { email: d.email || null, rid: rid, pwd: pwd, name: d.name || slug, forfait: d.forfait || 'menu-qr', lang: 'fr', paymentMode: paymentMode }
+    });
+    _watchFirstOpen(rid, commandeKey);
     var fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
     _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> ('+escapeHtml(fLabel)+') a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
   } catch(e) {
@@ -4651,38 +4802,6 @@ function writeQRSystem(slug, val) {
   db.ref('/config/features/orderUI').set(val);
   db.ref('/config/features/tableSystem').set(val);
   db.ref('/config/features/qrOrdering').set(val);
-}
-function writeForfait(slug, forfait) {
-  const id = slug.replace(/-/g,'_');
-  const btnId = forfait === 'menu-qr' ? 'forfait-menu-qr-'+id : 'forfait-services-'+id;
-  const btn = document.getElementById(btnId);
-  if (btn && btn.classList.contains('active')) return;
-
-  // Normaliser : 'services' → 'commandes-services' (valeur canonique)
-  const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
-  const isServices  = normForfait === 'commandes-services';
-  const isMenuQR    = !isServices;
-  // Mise à jour visuelle immédiate
-  const btnQR  = document.getElementById('forfait-menu-qr-'+id);
-  const btnSrv = document.getElementById('forfait-services-'+id);
-  const wrap   = document.getElementById('forfait-wrap-'+id);
-  if (btnQR)  btnQR.classList.toggle('active',  isMenuQR);
-  if (btnSrv) btnSrv.classList.toggle('active', isServices);
-  if (wrap)   wrap.classList.toggle('right', isServices);
-  // Écriture features + subscription/forfait dans main Firebase
-  const db = getClientDb(slug);
-  db.ref('/config/features').update({ callBtn: isServices, orderUI: isServices, tableSystem: isServices, qrOrdering: isServices });
-  db.ref('/config/subscription/forfait').set(normForfait);
-  // Écriture dans control Firebase (commande) pour sync local
-  const cmdKey = _getCmdKeyForSlug(slug);
-  if (cmdKey) {
-    _controlDb.ref('/commandes/' + cmdKey + '/forfait').set(normForfait);
-    if (_commandesCache[cmdKey]) {
-      _commandesCache[cmdKey].forfait = normForfait;
-      _rerenderClientBillingSection(cmdKey);
-      _doRenderPaiements();
-    }
-  }
 }
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
