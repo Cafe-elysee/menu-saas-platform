@@ -3588,6 +3588,13 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     return;
   }
 
+  if (result.case === 'no-op') {
+    // Rien n'a été écrit (ex: même forfait avec un mode non couvert par cette grille) —
+    // ne jamais afficher un faux succès (trouvé en audit).
+    _commandesCache[cmdKey] = prevState;
+    _rerenderClientBillingSection(cmdKey);
+    return;
+  }
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
   showToast(result.case === 'mid-cycle-downgrade' ? '📅 Changement programmé en fin de période' : '&#9989; Formule mise à jour');
