@@ -801,14 +801,16 @@ module.exports = async function handler(req, res) {
       if (isWindow) update.firstChangeUsedAt = Date.now();
       if (cmdKey && secret) { try { await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, update); } catch(e) {} }
       const mainToken = await getMainDbToken();
+      let _dbgMainWrite = 'no-token';
       if (mainToken) {
         try {
           const isCS = newForfait === 'commandes-services';
-          await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken,
+          const r1 = await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken,
             { callBtn: isCS, orderUI: isCS, tableSystem: isCS, qrOrdering: isCS });
-          await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken,
+          const r2 = await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken,
             { forfait: newForfait, price, paymentMode: safeMode });
-        } catch(e) {}
+          _dbgMainWrite = JSON.stringify({ r1, r2 });
+        } catch(e) { _dbgMainWrite = 'error: ' + e.message; }
       }
       if (isWindow && email) {
         try {
@@ -821,7 +823,7 @@ module.exports = async function handler(req, res) {
           });
         } catch(e) {}
       }
-      return res.status(200).json({ ok: true, case: cls.case, applied: { forfait: newForfait, price } });
+      return res.status(200).json({ ok: true, case: cls.case, applied: { forfait: newForfait, price }, _dbgMainWrite });
     }
 
     if (cls.case === 'mid-cycle-downgrade') {
