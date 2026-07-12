@@ -983,7 +983,10 @@ module.exports = async function handler(req, res) {
         await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { pendingForfaitChange: null });
       } catch(e) { /* non-bloquant */ }
     }
-    return res.status(200).json({ ok: true, sync: 'cancelled' });
+    // mainWrite requis pour que admin.html (_cancelScheduledForfait, appel SANS 'actor'
+    // volontairement) efface bien la bannière côté MAIN_DB — bug confirmé par audit : sans
+    // ce champ, le client cliquait "Annuler" sans jamais voir la bannière disparaître.
+    return res.status(200).json({ ok: true, sync: 'cancelled', mainWrite: { subscription: { pendingChange: null } } });
   }
 
   if (isPending) {
