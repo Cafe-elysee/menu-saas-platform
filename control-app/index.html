@@ -3130,19 +3130,32 @@ function _cancelScheduledDowngrade(cmdKey) {
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
 }
+const _upgradeConfirmInFlight = {};
 function _confirmUpgradePaid(cmdKey) {
   var d = _commandesCache[cmdKey];
-  if (!d) return;
-  var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({
-    rid: rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
-    newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
-    email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-    paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
-  }).then(function(r) {
-    if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
-    else { showToast('❌ Erreur'); }
-  }).catch(function() { showToast('❌ Erreur réseau'); });
+  if (!d || !d.pendingUpgrade || _upgradeConfirmInFlight[cmdKey]) return;
+  var amount = d.pendingUpgrade.prorata ? d.pendingUpgrade.prorata.amountDue : 0;
+  _showCtrlConfirm(
+    'Confirmer le paiement ?',
+    'Upgrade de « ' + escapeHtml(d.restaurant || '') + ' » marqué payé (' + amount + ' €).',
+    '✅ Confirmer',
+    function() {
+      if (_upgradeConfirmInFlight[cmdKey]) return;
+      _upgradeConfirmInFlight[cmdKey] = true;
+      var rid = _getSlugFromCmdKey(cmdKey);
+      _callNotifyForfait({
+        rid: rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
+        newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
+        email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
+        paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
+      }).then(function(r) {
+        if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+        else { showToast('❌ Erreur'); }
+      }).catch(function() { showToast('❌ Erreur réseau'); })
+        .finally(function() { delete _upgradeConfirmInFlight[cmdKey]; });
+    },
+    false
+  );
 }
 function _cancelPendingUpgradeCtrl(cmdKey) {
   var d = _commandesCache[cmdKey];
@@ -3398,16 +3411,24 @@ function _toggleSuspend(key) {
         const ridSync = (d.emailData && d.emailData.rid) || (d.clientCree && d.clientCree.rid);
         if (ridSync) {
           if (willSuspend) {
-            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: false, suspendu: true });
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: false, suspendu: true }).catch(function() {
+              showToast('⚠ Suspension enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
+            });
           } else {
-            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false });
+            _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false }).catch(function() {
+              showToast('⚠ Réactivation enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
+            });
             // Si la date de renouvellement est déjà dans le passé, la recalculer au
             // moment de la réactivation — sinon le cron B4 re-suspend automatiquement
             // ce client au run suivant, annulant silencieusement le geste de Malek.
             if (d.nextReminderAt && Date.now() >= d.nextReminderAt) {
               const newNextReminderAt = _addMonths(Date.now(), (d.paymentMode === 'annual') ? 12 : 1);
-              _controlWrite('/commandes/' + key + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {});
-              _saasDb.ref('restaurants/' + ridSync + '/config/subscription/endDate').set(newNextReminderAt);
+              _controlWrite('/commandes/' + key + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {
+                showToast('⚠ Échéance non resynchronisée — vérifiez manuellement');
+              });
+              _saasDb.ref('restaurants/' + ridSync + '/config/subscription/endDate').set(newNextReminderAt).catch(function() {
+                showToast('⚠ Échéance non resynchronisée côté restaurant — vérifiez manuellement');
+              });
               if (_commandesCache[key]) _commandesCache[key].nextReminderAt = newNextReminderAt;
             }
           }
@@ -3595,15 +3616,18 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   prices[comboKey] = price;
   _commandesCache[cmdKey] = Object.assign({}, d, { prices });
 
-  // La grille ne montre que les combos annuels → la combo du forfait actif est toujours annual
+  // La grille ne montre que des combos annuels (édition de prix de référence) — ne jamais
+  // en déduire un changement de mode de paiement : un client mensuel dont on édite le prix
+  // annuel de référence ne doit PAS basculer en annuel (bug confirmé, Fix audit paiements).
   var activeForfait = d.forfait || 'menu-qr';
-  var activeForfaitAnnualKey = _comboKey(activeForfait, 'annual');
-  var isActiveCombo = (comboKey === activeForfaitAnnualKey);
+  var activeMode = d.paymentMode || 'monthly';
+  var activeComboKey = _comboKey(activeForfait, activeMode);
+  var isActiveCombo = (comboKey === activeComboKey);
   _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
   const slug = _getSlugFromCmdKey(cmdKey);
   if (isActiveCombo) {
-    _controlWrite('/commandes/' + cmdKey, 'update', { price: price, prices: prices, paymentMode: 'annual' }).catch(function() {});
-    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices, paymentMode: 'annual' });
+    _controlWrite('/commandes/' + cmdKey, 'update', { price: price, prices: prices }).catch(function() {});
+    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices });
   } else {
     _controlWrite('/commandes/' + cmdKey + '/prices', 'update', { [comboKey]: price }).catch(function() {});
     if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
@@ -3647,15 +3671,40 @@ function _saveFirstOpenAt(key, newTs) {
   if (!d) return;
   if (d.firstOpenAt === newTs) return;
   const prev = Object.assign({}, d);
-  _commandesCache[key] = Object.assign({}, d, { firstOpenAt: newTs });
+  const rid  = _getSlugFromCmdKey(key);
+
+  // La date d'anniversaire ancre tout le cycle d'essai (même logique que _watchFirstOpen
+  // au premier usage réel) — tant qu'aucun premier paiement n'a été enregistré, la fin
+  // d'essai ET la prochaine échéance doivent suivre exactement la nouvelle date, des deux
+  // côtés (CONTROL_DB + config/subscription client). Une fois le client payant, son cycle
+  // récurrent (nextReminderAt/endDate) est indépendant et ne doit plus être déplacé.
+  const newTrialEnd = _addMonths(newTs, 1);
+  const update     = { firstOpenAt: newTs, trialEndAt: newTrialEnd };
+  const mainUpdate = { trialEndAt: newTrialEnd };
+  if (!d.paidAt) {
+    update.nextReminderAt = newTrialEnd;
+    mainUpdate.endDate = newTrialEnd;
+  }
+
+  _commandesCache[key] = Object.assign({}, d, update);
   _rerenderCommandeCard(key);
-  _controlWrite('/commandes/' + key + '/firstOpenAt', 'set', newTs)
+  _doRenderPaiements();
+
+  _controlWrite('/commandes/' + key, 'update', update)
+    .then(function() {
+      if (rid) {
+        _saasDb.ref('restaurants/' + rid + '/config/subscription').update(mainUpdate).catch(function() {
+          showToast('⚠ Date enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
+        });
+      }
+    })
     .catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
+      _doRenderPaiements();
       showToast('⚠ Erreur de synchronisation — réessayez.');
     });
-  showToast('📅 Date d\'anniversaire mise à jour');
+  showToast('📅 Date d\'anniversaire mise à jour' + (!d.paidAt ? ' — cycle d\'essai recalculé' : ''));
 }
 
 function _markPaid(key) {
