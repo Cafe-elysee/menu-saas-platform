@@ -6206,7 +6206,7 @@
   <div class="nav-top">
     <div class="nav-search-wrap">
       <svg class="s-ico"><use href="#ico-search"/></svg>
-      <input type="search" class="s-input" id="search" placeholder="Rechercher dans le menu…">
+      <input type="search" class="s-input" id="search" aria-label="Rechercher dans le menu" placeholder="Rechercher dans le menu…">
     </div>
     <div class="nav-controls">
       <div id="table-chip" aria-label="Numéro de table">📍 <span id="table-chip-label"></span></div>
@@ -9972,6 +9972,7 @@ function applyTranslations() {
   // Placeholders
   const si = document.getElementById('search');
   si.placeholder = t.search;
+  si.setAttribute('aria-label', t.search);
   // Dynamic elements
   document.getElementById('hero-tag').textContent = t.tagline;
   document.getElementById('hero-explore').textContent = t.explore;

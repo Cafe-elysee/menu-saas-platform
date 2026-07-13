@@ -1741,6 +1741,21 @@
   }
   body.demo-mode #demo-banner { display: block; }
 
+  #conflict-banner {
+    display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+    background: rgba(214,69,54,0.97); color: #fff; text-align: center;
+    padding: 0.6rem 1rem; font-size: 0.82rem; font-weight: 600;
+    font-family: 'Outfit', sans-serif; letter-spacing: 0.02em;
+    flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem;
+  }
+  #conflict-banner.show { display: flex; }
+  #conflict-banner button {
+    background: #fff; color: #b23224; border: none; border-radius: 999px;
+    padding: 0.35rem 0.9rem; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+  }
+  #conflict-banner button:hover { background: #f2e4e2; }
+
   /* ── ADMIN BOTTOM NAV ── */
   :root { --admin-nav-h: 62px; }
   #admin-bottom-nav {
@@ -2250,6 +2265,7 @@
   html.light .order-adm-card.status-done     { border-left:3px solid var(--green); }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
+<div id="conflict-banner"><span id="conflict-banner-msg"></span><button id="conflict-banner-btn" type="button"></button></div>
 
 <!-- ══════════════════════════════════════
      ADMIN LOADING SCREEN
@@ -3139,6 +3155,8 @@ const ADMIN_UI = {
     phPrice:       '4.50',
     produits:      'προϊόν(τα)',
     toastSaved:    '✓ Οι αλλαγές αποθηκεύτηκαν',
+    conflictMsg:   '⚠️ Το μενού τροποποιήθηκε από άλλη συσκευή. Αποθηκεύστε τώρα ή οι αλλαγές σας θα χαθούν.',
+    conflictBtn:   'Αποθήκευση τώρα',
     toastProd:     '✓ Το προϊόν ενημερώθηκε',
     fabTitle:      'Αποθήκευση όλων',
     fabTooltip:    'Αποθήκευση όλων',
@@ -3297,6 +3315,8 @@ const ADMIN_UI = {
     phPrice:       '4.50',
     produits:      'produit(s)',
     toastSaved:    '✓ Modifications sauvegardées avec succès',
+    conflictMsg:   '⚠️ Le menu a été modifié depuis un autre appareil. Enregistrez maintenant ou vos changements seront perdus.',
+    conflictBtn:   'Enregistrer maintenant',
     toastProd:     '✓ Produit mis à jour',
     fabTitle:      'Enregistrer tout',
     fabTooltip:    'Enregistrer tout',
@@ -3455,6 +3475,8 @@ const ADMIN_UI = {
     phPrice:       '4.50',
     produits:      'product(s)',
     toastSaved:    '✓ Changes saved successfully',
+    conflictMsg:   '⚠️ The menu was changed from another device. Save now or your changes will be lost.',
+    conflictBtn:   'Save now',
     toastProd:     '✓ Product updated',
     fabTitle:      'Save all',
     fabTooltip:    'Save all',
@@ -3613,6 +3635,8 @@ const ADMIN_UI = {
     phPrice:       '4.50',
     produits:      'Produkt(e)',
     toastSaved:    '✓ Änderungen gespeichert',
+    conflictMsg:   '⚠️ Das Menü wurde von einem anderen Gerät geändert. Jetzt speichern, sonst gehen Ihre Änderungen verloren.',
+    conflictBtn:   'Jetzt speichern',
     toastProd:     '✓ Produkt aktualisiert',
     fabTitle:      'Alles speichern',
     fabTooltip:    'Alles speichern',
@@ -3771,6 +3795,8 @@ const ADMIN_UI = {
     phPrice:       '4.50',
     produits:      'producto(s)',
     toastSaved:    '✓ Cambios guardados con éxito',
+    conflictMsg:   '⚠️ El menú fue modificado desde otro dispositivo. Guarde ahora o sus cambios se perderán.',
+    conflictBtn:   'Guardar ahora',
     toastProd:     '✓ Producto actualizado',
     fabTitle:      'Guardar todo',
     fabTooltip:    'Guardar todo',
@@ -4254,7 +4280,7 @@ const _LOGIN_UI = {
   const _il = localStorage.getItem('saas_ui_lang') || 'fr';
   const _it = _LOGIN_UI[_il] || _LOGIN_UI.fr;
   const pwdInput = document.getElementById('pwd-input');
-  if (pwdInput) pwdInput.placeholder = _it.pwd;
+  if (pwdInput) { pwdInput.placeholder = _it.pwd; pwdInput.setAttribute('aria-label', _it.pwd); }
   const loginBtn = document.getElementById('login-btn');
   if (loginBtn) loginBtn.textContent = _it.btn;
   // Sous-titre "Administration" localisé sur login + rid-selector
@@ -4262,6 +4288,8 @@ const _LOGIN_UI = {
   if (loginSub) loginSub.textContent = _it.sub;
   const rselSub = document.getElementById('rsel-sub');
   if (rselSub) rselSub.textContent = _it.sub;
+  const rselInput = document.getElementById('rsel-rid-input');
+  if (rselInput) rselInput.setAttribute('aria-label', _it.ridLabel);
   _syncLoginLangStrip('login-lang-strip', _il);
 })();
 
@@ -4407,7 +4435,9 @@ function _syncAdmPadding() {
   const h = document.getElementById('adm-header');
   const w = document.getElementById('adm-wrap');
   if (!h || !w || !h.offsetHeight) return;
-  const bannerH = document.body.classList.contains('demo-mode') ? 36 : 0;
+  const _conflictEl = document.getElementById('conflict-banner');
+  let bannerH = document.body.classList.contains('demo-mode') ? 36 : 0;
+  if (_conflictEl && _conflictEl.classList.contains('show')) bannerH += _conflictEl.offsetHeight;
   h.style.top = bannerH ? bannerH + 'px' : '';
   w.style.paddingTop = (h.offsetHeight + 20) + 'px';
 }
@@ -4466,6 +4496,25 @@ function applyMenuSnapshot(data) {
   }
 }
 
+function showConflictBanner() {
+  const banner = document.getElementById('conflict-banner');
+  if (!banner) return;
+  const ui = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  document.getElementById('conflict-banner-msg').textContent = ui.conflictMsg || '';
+  const btn = document.getElementById('conflict-banner-btn');
+  btn.textContent = ui.conflictBtn || '';
+  btn.onclick = saveData;
+  banner.classList.add('show');
+  _syncAdmPadding();
+}
+
+function hideConflictBanner() {
+  const banner = document.getElementById('conflict-banner');
+  if (!banner || !banner.classList.contains('show')) return;
+  banner.classList.remove('show');
+  _syncAdmPadding();
+}
+
 function loadData() {
   if (_menuListener) {
     _rref('menu').off('value', _menuListener);
@@ -4473,6 +4522,9 @@ function loadData() {
   _menuListener = _rref('menu').on('value', snapshot => {
     // Ignorer les mises à jour déclenchées par notre propre sauvegarde
     if (Date.now() - _lastLocalSave < 4000) return;
+    // Ne jamais écraser des modifications non enregistrées en cours d'édition :
+    // avertir plutôt que perdre silencieusement le travail du restaurateur.
+    if (typeof unsaved !== 'undefined' && unsaved) { showConflictBanner(); return; }
     const data = snapshot.val();
     applyMenuSnapshot(data);
   }, () => {
@@ -4584,6 +4636,18 @@ function _admPreviewErr(img) {
   img.outerHTML = `<div class="photo-preview-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8 5l1.5-2h5L16 5"/></svg><span>${_noPhoto}</span></div>`;
 }
 
+// Trim + longueur max sur un nom multilingue avant écriture Firebase —
+// évite qu'une chaîne uniquement composée d'espaces trompe les tests `if(name)`
+// existants (rendu d'un nom "vide" invisible au lieu du fallback prévu).
+function _sanitizeNameMap(nameMap) {
+  const r = {};
+  const src = nameMap || { fr:'', en:'', es:'' };
+  Object.keys(src).forEach(l => {
+    r[l] = (typeof src[l] === 'string' ? src[l] : '').trim().slice(0, 100);
+  });
+  return r;
+}
+
 function sanitizeItems(items) {
   return (items || []).map(item => {
     const r = {
@@ -4595,7 +4659,7 @@ function sanitizeItems(items) {
       type:      item.type  || '',
       temp:      item.temp  || '',
       badges:    Array.isArray(item.badges) ? item.badges : [],
-      name:      item.name      || { fr:'', en:'', es: '' },
+      name:      _sanitizeNameMap(item.name),
       desc:      item.desc      || { fr:'', en:'', es: '' },
       full:      item.full      || { fr:'', en:'', es: '' },
       allergens: item.allergens || { fr:[], en:[], es: [] },
@@ -4613,6 +4677,7 @@ function sanitizeItems(items) {
 }
 
 function saveData() {
+  (adminData.cats || []).forEach(cat => { cat.names = _sanitizeNameMap(cat.names); });
   adminData.items = sanitizeItems(adminData.items);
   adminData.menuTheme = currentMenuTheme;
   adminData.menuStyle = currentMenuMode;
@@ -4631,6 +4696,7 @@ function saveData() {
     localStorage.setItem(_PFX+'tx_hashes', JSON.stringify(adminData._txHashes || {}));
     localStorage.setItem(_PFX+'tx_lock',   JSON.stringify(adminData._txLock   || {}));
     unsaved = false;
+    hideConflictBanner();
     if (fab) {
       fab.classList.remove('unsaved');
       fab.classList.add('fab-success');
@@ -5947,6 +6013,7 @@ function renderCatsSection() {
       </div>
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
+        maxlength="100"
         data-ci="${ci}">
       <div class="cat-row-controls">
         <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
@@ -6509,7 +6576,7 @@ function buildProdForm(item) {
     <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
       <div class="form-group">
         <div class="form-lbl" data-uitxt="lblName">${t.lblName} (${l.toUpperCase()})</div>
-        <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName"
+        <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName" maxlength="100"
           value="${esc(item.name?.[l] || '')}" placeholder="${t.phName}">
       </div>
       <div class="form-group">

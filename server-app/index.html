@@ -2348,7 +2348,7 @@ function _startApp(confirmed) {
     var footer = document.getElementById('app-footer');
     if (logo) logo.textContent = name;
     if (footer) footer.textContent = '© ' + new Date().getFullYear() + ' ' + name;
-    document.title = name + ' — Serveur';
+    document.title = name + ' — ' + (T[lang] ? T[lang].hdrSub : 'Serveur');
     // Remplir l'onglet Réglages
     var elRid  = document.getElementById('settings-rid');
     var elName = document.getElementById('settings-name');
@@ -2396,6 +2396,14 @@ document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('deviceready', function() {
   setupNativePush();
   _checkServerTokenInFirebase();
+  // Force la reconnexion Firebase au retour au premier plan (l'app peut rester
+  // visuellement "connectée" mais figée après une longue mise en arrière-plan)
+  var _CapApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if (_CapApp) {
+    _CapApp.addListener('resume', function() {
+      try { firebase.database().goOnline(); } catch(e) {}
+    });
+  }
 }, false);
 </script>
 
