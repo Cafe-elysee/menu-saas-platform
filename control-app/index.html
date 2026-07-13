@@ -3802,9 +3802,17 @@ function _markPaid(key) {
       let update, payEntry;
 
       if (isFirstSub) {
-        // Premier abonnement — cycles alignés sur trialEndAt pour régularité
+        // Premier abonnement — cycles alignés sur trialEndAt pour régularité, MAIS jamais
+        // en-deçà d'aujourd'hui : si l'essai est resté impayé plus longtemps qu'un cycle
+        // complet (trialEndAt très ancien — ex. date d'anniversaire reculée manuellement
+        // pour un test), trialEndAt+1cycle peut retomber avant maintenant. Sans ce filet,
+        // le paiement du jour ne protège alors plus RIEN : classifyForfaitChange (serveur)
+        // revoit aussitôt nextReminderAt <= now et traite le prochain changement de forfait
+        // le jour même comme une fenêtre gratuite (instantané, sans devis ni paiement) —
+        // bug confirmé, même famille que le Fix #102 déjà appliqué à la branche récurrente.
         const base = d.trialEndAt || d.nextReminderAt || now;
-        const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
+        let nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
+        if (nextReminderAt <= now) nextReminderAt = isMonthly ? _addMonths(now, 1) : _addMonths(now, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
