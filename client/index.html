@@ -11067,9 +11067,13 @@ function setupFAB() {
    HERO FAB HIDE — masquer sonnette/commande sur hero (styles scroll)
 ================================================ */
 let _heroFabObserver = null;
+let _cardFabObserver = null;
+let _cardsVisibleForFab = new Set();
 
 function _setupHeroFabHide() {
   if (_heroFabObserver) { _heroFabObserver.disconnect(); _heroFabObserver = null; }
+  if (_cardFabObserver) { _cardFabObserver.disconnect(); _cardFabObserver = null; }
+  _cardsVisibleForFab.clear();
   const fabIds = ['call-fab','cart-fab','hist-fab'];
   // En mode papier : aucune gestion ici
   if (menuStyle === 'paper') {
@@ -11084,19 +11088,44 @@ function _setupHeroFabHide() {
     const el = document.getElementById(id);
     if (el) el.classList.add('hero-fab-hide');
   });
+
+  let _heroVisible = true;
+  const _applyFabHideState = () => {
+    // Masqué seulement si le hero est visible ET qu'aucun produit n'est encore visible —
+    // sinon (accueil court/peu rempli), un produit peut déjà être à l'écran alors que
+    // le hero l'est encore, et les boutons doivent quand même s'afficher.
+    const hide = _heroVisible && _cardsVisibleForFab.size === 0;
+    fabIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hero-fab-hide', hide);
+    });
+  };
+
   // Observer le hero (bandeau photo d'accueil) — FABs masqués tant qu'il est visible,
   // affichés dès qu'on le quitte, et ce jusqu'en bas de page (pas seulement pendant
   // la 1ère catégorie : sinon les FABs disparaissaient à nouveau après la 1ère section).
   const target = document.getElementById('hero');
-  if (!target) return;
-  _heroFabObserver = new IntersectionObserver(entries => {
-    const heroVisible = entries[0].isIntersecting;
-    fabIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hero-fab-hide', heroVisible);
-    });
-  }, { threshold: 0.15 });
-  _heroFabObserver.observe(target);
+  if (target) {
+    _heroFabObserver = new IntersectionObserver(entries => {
+      _heroVisible = entries[0].isIntersecting;
+      _applyFabHideState();
+    }, { threshold: 0.15 });
+    _heroFabObserver.observe(target);
+  }
+
+  // Observer les cartes produit — dès qu'une seule est visible à l'écran, les boutons
+  // s'affichent, indépendamment de l'état du hero.
+  const cards = document.querySelectorAll('.card');
+  if (cards.length) {
+    _cardFabObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) _cardsVisibleForFab.add(entry.target);
+        else _cardsVisibleForFab.delete(entry.target);
+      });
+      _applyFabHideState();
+    }, { threshold: 0.01 });
+    cards.forEach(card => _cardFabObserver.observe(card));
+  }
 }
 
 /* ================================================
