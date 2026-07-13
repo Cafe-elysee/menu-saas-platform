@@ -2193,6 +2193,7 @@
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
 'use strict';
@@ -2572,7 +2573,7 @@ const _clientDbs = {};
 
 let _saasDb = null;
 
-function initFirebase() {
+async function initFirebase() {
   const controlApp = firebase.initializeApp(CONTROL_FB_CONFIG, 'control');
   _controlDb = firebase.database(controlApp);
   if (!_saasDb) {
@@ -2580,6 +2581,7 @@ function initFirebase() {
     try { saasApp = firebase.app('saas-platform'); } catch(e) { saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform'); }
     _saasDb = firebase.database(saasApp);
   }
+  await _ensurePlatformAuth();
   listenCommandes();
   loadArchivedClients();
   loadClientsFromFirebase();
@@ -3513,6 +3515,39 @@ function _saveCommandePrice(key, rawVal) {
 // Miroir exact de la fonction équivalente dans client/admin.html (duplication volontaire,
 // projet vanilla JS sans module partagé — voir feedback_regles_travail).
 const CONTROL_APP_SECRET = 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY';
+
+// Connexion silencieuse control-app (identité "platform", Malek uniquement) — donne
+// aux règles Firebase de quoi distinguer Malek d'un visiteur anonyme, sans rien
+// changer à l'usage de control-app (aucune nouvelle action requise).
+let _platformAuthPromise = null;
+function _ensurePlatformAuth() {
+  if (!_platformAuthPromise) {
+    _platformAuthPromise = fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret: CONTROL_APP_SECRET })
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.ok && data.customToken) {
+          return firebase.auth(_saasDb.app).signInWithCustomToken(data.customToken);
+        }
+      })
+      .catch(function(e) { console.error('platform auth failed', e); });
+  }
+  return _platformAuthPromise;
+}
+
+// Mint un jeton {rid, role:'admin'} pour un restaurant donné — remplace l'ancien
+// config/ctrlBypass (fenêtre de course de 15s) par un vrai jeton signé côté serveur.
+function _mintAdminTokenFor(rid) {
+  return fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: CONTROL_APP_SECRET, rid: rid })
+  }).then(function(r) { return r.json(); });
+}
+
 async function _callNotifyForfait(payload) {
   const resp = await fetch('https://menu-saas-platform.vercel.app/api/notify-forfait', {
     method: 'POST',
@@ -4489,8 +4524,16 @@ function copyAdminLink() {
 
 async function openAdmin(e, slug) {
   e.preventDefault();
-  await getClientDb(slug).ref('/config/ctrlBypass').set(Date.now());
-  window.open('https://genext-qr.com/admin?ctrl=1#rid=' + encodeURIComponent(slug), '_system');
+  try {
+    const data = await _mintAdminTokenFor(slug);
+    if (data && data.ok && data.customToken) {
+      window.open('https://genext-qr.com/admin?ctrl=1#token=' + encodeURIComponent(data.customToken), '_system');
+    } else {
+      showToast('Erreur : lien admin indisponible');
+    }
+  } catch (e2) {
+    showToast('Erreur : lien admin indisponible');
+  }
 }
 
 async function toggleClientActive(slug) {

@@ -1667,6 +1667,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey:            "AIzaSyCM6SiQoWQfsq_t-80EfiVplXV9p534_eI",
@@ -3019,15 +3020,6 @@
 <div id="toast">✓ Modifications sauvegardées avec succès</div>
 
 <script>
-/* ═══════════════════════════════════════════
-   CONFIGURATION — MOT DE PASSE (SHA-256)
-   Pour changer le mot de passe :
-   1. Calculer SHA-256 du nouveau mot de passe sur : sha256.online
-   2. Remplacer la valeur de ADMIN_HASH ci-dessous
-═══════════════════════════════════════════ */
-// SHA-256 hash local — fallback si Firebase /config/adminHash est absent
-// Le hash Firebase a toujours la priorité. Changer via control-app.
-const ADMIN_HASH = 'b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576b3fdefa5b9e65dbe'; // demo (ne pas utiliser en prod)
 const STORE_KEY = _PFX + 'admin_data_v1';
 
 async function _hashPwd(pwd) {
@@ -4056,14 +4048,19 @@ function _doAdmConfirm() {
 async function checkLogin() {
   // Phase 1 : pas de ?rid= dans l'URL
   if (!new URLSearchParams(location.search).get('rid')) {
-    // Bypass control-app : ?ctrl=1#rid=xxx → écrire ctrlBypass puis rediriger
+    // Bypass control-app : ?ctrl=1#token=xxx → jeton Firebase Auth signé côté serveur
+    // (remplace l'ancien config/ctrlBypass, une fenêtre de course de 15s sans vraie
+    // vérification d'identité).
     if (new URLSearchParams(location.search).get('ctrl') === '1' && location.hash) {
-      const _hashRid = new URLSearchParams(location.hash.slice(1)).get('rid');
-      if (_hashRid) {
+      const _hashToken = new URLSearchParams(location.hash.slice(1)).get('token');
+      if (_hashToken) {
         try {
-          await firebase.database().ref('restaurants/' + _hashRid + '/config/ctrlBypass').set(Date.now());
-          location.replace(location.pathname + '?rid=' + encodeURIComponent(_hashRid) + '&ctrl=1');
-          return;
+          const cred = await firebase.auth().signInWithCustomToken(_hashToken);
+          const idTokenResult = await cred.user.getIdTokenResult();
+          if (idTokenResult.claims.rid) {
+            location.replace(location.pathname + '?rid=' + encodeURIComponent(idTokenResult.claims.rid));
+            return;
+          }
         } catch(e) {}
       }
     }
@@ -4080,84 +4077,35 @@ async function checkLogin() {
     }
   } catch(e) {}
 
-  const saved    = sessionStorage.getItem(_PFX+'admin_auth');
-  const sessionId = sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess');
-
-  if ((saved === 'ok' || localStorage.getItem(_PFX+'admin_sess')) && sessionId) {
-    // Vérifier que la session Firebase n'a pas été révoquée
-    try {
-      const snap = await _rref('sessions/' + sessionId).once('value');
-      if (snap.exists()) {
-        // Vérifier que le compte est toujours actif
-        try {
-          const actSnap = await _rref('/config/active').once('value');
-          if (actSnap.val() === false || actSnap.val() === null) {
-            sessionStorage.removeItem(_PFX+'admin_auth');
-            sessionStorage.removeItem(_PFX+'session_id');
-            localStorage.removeItem(_PFX+'admin_sess');
-            return;
-          }
-        } catch(e) {}
-        // Restaurer sessionStorage si on vient du localStorage
-        sessionStorage.setItem(_PFX+'admin_auth', 'ok');
-        sessionStorage.setItem(_PFX+'session_id', sessionId);
-        showAdmin(); return;
-      }
-      // Session révoquée → déconnexion forcée
-      sessionStorage.removeItem(_PFX+'admin_auth');
-      sessionStorage.removeItem(_PFX+'session_id');
-      localStorage.removeItem(_PFX+'admin_sess');
-    } catch(e) {
-      // Erreur réseau → laisser passer (mode offline)
-      sessionStorage.setItem(_PFX+'admin_auth', 'ok');
-      sessionStorage.setItem(_PFX+'session_id', sessionId);
-      showAdmin(); return;
-    }
-  }
-
   if (new URLSearchParams(location.search).get('demo') === '1') {
     document.body.classList.add('demo-mode');
     showAdmin(); return;
   }
 
-  if (new URLSearchParams(location.search).get('ctrl') === '1') {
-    try {
-      const snap = await _rref('/config/ctrlBypass').once('value');
-      const ts = snap.val();
-      if (ts && Date.now() - ts < 15000) {
-        await _rref('/config/ctrlBypass').remove();
-        await _openSession();
+  // Session Firebase Auth déjà active (persistance native du SDK, survit aux
+  // rechargements) — remplace l'ancien système sessions/{sid} + sessionStorage/localStorage.
+  await new Promise(resolve => {
+    const unsub = firebase.auth().onAuthStateChanged(async (user) => {
+      unsub();
+      if (!user) { _hideAdmLoadingScreen(); resolve(); return; }
+      try {
+        const idTokenResult = await user.getIdTokenResult();
+        const claims = idTokenResult.claims;
+        if (claims.rid !== _RID && claims.role !== 'platform') { _hideAdmLoadingScreen(); resolve(); return; }
+        const actSnap = await _rref('/config/active').once('value');
+        if (actSnap.val() === false || actSnap.val() === null) {
+          await firebase.auth().signOut();
+          _hideAdmLoadingScreen(); resolve(); return;
+        }
         showAdmin();
-        return;
-      }
-    } catch(e) {}
-  }
-  // Fallthrough : aucune session valide → écran login visible
-  _hideAdmLoadingScreen();
-}
-
-async function _openSession() {
-  const sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-  sessionStorage.setItem(_PFX+'admin_auth', 'ok');
-  sessionStorage.setItem(_PFX+'session_id', sid);
-  localStorage.setItem(_PFX+'admin_sess', sid);
-  try {
-    await _rref('sessions/' + sid).set({
-      ts: Date.now(),
-      rid: _RID,
-      ua: navigator.userAgent.slice(0, 120)
+      } catch(e) { _hideAdmLoadingScreen(); }
+      resolve();
     });
-  } catch(e) {}
+  });
 }
 
 async function _closeSession() {
-  const sid = sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess');
-  if (sid) {
-    try { await _rref('sessions/' + sid).remove(); } catch(e) {}
-  }
-  sessionStorage.removeItem(_PFX+'admin_auth');
-  sessionStorage.removeItem(_PFX+'session_id');
-  localStorage.removeItem(_PFX+'admin_sess');
+  try { await firebase.auth().signOut(); } catch(e) {}
 }
 
 /* ── THÈME ── */
@@ -4213,9 +4161,6 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   location.reload();
 });
 
-let _loginAttempts = 0;
-let _loginBlockUntil = 0;
-
 // _LOGIN_UI déclaré ici (avant l'IIFE ci-dessous) car const n'est pas hoisté
 const _LOGIN_UI = {
   fr: { pwd:'Mot de passe',  btn:'Connexion', sub:'Administration', ridLabel:'ID du restaurant',   ridHint:'Demandez votre code d\'accès à l\'administrateur', ridNew:'Nouvel identifiant', ridBtn:'Continuer', pwdHint:'Demandez votre mot de passe à l\'administrateur' },
@@ -4243,47 +4188,43 @@ const _LOGIN_UI = {
 
 async function doLogin() {
   const errEl = document.getElementById('login-err');
-  const now = Date.now();
-  // Anti-bruteforce : bloquer si trop de tentatives récentes
-  if (_loginBlockUntil > now) {
-    const secs = Math.ceil((_loginBlockUntil - now) / 1000);
-    errEl.textContent = `Trop de tentatives — réessayez dans ${secs}s`;
-    return;
-  }
   const val = document.getElementById('pwd-input').value;
-  const hash = await _hashPwd(val);
-
-  let expectedHash = ADMIN_HASH;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  errEl.textContent = '…';
   try {
-    const snap = await _rref('/config/adminHash').get();
-    if (snap.exists()) expectedHash = snap.val();
-  } catch {}
+    // Le mot de passe est vérifié côté serveur (jamais comparé dans le navigateur) —
+    // ferme la possibilité de lire config/adminHash directement et de comparer en local.
+    const resp = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rid: _RID, password: val })
+    });
+    const data = await resp.json();
 
-  if (hash === expectedHash) {
-    _loginAttempts = 0;
-    try {
-      const actSnap = await _rref('/config/active').once('value');
-      if (actSnap.val() === false || actSnap.val() === null) {
-        errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrSuspended;
-        document.getElementById('pwd-input').value = '';
-        document.getElementById('pwd-input').focus();
-        return;
-      }
-    } catch(e) {}
-    await _openSession();
+    if (resp.status === 429) {
+      const secs = Math.ceil((data.retryInMs || 0) / 1000);
+      errEl.textContent = `Trop de tentatives — réessayez dans ${secs}s`;
+      return;
+    }
+    if (resp.status === 403) {
+      errEl.textContent = t.loginErrSuspended;
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+      return;
+    }
+    if (!data.ok || !data.customToken) {
+      const suffix = data.attemptsRemaining != null ? ` (${5 - data.attemptsRemaining}/5).` : '.';
+      errEl.textContent = t.loginErrIncorrect + suffix;
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+      return;
+    }
+
+    await firebase.auth().signInWithCustomToken(data.customToken);
     _logAction('login');
     showAdmin();
-  } else {
-    _loginAttempts++;
-    if (_loginAttempts >= 5) {
-      _loginBlockUntil = Date.now() + 30000;
-      _loginAttempts = 0;
-      errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrBlocked;
-    } else {
-      errEl.textContent = (ADMIN_UI[currentLang]||ADMIN_UI.fr).loginErrIncorrect + ` (${_loginAttempts}/5).`;
-    }
-    document.getElementById('pwd-input').value = '';
-    document.getElementById('pwd-input').focus();
+  } catch(e) {
+    errEl.textContent = t.loginErrIncorrect || '❌ Erreur';
   }
 }
 
@@ -8621,8 +8562,13 @@ async function _callNotifyForfait(payload) {
   }
   return result;
 }
-function _sessionId() {
-  return sessionStorage.getItem(_PFX+'session_id') || localStorage.getItem(_PFX+'admin_sess') || '';
+// Jeton Firebase Auth de la session en cours — remplace l'ancien sid (nœud
+// sessions/{sid} désormais obsolète), vérifié cryptographiquement côté serveur
+// (voir verifySession() dans client/api/notify-forfait.js).
+async function _sessionId() {
+  const u = firebase.auth().currentUser;
+  if (!u) return '';
+  try { return await u.getIdToken(); } catch (e) { return ''; }
 }
 async function _restaurantName() {
   const nameSnap = await _rref('profile/name').once('value');
@@ -8699,7 +8645,7 @@ async function _changeSubscription(newForfait, newMode) {
       const quote = await _callNotifyForfait({
         rid: _RID, name: restName, oldForfait: curForfait, newForfait,
         email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
-        actor: 'client', confirm: false, sid: _sessionId()
+        actor: 'client', confirm: false, sid: await _sessionId()
       });
       if (fb) fb.textContent = '';
       if (quote && quote.ok && quote.case === 'mid-cycle-upgrade-prorata') {
@@ -8770,7 +8716,7 @@ async function _doConfirmUpgradeProrata(newForfait, newMode) {
     const result = await _callNotifyForfait({
       rid: _RID, name: restName, oldForfait: _subData?.forfait || 'menu-qr', newForfait,
       email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
-      actor: 'client', confirm: true, sid: _sessionId()
+      actor: 'client', confirm: true, sid: await _sessionId()
     });
     if (!result || !result.ok) { if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.subUpgradeError || '❌ Erreur, veuillez réessayer'; } return; }
     if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subPendingUpgradeBadge || '⏳ Upgrade en attente de paiement'; }
@@ -8780,11 +8726,11 @@ async function _doConfirmUpgradeProrata(newForfait, newMode) {
   }
 }
 
-function _cancelPendingUpgrade() {
+async function _cancelPendingUpgrade() {
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   _callNotifyForfait({
     rid: _RID, newForfait: _subData?.forfait || 'menu-qr', cancelUpgrade: true,
-    lang: currentLang, email: _subData?.email || null, actor: 'client', sid: _sessionId()
+    lang: currentLang, email: _subData?.email || null, actor: 'client', sid: await _sessionId()
   })
     .then(result => {
       if (result && result.ok) { showToast('↩️ ' + (t.subUpgradeCancelled || 'Retour à votre forfait actuel')); _loadSubscriptionSection(); }
@@ -8804,7 +8750,7 @@ async function _doChangeSubscription(newForfait, newMode, t) {
       oldForfait: _subData?.forfait || 'menu-qr', newForfait,
       email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
       isTrial: !!(_subData?.trialEndAt && Date.now() < _subData.trialEndAt),
-      actor: 'client', sid: _sessionId()
+      actor: 'client', sid: await _sessionId()
     });
     if (!result || !result.ok) {
       if (fb) { fb.style.color = 'var(--red)'; fb.textContent = (result && result.case === 'window-already-used') ? (t.subWindowAlreadyUsed || 'Vous avez déjà changé de forfait cette fois-ci.') : (t.subUpgradeError || '❌ Erreur'); }
@@ -8830,7 +8776,7 @@ async function _doChangePaymentModeOnly(newMode) {
       rid: _RID, name: restName,
       oldForfait: _subData?.forfait || 'menu-qr', newForfait: _subData?.forfait || 'menu-qr',
       email: _subData?.email || null, lang: currentLang, paymentMode: newMode,
-      onlyPaymentMode: true, sid: _sessionId()
+      onlyPaymentMode: true, sid: await _sessionId()
     });
     if (!result || !result.ok) { if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.subUpgradeError || '❌ Erreur'; } return; }
     if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.subModeChanged || '✅ Mode de paiement mis à jour'; }
@@ -8849,7 +8795,7 @@ async function _doScheduleForfait(newForfait) {
       rid: _RID, name: restName,
       oldForfait: _subData?.forfait || 'menu-qr', newForfait,
       email: _subData?.email || null, lang: currentLang,
-      paymentMode: payMode, pending: true, actor: 'client', sid: _sessionId()
+      paymentMode: payMode, pending: true, actor: 'client', sid: await _sessionId()
     });
     if (!result || !result.ok) { showToast(t.subUpgradeError || '❌ Erreur'); return; }
     showToast('📅 ' + (t.subPendingNotice || 'Changement programmé pour fin de période'));
@@ -8868,7 +8814,7 @@ async function _cancelScheduledForfait() {
     const result = await _callNotifyForfait({
       rid: _RID, name: '', oldForfait: '', newForfait: _subData?.forfait || 'menu-qr',
       email: null, lang: currentLang, paymentMode: _subData?.paymentMode || 'annual',
-      pending: 'cancel', sid: _sessionId()
+      pending: 'cancel', sid: await _sessionId()
     });
     if (result && result.ok) setTimeout(() => _loadSubscriptionSection(), 400);
   } catch(e) {
@@ -8999,14 +8945,14 @@ async function saveAdminPassword() {
       try {
         const hash = await _hashPwd(val);
         await _rref('/config/adminHash').set(hash);
-        // Révoquer toutes les sessions actives
-        await _rref('sessions').remove().catch(() => {});
+        // Révoquer les sessions Firebase Auth déjà émises (best-effort, ne bloque jamais)
+        fetch('/api/revoke-admin-sessions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rid: _RID })
+        }).catch(() => {});
         // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
         _removeSavedId(_RID);
-        // Vider la session locale (session + persistante) et recharger
-        sessionStorage.removeItem(_PFX+'admin_auth');
-        sessionStorage.removeItem(_PFX+'session_id');
-        localStorage.removeItem(_PFX+'admin_sess');
+        await firebase.auth().signOut().catch(() => {});
         inp.value = '';
         if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.pwdChangedLogout || '✅ Mot de passe modifié — reconnectez-vous'; }
         setTimeout(() => location.reload(), 1800);
@@ -9025,9 +8971,8 @@ function changeRestaurantId() {
     t.changeIdConfirmOk    || 'Confirmer',
     t.changeIdConfirmCancel|| 'Annuler',
     () => {
-      // Quitter l'UI sans fermer la session — elle reste valide pour cet ID
-      sessionStorage.removeItem(_PFX+'admin_auth');
-      sessionStorage.removeItem(_PFX+'session_id');
+      // Quitter l'UI sans fermer la session — la persistance native de Firebase Auth
+      // la garde valide pour cet ID au retour, sans redemander le mot de passe.
       location.href = location.pathname;
     }
   );

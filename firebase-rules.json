@@ -30,7 +30,7 @@
         "logs": {
           ".write": "!newData.exists()",
           "errors":  { ".write": true },
-          "actions": { ".write": true },
+          "actions": { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
           "orders":  { ".write": "auth != null" }
         },
 
@@ -49,15 +49,15 @@
         },
 
         "config": {
-          ".write": true,
+          ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
           "adminPwd": {
             ".validate": "!newData.exists()"
           }
         },
 
-        "menu":      { ".write": true },
-        "profile":   { ".write": true },
-        "sessions":  { ".write": true },
+        "menu":      { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "profile":   { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "sessions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
         "firstOpen": { ".write": true }
       }
     },

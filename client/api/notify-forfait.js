@@ -115,28 +115,18 @@ async function getAccessToken(sa) {
 // Vérifie qu'une session admin valide existe pour ce rid (restaurants/{rid}/sessions/{sid})
 // avant d'honorer un changement de forfait — sans ça, n'importe qui connaissant un rid réel
 // pouvait forger une requête et modifier la facturation d'un client sans authentification.
-// Dégradation gracieuse si le service account est absent (même posture que fetchSaasPricing
-// ci-dessous) : ne bloque jamais le flux si l'infra de vérification elle-même est indisponible,
-// seulement si la session est explicitement absente/invalide.
+// "sid" est désormais un vrai jeton Firebase Auth (ID token, pas un nœud
+// sessions/{sid}) — vérifié cryptographiquement (signature + expiration),
+// puis son claim "rid" doit correspondre au restaurant demandé. Échec fermé
+// dans tous les cas (jeton absent/invalide/expiré/mauvais rid).
 async function verifySession(rid, sid) {
   if (!sid) return false;
   try {
-    const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (!raw) return false; // infra de vérification indisponible — échec fermé
-    const sa = JSON.parse(raw);
-    const token = await getAccessToken(sa);
-    const url = SAAS_DB + '/restaurants/' + encodeURIComponent(rid) + '/sessions/' + encodeURIComponent(sid) + '.json?access_token=' + token;
-    return new Promise(resolve => {
-      const u = new URL(url);
-      const opts = { hostname: u.hostname, path: u.pathname + u.search, method: 'GET' };
-      const r2 = https.request(opts, r => {
-        let d = ''; r.on('data', c => d += c);
-        r.on('end', () => { try { resolve(JSON.parse(d) !== null); } catch(e) { resolve(false); } });
-      });
-      r2.on('error', () => resolve(false)); // erreur réseau de vérification — échec fermé
-      r2.end();
-    });
-  } catch(e) { return false; }
+    const { verifyIdToken } = require('./_lib/firebaseAdmin');
+    const payload = await verifyIdToken(sid, 'menu-saas-platform');
+    if (!payload) return false;
+    return payload.rid === rid;
+  } catch (e) { return false; }
 }
 // Lecture publique (mêmes règles Firebase que demoPage/*, déjà lisibles sans authentification
 // ailleurs dans le projet — voir autoCreateRestaurant dans demo-page/api/notify-commande.js,
