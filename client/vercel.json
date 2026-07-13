@@ -11,14 +11,6 @@
       },
       "continue": true
     },
-    {
-      "src": "^/MenuProServeur-SaaS-v1\\.0\\.apk$",
-      "headers": {
-        "Content-Type":        "application/vnd.android.package-archive",
-        "Content-Disposition": "attachment; filename=\"MenuProServeur-SaaS-v1.0.apk\""
-      },
-      "continue": true
-    },
     { "src": "^/api/(.*)$",      "dest": "/api/$1" },
     { "src": "^/menu$",          "dest": "/index.html" },
     { "src": "^/admin$",         "dest": "/admin.html" },

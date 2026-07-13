@@ -1,6 +1,6 @@
 /* ============================================================
-   Vercel Function — proxy d'écriture vers CONTROL_DB (menu-pro-control/commandes),
-   réservé à l'identité "platform" (Malek/control-app).
+   Vercel Function — proxy d'écriture ET de lecture vers CONTROL_DB
+   (menu-pro-control/commandes), réservé à l'identité "platform" (Malek/control-app).
 
    Remplace les écritures anonymes directes que faisait control-app jusqu'ici sur ce
    second projet Firebase — la connexion anonyme y était partagée avec n'importe quel
@@ -8,6 +8,14 @@
    Malek d'un tiers. Le secret RTDB legacy (FIREBASE_CONTROL_SECRET) ne quitte jamais
    ce serveur — seul un jeton "platform" déjà valide (voir platform-login.js) permet
    d'en déclencher l'usage.
+
+   op:'get' (lecture, ajouté audit sécurité 2026-07-13) : remplace l'ancienne règle
+   Firebase ".read":true sur /commandes (fuite de données personnelles — nom/email/
+   téléphone de tous les prospects lisibles par quiconque connaît l'URL du projet,
+   visible en clair dans le bundle JS public de demo-page). control-app n'a plus de
+   lecture directe sur ce projet Firebase — il interroge cet endpoint par sondage
+   (voir _pollCommandes dans control-app/index.html). Fusionné dans ce fichier plutôt
+   que créé à part : le plan Vercel Hobby limite à 12 fonctions serverless, déjà atteint.
 ============================================================ */
 
 const https = require('https');
@@ -48,7 +56,7 @@ module.exports = async function handler(req, res) {
   if (!path || typeof path !== 'string' || (path !== '/commandes' && !path.startsWith('/commandes/'))) {
     return res.status(400).json({ error: 'Invalid path' });
   }
-  const VALID_OPS = ['set', 'update', 'remove', 'push'];
+  const VALID_OPS = ['set', 'update', 'remove', 'push', 'get'];
   if (!VALID_OPS.includes(op)) return res.status(400).json({ error: 'Invalid op' });
 
   const payload = await verifyIdToken(sid, 'menu-saas-platform');
@@ -58,7 +66,10 @@ module.exports = async function handler(req, res) {
 
   try {
     let result;
-    if (op === 'remove') {
+    if (op === 'get') {
+      result = await controlRequest(path, 'GET');
+      return res.status(200).json({ ok: true, data: result });
+    } else if (op === 'remove') {
       result = await controlRequest(path, 'DELETE');
     } else if (op === 'push') {
       result = await controlRequest(path, 'POST', data);

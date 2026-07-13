@@ -2642,10 +2642,12 @@ const _clientDbs = {};
 
 let _saasDb = null;
 
-// Écritures vers CONTROL_DB (menu-pro-control/commandes) — passent désormais par un
-// endpoint serveur authentifié (identité "platform" vérifiée) plutôt que par l'ancienne
-// connexion anonyme directe, elle-même partagée avec n'importe quel visiteur demo-page.
-// Les LECTURES restent inchangées (listenCommandes ci-dessous, .read public assumé).
+// Écritures ET lectures vers CONTROL_DB (menu-pro-control/commandes) passent par un
+// endpoint serveur authentifié (identité "platform" vérifiée) — plus aucune connexion
+// directe de control-app à ce projet Firebase. Avant le fix audit sécurité 2026-07-13,
+// les lectures passaient par la règle Firebase ".read":true sur /commandes (fuite de
+// données personnelles réelle : nom/email/téléphone de tous les prospects lisibles par
+// quiconque connaît l'URL du projet, visible dans le bundle JS public de demo-page).
 async function _controlWrite(path, op, data) {
   const sid = await _platformIdToken();
   const r = await fetch('https://menu-saas-platform.vercel.app/api/control-db-write', {
@@ -2655,6 +2657,17 @@ async function _controlWrite(path, op, data) {
   const json = await r.json().catch(function() { return null; });
   if (!json || !json.ok) throw new Error((json && json.error) || 'control write failed');
   return json;
+}
+
+async function _controlRead(path) {
+  const sid = await _platformIdToken();
+  const r = await fetch('https://menu-saas-platform.vercel.app/api/control-db-write', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sid: sid, path: path, op: 'get' })
+  });
+  const json = await r.json().catch(function() { return null; });
+  if (!json || !json.ok) throw new Error((json && json.error) || 'control read failed');
+  return json.data;
 }
 
 async function initFirebase() {
@@ -2858,9 +2871,23 @@ function _rerenderCommandeCard(key) {
   _rerenderClientBillingSection(key);
 }
 
+// Sondage périodique de /commandes via l'endpoint serveur authentifié (remplace l'ancien
+// listener temps réel .on('value'), qui reposait sur la règle Firebase publique ".read":true
+// désormais fermée — voir _controlRead ci-dessus). Un intervalle de 8s reste largement
+// suffisant : aucune action de Malek n'attend ce sondage pour se refléter dans l'UI (chaque
+// action a déjà sa propre mise à jour optimiste locale immédiate).
+let _commandesPollTimer = null;
 function listenCommandes() {
-  _controlDb.ref('/commandes').on('value', snap => {
-    _commandesCache = snap.val() || {};
+  _pollCommandesOnce();
+  if (_commandesPollTimer) clearInterval(_commandesPollTimer);
+  _commandesPollTimer = setInterval(_pollCommandesOnce, 8000);
+}
+
+async function _pollCommandesOnce() {
+  let _data;
+  try { _data = await _controlRead('/commandes'); } catch(e) { return; }
+  {
+    _commandesCache = _data || {};
     // Restaurer _lastCreatedClients et _deletedClients depuis localStorage + nettoyer les entrées obsolètes
     Object.keys(_commandesCache).forEach(function(k) {
       if (!_lastCreatedClients[k]) {
@@ -2938,7 +2965,7 @@ function listenCommandes() {
         }
       });
     }, 200);
-  });
+  }
 }
 
 let _commandesRenderTimer = null;
@@ -4085,8 +4112,8 @@ async function restoreClient(slug, d) {
       // ne pas encore être peuplé juste après un rechargement de l'app — se fier à lui ici
       // ferait retomber silencieusement sur la reconstruction générique ci-dessous, perdant
       // le cycle d'abonnement réel malgré la commande d'origine toujours intacte en base).
-      var _existingCmdSnap = d.cmdKey ? await _controlDb.ref('/commandes/' + d.cmdKey).once('value') : null;
-      if (d.cmdKey && _existingCmdSnap && _existingCmdSnap.exists()) {
+      var _existingCmdData = d.cmdKey ? await _controlRead('/commandes/' + d.cmdKey) : null;
+      if (d.cmdKey && _existingCmdData) {
         // La commande d'origine n'a jamais été supprimée (juste marquée clientDeleted) —
         // la réactiver préserve tel quel le cycle d'abonnement réel (nextReminderAt,
         // trialEndAt, pendingUpgrade/pendingForfaitChange...) au lieu de repartir sur un
@@ -5944,8 +5971,8 @@ document.addEventListener('deviceready', () => {
     // ── Listeners EN PREMIER, avant tout appel à register() ──
     Push.addListener('registration', token => saveControlToken(token.value));
     Push.addListener('registrationError', () => setTimeout(() => Push.register(), 15000));
-    Push.addListener('pushNotificationReceived', notif => { showToast('🆕 Nouvelle commande !'); switchTab('clients'); });
-    Push.addListener('pushNotificationActionPerformed', action => { switchTab('clients'); });
+    Push.addListener('pushNotificationReceived', notif => { showToast('🆕 Nouvelle commande !'); switchTab('clients'); _pollCommandesOnce(); });
+    Push.addListener('pushNotificationActionPerformed', action => { switchTab('clients'); _pollCommandesOnce(); });
     if (!window._ctrlVisibilityListenerAdded) {
       window._ctrlVisibilityListenerAdded = true;
       document.addEventListener('visibilitychange', () => {

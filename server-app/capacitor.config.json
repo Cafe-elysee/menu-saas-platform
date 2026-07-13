@@ -10,6 +10,6 @@
   "android": {
     "captureInput": true,
     "allowMixedContent": true,
-    "webContentsDebuggingEnabled": true
+    "webContentsDebuggingEnabled": false
   }
 }

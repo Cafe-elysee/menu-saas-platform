@@ -7815,6 +7815,9 @@ function loadPrimaryLang() {
       currentLang = val;
       if (typeof window._updateLangBtn === 'function') window._updateLangBtn(val);
     }
+    // Alimente aussi l'onglet Réglages (évite un 2ᵉ listener Firebase redondant sur le même chemin)
+    _settingsLangData.primary = val;
+    if (typeof _settingsUpdateLangSelects === 'function') _settingsUpdateLangSelects();
   });
 }
 
@@ -7834,6 +7837,8 @@ function loadEnabledLangs() {
   _rref('/config/enabledLangs').on('value', snap => {
     adminEnabledLangs = snap.val() || {};
     filterAdminLangBtns();
+    // Alimente aussi l'onglet Réglages (évite un 2ᵉ listener Firebase redondant sur le même chemin)
+    _settingsLangData.enabled = adminEnabledLangs;
     _settingsRenderLangToggles();
   });
 }
@@ -8560,19 +8565,12 @@ function setupSettingsTab() {
     const inp = document.getElementById('settings-name-input');
     if (inp && snap.val()) inp.value = snap.val();
   });
-  // Langues activées
-  _rref('/config/enabledLangs').on('value', snap => {
-    _settingsLangData.enabled = snap.val() || {};
-    _settingsRenderLangToggles();
-  });
+  // Langues activées + langue admin : déjà couverts par loadEnabledLangs()/loadPrimaryLang()
+  // (appelés juste avant, showAdmin()) — un 2ᵉ listener Firebase sur les mêmes chemins était
+  // redondant (bug d'audit qualité/perf). _settingsLangData est alimenté directement par eux.
   // Langue par défaut
   _rref('/config/defaultLang').on('value', snap => {
     _settingsLangData.default = snap.val() || 'fr';
-    _settingsUpdateLangSelects();
-  });
-  // Langue admin
-  _rref('/config/primaryLang').on('value', snap => {
-    _settingsLangData.primary = snap.val() || 'fr';
     _settingsUpdateLangSelects();
   });
   // Code PIN du personnel — activé/désactivé selon la présence du hash

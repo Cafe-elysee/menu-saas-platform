@@ -1,7 +1,7 @@
 {
   "rules": {
     "commandes": {
-      ".read": true,
+      ".read": false,
       "$commandeId": {
         ".write": "auth != null && !data.exists()",
         ".validate": "!newData.exists() || (newData.hasChildren(['ts']) && newData.child('ts').isNumber())"
