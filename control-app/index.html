@@ -1746,6 +1746,7 @@
     .hist-inline-amt { color: var(--gold); font-weight: 600; }
     .hist-inline-empty { font-size: 0.77rem; color: var(--muted); padding: 4px 0; font-style: italic; }
     .hist-voir-tout { margin-top: 9px; font-size: 0.75rem; background: transparent; border: 1px solid rgba(200,164,78,0.2); color: var(--gold); border-radius: 8px; padding: 4px 11px; cursor: pointer; }
+    .f4-history-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin: 0.5rem 0 0.3rem; letter-spacing: 0.01em; }
   </style>
 
 </head>
@@ -3090,6 +3091,38 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
+  // ── Prochain renouvellement — toujours visible, jamais besoin d'ouvrir une modale ──
+  var renewalRow = '';
+  if (d.nextReminderAt) {
+    var renewalDate = new Date(d.nextReminderAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    var renewalOverdue = d.nextReminderAt < Date.now() && !d.suspendu;
+    renewalRow = '<div class="commande-birthdate-row">' +
+      '<span class="commande-birthdate-label">&#128260; Prochain renouvellement :</span>' +
+      '<span style="flex:1;text-align:center;font-weight:700;font-size:0.86rem;color:' + (renewalOverdue ? '#e05252' : 'var(--gold)') + '">' + escapeHtml(renewalDate) + '</span>' +
+    '</div>';
+  }
+
+  const _forfaitTypeLabels = {
+    'upgrade-paid': '⬆️ Upgrade payé', 'downgrade-immediate': '⬇️ Downgrade immédiat',
+    'downgrade-scheduled': '⬇️ Downgrade appliqué', 'trial': '🔄 Changement (essai)',
+    'window-first-use': '🔄 Changement de forfait', 'window-already-used': '🔄 Changement de forfait'
+  };
+  const _forfaitNameLabels = { 'commandes-services': 'Commandes & Services', 'menu-qr': 'Menu QR' };
+  const _forfaitModeLabels = { annual: 'Annuel', monthly: 'Mensuel' };
+  var historyEntries = Object.values(d.forfaitHistory || {}).filter(function(h) { return h && h.date; }).sort(function(a,b) { return b.date - a.date; });
+  var historyHtml = historyEntries.length === 0
+    ? '<div class="hist-inline-empty">Aucun changement de forfait enregistré.</div>'
+    : historyEntries.slice(0, 5).map(function(h) {
+        var ds = new Date(h.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+        var fromLbl = _forfaitNameLabels[h.fromForfait] || h.fromForfait || '—';
+        var toLbl   = _forfaitNameLabels[h.toForfait] || h.toForfait || '—';
+        var modeChanged = h.fromMode && h.toMode && h.fromMode !== h.toMode;
+        var detail = fromLbl + ' &#8594; ' + toLbl + (modeChanged ? ' (' + (_forfaitModeLabels[h.fromMode] || h.fromMode) + '&#8594;' + (_forfaitModeLabels[h.toMode] || h.toMode) + ')' : '');
+        var priceStr = (h.toPrice != null) ? (h.toPrice + '&#8364;') : '';
+        return '<div class="hist-inline-item"><span class="hist-inline-date">' + escapeHtml(ds) + ' &#183; ' + escapeHtml(_forfaitTypeLabels[h.type] || h.type || '') + '<br><span style="opacity:0.75">' + escapeHtml(detail) + '</span></span><span class="hist-inline-amt">' + escapeHtml(priceStr) + '</span></div>';
+      }).join('');
+  var historySection = '<div class="f4-history-label">&#128220; Historique du forfait</div>' + historyHtml;
+
   // ── Visibilité des changements en attente (invisible auparavant — bug d'audit) ──
   var pendingHtml = '';
   if (d.pendingForfaitChange) {
@@ -3117,6 +3150,8 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     pendingHtml +
     '<div class="f4-grid">' + gridHtml + '</div>' +
     birthdateRow +
+    renewalRow +
+    historySection +
   '</div>';
 }
 
@@ -3678,11 +3713,18 @@ function _saveFirstOpenAt(key, newTs) {
   // d'essai ET la prochaine échéance doivent suivre exactement la nouvelle date, des deux
   // côtés (CONTROL_DB + config/subscription client). Une fois le client payant, son cycle
   // récurrent (nextReminderAt/endDate) est indépendant et ne doit plus être déplacé.
-  const newTrialEnd = _addMonths(newTs, 1);
-  const update     = { firstOpenAt: newTs, trialEndAt: newTrialEnd };
-  const mainUpdate = { trialEndAt: newTrialEnd };
+  const update     = { firstOpenAt: newTs };
+  const mainUpdate = {};
   if (!d.paidAt) {
+    // Seulement tant que le client n'a jamais payé : trialEndAt/nextReminderAt/endDate
+    // sont encore purement dérivés de firstOpenAt. Une fois payant, les repousser ici
+    // pourrait réafficher à tort la bannière "essai gratuit" côté client (admin.html se
+    // base uniquement sur trialEndAt vs. maintenant, sans vérifier paidAt) — on laisse
+    // alors son cycle réel (déjà indépendant) intact.
+    const newTrialEnd = _addMonths(newTs, 1);
+    update.trialEndAt = newTrialEnd;
     update.nextReminderAt = newTrialEnd;
+    mainUpdate.trialEndAt = newTrialEnd;
     mainUpdate.endDate = newTrialEnd;
   }
 
@@ -3692,7 +3734,7 @@ function _saveFirstOpenAt(key, newTs) {
 
   _controlWrite('/commandes/' + key, 'update', update)
     .then(function() {
-      if (rid) {
+      if (rid && Object.keys(mainUpdate).length > 0) {
         _saasDb.ref('restaurants/' + rid + '/config/subscription').update(mainUpdate).catch(function() {
           showToast('⚠ Date enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
         });

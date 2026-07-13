@@ -63,6 +63,18 @@ function fbRequest(db, path, method, secret, body) {
 }
 const fbGet   = (db, path, s)       => fbRequest(db, path, 'GET',   s, null);
 const fbPatch = (db, path, s, body) => fbRequest(db, path, 'PATCH', s, body);
+const fbPush  = (db, path, s, body) => fbRequest(db, path, 'POST',  s, body);
+
+// Historique des changements d'abonnement réellement appliqués (visible dans la carte
+// client, control-app) — jamais pour un simple état "en attente" (déjà visible via les
+// badges pendingForfaitChange/pendingUpgrade), uniquement au moment où un changement
+// devient réellement effectif.
+async function _logForfaitChange(secret, cmdKey, entry) {
+  if (!cmdKey || !secret) return;
+  try {
+    await fbPush(CONTROL_DB, '/commandes/' + cmdKey + '/forfaitHistory', secret, Object.assign({ date: Date.now() }, entry));
+  } catch(e) {}
+}
 
 function httpsPost(url, headers, body) {
   return new Promise((resolve, reject) => {
@@ -774,6 +786,13 @@ module.exports = async function handler(req, res) {
             forfait: pu.forfait, price: pu.prorata.newFullPrice, paymentMode: upgradeMode, paidAt: Date.now(),
             nextReminderAt: newNextReminderAt, pendingUpgrade: null
           });
+          await _logForfaitChange(secret, cmdKey, {
+            type: 'upgrade-paid',
+            fromForfait: cmdData?.forfait || 'menu-qr', toForfait: pu.forfait,
+            fromMode: cmdData?.paymentMode || curMode, toMode: upgradeMode,
+            fromPrice: cmdData?.price ?? null, toPrice: pu.prorata.newFullPrice,
+            amountPaid: pu.prorata.amountDue
+          });
         } catch(e) {}
       }
       const mainToken = await getMainDbToken();
@@ -822,7 +841,17 @@ module.exports = async function handler(req, res) {
       const isWindow = cls.case !== 'trial';
       const update = { forfait: newForfait, price, paymentMode: safeMode };
       if (isWindow) update.firstChangeUsedAt = Date.now();
-      if (cmdKey && secret) { try { await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, update); } catch(e) {} }
+      if (cmdKey && secret) {
+        try {
+          await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, update);
+          await _logForfaitChange(secret, cmdKey, {
+            type: cls.case,
+            fromForfait: cmdData?.forfait || 'menu-qr', toForfait: newForfait,
+            fromMode: cmdData?.paymentMode || curMode, toMode: safeMode,
+            fromPrice: cmdData?.price ?? null, toPrice: price
+          });
+        } catch(e) {}
+      }
       const isCS = newForfait === 'commandes-services';
       const mainWrite = {
         features: { callBtn: isCS, orderUI: isCS, tableSystem: isCS, qrOrdering: isCS },
@@ -856,6 +885,12 @@ module.exports = async function handler(req, res) {
           try {
             await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret,
               { forfait: newForfait, price, paymentMode: safeMode, nextReminderAt: newNextReminderAt, pendingForfaitChange: null });
+            await _logForfaitChange(secret, cmdKey, {
+              type: 'downgrade-immediate',
+              fromForfait: cmdData?.forfait || 'menu-qr', toForfait: newForfait,
+              fromMode: cmdData?.paymentMode || curMode, toMode: safeMode,
+              fromPrice: cmdData?.price ?? null, toPrice: price
+            });
           } catch(e) {}
         }
         const mainToken = await getMainDbToken();
