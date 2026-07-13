@@ -2272,7 +2272,7 @@ function _setupSubSyncListener(slug, cmdKey) {
     if (sub.prices && JSON.stringify(sub.prices) !== JSON.stringify(d.prices)) { d.prices = sub.prices; changed = true; }
     if (changed) {
       // Persiste dans control Firebase pour offline/historique
-      _controlDb.ref('/commandes/' + cmdKey).update({ price: d.price, forfait: d.forfait, paymentMode: d.paymentMode, prices: d.prices || null });
+      _controlWrite('/commandes/' + cmdKey, 'update', { price: d.price, forfait: d.forfait, paymentMode: d.paymentMode, prices: d.prices || null }).catch(function() {});
       _rerenderClientBillingSection(cmdKey);
       _doRenderPaiements();
     }
@@ -2449,16 +2449,46 @@ function _hideCtrlLoadingScreen() {
   requestAnimationFrame(step);
 }
 
+// Identité "platform" (Malek uniquement) — vraie authentification Firebase Auth,
+// remplace l'ancien verrou 100% local (hash comparé côté client, jamais vérifié par
+// le serveur) par une session réelle, révocable, vérifiée à chaque appel serveur.
+let _loginResolved = false;
+
+function _getSaasApp() {
+  try { return firebase.app('saas-platform'); }
+  catch(e) { return firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform'); }
+}
+
+async function _platformIdToken() {
+  try {
+    const user = firebase.auth(_getSaasApp()).currentUser;
+    if (!user) return null;
+    return await user.getIdToken();
+  } catch(e) { return null; }
+}
+
 function initLogin() {
-  const stored = localStorage.getItem('ctrl_pw_hash');
-  if (!stored) {
-    _isFirstRun = true;
-    document.getElementById('first-run-note').style.display = 'block';
-    document.getElementById('login-pw').placeholder = 'Créer un mot de passe';
-    document.getElementById('login-pw2-wrap').style.display = 'block';
-    document.getElementById('login-btn').textContent = 'Créer le mot de passe';
+  _saasDb = firebase.database(_getSaasApp());
+  // Session déjà persistée sur cet appareil (comme admin.html) → pas besoin de
+  // retaper le mot de passe à chaque ouverture de l'application.
+  firebase.auth(_getSaasApp()).onAuthStateChanged(function(user) {
+    if (_loginResolved) return;
+    _loginResolved = true;
+    _hideCtrlLoadingScreen();
+    if (user) { showApp(); } else { document.getElementById('login-screen').classList.remove('hidden'); }
+  });
+}
+
+async function _platformLoginRequest(password) {
+  const r = await fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: password })
+  });
+  const data = await r.json().catch(function() { return null; });
+  if (data && data.ok && data.customToken) {
+    await firebase.auth(_getSaasApp()).signInWithCustomToken(data.customToken);
   }
-  _hideCtrlLoadingScreen();
+  return data || {};
 }
 
 async function tryLogin() {
@@ -2470,18 +2500,38 @@ async function tryLogin() {
     const pw2 = document.getElementById('login-pw2').value.trim();
     if (pw !== pw2) { showErr(err, 'Les mots de passe ne correspondent pas'); return; }
     if (pw.length < 4) { showErr(err, 'Minimum 4 caractères'); return; }
-    localStorage.setItem('ctrl_pw_hash', await sha256(pw));
-    err.style.display = 'none';
-    showApp();
+    try {
+      const setRes = await fetch('https://menu-saas-platform.vercel.app/api/platform-set-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      }).then(function(r) { return r.json(); });
+      if (!setRes || !setRes.ok) { showErr(err, 'Erreur — réessayez'); return; }
+      const login = await _platformLoginRequest(pw);
+      if (!login.ok) { showErr(err, 'Erreur — réessayez'); return; }
+      err.style.display = 'none';
+      showApp();
+    } catch(e) { showErr(err, 'Erreur réseau'); }
   } else {
-    const hash = await sha256(pw);
-    if (hash === localStorage.getItem('ctrl_pw_hash')) {
+    try {
+      const login = await _platformLoginRequest(pw);
+      if (login.needsSetup) {
+        // Aucun mot de passe encore configuré (ex. réinstallation) → bascule en création.
+        _isFirstRun = true;
+        document.getElementById('first-run-note').style.display = 'block';
+        document.getElementById('login-pw').placeholder = 'Créer un mot de passe';
+        document.getElementById('login-pw2-wrap').style.display = 'block';
+        document.getElementById('login-btn').textContent = 'Créer le mot de passe';
+        showErr(err, 'Aucun mot de passe configuré — créez-en un');
+        return;
+      }
+      if (!login.ok) {
+        showErr(err, login.error === 'Too many attempts' ? 'Trop de tentatives — réessayez plus tard' : 'Mot de passe incorrect');
+        return;
+      }
       err.style.display = 'none';
       showApp();
       showToast('Connexion réussie ✓');
-    } else {
-      showErr(err, 'Mot de passe incorrect');
-    }
+    } catch(e) { showErr(err, 'Erreur réseau'); }
   }
 }
 
@@ -2495,6 +2545,7 @@ document.getElementById('login-pw2').addEventListener('keydown', e => {
 });
 
 function logout() {
+  firebase.auth(_getSaasApp()).signOut().catch(function() {});
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('login-pw').value = '';
@@ -2576,21 +2627,28 @@ const _clientDbs = {};
 
 let _saasDb = null;
 
+// Écritures vers CONTROL_DB (menu-pro-control/commandes) — passent désormais par un
+// endpoint serveur authentifié (identité "platform" vérifiée) plutôt que par l'ancienne
+// connexion anonyme directe, elle-même partagée avec n'importe quel visiteur demo-page.
+// Les LECTURES restent inchangées (listenCommandes ci-dessous, .read public assumé).
+async function _controlWrite(path, op, data) {
+  const sid = await _platformIdToken();
+  const r = await fetch('https://menu-saas-platform.vercel.app/api/control-db-write', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sid: sid, path: path, op: op, data: data })
+  });
+  const json = await r.json().catch(function() { return null; });
+  if (!json || !json.ok) throw new Error((json && json.error) || 'control write failed');
+  return json;
+}
+
 async function initFirebase() {
   const controlApp = firebase.initializeApp(CONTROL_FB_CONFIG, 'control');
   _controlDb = firebase.database(controlApp);
-  if (!_saasDb) {
-    let saasApp;
-    try { saasApp = firebase.app('saas-platform'); } catch(e) { saasApp = firebase.initializeApp(SAAS_FB_CONFIG, 'saas-platform'); }
-    _saasDb = firebase.database(saasApp);
-  }
-  await _ensurePlatformAuth();
-  // Connexion anonyme sur le projet Control (menu-pro-control) — symétrique à
-  // demo-page (ensureCtrlAnonAuth), nécessaire pour que la création d'une
-  // commande neuve puisse exiger une authentification sans casser control-app.
-  try {
-    await firebase.auth(controlApp).signInAnonymously();
-  } catch (e) { console.error('control anon auth failed', e); }
+  if (!_saasDb) _saasDb = firebase.database(_getSaasApp());
+  // control-app n'écrit plus jamais directement sur ce projet (toutes les mutations
+  // passent désormais par /api/control-db-write, authentifié côté serveur) — seule la
+  // lecture (.read public) reste nécessaire ici, aucune authentification requise.
   listenCommandes();
   loadArchivedClients();
   loadClientsFromFirebase();
@@ -2709,7 +2767,7 @@ function _watchFirstOpen(rid, cmdKey) {
       const _foTs = Date.now();
       const _trialEnd = _addMonths(_foTs, 1);
       // Essai gratuit : nextReminderAt = fin du mois d'essai (premier paiement dû à trialEndAt)
-      _controlDb.ref('/commandes/' + cmdKey).update({ statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd });
+      _controlWrite('/commandes/' + cmdKey, 'update', { statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd }).catch(function() {});
       _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _trialEnd, trialEndAt: _trialEnd });
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
@@ -3036,7 +3094,7 @@ function _saveCreationFeePrice(key, rawVal) {
   _commandesCache[key] = Object.assign({}, d, { prices });
   _rerenderClientBillingSection(key);
   _rerenderCommandeCard(key);
-  _controlDb.ref('/commandes/' + key + '/prices/creation').set(price).catch(function() {
+  _controlWrite('/commandes/' + key + '/prices/creation', 'set', price).catch(function() {
     _commandesCache[key] = prev;
     _rerenderClientBillingSection(key);
     _rerenderCommandeCard(key);
@@ -3127,7 +3185,7 @@ function _cancelScheduledDowngrade(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
     if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3140,7 +3198,7 @@ function _confirmUpgradePaid(cmdKey) {
     rid: rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
     newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-    paymentMode: d.paymentMode || 'annual', actor: 'malek', controlSecret: CONTROL_APP_SECRET, confirmUpgradePayment: true
+    paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
   }).then(function(r) {
     if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
     else { showToast('❌ Erreur'); }
@@ -3150,7 +3208,7 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek', controlSecret: CONTROL_APP_SECRET }).then(function(r) {
+  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
     if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3215,14 +3273,14 @@ function _savePaymentMode(cmdKey, mode) {
   _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode, nextReminderAt: newNextReminderAt });
   _rerenderClientBillingSection(cmdKey);
   _rerenderCommandeCard(cmdKey);
-  _controlDb.ref('/commandes/' + cmdKey + '/paymentMode').set(mode).catch(function() {
+  _controlWrite('/commandes/' + cmdKey + '/paymentMode', 'set', mode).catch(function() {
     _commandesCache[cmdKey] = prev;
     _rerenderClientBillingSection(cmdKey);
     _rerenderCommandeCard(cmdKey);
     showToast('⚠ Erreur de synchronisation');
   });
   if (newNextReminderAt && newNextReminderAt !== d.nextReminderAt) {
-    _controlDb.ref('/commandes/' + cmdKey + '/nextReminderAt').set(newNextReminderAt).catch(function() {});
+    _controlWrite('/commandes/' + cmdKey + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {});
   }
   // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
   const _slugPM = _getSlugFromCmdKey(cmdKey);
@@ -3434,7 +3492,7 @@ function _toggleSuspend(key) {
     _commandesCache[key] = Object.assign({}, d, { suspendu: willSuspend });
     _rerenderCommandeCard(key);
     // Sync Firebase silencieux en arrière-plan
-    _controlDb.ref('/commandes/' + key + '/suspendu').set(willSuspend)
+    _controlWrite('/commandes/' + key + '/suspendu', 'set', willSuspend)
       .then(function() {
         // Sync SaaS Firebase active/suspendu (suspension manuelle ET réactivation)
         const ridSync = (d.emailData && d.emailData.rid) || (d.clientCree && d.clientCree.rid);
@@ -3448,7 +3506,7 @@ function _toggleSuspend(key) {
             // ce client au run suivant, annulant silencieusement le geste de Malek.
             if (d.nextReminderAt && Date.now() >= d.nextReminderAt) {
               const newNextReminderAt = _addMonths(Date.now(), (d.paymentMode === 'annual') ? 12 : 1);
-              _controlDb.ref('/commandes/' + key + '/nextReminderAt').set(newNextReminderAt);
+              _controlWrite('/commandes/' + key + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {});
               _saasDb.ref('restaurants/' + ridSync + '/config/subscription/endDate').set(newNextReminderAt);
               if (_commandesCache[key]) _commandesCache[key].nextReminderAt = newNextReminderAt;
             }
@@ -3457,17 +3515,19 @@ function _toggleSuspend(key) {
         if (!willSuspend) {
           const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
           if (emailAddr) {
-            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: emailAddr,
-                name: d.restaurant || '',
-                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                type: 'reactivation',
-                secret: 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY'
-              })
-            }).catch(function() {});
+            _platformIdToken().then(function(sid) {
+              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: emailAddr,
+                  name: d.restaurant || '',
+                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                  type: 'reactivation',
+                  sid: sid
+                })
+              }).catch(function() {});
+            });
           }
         }
       })
@@ -3511,7 +3571,7 @@ function _saveCommandePrice(key, rawVal) {
   if (d.price === price) return;
   _commandesCache[key] = Object.assign({}, d, { price });
   // Sync vers control Firebase (local)
-  _controlDb.ref('/commandes/' + key + '/price').set(price);
+  _controlWrite('/commandes/' + key + '/price', 'set', price).catch(function() {});
   // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
   const slug = _getSlugFromCmdKey(key);
   if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/price').set(price);
@@ -3524,45 +3584,24 @@ function _saveCommandePrice(key, rawVal) {
 // ── Appel centralisé à l'API de facturation — seule autorité d'écriture (Refonte abonnement) ──
 // Miroir exact de la fonction équivalente dans client/admin.html (duplication volontaire,
 // projet vanilla JS sans module partagé — voir feedback_regles_travail).
-const CONTROL_APP_SECRET = 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY';
 
-// Connexion silencieuse control-app (identité "platform", Malek uniquement) — donne
-// aux règles Firebase de quoi distinguer Malek d'un visiteur anonyme, sans rien
-// changer à l'usage de control-app (aucune nouvelle action requise).
-let _platformAuthPromise = null;
-function _ensurePlatformAuth() {
-  if (!_platformAuthPromise) {
-    _platformAuthPromise = fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: CONTROL_APP_SECRET })
-    })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data && data.ok && data.customToken) {
-          return firebase.auth(_saasDb.app).signInWithCustomToken(data.customToken);
-        }
-      })
-      .catch(function(e) { console.error('platform auth failed', e); });
-  }
-  return _platformAuthPromise;
-}
-
-// Mint un jeton {rid, role:'admin'} pour un restaurant donné — remplace l'ancien
-// config/ctrlBypass (fenêtre de course de 15s) par un vrai jeton signé côté serveur.
-function _mintAdminTokenFor(rid) {
-  return fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
+// Mint un jeton {rid, role:'admin'} pour un restaurant donné — exige une session
+// "platform" déjà valide (mot de passe déjà saisi), remplace l'ancien secret statique.
+async function _mintAdminTokenFor(rid) {
+  const sid = await _platformIdToken();
+  return fetch('https://menu-saas-platform.vercel.app/api/platform-admin-token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ secret: CONTROL_APP_SECRET, rid: rid })
+    body: JSON.stringify({ rid: rid, sid: sid })
   }).then(function(r) { return r.json(); });
 }
 
 async function _callNotifyForfait(payload) {
+  const sid = await _platformIdToken();
   const resp = await fetch('https://menu-saas-platform.vercel.app/api/notify-forfait', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(Object.assign({}, payload, { sid: sid }))
   });
   const result = await resp.json();
   // Le serveur décide QUOI écrire (calculs/règles) mais l'écriture MAIN_DB elle-même se
@@ -3593,7 +3632,7 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   const payload = {
     rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-    paymentMode: normMode, actor: 'malek', controlSecret: CONTROL_APP_SECRET
+    paymentMode: normMode, actor: 'malek',
   };
 
   let result;
@@ -3655,7 +3694,7 @@ async function _forceApplyDowngrade(cmdKey) {
     const result = await _callNotifyForfait({
       rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: pfc.forfait,
       email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-      paymentMode: d.paymentMode || 'annual', actor: 'malek', controlSecret: CONTROL_APP_SECRET, immediate: true
+      paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
     });
     if (result && result.ok) { showToast('✅ Changement appliqué immédiatement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
     else { showToast('❌ Erreur'); }
@@ -3679,10 +3718,10 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
   const slug = _getSlugFromCmdKey(cmdKey);
   if (isActiveCombo) {
-    _controlDb.ref('/commandes/' + cmdKey).update({ price: price, prices: prices, paymentMode: 'annual' });
+    _controlWrite('/commandes/' + cmdKey, 'update', { price: price, prices: prices, paymentMode: 'annual' }).catch(function() {});
     if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices, paymentMode: 'annual' });
   } else {
-    _controlDb.ref('/commandes/' + cmdKey + '/prices').update({ [comboKey]: price });
+    _controlWrite('/commandes/' + cmdKey + '/prices', 'update', { [comboKey]: price }).catch(function() {});
     if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
   }
   showToast('&#128190; Prix enregistré : ' + price + ' €');
@@ -3726,7 +3765,7 @@ function _saveFirstOpenAt(key, newTs) {
   const prev = Object.assign({}, d);
   _commandesCache[key] = Object.assign({}, d, { firstOpenAt: newTs });
   _rerenderCommandeCard(key);
-  _controlDb.ref('/commandes/' + key + '/firstOpenAt').set(newTs)
+  _controlWrite('/commandes/' + key + '/firstOpenAt', 'set', newTs)
     .catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
@@ -3771,9 +3810,9 @@ function _markPaid(key) {
       _rerenderCommandeCard(key);
       _doRenderPaiements();
 
-      _controlDb.ref('/commandes/' + key).update(update)
+      _controlWrite('/commandes/' + key, 'update', update)
         .then(function() {
-          _controlDb.ref('/commandes/' + key + '/paiements').push(payEntry);
+          _controlWrite('/commandes/' + key + '/paiements', 'push', payEntry).catch(function() {});
           const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
           if (rid) {
             _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
@@ -3781,20 +3820,22 @@ function _markPaid(key) {
           }
           const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
           if (emailAddr) {
-            fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                rid: rid || '',
-                email: emailAddr,
-                name: d.restaurant || '',
-                lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                amount: price,
-                paymentMode: d.paymentMode || 'monthly',
-                nextDue: update.nextReminderAt,
-                secret: 'GnCtrl_LUM1zR1IVADMahfkKygna9fQXi4FqTmY'
-              })
-            }).catch(function() {});
+            _platformIdToken().then(function(sid) {
+              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  rid: rid || '',
+                  email: emailAddr,
+                  name: d.restaurant || '',
+                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
+                  amount: price,
+                  paymentMode: d.paymentMode || 'monthly',
+                  nextDue: update.nextReminderAt,
+                  sid: sid
+                })
+              }).catch(function() {});
+            });
           }
         })
         .catch(function() {
@@ -4055,14 +4096,13 @@ async function restoreClient(slug, d) {
     // invisible du cron (plus aucun rappel/suspension automatique). Reproduit les mêmes
     // champs qu'une création normale, sans firstOpenAt/nextReminderAt : le cycle d'essai
     // redémarre normalement au prochain login réel via _watchFirstOpen, comme un nouveau client.
-    var cmdRef = _controlDb.ref('/commandes').push();
-    var commandeKey = cmdRef.key;
-    await cmdRef.set({
+    var pushRes = await _controlWrite('/commandes', 'push', {
       statut: 'traite', lu: true, ts: Date.now(),
       restaurant: d.name || slug, email: d.email || null, langue: 'fr',
       forfait: d.forfait || 'menu-qr', paymentMode: paymentMode, price: price,
       emailData: { email: d.email || null, rid: rid, pwd: pwd, name: d.name || slug, forfait: d.forfait || 'menu-qr', lang: 'fr', paymentMode: paymentMode }
     });
+    var commandeKey = pushRes && pushRes.result && pushRes.result.name;
     _watchFirstOpen(rid, commandeKey);
     var fLabel = isCS ? 'Commandes & Services' : 'Menu QR';
     _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> ('+escapeHtml(fLabel)+') a été recréé. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
@@ -4096,7 +4136,7 @@ function _checkAutoSuspend() {
     const prev = _commandesCache[key];
     _commandesCache[key] = Object.assign({}, d, { suspendu: true });
     _rerenderCommandeCard(key);
-    _controlDb.ref('/commandes/' + key + '/suspendu').set(true).catch(function() {
+    _controlWrite('/commandes/' + key + '/suspendu', 'set', true).catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
     });
@@ -4209,7 +4249,7 @@ function _doCtrlConfirm() {
 
 function deleteCommande(key) {
   _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
-    _controlDb.ref('/commandes/' + key).remove();
+    _controlWrite('/commandes/' + key, 'remove').catch(function() {});
     localStorage.removeItem('ctrl_cmd_done_' + key);
     localStorage.removeItem('ctrl_cmd_del_' + key);
     localStorage.removeItem('ctrl_cmd_pause_' + key);
@@ -4226,7 +4266,7 @@ function deleteCommande(key) {
 
 function viderCommande() {
   _showCtrlConfirm('Supprimer toutes les commandes', 'Toutes les commandes seront supprimées. Cette action est irréversible.', 'Tout supprimer', () => {
-    _controlDb.ref('/commandes').remove()
+    _controlWrite('/commandes', 'remove')
       .then(() => showToast('Toutes les commandes supprimées'))
       .catch(e => showToast('Erreur : ' + (e.message || e)));
   }, true);
@@ -4234,12 +4274,12 @@ function viderCommande() {
 
 
 function markCommandeRead(key) {
-  _controlDb.ref('/commandes/' + key + '/lu').set(true);
+  _controlWrite('/commandes/' + key + '/lu', 'set', true).catch(function() {});
 }
 
 function setCommandeStatus(key, sel) {
   const status = sel.value;
-  _controlDb.ref('/commandes/' + key).update({ statut: status, lu: true });
+  _controlWrite('/commandes/' + key, 'update', { statut: status, lu: true }).catch(function() {});
   const card = document.querySelector('.commande-card[data-key="' + key + '"]');
   if (!card) return;
 
@@ -4329,7 +4369,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     _lastCreatedClients[commandeKey] = clientCreeData;
     localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
     const _nowTs2 = Date.now();
-    _controlDb.ref('/commandes/' + commandeKey).update({
+    await _controlWrite('/commandes/' + commandeKey, 'update', {
       statut: 'en_cours', lu: true, clientCree: clientCreeData,
       emailLivraisonProgramme: _nowTs2 + 2 * 60 * 60 * 1000,
       emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
@@ -4391,7 +4431,7 @@ function recreerClientDepuisCommande(btnEl) {
         localStorage.setItem('ctrl_cmd_done_' + commandeKey, JSON.stringify(clientCreeData));
         const _cmdDataRecr = _commandesCache[commandeKey] || {};
         const _nowTs3 = Date.now();
-        await _controlDb.ref('/commandes/' + commandeKey).update({
+        await _controlWrite('/commandes/' + commandeKey, 'update', {
           statut: 'en_cours', lu: true, clientCree: clientCreeData,
           emailLivraisonProgramme: _nowTs3 + 2 * 60 * 60 * 1000,
           emailLivraisonSent: null,
@@ -4603,7 +4643,7 @@ async function confirmDeleteClient() {
     });
     // Supprimer le paiement en attente de la commande liée
     if (_dCk) {
-      _controlDb.ref('/commandes/' + _dCk).update({ clientDeleted: true }).catch(function() {});
+      _controlWrite('/commandes/' + _dCk, 'update', { clientDeleted: true }).catch(function() {});
     }
     closeDelModal();
     // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
@@ -4781,7 +4821,7 @@ async function _saveContact(slug, type, val) {
       var cmdKey = _findCommandeForClient(slug);
       if (cmdKey) {
         var emailSync = val || null;
-        await _controlDb.ref('/commandes/' + cmdKey).update({
+        await _controlWrite('/commandes/' + cmdKey, 'update', {
           email: emailSync,
           'emailData/email': emailSync
         });
@@ -5806,9 +5846,18 @@ async function changeAppPassword() {
   const fb = document.getElementById('set-pw-fb');
   if (!n || n.length < 4) { fb.className='pw-feedback err'; fb.textContent='Minimum 4 caractères'; return; }
   if (n !== c) { fb.className='pw-feedback err'; fb.textContent='Les mots de passe ne correspondent pas'; return; }
-  localStorage.setItem('ctrl_pw_hash', await sha256(n));
-  fb.className='pw-feedback ok'; fb.textContent='✓ Mot de passe modifié';
+  fb.className='pw-feedback'; fb.textContent='…';
+  try {
+    const sid = await _platformIdToken();
+    const res = await fetch('https://menu-saas-platform.vercel.app/api/platform-set-password', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: n, sid: sid })
+    }).then(function(r) { return r.json(); });
+    if (!res || !res.ok) { fb.className='pw-feedback err'; fb.textContent='❌ Erreur'; return; }
+  } catch(e) { fb.className='pw-feedback err'; fb.textContent='❌ Erreur réseau'; return; }
+  fb.className='pw-feedback ok'; fb.textContent='✓ Mot de passe modifié — reconnexion…';
   document.getElementById('set-pw-new').value=''; document.getElementById('set-pw-conf').value='';
+  setTimeout(function() { logout(); }, 1200);
   setTimeout(() => { fb.textContent=''; }, 3000);
 }
 

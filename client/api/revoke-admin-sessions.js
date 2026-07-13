@@ -17,15 +17,15 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { rid, role } = req.body || {};
-  if (!rid) return res.status(400).json({ error: 'Missing rid' });
-  const prefix = role === 'staff' ? 'staff_' : 'admin_';
+  if (!rid && role !== 'platform') return res.status(400).json({ error: 'Missing rid' });
+  const uid = role === 'platform' ? 'platform_malek' : (role === 'staff' ? 'staff_' : 'admin_') + rid;
 
   const sa = getServiceAccount();
   if (!sa) return res.status(200).json({ ok: false, note: 'service account unavailable' });
 
   try {
     const token = await getAccessToken(sa);
-    await revokeRefreshTokens(token, prefix + rid);
+    await revokeRefreshTokens(token, uid);
     return res.status(200).json({ ok: true });
   } catch (e) {
     return res.status(200).json({ ok: false, error: e.message || String(e) });

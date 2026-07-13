@@ -3,7 +3,7 @@
     "commandes": {
       ".read": true,
       "$commandeId": {
-        ".write": "auth != null || data.exists()",
+        ".write": "auth != null && !data.exists()",
         ".validate": "!newData.exists() || (newData.hasChildren(['ts']) && newData.child('ts').isNumber())"
       }
     },
