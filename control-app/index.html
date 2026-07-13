@@ -3491,12 +3491,13 @@ function _addMonths(ts, n) {
 }
 
 function _getCommandePrice(d) {
-  // Priorité : prix combo actif → prix custom → défaut
+  // Priorité : prix combo actif → prix custom → tarif public actuel → dernier recours
   var activeForfait = d.forfait || 'menu-qr';
   var activeMode    = d.paymentMode || 'monthly';
   var ck = _comboKey(activeForfait, activeMode);
   if (d.prices && d.prices[ck] != null) return d.prices[ck];
   if (d.price != null && d.price >= 0) return d.price;
+  if (_GLOBAL_PLAN_PRICES[ck] != null) return _GLOBAL_PLAN_PRICES[ck];
   return activeMode === 'annual' ? (_PRICE_ANNUAL[activeForfait] || 0) : (_PRICE_MONTHLY[activeForfait] || 0);
 }
 
@@ -4029,8 +4030,10 @@ async function restoreClient(slug, d) {
     var pwd = _buildPwdDefault(d.name||slug);
     var hash = await ncHashPwd(pwd);
     var isCS = d.forfait === 'commandes-services';
-    var paymentMode = 'annual';
-    var price = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
+    // Prix/mode du client restauré (jamais le prix global par défaut) : combo custom
+    // enregistré sur sa commande, sinon son ancien prix, sinon le tarif public actuel.
+    var paymentMode = d.paymentMode || 'monthly';
+    var price = _getComboPrice(d, d.forfait || 'menu-qr', paymentMode);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     // .update() (pas .set()) : Firebase autorise chaque clé sur son propre chemin, déjà permis.
     await _saasDb.ref('restaurants/'+rid).update({
@@ -4299,9 +4302,12 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const cmdData = _commandesCache[commandeKey] || {};
     const isCS = cmdData.forfait === 'commandes-services';
 
-    const _subPayMode2 = 'annual';
+    // Prix/mode réellement vus par le client à sa commande (jamais le prix global
+    // par défaut) : combo custom enregistré sur sa commande, sinon le tarif public actuel.
+    const _subForfait2 = cmdData.forfait || 'menu-qr';
+    const _subPayMode2 = cmdData.paymentMode || 'monthly';
     const _subEmail2   = cmdData.email || null;
-    const _subPrice2   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
+    const _subPrice2   = _getComboPrice(cmdData, _subForfait2, _subPayMode2);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
     await _saasDb.ref('restaurants/' + rid).update({
       profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
@@ -4356,9 +4362,12 @@ function recreerClientDepuisCommande(btnEl) {
         const ts   = Date.now();
         const cmdData = _commandesCache[commandeKey] || {};
         const isCS = cmdData.forfait === 'commandes-services';
-        const _subPayModeR = 'annual';
+        // Prix/mode réellement vus par le client à sa commande (jamais le prix global
+        // par défaut) : combo custom enregistré sur sa commande, sinon le tarif public actuel.
+        const _subForfaitR = cmdData.forfait || 'menu-qr';
+        const _subPayModeR = cmdData.paymentMode || 'monthly';
         const _subEmailR   = cmdData.email || null;
-        const _subPriceR   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
+        const _subPriceR   = _getComboPrice(cmdData, _subForfaitR, _subPayModeR);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
         await _saasDb.ref('restaurants/' + oldRid).update({
           profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),

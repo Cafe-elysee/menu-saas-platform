@@ -1683,6 +1683,19 @@
     const _RID  = new URLSearchParams(location.search).get('rid') || 'demo';
     const _PFX  = _RID + '_'; // préfixe localStorage isolé par restaurant
     const _rref = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
+
+    // Prix publics actuels (Réglages control-app) — lecture publique, mêmes règles
+    // Firebase que demoPage/* ailleurs dans le projet. Sert de secours pour toute
+    // combinaison forfait/mode sans prix personnalisé sur CE restaurant (_subPriceFor/
+    // _renderSubSection) : sans ça, un changement de tarif public (control-app) ne se
+    // reflète jamais dans la grille Réglages admin, qui restait figée sur d'anciennes
+    // valeurs codées en dur.
+    let _globalPlanPrices = {};
+    _db.ref('demoPage/pricing/prices').on('value', snap => {
+      _globalPlanPrices = snap.val() || {};
+      if (typeof _loadSubscriptionSection === 'function' && _subData) _loadSubscriptionSection();
+    });
+
     const isDemo = new URLSearchParams(location.search).get('demo') === '1';
     if (isDemo) {
       const _origRef = _db.ref.bind(_db);
@@ -8141,8 +8154,9 @@ function _renderSubSection(el, t, sub) {
   const isCS     = forfait === 'commandes-services';
   const payMode  = sub.paymentMode || 'annual';
   const activeCk = (isCS ? 'srv' : 'qr') + '-' + (payMode === 'annual' ? 'annual' : 'monthly');
-  const defaultPrice = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
-  // Lecture prioritaire : prix per-combo Firebase > prix flat > fallback hardcodé
+  const _hardDefault = isCS ? (payMode === 'annual' ? 990 : 99) : (payMode === 'annual' ? 490 : 49);
+  const defaultPrice = (_globalPlanPrices[activeCk] != null) ? _globalPlanPrices[activeCk] : _hardDefault;
+  // Lecture prioritaire : prix per-combo Firebase > prix flat > tarif public actuel > fallback hardcodé
   const price    = (sub.prices && sub.prices[activeCk] != null) ? sub.prices[activeCk] : (sub.price != null ? sub.price : defaultPrice);
   const now      = Date.now();
   const trialEndAt   = sub.trialEndAt || 0;
@@ -8206,7 +8220,8 @@ function _renderSubSection(el, t, sub) {
       const _act  = _f === forfait && _m === payMode;
       const _ck   = (_f === 'commandes-services' ? 'srv' : 'qr') + '-' + (_m === 'annual' ? 'annual' : 'monthly');
       const _hard = _f === 'commandes-services' ? (_m === 'annual' ? 990 : 99) : (_m === 'annual' ? 490 : 49);
-      const _std  = (sub.prices && sub.prices[_ck] != null) ? sub.prices[_ck] : _hard;
+      const _pub  = (_globalPlanPrices[_ck] != null) ? _globalPlanPrices[_ck] : _hard;
+      const _std  = (sub.prices && sub.prices[_ck] != null) ? sub.prices[_ck] : _pub;
       const _sfx  = _m === 'annual' ? (_perYear[currentLang]||'/an') : (_perMonth[currentLang]||'/mois');
       const _fLbl = _f === 'commandes-services' ? (t.subForfaitCS||'C&S') : (t.subForfaitMenuQR||'Menu QR');
       const _mLbl = _m === 'annual' ? (t.subAnnual||'Annuel') : (t.subMonthly||'Mensuel');
@@ -8537,7 +8552,8 @@ function _showPaymentReminderPopup(sub, t) {
 function _subPriceFor(forfait, mode) {
   const isCS = forfait === 'commandes-services';
   const key = (isCS ? 'srv' : 'qr') + '-' + (mode === 'annual' ? 'annual' : 'monthly');
-  const fallback = isCS ? (mode === 'annual' ? 990 : 99) : (mode === 'annual' ? 490 : 49);
+  const hardFallback = isCS ? (mode === 'annual' ? 990 : 99) : (mode === 'annual' ? 490 : 49);
+  const fallback = (_globalPlanPrices[key] != null) ? _globalPlanPrices[key] : hardFallback;
   return (_subData?.prices && _subData.prices[key] != null) ? _subData.prices[key] : fallback;
 }
 
