@@ -3991,7 +3991,8 @@ async function restoreClient(slug, d) {
     var paymentMode = 'annual';
     var price = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
-    await _saasDb.ref('restaurants/'+rid).set({
+    // .update() (pas .set()) : Firebase autorise chaque clé sur son propre chemin, déjà permis.
+    await _saasDb.ref('restaurants/'+rid).update({
       profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] }, _restoreContacts),
       config: {
         adminHash: hash, tableCount: 0, active: true,
@@ -4261,7 +4262,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     const _subEmail2   = cmdData.email || null;
     const _subPrice2   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
-    await _saasDb.ref('restaurants/' + rid).set({
+    await _saasDb.ref('restaurants/' + rid).update({
       profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
       config: {
         adminHash: hash, tableCount: 0, active: true,
@@ -4318,7 +4319,7 @@ function recreerClientDepuisCommande(btnEl) {
         const _subEmailR   = cmdData.email || null;
         const _subPriceR   = isCS ? (_GLOBAL_PLAN_PRICES['srv-annual'] || 990) : (_GLOBAL_PLAN_PRICES['qr-annual'] || 490);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
-        await _saasDb.ref('restaurants/' + oldRid).set({
+        await _saasDb.ref('restaurants/' + oldRid).update({
           profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),
           config: {
             adminHash: hash, tableCount: 0, active: true,
@@ -4533,7 +4534,12 @@ async function confirmDeleteClient() {
       cmdKey:      _dCk || null
     });
     btn.textContent = 'Suppression…';
-    await _saasDb.ref('restaurants/' + slug).remove();
+    // .update() avec chaque enfant à null (pas .remove() sur restaurants/{slug} entier) :
+    // même résultat, mais Firebase autorise chaque chemin individuellement (déjà permis).
+    await _saasDb.ref('restaurants/' + slug).update({
+      devices: null, orders: null, calls: null, logs: null, messages: null,
+      analytics: null, config: null, menu: null, profile: null, sessions: null, firstOpen: null
+    });
     // Supprimer le paiement en attente de la commande liée
     if (_dCk) {
       _controlDb.ref('/commandes/' + _dCk).update({ clientDeleted: true }).catch(function() {});

@@ -12,6 +12,7 @@
         },
 
         "orders": {
+          ".write": "!newData.exists()",
           "$orderId": {
             ".write": "auth != null || data.exists()",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
@@ -19,6 +20,7 @@
         },
 
         "calls": {
+          ".write": "!newData.exists()",
           "$callId": {
             ".write": "auth != null || data.exists()",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
@@ -26,6 +28,7 @@
         },
 
         "logs": {
+          ".write": "!newData.exists()",
           "errors":  { ".write": true },
           "actions": { ".write": true },
           "orders":  { ".write": "auth != null" }
