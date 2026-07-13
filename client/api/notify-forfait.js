@@ -243,7 +243,13 @@ function classifyForfaitChange({ cmdData, now, newForfait, oldForfait, newMode, 
   if (inPaymentWindow) {
     const alreadyUsed = !!(cmdData && cmdData.firstChangeUsedAt && nextReminderAt && cmdData.firstChangeUsedAt > nextReminderAt);
     if (alreadyUsed) {
-      return { case: 'window-already-used', blocked: actor !== 'malek', reason: 'already-used-this-window' };
+      // Bloqué pour TOUT le monde, y compris actor:'malek' (control-app) — la limite "un
+      // changement gratuit par fenêtre" protège le client, peu importe qui clique le bouton.
+      // Si Malek a besoin de forcer un changement en support, _forceApplyDowngrade
+      // (immediate:true) reste le mécanisme explicite prévu pour ça, pas ce contournement
+      // implicite (bug confirmé : permettait des changements gratuits illimités depuis
+      // control-app pendant toute la fenêtre de paiement).
+      return { case: 'window-already-used', blocked: true, reason: 'already-used-this-window' };
     }
     return { case: 'window-first-use', blocked: false, reason: null };
   }
@@ -729,6 +735,13 @@ module.exports = async function handler(req, res) {
   // ══════════════════════════════════════════════════════════════════════════
   if (actor === 'client' || actor === 'malek') {
     const curMode = (cmdData && cmdData.paymentMode) || 'annual';
+    // Forfait actuel : TOUJOURS dérivé de cmdData (lecture fraîche CONTROL_DB), jamais du
+    // `oldForfait` envoyé par le client — celui-ci peut être périmé (cache local control-app
+    // pas encore resynchronisé, ex. juste après une mise à jour optimiste non confirmée) et
+    // fausserait alors la classification (downgrade/upgrade/no-op) ET le calcul du prorata.
+    // Bug confirmé par Malek : un forfait client-fourni périmé faisait traiter un downgrade
+    // comme un upgrade (ou l'inverse) selon l'ordre des clics, avec emails/prix incohérents.
+    const curForfait = (cmdData && cmdData.forfait) || 'menu-qr';
 
     // ── Annulation d'un downgrade programmé en fin de période ────────────────────
     // (équivalent à la branche historique pending:'cancel', nécessaire ici pour que
@@ -806,7 +819,7 @@ module.exports = async function handler(req, res) {
       }
       if (email) {
         try {
-          const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, pu.forfait, true, upgradeMode, effectivePriceObj, false);
+          const { subject, html } = buildForfaitEmail(safeLang, safeName, curForfait, pu.forfait, true, upgradeMode, effectivePriceObj, false);
           await createTransport().sendMail({
             from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
             text: safeName + ' — Forfait mis à niveau (paiement confirmé)\n\nGeNext — ' + process.env.GMAIL_USER,
@@ -825,7 +838,7 @@ module.exports = async function handler(req, res) {
     }
 
     const cls = classifyForfaitChange({
-      cmdData, now: Date.now(), newForfait, oldForfait, newMode: safeMode, oldMode: curMode, actor
+      cmdData, now: Date.now(), newForfait, oldForfait: curForfait, newMode: safeMode, oldMode: curMode, actor
     });
 
     if (cls.case === 'no-op') {
@@ -936,13 +949,13 @@ module.exports = async function handler(req, res) {
     }
 
     if (cls.case === 'mid-cycle-upgrade-prorata') {
-      const prorata = computeUpgradeProrata({ cmdData, priceObj, now: Date.now(), oldForfait, oldMode: curMode, newForfait, newMode: safeMode });
+      const prorata = computeUpgradeProrata({ cmdData, priceObj, now: Date.now(), oldForfait: curForfait, oldMode: curMode, newForfait, newMode: safeMode });
       if (confirm !== true) {
         return res.status(200).json({ ok: true, case: 'mid-cycle-upgrade-prorata', quote: prorata });
       }
       const deadline = Date.now() + 7 * 24 * 3600 * 1000;
       const pendingUpFull = {
-        forfait: newForfait, fromForfait: oldForfait, newMode: safeMode, prorata, deadline, createdAt: Date.now(),
+        forfait: newForfait, fromForfait: curForfait, newMode: safeMode, prorata, deadline, createdAt: Date.now(),
         oldEndDate: prorata.oldEndDate, oldNextReminderAt: prorata.oldNextReminderAt
       };
       if (cmdKey && secret) {

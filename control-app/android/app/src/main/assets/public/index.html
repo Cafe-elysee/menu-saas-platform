@@ -3196,7 +3196,7 @@ function _cancelScheduledDowngrade(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
-    if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); }
+    if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
 }
@@ -3219,7 +3219,7 @@ function _confirmUpgradePaid(cmdKey) {
         email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
         paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
       }).then(function(r) {
-        if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+        if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
         else { showToast('❌ Erreur'); }
       }).catch(function() { showToast('❌ Erreur réseau'); })
         .finally(function() { delete _upgradeConfirmInFlight[cmdKey]; });
@@ -3232,7 +3232,7 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
-    if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); }
+    if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
 }
@@ -3654,9 +3654,24 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     _rerenderClientBillingSection(cmdKey);
     return;
   }
+  if (result.case === 'mid-cycle-downgrade') {
+    // Programmé pour la fin de période — le forfait ACTIF ne change pas maintenant (seul
+    // un pendingForfaitChange est posé, déjà affiché via le badge dédié). Annuler la mise à
+    // jour optimiste : sans ça, le prix affiché change instantanément à tort puis "corrige"
+    // une seconde plus tard quand le listener temps réel rattrape l'état réel — en plus de
+    // fausser la classification du PROCHAIN clic (voir fix serveur curForfait), qui lisait
+    // jusqu'ici ce cache local optimiste comme s'il reflétait le forfait réellement actif.
+    _commandesCache[cmdKey] = prevState;
+    _rerenderClientBillingSection(cmdKey);
+    _doRenderPaiements();
+    _pollCommandesOnce();
+    showToast('📅 Changement programmé en fin de période');
+    return;
+  }
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
-  showToast(result.case === 'mid-cycle-downgrade' ? '📅 Changement programmé en fin de période' : '&#9989; Formule mise à jour');
+  _pollCommandesOnce();
+  showToast('&#9989; Formule mise à jour');
 }
 
 // ── Forcer l'application immédiate d'un downgrade programmé (cas support exceptionnel) ──
@@ -3671,7 +3686,7 @@ async function _forceApplyDowngrade(cmdKey) {
       email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
       paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
     });
-    if (result && result.ok) { showToast('✅ Changement appliqué immédiatement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+    if (result && result.ok) { showToast('✅ Changement appliqué immédiatement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
     else { showToast('❌ Erreur'); }
   } catch(e) { showToast('❌ Erreur réseau'); }
 }
