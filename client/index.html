@@ -8953,7 +8953,7 @@ async function confirmOrder() {
     } catch(_) {}
 
     // Log commande
-    _rref('logs/orders/' + orderId).set({ ts, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
+    _rref('logs/receipts/' + orderId).set({ ts, table: String(tableNum), total, itemCount: items.length }).catch(() => {});
 
     // Historique local
     saveOrderToHistory(orderId, tableNum, items, total);

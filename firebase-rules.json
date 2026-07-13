@@ -29,9 +29,9 @@
 
         "logs": {
           ".write": "!newData.exists()",
-          "errors":  { ".write": true },
-          "actions": { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-          "orders":  { ".write": "auth != null" }
+          "errors":   { ".write": true },
+          "actions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+          "receipts": { ".write": "auth != null" }
         },
 
         "messages": {
