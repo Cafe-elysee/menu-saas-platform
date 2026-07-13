@@ -2582,6 +2582,12 @@ async function initFirebase() {
     _saasDb = firebase.database(saasApp);
   }
   await _ensurePlatformAuth();
+  // Connexion anonyme sur le projet Control (menu-pro-control) — symétrique à
+  // demo-page (ensureCtrlAnonAuth), nécessaire pour que la création d'une
+  // commande neuve puisse exiger une authentification sans casser control-app.
+  try {
+    await firebase.auth(controlApp).signInAnonymously();
+  } catch (e) { console.error('control anon auth failed', e); }
   listenCommandes();
   loadArchivedClients();
   loadClientsFromFirebase();
