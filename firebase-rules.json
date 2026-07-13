@@ -60,7 +60,7 @@
         "menu":      { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
         "profile":   { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
         "sessions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "firstOpen": { ".write": true }
+        "firstOpen": { ".write": true, ".validate": "newData.isBoolean()" }
       }
     },
 

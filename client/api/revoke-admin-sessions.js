@@ -5,9 +5,14 @@
    mais pour de vraies sessions Firebase Auth. Best-effort : un échec
    ne doit jamais bloquer le changement de mot de passe lui-même
    (déjà effectif dans tous les cas via config/adminHash).
+
+   Exige un jeton "sid" (l'appelant révoque UNIQUEMENT sa propre session déjà
+   valide — son propre rid, ou l'identité "platform") — un rid seul n'est pas
+   un secret (visible dans l'URL publique du restaurant), donc jamais suffisant
+   à lui seul pour déclencher une révocation.
 ============================================================ */
 
-const { getServiceAccount, getAccessToken, revokeRefreshTokens } = require('./_lib/firebaseAdmin');
+const { getServiceAccount, getAccessToken, revokeRefreshTokens, verifyIdToken } = require('./_lib/firebaseAdmin');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,8 +21,13 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { rid, role } = req.body || {};
+  const { rid, role, sid } = req.body || {};
   if (!rid && role !== 'platform') return res.status(400).json({ error: 'Missing rid' });
+
+  const payload = await verifyIdToken(sid, 'menu-saas-platform');
+  const isSelf = !!payload && (payload.role === 'platform' || payload.rid === rid);
+  if (!isSelf) return res.status(401).json({ error: 'Unauthorized' });
+
   const uid = role === 'platform' ? 'platform_malek' : (role === 'staff' ? 'staff_' : 'admin_') + rid;
 
   const sa = getServiceAccount();
