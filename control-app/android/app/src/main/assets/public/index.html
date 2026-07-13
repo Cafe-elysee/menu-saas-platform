@@ -4073,6 +4073,56 @@ async function restoreClient(slug, d) {
     }
     var pwd = _buildPwdDefault(d.name||slug);
     var hash = await ncHashPwd(pwd);
+
+    if (d.snapshot) {
+      // Restauration fidèle (client supprimé manuellement, avait un vrai menu/abonnement) :
+      // profil + menu + configuration restaurés EXACTEMENT comme au moment de la suppression
+      // (prix personnalisés, menu réel, thème, langues, cycle d'abonnement en cours — pas une
+      // reconstruction générique qui effacerait silencieusement le travail du restaurateur).
+      // Seul le mot de passe est régénéré (l'ancien hash n'est jamais récupérable).
+      var restoredConfig = Object.assign({}, d.snapshot.config, { adminHash: hash, active: true, suspendu: false });
+      await _saasDb.ref('restaurants/'+rid).update({
+        profile:   d.snapshot.profile || { name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] },
+        config:    restoredConfig,
+        menu:      d.snapshot.menu || { menuTheme: 'carte-classique', menuStyle: 'simple' },
+        firstOpen: (d.snapshot.firstOpen !== undefined) ? d.snapshot.firstOpen : false
+      });
+      await _saasDb.ref('/archivedClients/'+rid).remove();
+      var subF = restoredConfig.subscription || {};
+      if (d.cmdKey && _commandesCache[d.cmdKey]) {
+        // La commande d'origine n'a jamais été supprimée (juste marquée clientDeleted) —
+        // la réactiver préserve tel quel le cycle d'abonnement réel (nextReminderAt,
+        // trialEndAt, pendingUpgrade/pendingForfaitChange...) au lieu de repartir sur un
+        // essai gratuit neuf comme le faisait l'ancienne reconstruction générique.
+        await _controlWrite('/commandes/' + d.cmdKey, 'update', { clientDeleted: false, clientDeletedAt: null, restaurant: d.name || slug }).catch(function() {});
+        delete _deletedClients[d.cmdKey];
+        localStorage.removeItem('ctrl_cmd_del_' + d.cmdKey);
+        // N'observer un "premier login" que si le client n'avait jamais réellement ouvert son
+        // application avant suppression — sinon son cycle réel (déjà préservé ci-dessus en
+        // réactivant sa commande d'origine intacte) serait écrasé par un nouveau cycle d'essai
+        // qui repartirait de zéro dès que ce listener se déclencherait (il se déclenche
+        // immédiatement si firstOpen est déjà à true).
+        if (d.snapshot.firstOpen !== true) { _watchFirstOpen(rid, d.cmdKey); }
+      } else {
+        // Commande d'origine introuvable (cas rare) — en crée une neuve pour que le cron
+        // puisse quand même suivre ce client, avec les infos issues du snapshot restauré.
+        var pushRes2 = await _controlWrite('/commandes', 'push', {
+          statut: 'traite', lu: true, ts: Date.now(),
+          restaurant: d.name || slug, email: d.email || null, langue: 'fr',
+          forfait: subF.forfait || 'menu-qr', paymentMode: subF.paymentMode || 'monthly', price: subF.price || 0,
+          emailData: { email: d.email || null, rid: rid, pwd: pwd, name: d.name || slug, forfait: subF.forfait || 'menu-qr', lang: 'fr', paymentMode: subF.paymentMode || 'monthly' }
+        });
+        var commandeKey2 = pushRes2 && pushRes2.result && pushRes2.result.name;
+        _watchFirstOpen(rid, commandeKey2);
+      }
+      var fLabel2 = subF.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+      _showCtrlConfirm('Client restauré ✅', 'Le client <b>'+escapeHtml(d.name||slug)+'</b> ('+escapeHtml(fLabel2)+') a été recréé avec son menu, ses prix et son abonnement d\'origine. ID : <code>'+escapeHtml(rid)+'</code> — Mot de passe : <code>'+escapeHtml(pwd)+'</code>', 'OK', null, false);
+      return;
+    }
+
+    // Ancien format d'archive (restaurant jamais ouvert, supprimé automatiquement après 7
+    // jours d'inactivité — voir cron B_DEL) : aucun contenu réel à préserver, reconstruction
+    // générique comme avant.
     var isCS = d.forfait === 'commandes-services';
     // Prix/mode du client restauré (jamais le prix global par défaut) : combo custom
     // enregistré sur sa commande, sinon son ancien prix, sinon le tarif public actuel.
@@ -4621,18 +4671,23 @@ async function confirmDeleteClient() {
   const btn = document.getElementById('del-confirm-btn');
   btn.textContent = 'Archivage…'; btn.disabled = true;
   try {
-    var _dPSnap = await _saasDb.ref('restaurants/' + slug + '/profile').once('value');
-    var _dProf  = _dPSnap.val() || {};
+    // Snapshot complet du restaurant (profil + menu + configuration) AVANT suppression —
+    // indispensable pour qu'une restauration soit fidèle (prix personnalisés, menu réel,
+    // thème, langues, cycle d'abonnement en cours...) plutôt qu'une reconstruction générique
+    // qui effacerait silencieusement tout le travail du restaurateur (voir restoreClient()).
+    var _dFullSnap = await _saasDb.ref('restaurants/' + slug).once('value');
+    var _dFull  = _dFullSnap.val() || {};
+    var _dProf  = _dFull.profile || {};
+    var _dSub   = (_dFull.config && _dFull.config.subscription) || {};
     var _dCk    = _findCommandeForClient(slug);
-    var _dCd    = _dCk ? _commandesCache[_dCk] : null;
     await _saasDb.ref('/archivedClients/' + slug).set({
       name:        _dProf.name || slug,
-      forfait:     (_dCd && (_dCd.forfaitType || (_dCd.forfait === 'commandes-services' ? 'commandes-services' : 'menu-qr'))) || 'menu-qr',
-      paymentMode: (_dCd && _dCd.paymentMode) || 'monthly',
-      email:       (_dProf.contacts && _dProf.contacts.email) || (_dCd && _dCd.email) || '',
-      lang:        (_dCd && _dCd.langue) || 'fr',
+      forfait:     _dSub.forfait || 'menu-qr',
+      paymentMode: _dSub.paymentMode || 'monthly',
+      email:       (_dProf.contacts && _dProf.contacts.email) || _dSub.email || '',
       deletedAt:   Date.now(),
-      cmdKey:      _dCk || null
+      cmdKey:      _dCk || null,
+      snapshot:    _dFull
     });
     btn.textContent = 'Suppression…';
     // .update() avec chaque enfant à null (pas .remove() sur restaurants/{slug} entier) :
