@@ -1971,7 +1971,10 @@
         <div id="cp-group-guide-serveur" style="margin-bottom:1.1rem"></div>
 
         <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">🍽️ Menu client</div>
-        <div id="cp-group-guide-menu"></div>
+        <div id="cp-group-guide-menu" style="margin-bottom:1.1rem"></div>
+
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">🔒 Sécurité</div>
+        <div id="cp-group-guide-securite"></div>
       </div>
     </div>
 
@@ -5496,6 +5499,10 @@ const GUIDE_ITEMS = {
     { key: 'menu-produit',    title: "La fiche détaillée d'un produit" },
     { key: 'menu-commander',  title: 'Commander et appeler le serveur' },
     { key: 'menu-langues',    title: 'Changer de langue et de thème (client)' }
+  ],
+  securite: [
+    { key: 'adm-securite-mdp', title: 'Mot de passe administrateur et sécurité de vos accès' },
+    { key: 'adm-securite-pin', title: 'Code PIN du personnel : activer/désactiver' }
   ]
 };
 function _guSlotHtml(item) {
@@ -5515,12 +5522,14 @@ function _guSlotHtml(item) {
   '</div>';
 }
 function buildGuidePhotosUI() {
-  const adminEl   = document.getElementById('cp-group-guide-admin');
-  const serveurEl = document.getElementById('cp-group-guide-serveur');
-  const menuEl    = document.getElementById('cp-group-guide-menu');
-  if (adminEl)   adminEl.innerHTML   = GUIDE_ITEMS.admin.map(_guSlotHtml).join('');
-  if (serveurEl) serveurEl.innerHTML = GUIDE_ITEMS.serveur.map(_guSlotHtml).join('');
-  if (menuEl)    menuEl.innerHTML    = GUIDE_ITEMS.menu.map(_guSlotHtml).join('');
+  const adminEl    = document.getElementById('cp-group-guide-admin');
+  const serveurEl  = document.getElementById('cp-group-guide-serveur');
+  const menuEl     = document.getElementById('cp-group-guide-menu');
+  const securiteEl = document.getElementById('cp-group-guide-securite');
+  if (adminEl)    adminEl.innerHTML    = GUIDE_ITEMS.admin.map(_guSlotHtml).join('');
+  if (serveurEl)  serveurEl.innerHTML  = GUIDE_ITEMS.serveur.map(_guSlotHtml).join('');
+  if (menuEl)     menuEl.innerHTML     = GUIDE_ITEMS.menu.map(_guSlotHtml).join('');
+  if (securiteEl) securiteEl.innerHTML = GUIDE_ITEMS.securite.map(_guSlotHtml).join('');
 }
 function showGuidePhoto(key, url) {
   const img  = document.getElementById('dp-img-guide-' + key);
@@ -5591,7 +5600,7 @@ function loadGuidePhotos() {
   if (!_saasDb) return;
   _saasDb.ref('demoPage/guideContent').once('value').then(snap => {
     const data = snap.val() || {};
-    [...GUIDE_ITEMS.admin, ...GUIDE_ITEMS.serveur, ...GUIDE_ITEMS.menu].forEach(item => {
+    [...GUIDE_ITEMS.admin, ...GUIDE_ITEMS.serveur, ...GUIDE_ITEMS.menu, ...GUIDE_ITEMS.securite].forEach(item => {
       showGuidePhoto(item.key, data[item.key] || '');
     });
   });
