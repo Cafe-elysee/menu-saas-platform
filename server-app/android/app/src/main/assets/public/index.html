@@ -763,7 +763,8 @@
       <button class="slang-btn" data-lang="el" onclick="_pinPickLang('el')">🇬🇷</button>
       <button class="slang-btn" data-lang="es" onclick="_pinPickLang('es')">🇪🇸</button>
     </div>
-    <input type="password" inputmode="numeric" id="pin-input" placeholder=""
+    <div id="pin-instr" style="font-size:0.86rem;color:var(--cream);margin-bottom:14px;line-height:1.4">Saisissez le code PIN pour continuer</div>
+    <input type="password" inputmode="numeric" id="pin-input" placeholder="Code PIN"
       style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.2em;margin-bottom:8px">
     <div id="pin-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demandez le code au restaurateur</div>
     <div id="pin-err" style="color:#ef5350;font-size:0.78rem;min-height:16px;margin-bottom:10px"></div>
@@ -2112,17 +2113,19 @@ function _attemptSilentStaffLogin(resolve) {
 
 var _pinResolve = null;
 var _PIN_T = {
-  fr:{ appSub:'Serveur', sub:'Code du personnel', hint:'Demandez le code au restaurateur', confirm:'Confirmer' },
-  en:{ appSub:'Server', sub:'Staff code', hint:'Ask the restaurant owner for the code', confirm:'Confirm' },
-  el:{ appSub:'Σερβιτόρος', sub:'Κωδικός προσωπικού', hint:'Ζητήστε τον κωδικό από τον ιδιοκτήτη', confirm:'Επιβεβαίωση' },
-  de:{ appSub:'Server', sub:'Personal-Code', hint:'Fragen Sie den Restaurantbesitzer nach dem Code', confirm:'Bestätigen' },
-  es:{ appSub:'Camarero', sub:'Código del personal', hint:'Solicite el código al dueño del restaurante', confirm:'Continuar' }
+  fr:{ appSub:'Serveur', sub:'Code du personnel', instr:'Saisissez le code PIN pour continuer', placeholder:'Code PIN', hint:'Demandez le code au restaurateur', confirm:'Confirmer' },
+  en:{ appSub:'Server', sub:'Staff code', instr:'Enter the PIN code to continue', placeholder:'PIN code', hint:'Ask the restaurant owner for the code', confirm:'Confirm' },
+  el:{ appSub:'Σερβιτόρος', sub:'Κωδικός προσωπικού', instr:'Πληκτρολογήστε τον κωδικό PIN για να συνεχίσετε', placeholder:'Κωδικός PIN', hint:'Ζητήστε τον κωδικό από τον ιδιοκτήτη', confirm:'Επιβεβαίωση' },
+  de:{ appSub:'Server', sub:'Personal-Code', instr:'Geben Sie den PIN-Code ein, um fortzufahren', placeholder:'PIN-Code', hint:'Fragen Sie den Restaurantbesitzer nach dem Code', confirm:'Bestätigen' },
+  es:{ appSub:'Camarero', sub:'Código del personal', instr:'Introduzca el código PIN para continuar', placeholder:'Código PIN', hint:'Solicite el código al dueño del restaurante', confirm:'Continuar' }
 };
 function _renderPinScreenTexts() {
   var sl = ['fr','en','el','de','es'].indexOf(lang) >= 0 ? lang : 'fr';
   var t = _PIN_T[sl] || _PIN_T.fr;
   var subEl = document.getElementById('pin-subtitle-static'); if (subEl) subEl.textContent = t.appSub;
   var appSubEl = document.getElementById('pin-app-sub'); if (appSubEl) appSubEl.textContent = t.sub;
+  var instrEl = document.getElementById('pin-instr'); if (instrEl) instrEl.textContent = t.instr;
+  var inpEl = document.getElementById('pin-input'); if (inpEl) inpEl.placeholder = t.placeholder;
   var hintEl = document.getElementById('pin-hint'); if (hintEl) hintEl.textContent = t.hint;
   var btnEl = document.getElementById('pin-confirm-btn'); if (btnEl) btnEl.textContent = t.confirm;
   document.querySelectorAll('#pin-lang-strip .slang-btn').forEach(function(b) {
