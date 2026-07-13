@@ -663,6 +663,7 @@
     .commande-price-save-btn:hover { background: rgba(200,164,78,0.22); }
     /* ── Grille 4 formules forfait × mode ── */
     .f4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .f4-grid.loading { opacity: 0.5; pointer-events: none; }
     .f4-combo {
       border: 1.5px solid rgba(200,164,78,0.2); border-radius: 14px;
       padding: 11px 10px; cursor: pointer; user-select: none;
@@ -3183,7 +3184,7 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
 
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
     pendingHtml +
-    '<div class="f4-grid">' + gridHtml + '</div>' +
+    '<div class="f4-grid" id="f4-grid-' + cmdKey + '">' + gridHtml + '</div>' +
     birthdateRow +
     renewalRow +
     historySection +
@@ -3591,38 +3592,43 @@ async function _callNotifyForfait(payload) {
   return result;
 }
 
+const _comboChangeInFlight = {};
 async function _setActiveCombo(cmdKey, forfait, mode) {
   const d = _commandesCache[cmdKey];
-  if (!d) return;
+  if (!d || _comboChangeInFlight[cmdKey]) return;
   const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
   const normMode    = (mode === 'annual') ? 'annual' : 'monthly';
   if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'monthly')) return;
 
   const rid = _getSlugFromCmdKey(cmdKey);
-  const prevState = Object.assign({}, d);
-  // Mise à jour optimiste locale (réactivité immédiate) — rollback si l'API échoue
-  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
-  _rerenderClientBillingSection(cmdKey);
-
   const payload = {
     rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
     paymentMode: normMode, actor: 'malek',
   };
 
+  // AUCUNE mise à jour optimiste ici : la vraie décision (application immédiate, devis au
+  // prorata, ou simple programmation en fin de période) n'est connue qu'APRÈS la réponse du
+  // serveur. Deviner et afficher un résultat avant de le connaître causait un flash suivi
+  // d'une correction (bug confirmé par Malek), et polluait le cache local avec un forfait
+  // temporairement faux — lu ensuite par le clic suivant comme si c'était l'état réel.
+  _comboChangeInFlight[cmdKey] = true;
+  const gridEl = document.getElementById('f4-grid-' + cmdKey);
+  if (gridEl) gridEl.classList.add('loading');
+
   let result;
   try {
     result = await _callNotifyForfait(payload);
   } catch(e) {
-    _commandesCache[cmdKey] = prevState;
-    _rerenderClientBillingSection(cmdKey);
+    if (gridEl) gridEl.classList.remove('loading');
+    delete _comboChangeInFlight[cmdKey];
     showToast('❌ Erreur réseau');
     return;
   }
+  if (gridEl) gridEl.classList.remove('loading');
+  delete _comboChangeInFlight[cmdKey];
 
   if (!result || !result.ok) {
-    _commandesCache[cmdKey] = prevState;
-    _rerenderClientBillingSection(cmdKey);
     showToast(result && result.case === 'window-already-used' ? '❌ Déjà changé une fois cette fenêtre' : '❌ Erreur');
     return;
   }
@@ -3630,8 +3636,6 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   // Upgrade en cours de cycle payé : devis reçu, RIEN n'a encore été écrit — on demande
   // confirmation à Malek avec le montant exact avant de créer le paiement en attente.
   if (result.case === 'mid-cycle-upgrade-prorata') {
-    _commandesCache[cmdKey] = prevState;
-    _rerenderClientBillingSection(cmdKey);
     const q = result.quote;
     _showCtrlConfirm(
       'Upgrade au prorata',
@@ -3639,7 +3643,7 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
       'Confirmer',
       function() {
         _callNotifyForfait(Object.assign({}, payload, { confirm: true })).then(function(r2) {
-          if (r2 && r2.ok) { showToast('⏳ Upgrade en attente de paiement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); }
+          if (r2 && r2.ok) { showToast('⏳ Upgrade en attente de paiement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
           else { showToast('❌ Erreur'); }
         }).catch(function() { showToast('❌ Erreur réseau'); });
       }
@@ -3649,25 +3653,28 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
 
   if (result.case === 'no-op') {
     // Rien n'a été écrit (ex: même forfait avec un mode non couvert par cette grille) —
-    // ne jamais afficher un faux succès (trouvé en audit).
-    _commandesCache[cmdKey] = prevState;
-    _rerenderClientBillingSection(cmdKey);
+    // ne jamais afficher un faux succès (trouvé en audit). Rien n'a non plus été affiché
+    // avant cet instant, donc rien à annuler.
     return;
   }
+
   if (result.case === 'mid-cycle-downgrade') {
-    // Programmé pour la fin de période — le forfait ACTIF ne change pas maintenant (seul
-    // un pendingForfaitChange est posé, déjà affiché via le badge dédié). Annuler la mise à
-    // jour optimiste : sans ça, le prix affiché change instantanément à tort puis "corrige"
-    // une seconde plus tard quand le listener temps réel rattrape l'état réel — en plus de
-    // fausser la classification du PROCHAIN clic (voir fix serveur curForfait), qui lisait
-    // jusqu'ici ce cache local optimiste comme s'il reflétait le forfait réellement actif.
-    _commandesCache[cmdKey] = prevState;
+    // Programmé pour la fin de période — le forfait ACTIF ne change PAS maintenant. On pose
+    // juste le badge "pending" (déjà connu via la réponse serveur, scheduledFor/newPrice) —
+    // le prix/forfait affiché comme "actif" reste celui réellement en vigueur aujourd'hui.
+    _commandesCache[cmdKey] = Object.assign({}, d, {
+      pendingForfaitChange: { forfait: normForfait, price: result.newPrice, mode: 'downgrade-end-of-period', scheduledAt: result.scheduledFor }
+    });
     _rerenderClientBillingSection(cmdKey);
     _doRenderPaiements();
     _pollCommandesOnce();
     showToast('📅 Changement programmé en fin de période');
     return;
   }
+
+  // Application instantanée (essai gratuit ou fenêtre de 7j non encore utilisée) — le
+  // forfait a réellement changé côté serveur, on reflète maintenant ce vrai résultat.
+  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
   _pollCommandesOnce();
