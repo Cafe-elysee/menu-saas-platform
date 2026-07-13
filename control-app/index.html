@@ -3605,6 +3605,12 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
     paymentMode: normMode, actor: 'malek',
+    // Depuis la carte client (control-app), un downgrade s'applique TOUJOURS immédiatement —
+    // contrairement à admin.html (client self-service), qui ne doit jamais pouvoir se
+    // downgrader lui-même immédiatement (seulement programmer en fin de période, cf. cls.case
+    // 'mid-cycle-downgrade' sans immediate). Le serveur n'honore ce drapeau QUE pour
+    // actor:'malek', donc sans effet sur les autres appelants même s'il était présent.
+    immediate: true,
   };
 
   // AUCUNE mise à jour optimiste ici : la vraie décision (application immédiate, devis au
@@ -3659,9 +3665,9 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   }
 
   if (result.case === 'mid-cycle-downgrade') {
-    // Programmé pour la fin de période — le forfait ACTIF ne change PAS maintenant. On pose
-    // juste le badge "pending" (déjà connu via la réponse serveur, scheduledFor/newPrice) —
-    // le prix/forfait affiché comme "actif" reste celui réellement en vigueur aujourd'hui.
+    // Ne devrait plus jamais arriver depuis control-app (immediate:true toujours envoyé
+    // ci-dessus) — gardé en filet défensif seulement. Programmé pour la fin de période, le
+    // forfait ACTIF ne change PAS : on pose juste le badge "pending" via la réponse serveur.
     _commandesCache[cmdKey] = Object.assign({}, d, {
       pendingForfaitChange: { forfait: normForfait, price: result.newPrice, mode: 'downgrade-end-of-period', scheduledAt: result.scheduledFor }
     });
@@ -3672,8 +3678,9 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     return;
   }
 
-  // Application instantanée (essai gratuit ou fenêtre de 7j non encore utilisée) — le
-  // forfait a réellement changé côté serveur, on reflète maintenant ce vrai résultat.
+  // Application instantanée : downgrade immédiat (immediate:true, toujours le cas depuis
+  // control-app), ou essai gratuit / fenêtre de 7j non encore utilisée. Le forfait a
+  // réellement changé côté serveur, on reflète maintenant ce vrai résultat.
   _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
   _rerenderClientBillingSection(cmdKey);
   _doRenderPaiements();
