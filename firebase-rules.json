@@ -67,7 +67,7 @@
     "archivedClients": {
       ".read": true,
       "$slug": {
-        ".write": true
+        ".write": "auth != null && auth.token.role === 'platform'"
       }
     },
 
@@ -75,7 +75,7 @@
       "fcm_tokens": {
         "$deviceId": {
           ".read": false,
-          ".write": true,
+          ".write": "auth != null && auth.token.role === 'platform'",
           ".validate": "!newData.exists() || (newData.hasChildren(['token','ts']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber())"
         }
       }
@@ -83,7 +83,7 @@
 
     "demoPage": {
       ".read": true,
-      ".write": true,
+      ".write": "auth != null && auth.token.role === 'platform'",
 
       "guideContent": {
         "$articleId": {
