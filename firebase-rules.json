@@ -4,9 +4,8 @@
       ".read": true,
 
       "$rid": {
-        ".write": true,
-
         "devices": {
+          ".write": true,
           "$deviceId": {
             ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
           }
@@ -14,33 +13,49 @@
 
         "orders": {
           "$orderId": {
+            ".write": "auth != null || data.exists()",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
         "calls": {
           "$callId": {
+            ".write": "auth != null || data.exists()",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
+        "logs": {
+          "errors":  { ".write": true },
+          "actions": { ".write": true },
+          "orders":  { ".write": "auth != null" }
+        },
+
         "messages": {
+          ".write": true,
           "$msgId": {
             ".validate": "!newData.exists() || (newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length < 500 && newData.child('ts').isNumber())"
           }
         },
 
         "analytics": {
+          ".write": true,
           "$dateKey": {
             ".validate": "!newData.exists() || newData.child('createdAt').isNumber()"
           }
         },
 
         "config": {
+          ".write": true,
           "adminPwd": {
             ".validate": "!newData.exists()"
           }
-        }
+        },
+
+        "menu":      { ".write": true },
+        "profile":   { ".write": true },
+        "sessions":  { ".write": true },
+        "firstOpen": { ".write": true }
       }
     },
 

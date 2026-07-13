@@ -5553,6 +5553,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey:            "AIzaSyCM6SiQoWQfsq_t-80EfiVplXV9p534_eI",
@@ -5576,6 +5577,22 @@
     });
     // _rref : préfixe tous les chemins Firebase avec restaurants/{rid}/
     const _rref = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
+
+    // Connexion anonyme Firebase — invisible pour le visiteur, aucun changement d'UX.
+    // Nécessaire pour que les règles Firebase puissent exiger auth != null sur orders/calls/logs
+    // sans dépendre uniquement de la connaissance du rid. Déclenchée dès le chargement de la page ;
+    // ensureAnonAuth() est ré-appelée (sans frais, déjà résolue) juste avant chaque écriture concernée.
+    let _anonAuthPromise = null;
+    function ensureAnonAuth() {
+      if (!_anonAuthPromise) {
+        _anonAuthPromise = new Promise(resolve => {
+          firebase.auth().onAuthStateChanged(user => { if (user) resolve(user); });
+          firebase.auth().signInAnonymously().catch(e => { console.error('anon auth failed', e); resolve(null); });
+        });
+      }
+      return _anonAuthPromise;
+    }
+    ensureAnonAuth();
   </script>
 </head>
 <body>
@@ -8914,6 +8931,7 @@ async function confirmOrder() {
   sendNotify();
 
   try {
+    await ensureAnonAuth();
     await _rref('orders/' + orderId).set(order);
 
     // Analytics agrégat — fire-and-forget, n'impacte pas le flux commande
@@ -11180,7 +11198,7 @@ function setupScrollObserver() {
 /* ================================================
    TABLE NUMBER MODAL
 ================================================ */
-function confirmTableCall() {
+async function confirmTableCall() {
   let num;
   if (_TID) {
     // Mode QR : numéro de table depuis l'URL, pas de saisie
@@ -11225,6 +11243,7 @@ function confirmTableCall() {
 
   // 2. Firebase Realtime Database — app ouverte (temps réel)
   try {
+    await ensureAnonAuth();
     const _callTs = Date.now();
     _rref('calls/lastCall').set({ table: String(num), ts: _callTs, lang: lang || 'fr' });
     _rref('calls/' + _callTs).set({ table: String(num), ts: _callTs, lang: lang || 'fr', status: 'received', createdAt: _callTs });
