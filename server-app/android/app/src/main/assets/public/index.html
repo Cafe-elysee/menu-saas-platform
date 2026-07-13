@@ -756,6 +756,13 @@
       <div class="gns-setup-subtitle" id="pin-subtitle-static">Serveur</div>
     </div>
     <div id="pin-app-sub" style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;letter-spacing:0.12em;text-transform:uppercase">Code du personnel</div>
+    <div class="setup-lang-strip" id="pin-lang-strip">
+      <button class="slang-btn" data-lang="fr" onclick="_pinPickLang('fr')">🇫🇷</button>
+      <button class="slang-btn" data-lang="en" onclick="_pinPickLang('en')">🇬🇧</button>
+      <button class="slang-btn" data-lang="de" onclick="_pinPickLang('de')">🇩🇪</button>
+      <button class="slang-btn" data-lang="el" onclick="_pinPickLang('el')">🇬🇷</button>
+      <button class="slang-btn" data-lang="es" onclick="_pinPickLang('es')">🇪🇸</button>
+    </div>
     <input type="password" inputmode="numeric" id="pin-input" placeholder=""
       style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid rgba(200,164,78,0.3);background:var(--card);color:var(--cream);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:0.2em;margin-bottom:8px">
     <div id="pin-hint" style="font-size:0.68rem;color:var(--muted);margin-bottom:20px">Demandez le code au restaurateur</div>
@@ -2067,8 +2074,10 @@ function confirmSetupRid() {
 }
 
 /* ── CODE PIN DU PERSONNEL — demandé une seule fois par appareil, la
-   persistance native de Firebase Auth garde ensuite l'appareil connecté ── */
-var _pinResolve = null;
+   persistance native de Firebase Auth garde ensuite l'appareil connecté.
+   Transition douce : tant qu'aucun code n'est configuré par le
+   restaurateur, la connexion se fait silencieusement, SANS jamais
+   afficher cet écran — comportement strictement identique à avant. ── */
 function _ensureStaffAuth() {
   return new Promise(function(resolve) {
     var unsub = firebase.auth().onAuthStateChanged(function(user) {
@@ -2076,15 +2085,32 @@ function _ensureStaffAuth() {
       if (user && user.getIdTokenResult) {
         user.getIdTokenResult().then(function(res) {
           if (res.claims.rid === _RID || res.claims.role === 'platform') { resolve(); return; }
-          _showPinScreen(resolve);
-        }).catch(function() { _showPinScreen(resolve); });
+          _attemptSilentStaffLogin(resolve);
+        }).catch(function() { _attemptSilentStaffLogin(resolve); });
       } else {
-        _showPinScreen(resolve);
+        _attemptSilentStaffLogin(resolve);
       }
     });
   });
 }
 
+function _attemptSilentStaffLogin(resolve) {
+  fetch('https://menu-saas-platform.vercel.app/api/staff-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rid: _RID })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.ok && data.pinRequired === false && data.customToken) {
+        return firebase.auth().signInWithCustomToken(data.customToken).then(function() { resolve(); });
+      }
+      _showPinScreen(resolve);
+    })
+    .catch(function() { _showPinScreen(resolve); });
+}
+
+var _pinResolve = null;
 var _PIN_T = {
   fr:{ appSub:'Serveur', sub:'Code du personnel', hint:'Demandez le code au restaurateur', confirm:'Confirmer' },
   en:{ appSub:'Server', sub:'Staff code', hint:'Ask the restaurant owner for the code', confirm:'Confirm' },
@@ -2092,15 +2118,27 @@ var _PIN_T = {
   de:{ appSub:'Server', sub:'Personal-Code', hint:'Fragen Sie den Restaurantbesitzer nach dem Code', confirm:'Bestätigen' },
   es:{ appSub:'Camarero', sub:'Código del personal', hint:'Solicite el código al dueño del restaurante', confirm:'Continuar' }
 };
-function _showPinScreen(resolve) {
-  _pinResolve = resolve;
-  _hideSrvLoading();
+function _renderPinScreenTexts() {
   var sl = ['fr','en','el','de','es'].indexOf(lang) >= 0 ? lang : 'fr';
   var t = _PIN_T[sl] || _PIN_T.fr;
   var subEl = document.getElementById('pin-subtitle-static'); if (subEl) subEl.textContent = t.appSub;
   var appSubEl = document.getElementById('pin-app-sub'); if (appSubEl) appSubEl.textContent = t.sub;
   var hintEl = document.getElementById('pin-hint'); if (hintEl) hintEl.textContent = t.hint;
   var btnEl = document.getElementById('pin-confirm-btn'); if (btnEl) btnEl.textContent = t.confirm;
+  document.querySelectorAll('#pin-lang-strip .slang-btn').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.lang === sl);
+  });
+}
+function _pinPickLang(l) {
+  lang = l;
+  localStorage.setItem('saas_ui_lang', l);
+  localStorage.setItem(_PFX+'app_lang', l);
+  _renderPinScreenTexts();
+}
+function _showPinScreen(resolve) {
+  _pinResolve = resolve;
+  _hideSrvLoading();
+  _renderPinScreenTexts();
   var screen = document.getElementById('pin-screen');
   if (screen) screen.style.display = 'flex';
   var inp = document.getElementById('pin-input');
