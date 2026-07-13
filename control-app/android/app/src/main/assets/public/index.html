@@ -3589,7 +3589,7 @@ function _saveCommandePrice(key, rawVal) {
 // "platform" déjà valide (mot de passe déjà saisi), remplace l'ancien secret statique.
 async function _mintAdminTokenFor(rid) {
   const sid = await _platformIdToken();
-  return fetch('https://menu-saas-platform.vercel.app/api/platform-admin-token', {
+  return fetch('https://menu-saas-platform.vercel.app/api/platform-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ rid: rid, sid: sid })

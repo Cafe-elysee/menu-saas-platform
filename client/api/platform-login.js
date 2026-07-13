@@ -6,10 +6,17 @@
    Firebase déclarée, donc refusé par défaut à tout accès client, authentifié
    ou non — seul ce service account, qui contourne les règles, peut y accéder).
    Anti-bruteforce persistant, même mécanique que admin-login.js/staff-login.js.
+
+   Deux usages distincts (fusionnés dans ce même fichier pour rester sous la
+   limite de 12 Serverless Functions du plan Hobby Vercel) :
+   - {password} : connexion normale, mint {role:'platform'}.
+   - {rid, sid} : impersonation admin pour le bouton "Admin ↗" de control-app —
+     exige une session "platform" déjà valide (voir verifyIdToken plus bas),
+     mint {rid, role:'admin'}. Remplace l'ancien secret réutilisable indéfiniment.
 ============================================================ */
 
 const crypto = require('crypto');
-const { getServiceAccount, getAccessToken, mintCustomToken, fbRequest } = require('./_lib/firebaseAdmin');
+const { getServiceAccount, getAccessToken, mintCustomToken, fbRequest, verifyIdToken } = require('./_lib/firebaseAdmin');
 
 const SAAS_DB = 'https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app';
 const MAX_ATTEMPTS = 5;
@@ -26,7 +33,22 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { password } = req.body || {};
+  const { password, rid, sid } = req.body || {};
+
+  if (rid) {
+    // Impersonation admin — exige une session "platform" déjà valide.
+    const payload = await verifyIdToken(sid, 'menu-saas-platform');
+    if (!payload || payload.role !== 'platform') return res.status(401).json({ error: 'Unauthorized' });
+    const sa = getServiceAccount();
+    if (!sa) return res.status(500).json({ error: 'Service account unavailable' });
+    try {
+      const customToken = mintCustomToken(sa, 'admin_' + rid, { rid, role: 'admin' });
+      return res.status(200).json({ ok: true, customToken });
+    } catch (e) {
+      return res.status(500).json({ error: e.message || String(e) });
+    }
+  }
+
   if (!password) return res.status(400).json({ error: 'Missing password' });
 
   const sa = getServiceAccount();
