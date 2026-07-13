@@ -122,7 +122,7 @@ async function verifySession(rid, sid) {
   if (!sid) return false;
   try {
     const raw = process.env.PLATFORM_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (!raw) return true; // infra de vérification indisponible — ne pas casser le flux existant
+    if (!raw) return false; // infra de vérification indisponible — échec fermé
     const sa = JSON.parse(raw);
     const token = await getAccessToken(sa);
     const url = SAAS_DB + '/restaurants/' + encodeURIComponent(rid) + '/sessions/' + encodeURIComponent(sid) + '.json?access_token=' + token;
@@ -133,10 +133,10 @@ async function verifySession(rid, sid) {
         let d = ''; r.on('data', c => d += c);
         r.on('end', () => { try { resolve(JSON.parse(d) !== null); } catch(e) { resolve(false); } });
       });
-      r2.on('error', () => resolve(true)); // erreur réseau de vérification — ne pas casser le flux
+      r2.on('error', () => resolve(false)); // erreur réseau de vérification — échec fermé
       r2.end();
     });
-  } catch(e) { return true; }
+  } catch(e) { return false; }
 }
 // Lecture publique (mêmes règles Firebase que demoPage/*, déjà lisibles sans authentification
 // ailleurs dans le projet — voir autoCreateRestaurant dans demo-page/api/notify-commande.js,

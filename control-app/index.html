@@ -3994,7 +3994,7 @@ async function restoreClient(slug, d) {
     await _saasDb.ref('restaurants/'+rid).set({
       profile: Object.assign({ name: d.name||slug, createdAt: Date.now(), langs: ['fr','en','el','de','es'] }, _restoreContacts),
       config: {
-        adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+        adminHash: hash, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
         retention: { calls: 2592000000, orders: 2592000000 },
         subscription: { forfait: d.forfait||'menu-qr', paymentMode: paymentMode, price: price, email: d.email||null }
@@ -4264,7 +4264,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     await _saasDb.ref('restaurants/' + rid).set({
       profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContacts2 ? { contacts: _profContacts2 } : {}),
       config: {
-        adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+        adminHash: hash, tableCount: 0, active: true,
         features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
         retention: { calls: 2592000000, orders: 2592000000 },
         subscription: { forfait: cmdData.forfait || 'menu-qr', paymentMode: _subPayMode2, price: _subPrice2, email: _subEmail2 }
@@ -4321,7 +4321,7 @@ function recreerClientDepuisCommande(btnEl) {
         await _saasDb.ref('restaurants/' + oldRid).set({
           profile: Object.assign({ name: restaurantName, createdAt: ts, langs: ['fr','en','el','de','es'] }, _profContactsR),
           config: {
-            adminHash: hash, adminPwd: pwd, tableCount: 0, active: true,
+            adminHash: hash, tableCount: 0, active: true,
             features: { callBtn: isCS, orderUI: isCS, photos: true, tableSystem: isCS, qrOrdering: isCS, eventOverlay: true },
             retention: { calls: 2592000000, orders: 2592000000 },
             subscription: { forfait: cmdData.forfait || 'menu-qr', paymentMode: _subPayModeR, price: _subPriceR, email: _subEmailR }
@@ -4426,7 +4426,7 @@ function buildClientCard(client) {
       '<div class="info-edit-warn" id="idwarn-'+id+'"></div>'+
       '<div class="section-label" style="margin-top:10px">&#128273; Mot de passe actuel</div>'+
       '<div class="cur-pwd-row"><div class="pw-wrap" style="flex:1;min-width:0">'+
-        '<input type="password" id="admcurpwd-'+id+'" class="cur-pwd-inp" value="" placeholder="—" readonly>'+
+        '<input type="password" id="admcurpwd-'+id+'" class="cur-pwd-inp" value="" placeholder="Non affiché (sécurité) — changez-le si besoin" readonly>'+
         '<button type="button" class="ctrl-pw-eye" onclick="_togglePwEye(this)" tabindex="-1">'+
           '<svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+
           '<svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'+
@@ -4652,9 +4652,7 @@ function loadClientData(client) {
     const rc = document.getElementById('ret-calls-'+id);  if (rc  && ret.calls)  rc.value  = ret.calls;
     const ro = document.getElementById('ret-orders-'+id); if (ro  && ret.orders) ro.value  = ret.orders;
 
-    // Mot de passe actuel (visible par Malek uniquement)
-    const pwEl = document.getElementById('admcurpwd-' + id);
-    if (pwEl) pwEl.value = cfg.adminPwd || '';
+    // Le mot de passe en clair n'est plus stocké côté Firebase — le champ reste vide.
   });
 
   // Contacts listener (profile du restaurant)
@@ -4873,7 +4871,6 @@ async function updatePassword(slug) {
   if (!pw || pw.length < 4) { fb.className='pw-feedback err'; fb.textContent='Minimum 4 caractères'; return; }
   const hash = await sha256(pw);
   await getClientDb(slug).ref('/config/adminHash').set(hash);
-  await getClientDb(slug).ref('/config/adminPwd').set(pw).catch(() => {});
   fb.className='pw-feedback ok'; fb.textContent='✓ Mis à jour';
   input.value = '';
   setTimeout(() => { fb.textContent=''; }, 3000);

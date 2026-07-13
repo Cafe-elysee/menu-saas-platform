@@ -34,6 +34,12 @@
           "$dateKey": {
             ".validate": "!newData.exists() || newData.child('createdAt').isNumber()"
           }
+        },
+
+        "config": {
+          "adminPwd": {
+            ".validate": "!newData.exists()"
+          }
         }
       }
     },

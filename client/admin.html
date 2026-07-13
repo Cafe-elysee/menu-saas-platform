@@ -8999,7 +8999,6 @@ async function saveAdminPassword() {
       try {
         const hash = await _hashPwd(val);
         await _rref('/config/adminHash').set(hash);
-        await _rref('/config/adminPwd').set(val).catch(() => {});
         // Révoquer toutes les sessions actives
         await _rref('sessions').remove().catch(() => {});
         // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
@@ -9508,7 +9507,6 @@ async function _confirmFlPwd() {
     const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p1));
     const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
     await _rref('/config/adminHash').set(hash);
-    await _rref('/config/adminPwd').set(p1).catch(() => {});
   } catch(_e) {}
   const pop3 = document.getElementById('fl-popup-3');
   pop3.classList.remove('show');
