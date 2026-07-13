@@ -1631,8 +1631,15 @@ function setupNativePush() {
     var data  = notification.data || {};
     var table = data.table || notification.title || '?';
     if (data.type === 'bell' || (notification.title || '').toLowerCase().includes('appel')) {
-      nativeVibrate([300, 100, 300, 100, 600]);
-      receiveCall(table, parseInt(data.ts || '0') || Date.now());
+      // Même déduplication par ts que le listener Firebase (calls/lastCall, ligne ~1497) —
+      // sans elle, un même appel client déclenchait sonnerie+vibration deux fois (Firebase
+      // ET push FCM arrivent quasi simultanément quand server-app est au premier plan).
+      var _bellTs = parseInt(data.ts || '0') || Date.now();
+      if (_bellTs > _lastCallTs) {
+        _lastCallTs = _bellTs;
+        localStorage.setItem(_PFX+'last_call_ts', String(_lastCallTs));
+        receiveCall(table, _bellTs);
+      }
     } else if (data.type === 'message') {
       nativeVibrate([100, 60, 100]);
       var text = data.body || notification.body || notification.title || '?';

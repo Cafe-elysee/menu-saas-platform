@@ -3268,6 +3268,8 @@
       font-family:'Cormorant',serif;
       font-size:1.15rem; font-style:italic; color:var(--muted);
     }
+    #menu-empty { text-align:center; padding:56px 24px; display:none; }
+    #menu-empty.show { display:block; }
 
     /* ================================================
        BOTTOM SHEET
@@ -6239,6 +6241,7 @@
 <main id="menu-wrap">
   <div id="menu-secs"></div>
   <div id="no-res"><p class="no-res-txt" id="no-res-txt">Aucun résultat pour votre recherche</p></div>
+  <div id="menu-empty"><p class="no-res-txt" id="menu-empty-txt"></p></div>
 </main>
 
 <!-- ================================================
@@ -6468,6 +6471,7 @@ const UI = {
     tableCancel:'Ακύρωση',
     alLabel:'Λεπτομέρειες',
     noRes:'Δεν βρέθηκαν αποτελέσματα',
+    menuEmpty:'📋 Το μενού είναι σε προετοιμασία — επιστρέψτε σύντομα!',
     wifiN:'WiFi ', wifiV:'',
     hoursV:'', addrV:'', contactV:'',
     cartTitle:'Η παραγγελία μου', cartTotal:'Σύνολο', cartSend:'Αποστολή παραγγελίας', cartCancel:'Ακύρωση',
@@ -6503,6 +6507,7 @@ const UI = {
     tableCancel:'Annuler',
     alLabel:'Détails',
     noRes:'Aucun résultat pour votre recherche',
+    menuEmpty:'📋 Le menu est en préparation — revenez bientôt !',
     wifiN:'WiFi ', wifiV:'',
     hoursV:'', addrV:'', contactV:'',
     cartTitle:'Votre commande', cartTotal:'Total', cartSend:'Envoyer la commande', cartCancel:'Annuler',
@@ -6538,6 +6543,7 @@ const UI = {
     tableCancel:'Cancel',
     alLabel:'Details',
     noRes:'No results for your search',
+    menuEmpty:'📋 The menu is being prepared — check back soon!',
     wifiN:'WiFi ', wifiV:'',
     hoursV:'', addrV:'', contactV:'',
     cartTitle:'Your order', cartTotal:'Total', cartSend:'Send order', cartCancel:'Cancel',
@@ -6573,6 +6579,7 @@ const UI = {
     tableCancel:'Cancelar',
     alLabel:'Detalles',
     noRes:'No hay resultados para su búsqueda',
+    menuEmpty:'📋 El menú está en preparación — ¡vuelva pronto!',
     wifiN:'Wi-Fi ', wifiV:'',
     hoursV:'', addrV:'', contactV:'',
     cartTitle:'Su pedido', cartTotal:'Total', cartSend:'Enviar pedido', cartCancel:'Cancelar',
@@ -6608,6 +6615,7 @@ const UI = {
     tableCancel:'Abbrechen',
     alLabel:'Details',
     noRes:'Keine Ergebnisse für Ihre Suche',
+    menuEmpty:'📋 Die Speisekarte wird vorbereitet — schauen Sie bald wieder vorbei!',
     wifiN:'WLAN ', wifiV:'',
     hoursV:'', addrV:'', contactV:'',
     cartTitle:'Meine Bestellung', cartTotal:'Gesamt', cartSend:'Bestellung senden', cartCancel:'Abbrechen',
@@ -8702,7 +8710,12 @@ function removeFromCart(itemId, dose, sugar) {
   if (dose !== undefined || sugar !== undefined) {
     idx = cartItems.findIndex(ci => ci.id === itemId && (ci.dose||'') === (dose||'') && (ci.sugar||'') === (sugar||''));
   } else {
-    idx = cartItems.findIndex(ci => ci.id === itemId);
+    // Plusieurs variantes dose/sucre possibles pour un même produit (doseOption) : sans
+    // variante précisée (bouton rapide carte/fiche produit), retirer la plus récemment
+    // ajoutée plutôt que la première — seule interprétation non ambiguë ("annuler mon
+    // dernier ajout"). La révision précise par variante reste possible dans le panier.
+    idx = -1;
+    for (let i = cartItems.length - 1; i >= 0; i--) { if (cartItems[i].id === itemId) { idx = i; break; } }
   }
   if (idx === -1) return;
   if (cartItems[idx].qty > 1) cartItems[idx].qty--;
@@ -10003,6 +10016,7 @@ function applyTranslations() {
   if (_subGroups[1]) _subGroups[1].style.display = _sub2 ? '' : 'none';
   if (_subGroups[2]) _subGroups[2].style.display = _sub3 ? '' : 'none';
   document.getElementById('no-res-txt').textContent = t.noRes;
+  document.getElementById('menu-empty-txt').textContent = t.menuEmpty || '';
   document.getElementById('al-lbl').textContent = t.alLabel;
   // Footer
   document.getElementById('ft-wifi').innerHTML = `<strong>${_esc(t.wifiN||'')}</strong>`;
@@ -10156,6 +10170,10 @@ function renderMenu() {
       cardsEl.appendChild(card);
     });
   });
+  // Menu totalement vide (nouveau restaurant sans catégorie, ou tout masqué/hors-horaire) —
+  // jamais de page blanche silencieuse, toujours un message explicite (bug d'audit confirmé).
+  const _menuEmptyEl = document.getElementById('menu-empty');
+  if (_menuEmptyEl) _menuEmptyEl.classList.toggle('show', container.children.length === 0);
   // IntersectionObserver gère l'apparition (plus rapide, pas de setTimeout)
   setupScrollObserver();
   // Animation d'entrée hero-card (styles non-paper : Carte, List, etc.)

@@ -2532,7 +2532,7 @@ async function tryLogin() {
 
 function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 
-// Fermeture des modales avec Echap (del/hist/contact-edit/ctrl-confirm)
+// Fermeture des modales avec Echap (même couverture que le bouton retour Android, ligne ~5900)
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   var _hm = document.getElementById('hist-modal');
@@ -2543,6 +2543,14 @@ document.addEventListener('keydown', e => {
   if (_cem && _cem.classList.contains('show')) { _closeContactEditModal(); return; }
   var _dm = document.getElementById('del-modal');
   if (_dm && _dm.classList.contains('show')) { closeDelModal(); return; }
+  var _rm = document.getElementById('retention-modal');
+  if (_rm && _rm.classList.contains('open')) { cancelRetention(); return; }
+  var _lm = document.getElementById('lang-modal');
+  if (_lm && _lm.classList.contains('open')) { cancelLangDisable(); return; }
+  var _tm = document.getElementById('theme-modal');
+  if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
+  var _vm = document.getElementById('variant-modal');
+  if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
 });
 document.getElementById('login-pw').addEventListener('keydown', e => {
   if (e.key === 'Enter') { _isFirstRun ? document.getElementById('login-pw2').focus() : tryLogin(); }
@@ -4513,7 +4521,7 @@ function buildClientCard(client) {
   const _cd0   = _ck0 ? _commandesCache[_ck0] : null;
   const _billInit = (_ck0 && _cd0) ? _buildClientBillingSectionHTML(_ck0, _cd0) : '<div class="hist-inline-empty">Aucune commande.</div>';
   const _payInit  = (_ck0 && _cd0) ? _buildPaymentSectionHTML(_ck0, _cd0) : '';
-  const _nameEsc  = (client.name || '').replace(/'/g, '&#39;');
+  const _nameEsc  = escapeHtml(client.name || '');
 
   const div = document.createElement('div');
   div.className = 'client-card';
@@ -5900,8 +5908,6 @@ document.addEventListener('deviceready', () => {
       if (_cem && _cem.classList.contains('show')) { _closeContactEditModal(); return; }
       var _dm = document.getElementById('del-modal');
       if (_dm && _dm.classList.contains('show')) { closeDelModal(); return; }
-      var _nm = document.getElementById('nc-modal');
-      if (_nm && _nm.classList.contains('show')) { closeNewClientModal(); return; }
       var _rm = document.getElementById('retention-modal');
       if (_rm && _rm.classList.contains('open')) { cancelRetention(); return; }
       var _lm = document.getElementById('lang-modal');

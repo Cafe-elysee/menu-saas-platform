@@ -6331,7 +6331,16 @@ function renderProdCard(container, item, ci) {
     const _eyeOffSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
     btn.innerHTML = nowVisible ? _eyeOnSvg : _eyeOffSvg;
     if (nowVisible) delete item.visible; else item.visible = false;
-    markUnsaved();
+    // Sauvegarde directe dans Firebase pour effet immédiat dans le menu client — cohérent
+    // avec le toggle de visibilité catégorie (cat-vis-btn, effet immédiat sans "Enregistrer").
+    // Sans ça, un restaurateur qui masque un produit et quitte sans sauvegarder croit l'avoir
+    // retiré du menu alors qu'il reste visible côté client (bug d'audit confirmé).
+    const _idx = adminData.items.findIndex(it => it.id === item.id);
+    if (_idx !== -1) {
+      _lastLocalSave = Date.now();
+      if (nowVisible) _rref('menu/items/' + _idx + '/visible').remove();
+      else _rref('menu/items/' + _idx + '/visible').set(false);
+    }
   });
 
   // Verrou traduction : champ modifié manuellement en EN/AR

@@ -30,7 +30,12 @@
 
         "logs": {
           ".write": "!newData.exists()",
-          "errors":   { ".write": true },
+          "errors": {
+            ".write": true,
+            "$errId": {
+              ".validate": "!newData.exists() || (newData.hasChildren(['msg','ts']) && newData.child('msg').isString() && newData.child('msg').val().length < 300 && newData.child('ts').isNumber())"
+            }
+          },
           "actions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
           "receipts": { ".write": "auth != null" }
         },
