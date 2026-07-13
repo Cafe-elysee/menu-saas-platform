@@ -5845,10 +5845,6 @@ function setGlobalLang(l) {
   _fpSetLocale(l);
 }
 
-function switchInfoLang(l) {
-  setGlobalLang(l);
-}
-
 /* ─── SECTION CATÉGORIES ─── */
 const ICONS = [
   'ico-coffee','ico-cold','ico-food','ico-cake','ico-sunrise','ico-hookah',
@@ -6341,8 +6337,14 @@ function renderProdCard(container, item, ci) {
     }
 
     const reader = new FileReader();
+    reader.onerror = () => {
+      showToast('❌ Fichier image invalide — réessayez');
+    };
     reader.onload = ev => {
       const img = new Image();
+      img.onerror = () => {
+        showToast('❌ Fichier image invalide — réessayez');
+      };
       img.onload = () => {
         const MAX = 1200;
         let w = img.width, h = img.height;
@@ -6473,7 +6475,7 @@ function renderProdCard(container, item, ci) {
     if (fromIdx === -1 || toIdx === -1) return;
     adminData.items[fromIdx].cat = item.cat; // déplacer vers la même catégorie
     const [moved] = adminData.items.splice(fromIdx, 1);
-    adminData.items.splice(fromIdx < toIdx ? toIdx : toIdx, 0, moved);
+    adminData.items.splice(fromIdx < toIdx ? toIdx - 1 : toIdx, 0, moved);
     markUnsaved(); renderProductsSection();
   });
 
@@ -7090,410 +7092,6 @@ function injectSVG() {
   `;
   document.body.appendChild(svg);
 }
-
-/* ═══════════════════════════════════════════
-   DONNÉES PAR DÉFAUT (produits)
-═══════════════════════════════════════════ */
-function getDefaultItems() {
-  return [
-  /* ---- CAT 0: Boissons Chaudes ---- */
-  {
-    id:1, cat:0, price:'€3.50', photo:'photo-1509042239860-f550ce710b93',
-    badges:['popular'],
-    name:{ fr:'Espresso', en:'Espresso', es:'Espresso' },
-    desc:{ fr:'Café court et intense — pur, concentré, servi chaud.', en:'Short and intense coffee — pure, concentrated, served hot.', es:'Short and intense coffee — pure, concentrated, served hot.' },
-    full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', es:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:2, cat:0, price:'€4.00', photo:'photo-1565031491910-e57fac031c41',
-    badges:[],
-    name:{ fr:'Doppio', en:'Doppio', es:'Doppio' },
-    desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', es:'Powerful double espresso — for true lovers of strong coffee.' },
-    full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', es:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:3, cat:0, price:'€5.50', photo:'photo-1572442388796-11668a67e53d',
-    badges:['popular'],
-    name:{ fr:'Cappuccino', en:'Cappuccino', es:'Cappuccino' },
-    desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', es:'Espresso, steamed milk and velvety foam — the perfect balance.' },
-    full:{ fr:'Notre cappuccino est préparé avec un espresso maison et un lait entier texturé à la vapeur à 65°C pour une mousse soyeuse et homogène. Un classique indémodable.', en:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.', es:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:4, cat:0, price:'€6.00', photo:'photo-1561882468-9110e03e0f78',
-    badges:['popular'],
-    name:{ fr:'Café Latte', en:'Café Latte', es:'Café Latte' },
-    desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', es:'Espresso on a bed of silky milk, soft and creamy.' },
-    full:{ fr:'Le café latte associe un espresso intense à une grande quantité de lait micro-moussé pour une boisson douce, longue et réconfortante. Parfait pour un moment de détente.', en:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.', es:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:5, cat:0, price:'€5.00', photo:'photo-1514432324607-a09d9b4aefdd',
-    badges:[],
-    name:{ fr:'Café Noisette', en:'Hazelnut Coffee', es:'Hazelnut Coffee' },
-    desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', es:'Espresso with a cloud of hazelnut-scented milk.' },
-    full:{ fr:'Un espresso doux agrémenté d\'un soupçon de lait chaud et d\'un arôme de noisette. La douceur d\'un latte avec le caractère d\'un espresso.', en:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.', es:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:6, cat:0, price:'€4.50', photo:'photo-1496318447583-f524534e9ce1',
-    badges:[],
-    name:{ fr:'Americano', en:'Americano', es:'Americano' },
-    desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', es:'Espresso extended with hot water — long and balanced coffee.' },
-    full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', es:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:7, cat:0, price:'€3.00', photo:'photo-1544787219-7f47ccb76574',
-    badges:[],
-    name:{ fr:'Thé Nature', en:'Plain Tea', es:'Plain Tea' },
-    desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', es:'Black or green tea of your choice — warm and comforting.' },
-    full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', es:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:8, cat:0, price:'€4.00', photo:'photo-1556679343-c7306c1976bc',
-    badges:['popular'],
-    name:{ fr:'Thé à la Menthe', en:'Mint Tea', es:'Mint Tea' },
-    desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', es:'Fresh green tea infused with fresh mint — traditional and refreshing.' },
-    full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', es:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:9, cat:0, price:'€7.00', photo:'photo-1542990253-a781e904e62f',
-    badges:[],
-    name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', es:'Hot Chocolate' },
-    desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', es:'Smooth and creamy chocolate — guaranteed comfort.' },
-    full:{ fr:'Un chocolat chaud préparé avec du vrai cacao en poudre et du lait entier, couronné d\'une généreuse touche de chantilly. Le petit plaisir par excellence.', en:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.', es:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-
-  /* ---- CAT 1: Boissons Froides ---- */
-  {
-    id:10, cat:1, price:'€12.00', photo:'photo-1514362545857-3bc16c4c7d1b',
-    badges:['popular'],
-    name:{ fr:'Mojito Classique', en:'Classic Mojito', es:'Classic Mojito' },
-    desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', es:'Fresh mint, lime, cane sugar and sparkling water — the original.' },
-    full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', es:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:11, cat:1, price:'€12.00', photo:'photo-1544145945-f90425340c7e',
-    badges:['popular'],
-    name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', es:'Strawberry Mojito' },
-    desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', es:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.' },
-    full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', es:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:12, cat:1, price:'€13.00', photo:'photo-1553361371-9b22f78e8b1d',
-    badges:[],
-    name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', es:'Red Fruits Smoothie' },
-    desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', es:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.' },
-    full:{ fr:'Un mélange généreux de fruits rouges frais ou surgelés, mixés avec du lait ou du jus de pomme pour une texture épaisse et onctueuse. Riche en antioxydants.', en:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.', es:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:13, cat:1, price:'€13.00', photo:'photo-1490645935967-10de6ba17061',
-    badges:[],
-    name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', es:'Mango Banana Smoothie' },
-    desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', es:'Blended mango and banana — tropical, sweet and nourishing.' },
-    full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', es:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:14, cat:1, price:'€8.00', photo:'photo-1621506289937-a8e4df240d0b',
-    badges:[],
-    name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', es:'Fresh Orange Juice' },
-    desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', es:'Fresh oranges pressed on demand — pure and natural.' },
-    full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', es:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:15, cat:1, price:'€8.00', photo:'photo-1589733955941-5eeaf752f6dd',
-    badges:[],
-    name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', es:'Watermelon Juice' },
-    desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', es:'Blended fresh watermelon — light, sweet and ultra-refreshing.' },
-    full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', es:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:16, cat:1, price:'€9.00', photo:'photo-1461023058943-07fcbe16d735',
-    badges:['popular'],
-    name:{ fr:'Ice Latte', en:'Ice Latte', es:'Ice Latte' },
-    desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', es:'Espresso over ice with cold milk — velvety iced coffee.' },
-    full:{ fr:'Un espresso double versé sur des glaçons avec du lait entier froid pour une boisson rafraîchissante qui allie la puissance du café à la douceur du lait. À siroter lentement.', en:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.', es:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:17, cat:1, price:'€8.00', photo:'photo-1600718374662-0483d2b9da44',
-    badges:[],
-    name:{ fr:'Ice Coffee', en:'Ice Coffee', es:'Ice Coffee' },
-    desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', es:'Prepared cold coffee, sweetened and served over ice — simple and delicious.' },
-    full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', es:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:18, cat:1, price:'€13.00', photo:'photo-1568901346375-23c9450c58cd',
-    badges:[],
-    name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', es:'Chocolate Milkshake' },
-    desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', es:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.' },
-    full:{ fr:'Notre milkshake au chocolat est mixé avec de la glace artisanale au chocolat, du lait entier et un généreux filet de sirop de chocolat. Couronné de chantilly et d\'éclats de chocolat.', en:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.', es:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.' },
-    allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], es:['Milk','Gluten'] }
-  },
-  {
-    id:19, cat:1, price:'€13.00', photo:'photo-1614086138868-51ab4f45f84c',
-    badges:['popular'],
-    name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', es:'Strawberry Milkshake' },
-    desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', es:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.' },
-    full:{ fr:'Des fraises fraîches mixées avec de la glace à la vanille et du lait pour un shake fruité et crémeux. Une douceur irrésistible à toute heure.', en:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.', es:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.' },
-    allergens:{ fr:['Lait'], en:['Milk'], es:['Milk'] }
-  },
-  {
-    id:20, cat:1, price:'€14.00', photo:'photo-1551024709-8f23befc6f87',
-    badges:['new'],
-    name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', es:'Tropical Cocktail' },
-    desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', es:'Pineapple, mango, passion fruit and lime — a tropical journey.' },
-    full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', es:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:21, cat:1, price:'€11.00', photo:'photo-1543362906-acfc16c67564',
-    badges:[],
-    name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', es:'Lemon Ginger Detox' },
-    desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', es:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.' },
-    full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', es:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-
-  /* ---- CAT 2: Cuisine ---- */
-  {
-    id:22, cat:2, price:'€17.00', photo:'photo-1512621776951-a57141f2eefd',
-    badges:[],
-    name:{ fr:'Salade César', en:'Caesar Salad', es:'Caesar Salad' },
-    desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', es:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.' },
-    full:{ fr:'Notre salade César est préparée avec de la laitue romaine croquante, du poulet grillé mariné aux herbes, des croûtons dorés maison, des copeaux de parmesan et notre sauce César crémeuse préparée chaque jour.', en:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.', es:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:23, cat:2, price:'€16.00', photo:'photo-1540420773420-3366772f4999',
-    badges:[],
-    name:{ fr:'Salade Thon', en:'Tuna Salad', es:'Tuna Salad' },
-    desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', es:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.' },
-    full:{ fr:'Une salade fraîche et nourrissante avec du thon de qualité, des légumes croquants, des olives et une vinaigrette légère préparée chaque jour. Idéale pour un repas léger.', en:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.', es:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.' },
-    allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], es:['Eggs','Fish'] }
-  },
-  {
-    id:24, cat:2, price:'€24.00', photo:'photo-1563379926898-05f4575a45d8',
-    badges:['popular'],
-    name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', es:'Pasta Carbonara' },
-    desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', es:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.' },
-    full:{ fr:'Notre carbonara est préparée avec des pâtes fraîches cuites al dente, une crème de parmesan onctueuse et du bacon fumé. Saupoudrée de poivre noir fraîchement moulu.', en:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.', es:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:25, cat:2, price:'€24.00', photo:'photo-1621996346565-e3dbc646d9a9',
-    badges:[],
-    name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', es:'Pasta Bolognese' },
-    desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', es:'Pasta with minced meat tomato sauce, slow-simmered.' },
-    full:{ fr:'Notre bolognaise est préparée avec de la viande hachée de bœuf, des tomates concassées, des oignons et des herbes aromatiques, mijotée pendant plusieurs heures pour un goût riche et profond.', en:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.', es:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.' },
-    allergens:{ fr:['Gluten'], en:['Gluten'], es:['Gluten'] }
-  },
-  {
-    id:26, cat:2, price:'€26.00', photo:'photo-1586190848861-99aa4a171e90',
-    badges:['popular'],
-    name:{ fr:'Hamburger Classic', en:'Classic Burger', es:'Classic Burger' },
-    desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', es:'Beef patty, melted cheddar, lettuce, tomato and house sauce.' },
-    full:{ fr:'Notre burger est composé d\'un steak haché de bœuf juteux, d\'une tranche de cheddar fondu, de salade fraîche, de tomate et de notre sauce secrète maison. Servi avec des frites ou une salade.', en:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.', es:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:27, cat:2, price:'€26.00', photo:'photo-1568901346375-23c9450c58cd',
-    badges:['new'],
-    name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', es:'Crispy Chicken Burger' },
-    desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', es:'Crispy fried chicken, coleslaw, pickles and ranch sauce.' },
-    full:{ fr:'Un filet de poulet croustillant pané et frit, posé sur un pain brioché avec du coleslaw maison, des pickles croquants et une sauce ranch crémeuse. Savoureux et généreux.', en:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.', es:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:28, cat:2, price:'€22.00', photo:'photo-1552332386-f8dd00dc2f85',
-    badges:['popular'],
-    name:{ fr:'Tacos Poulet', en:'Chicken Tacos', es:'Chicken Tacos' },
-    desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', es:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.' },
-    full:{ fr:'Nos tacos sont préparés dans une galette moelleuse avec du poulet mariné grillé, du fromage fondu, de la salade fraîche, des tomates et une sauce crémeuse épicée.', en:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.', es:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
-  },
-  {
-    id:29, cat:2, price:'€20.00', photo:'photo-1528735602780-2552fd46c7af',
-    badges:[],
-    name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', es:'Tuna Cheese Ciabatta' },
-    desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', es:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.' },
-    full:{ fr:'Une ciabatta croustillante garnie de thon à l\'huile d\'olive, de fromage fondu, de tomates fraîches et de roquette. Grillée à point pour un résultat chaud et savoureux.', en:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.', es:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.' },
-    allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], es:['Gluten','Milk','Fish'] }
-  },
-  {
-    id:30, cat:2, price:'€18.00', photo:'photo-1565299507177-b0ac66763828',
-    badges:[],
-    name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', es:'Lebanese Chicken Sandwich' },
-    desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', es:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.' },
-    full:{ fr:'Un sandwich généreux dans un pain pita chaud avec du poulet mariné aux épices orientales, de la sauce toum à l\'ail, du chou blanc et des tomates fraîches. Un goût authentique.', en:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.', es:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.' },
-    allergens:{ fr:['Gluten'], en:['Gluten'], es:['Gluten'] }
-  },
-  {
-    id:31, cat:2, price:'€16.00', photo:'photo-1519676867240-f03562e64548',
-    badges:[],
-    name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', es:'Chicken Cheese Crêpe' },
-    desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', es:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.' },
-    full:{ fr:'Une crêpe salée fine et dorée garnie de poulet grillé émincé, de fromage fondu crémeux et de fines herbes fraîches. Pliée et servie chaude.', en:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.', es:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:32, cat:2, price:'€16.00', photo:'photo-1528735602780-2552fd46c7af',
-    badges:[],
-    name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', es:'Mozzarella Tomato Panini' },
-    desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', es:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.' },
-    full:{ fr:'Un panini grillé croustillant garni de mozzarella fondante, de tomates fraîches tranchées et de feuilles de basilic frais. Un délice simple et savoureux.', en:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.', es:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
-  },
-  {
-    id:33, cat:2, price:'€14.00', photo:'photo-1525351484163-7529414344d8',
-    badges:[],
-    name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', es:'Cheese Omelette' },
-    desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', es:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.' },
-    full:{ fr:'Notre omlette est préparée avec trois œufs frais battus, du fromage fondu généreusement et des fines herbes fraîches. Moelleuse à l\'intérieur, légèrement dorée à l\'extérieur.', en:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.', es:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.' },
-    allergens:{ fr:['Œufs','Lait'], en:['Eggs','Milk'], es:['Eggs','Milk'] }
-  },
-
-  /* ---- CAT 3: Sucré ---- */
-  {
-    id:34, cat:3, price:'€10.00', photo:'photo-1519676867240-f03562e64548',
-    badges:['popular'],
-    name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', es:'Nutella Crêpe' },
-    desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', es:'Fine sweet crêpe generously filled with Nutella — a timeless classic.' },
-    full:{ fr:'Une crêpe fine et dorée nappée d\'une couche généreuse de Nutella fondant. Simple, gourmand et inégalable. À déguster chaud pour un maximum de plaisir.', en:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.', es:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.' },
-    allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], es:['Gluten','Milk','Tree nuts'] }
-  },
-  {
-    id:35, cat:3, price:'€11.00', photo:'photo-1605288558240-e2d0fa15c1d4',
-    badges:[],
-    name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', es:'Strawberry Cream Crêpe' },
-    desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', es:'Sweet crêpe with fresh strawberries and house whipped cream.' },
-    full:{ fr:'Une crêpe légère garnie de fraises fraîches tranchées et d\'une généreuse rosette de chantilly maison. Un dessert frais et élégant.', en:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.', es:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:36, cat:3, price:'€11.00', photo:'photo-1562376552-0d160a2f238a',
-    badges:[],
-    name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', es:'Chocolate Waffle' },
-    desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', es:'Crispy waffle, warm chocolate sauce and whipped cream.' },
-    full:{ fr:'Notre gaufre est croustillante à l\'extérieur et moelleuse à l\'intérieur, nappée d\'une sauce au chocolat chaude et couronnée d\'une généreuse chantilly. Un régal à partager.', en:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.', es:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:37, cat:3, price:'€13.00', photo:'photo-1567620832903-9fc6debc209f',
-    badges:['new','popular'],
-    name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', es:'Lotus Waffle' },
-    desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', es:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.' },
-    full:{ fr:'Notre gaufre Lotus est notre création signature. Une gaufre dorée et croustillante généreusement nappée de crème de biscuit Lotus fondu, parsemée d\'éclats de Speculoos caramélisés.', en:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.', es:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
-  },
-  {
-    id:38, cat:3, price:'€12.00', photo:'photo-1530373239216-42518e6b4063',
-    badges:['popular'],
-    name:{ fr:'Tiramisu Maison', en:'House Tiramisu', es:'House Tiramisu' },
-    desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', es:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.' },
-    full:{ fr:'Notre tiramisu est préparé chaque jour selon la recette italienne traditionnelle : mascarpone crémeux, biscuits savoiardi imbibés de café fort et saupoudrés de cacao pur. Un dessert inoubliable.', en:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.', es:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:39, cat:3, price:'€12.00', photo:'photo-1533134242443-d4fd215305ad',
-    badges:[],
-    name:{ fr:'Cheesecake', en:'Cheesecake', es:'Cheesecake' },
-    desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', es:'Buttery base, smooth cream cheese and red fruit coulis.' },
-    full:{ fr:'Notre cheesecake est préparé avec une base de biscuits émiettés beurrés, une crème de fromage Philadelphia onctueuse et un coulis de fruits rouges maison. Fraîcheur et gourmandise.', en:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.', es:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:40, cat:3, price:'€10.00', photo:'photo-1606312619070-d48b5b7a1b96',
-    badges:[],
-    name:{ fr:'Brownie Chaud', en:'Warm Brownie', es:'Warm Brownie' },
-    desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', es:'Melting chocolate brownie, served warm with vanilla ice cream.' },
-    full:{ fr:'Un brownie dense et fondant, riche en chocolat et noix, servi chaud et accompagné d\'une boule de glace à la vanille. Le contraste chaud-froid est irrésistible.', en:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.', es:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.' },
-    allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], es:['Gluten','Milk','Eggs','Tree nuts'] }
-  },
-  {
-    id:41, cat:3, price:'€13.00', photo:'photo-1564355808539-22fda35bed7e',
-    badges:['popular'],
-    name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', es:'Chocolate Lava Cake' },
-    desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', es:'Soft cake with a flowing hot chocolate centre — the signature dessert.' },
-    full:{ fr:'Notre coulant est cuit à la commande pour garantir un cœur coulant parfait. Servi avec une boule de glace à la vanille, il révèle un chocolat noir intense à la première cuillère.', en:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.', es:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-
-  /* ---- CAT 4: Le Matin ---- */
-  {
-    id:42, cat:4, price:'€18.00', photo:'photo-1504754524776-8f4f37790ca0',
-    badges:[],
-    name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', es:'Classic Breakfast' },
-    desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', es:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.' },
-    full:{ fr:'Notre petit-déjeuner classique comprend une boisson chaude au choix, des tranches de pain frais avec beurre et confiture, un jus d\'orange pressé et un fromage frais. Le démarrage parfait.', en:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.', es:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.' },
-    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], es:['Gluten','Milk'] }
-  },
-  {
-    id:43, cat:4, price:'€24.00', photo:'photo-1533089860892-a7c6f0a88666',
-    badges:['popular'],
-    name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', es:'Full Breakfast' },
-    desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', es:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.' },
-    full:{ fr:'Un petit-déjeuner généreux avec des œufs brouillés crémeux, du fromage, des toasts grillés, un jus de fruits pressé, un café maison, un yaourt et une assiette de fruits de saison.', en:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.', es:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-  {
-    id:44, cat:4, price:'€26.00', photo:'photo-1484723091739-30990009462f',
-    badges:['new'],
-    name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', es:'American Breakfast' },
-    desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', es:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.' },
-    full:{ fr:'Trois pancakes moelleux accompagnés d\'œufs au plat, de bacon croustillant, d\'un sirop d\'érable et d\'un grand verre de jus de fruits frais. Le brunch américain par excellence.', en:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.', es:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.' },
-    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], es:['Gluten','Milk','Eggs'] }
-  },
-
-  /* ---- CAT 5: Hookah ---- */
-  {
-    id:45, cat:5, price:'€35.00', photo:'photo-1584302179602-e4c3d3fd629d',
-    badges:['popular'],
-    name:{ fr:'Chicha Simple', en:'Single Hookah', es:'Single Hookah' },
-    desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', es:'Premium hookah with your choice of flavour — relaxation guaranteed.' },
-    full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', es:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:46, cat:5, price:'€40.00', photo:'photo-1584302179602-e4c3d3fd629d',
-    badges:[],
-    name:{ fr:'Chicha Double', en:'Double Hookah', es:'Double Hookah' },
-    desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', es:'Double hookah with two combined flavours — enriched experience.' },
-    full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', es:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:47, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
-    badges:[],
-    name:{ fr:'Supplément Glace', en:'Ice Supplement', es:'Ice Supplement' },
-    desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', es:'Add ice to your hookah vase for a cooler, smoother smoke.' },
-    full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', es:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.' },
-    allergens:{ fr:[], en:[], es: [] }
-  },
-  {
-    id:48, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
-    badges:[],
-    name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', es:'Coconut Milk Supplement' },
-    desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', es:'Replace water with coconut milk for a creamy, exotic smoke.' },
-    full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', es:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.' },
-    allergens:{ fr:[], en:[], es: [] }
-  }
-  ];
-}
-
 /* ═══════════════════════════════════════════
    TRADUCTION AUTOMATIQUE — Google Translate (endpoint public)
    Aucune clé requise, qualité excellente, supporte FR/EN/AR.
@@ -8083,12 +7681,6 @@ function loadMenuMode() {
   });
 }
 
-function saveMenuMode(mode) {
-  currentMenuMode = mode;
-  _rref('menu/menuStyle').set(mode);
-  syncStyleAdminUI(mode);
-}
-
 const _MODE_PRIORITY = ['paper','simple'];
 let _currentFeatures = null;
 
@@ -8101,16 +7693,6 @@ function _featOk(btnKey) {
   if (nested !== undefined) return nested !== false;
   return true;
 }
-function _styleOk(mode) {
-  if (!_currentFeatures) return true;
-  const nativeKey = mode === 'paper' ? 'stylePaper' : 'styleDynamic';
-  const flat   = _currentFeatures[nativeKey];
-  const nested = _currentFeatures.styles?.[mode];
-  if (flat   !== undefined) return flat   !== false;
-  if (nested !== undefined) return nested !== false;
-  return true;
-}
-
 function applyFeatures(features) {
   _currentFeatures = features;
 
@@ -8363,31 +7945,6 @@ function _renderSubSection(el, t, sub) {
 
   // Popup rappel une seule fois par session
   _checkPaymentReminderPopup(sub, t);
-}
-
-// ── Bouton Payer → Espèces ────────────────────────────────────────────────────
-function _subPayCash() {
-  const t    = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const tpay = _PAY_T[currentLang] || _PAY_T.fr;
-  const rid  = _RID || '';
-  const sub  = _subData || {};
-  const price = sub.price != null ? sub.price : _subPriceFor(sub.forfait || 'menu-qr', sub.paymentMode || 'annual');
-  const msgTemplate = tpay.cashMsg || 'Bonjour GeNext 👋\nID restaurant : {rid}\nMontant : {amt}€\nAdresse : \nDate et heure souhaitée : ';
-  const msg  = msgTemplate.replace('{rid}', rid).replace('{amt}', price);
-  const text = encodeURIComponent(msg);
-  const waUrl  = 'https://wa.me/' + WA_PHONE + '?text=' + text;
-  const vibUrl = 'viber://chat?number=%2B' + VIBER_PHONE + '&text=' + text;
-  _showAdmConfirm(
-    t.subPayCash || 'Paiement en espèces',
-    (t.subPayCashMsg || 'Contactez-nous par WhatsApp, Viber ou email avec votre ID restaurant.') +
-      '<div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">' +
-      '<a href="' + waUrl + '" onclick="window.open(this.href,\'_system\');return false;" style="display:block;text-align:center;padding:10px;background:#25d366;color:#fff;border-radius:9px;font-weight:700;text-decoration:none;font-size:0.85rem">📱 WhatsApp</a>' +
-      '<a href="' + vibUrl + '" onclick="window.open(this.href,\'_system\');return false;" style="display:block;text-align:center;padding:10px;background:#7360f2;color:#fff;border-radius:9px;font-weight:700;text-decoration:none;font-size:0.85rem">📳 Viber</a>' +
-      '</div>',
-    '',
-    t.subConfirmCancel || 'Fermer',
-    null
-  );
 }
 
 // ── Modal paiement dédié ──────────────────────────────────────────────────────

@@ -2251,12 +2251,6 @@ function _getSlugFromCmdKey(key) {
   if (!d) return null;
   return (d.clientCree && d.clientCree.rid) || (d.emailData && d.emailData.rid) || null;
 }
-function _getCmdKeyForSlug(slug) {
-  return Object.keys(_commandesCache).find(function(k) {
-    var d = _commandesCache[k];
-    return d && ((d.clientCree && d.clientCree.rid === slug) || (d.emailData && d.emailData.rid === slug));
-  }) || null;
-}
 function _setupSubSyncListener(slug, cmdKey) {
   if (_subSyncActive[slug]) return;
   _subSyncActive[slug] = true;
@@ -2789,35 +2783,6 @@ const _INFO_TIPS = {
   contact_apres: 'Envoie le <strong>message de livraison</strong> avec le lien d\'accès, l\'identifiant et le mot de passe du client pour qu\'il puisse se connecter immédiatement.'
 };
 
-function showInfoTooltip(btn, tipId) {
-  const existing = document.getElementById('_info-tip-overlay');
-  if (existing) { existing.remove(); return; }
-  const html = _INFO_TIPS[tipId] || '';
-  if (!html) return;
-
-  const overlay = document.createElement('div');
-  overlay.id = '_info-tip-overlay';
-  overlay.className = 'info-tooltip-overlay';
-  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-
-  const tip = document.createElement('div');
-  tip.className = 'info-tooltip';
-  tip.innerHTML = html + '<button class="info-tooltip-close" onclick="document.getElementById(\'_info-tip-overlay\').remove()">✕</button>';
-
-  const rect = btn.getBoundingClientRect();
-  let left = rect.left;
-  let top  = rect.bottom + 8;
-  const tipW = Math.min(280, window.innerWidth - 40);
-  if (left + tipW > window.innerWidth - 20) left = window.innerWidth - tipW - 20;
-  if (left < 20) left = 20;
-  if (top + 180 > window.innerHeight) { top = rect.top - 8; tip.style.transform = 'translateY(-100%)'; }
-  tip.style.left = left + 'px';
-  tip.style.top  = top  + 'px';
-
-  overlay.appendChild(tip);
-  document.body.appendChild(overlay);
-}
-
 // ── Messages de livraison (après création client) ─
 function buildDeliverySubject(rest, forfait, lang) {
   const s = {
@@ -2869,24 +2834,6 @@ function _rerenderCommandeCard(key) {
     existing.parentNode.replaceChild(newCard, existing);
   }
   _rerenderClientBillingSection(key);
-}
-
-function _copyViberMsg(key) {
-  const d = _commandesCache[key];
-  const created = (d && d.clientCree) || _lastCreatedClients[key];
-  if (!d) return;
-  const trial = _trialInfo(d, key);
-  const lang  = d.langue || 'fr';
-  let msg;
-  if (!trial.noTrial) {
-    msg = _buildPaymentReminderMsg(d, d.restaurant || '', lang);
-  } else if (created) {
-    const fLabel = d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-    msg = buildDeliveryMsg(d.restaurant || '', created.rid, created.pwd, fLabel, lang);
-  } else {
-    return;
-  }
-  navigator.clipboard.writeText(msg).then(function() { showToast('Message copié ! 📋'); });
 }
 
 function listenCommandes() {
@@ -3085,26 +3032,6 @@ function _debouncePriceInput(inputId, saveFn) {
 }
 
 // ── Sauvegarder un prix de frais de création custom (conservé pour rétrocompatibilité) ──────────────────────────
-function _saveCreationFeePrice(key, rawVal) {
-  const price = Math.max(0, parseInt(rawVal, 10) || 0);
-  const d = _commandesCache[key];
-  if (!d) return;
-  const prev = Object.assign({}, d);
-  const prices = Object.assign({}, d.prices || {}, { creation: price });
-  _commandesCache[key] = Object.assign({}, d, { prices });
-  _rerenderClientBillingSection(key);
-  _rerenderCommandeCard(key);
-  _controlWrite('/commandes/' + key + '/prices/creation', 'set', price).catch(function() {
-    _commandesCache[key] = prev;
-    _rerenderClientBillingSection(key);
-    _rerenderCommandeCard(key);
-    showToast('⚠ Erreur de synchronisation');
-  });
-  const slug = _getSlugFromCmdKey(key);
-  if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices/creation').set(price);
-  showToast('💾 Frais de création mis à jour');
-}
-
 // ── Prix pour une combinaison forfait+mode ────────────────────────────────
 function _getComboPrice(d, forfait, mode) {
   var ck = _comboKey(forfait, mode);
@@ -3253,46 +3180,6 @@ function _buildPaymentSectionHTML(cmdKey, d) {
 }
 
 // ── Sauvegarder le mode paiement (optimistic) ────────────────────────────────
-function _savePaymentMode(cmdKey, mode) {
-  if (mode !== 'monthly' && mode !== 'annual') return;
-  const d = _commandesCache[cmdKey];
-  if (!d || d.paymentMode === mode) return;
-  // Toggle visuel immédiat du segmented control
-  var wrap = document.getElementById('paymode-wrap-' + cmdKey);
-  if (wrap) {
-    wrap.classList.toggle('right', mode === 'annual');
-    var btns = wrap.querySelectorAll('.forfait-seg-btn');
-    if (btns.length === 2) { btns[0].classList.toggle('active', mode === 'monthly'); btns[1].classList.toggle('active', mode === 'annual'); }
-  }
-  var unitEl = document.getElementById('price-unit-' + cmdKey);
-  if (unitEl) unitEl.textContent = '€/' + (mode === 'annual' ? 'an' : 'mois');
-  const prev = Object.assign({}, d);
-  const isInTrial = d.trialEndAt && Date.now() < d.trialEndAt;
-  const baseTs = isInTrial ? null : (d.paidAt || d.trialEndAt || d.firstOpenAt || null);
-  const newNextReminderAt = (!isInTrial && baseTs) ? _addMonths(baseTs, mode === 'annual' ? 12 : 1) : d.nextReminderAt;
-  _commandesCache[cmdKey] = Object.assign({}, d, { paymentMode: mode, nextReminderAt: newNextReminderAt });
-  _rerenderClientBillingSection(cmdKey);
-  _rerenderCommandeCard(cmdKey);
-  _controlWrite('/commandes/' + cmdKey + '/paymentMode', 'set', mode).catch(function() {
-    _commandesCache[cmdKey] = prev;
-    _rerenderClientBillingSection(cmdKey);
-    _rerenderCommandeCard(cmdKey);
-    showToast('⚠ Erreur de synchronisation');
-  });
-  if (newNextReminderAt && newNextReminderAt !== d.nextReminderAt) {
-    _controlWrite('/commandes/' + cmdKey + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {});
-  }
-  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
-  const _slugPM = _getSlugFromCmdKey(cmdKey);
-  if (_slugPM) {
-    _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/paymentMode').set(mode);
-    if (newNextReminderAt && newNextReminderAt !== d.nextReminderAt) {
-      _saasDb.ref('restaurants/' + _slugPM + '/config/subscription/endDate').set(newNextReminderAt);
-    }
-  }
-  showToast('💾 Mode ' + (mode === 'annual' ? 'annuel' : 'mensuel') + ' enregistré');
-}
-
 // ── Re-render toutes les sections facturation ouvertes (ex: changement prix global) ──
 function _rerenderAllBillingSections() {
   Object.keys(_commandesCache).forEach(function(k) {
@@ -3564,22 +3451,6 @@ function _getCommandePrice(d) {
   return activeMode === 'annual' ? (_PRICE_ANNUAL[activeForfait] || 0) : (_PRICE_MONTHLY[activeForfait] || 0);
 }
 
-function _saveCommandePrice(key, rawVal) {
-  const price = Math.max(0, parseInt(rawVal, 10) || 0);
-  const d = _commandesCache[key];
-  if (!d) return;
-  if (d.price === price) return;
-  _commandesCache[key] = Object.assign({}, d, { price });
-  // Sync vers control Firebase (local)
-  _controlWrite('/commandes/' + key + '/price', 'set', price).catch(function() {});
-  // Sync vers main Firebase (source de vérité → admin voit la mise à jour en temps réel)
-  const slug = _getSlugFromCmdKey(key);
-  if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/price').set(price);
-  showToast('💾 Prix mis à jour : ' + price + ' €');
-  _rerenderClientBillingSection(key);
-  _doRenderPaiements();
-}
-
 // ── Activer une formule (forfait + mode) et synchroniser partout ────────────
 // ── Appel centralisé à l'API de facturation — seule autorité d'écriture (Refonte abonnement) ──
 // Miroir exact de la fonction équivalente dans client/admin.html (duplication volontaire,
@@ -3812,11 +3683,20 @@ function _markPaid(key) {
 
       _controlWrite('/commandes/' + key, 'update', update)
         .then(function() {
-          _controlWrite('/commandes/' + key + '/paiements', 'push', payEntry).catch(function() {});
+          _controlWrite('/commandes/' + key + '/paiements', 'push', payEntry).catch(function() {
+            showToast('⚠ Paiement enregistré mais absent de l\'historique — vérifiez manuellement');
+          });
           const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
           if (rid) {
-            _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false });
-            _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: update.nextReminderAt });
+            // Sans .catch ici, un échec laisserait silencieusement le restaurant suspendu/
+            // périmé côté MAIN_DB alors que la commande est déjà marquée payée côté CONTROL_DB —
+            // alerter Malek explicitement plutôt que de masquer l'incohérence.
+            Promise.all([
+              _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false }),
+              _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: update.nextReminderAt })
+            ]).catch(function() {
+              showToast('⚠ Paiement enregistré mais la réactivation du restaurant a échoué — vérifiez manuellement');
+            });
           }
           const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
           if (emailAddr) {
@@ -4089,7 +3969,12 @@ async function restoreClient(slug, d) {
       });
       await _saasDb.ref('/archivedClients/'+rid).remove();
       var subF = restoredConfig.subscription || {};
-      if (d.cmdKey && _commandesCache[d.cmdKey]) {
+      // Lecture directe Firebase (pas _commandesCache, un cache local asynchrone qui peut
+      // ne pas encore être peuplé juste après un rechargement de l'app — se fier à lui ici
+      // ferait retomber silencieusement sur la reconstruction générique ci-dessous, perdant
+      // le cycle d'abonnement réel malgré la commande d'origine toujours intacte en base).
+      var _existingCmdSnap = d.cmdKey ? await _controlDb.ref('/commandes/' + d.cmdKey).once('value') : null;
+      if (d.cmdKey && _existingCmdSnap && _existingCmdSnap.exists()) {
         // La commande d'origine n'a jamais été supprimée (juste marquée clientDeleted) —
         // la réactiver préserve tel quel le cycle d'abonnement réel (nextReminderAt,
         // trialEndAt, pendingUpgrade/pendingForfaitChange...) au lieu de repartir sur un
@@ -4313,15 +4198,6 @@ function deleteCommande(key) {
     }
   }, true);
 }
-
-function viderCommande() {
-  _showCtrlConfirm('Supprimer toutes les commandes', 'Toutes les commandes seront supprimées. Cette action est irréversible.', 'Tout supprimer', () => {
-    _controlWrite('/commandes', 'remove')
-      .then(() => showToast('Toutes les commandes supprimées'))
-      .catch(e => showToast('Erreur : ' + (e.message || e)));
-  }, true);
-}
-
 
 function markCommandeRead(key) {
   _controlWrite('/commandes/' + key + '/lu', 'set', true).catch(function() {});
@@ -4644,13 +4520,6 @@ async function openAdmin(e, slug) {
   }
 }
 
-async function toggleClientActive(slug) {
-  const db = getClientDb(slug);
-  const snap = await db.ref('/config/active').once('value');
-  const current = snap.val() !== false; // null ou true = actif
-  await db.ref('/config/active').set(!current);
-}
-
 let _deleteSlug = null;
 function askDeleteClient(slug, name) {
   _deleteSlug = slug;
@@ -4971,15 +4840,6 @@ function _colorDist(h1, h2) {
   const [r1,g1,b1]=p(h1),[r2,g2,b2]=p(h2);
   return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
 }
-function writeFeatureBtn(slug, btn, val) {
-  getClientDb(slug).ref('/config/features/' + btn).set(val);
-}
-function writeQRSystem(slug, val) {
-  const db = getClientDb(slug);
-  db.ref('/config/features/orderUI').set(val);
-  db.ref('/config/features/tableSystem').set(val);
-  db.ref('/config/features/qrOrdering').set(val);
-}
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
   getClientDb(slug).ref('/config/defaultLang').set(lang);
@@ -5042,29 +4902,6 @@ async function updatePassword(slug) {
 // LANGUE — protection disable
 // ════════════════════════════════════════════════════
 let _pendingDisable = null;
-
-async function onLangToggle(slug, lang, checkbox) {
-  const state = getClientState(slug);
-  if (!checkbox.checked) {
-    const client    = CLIENTS.find(c => c.slug === slug);
-    const remaining = (client.langs||[]).filter(l => l !== lang && state.enabledLangs[l] !== false);
-    if (remaining.length === 0) { checkbox.checked = true; return; }
-    const isDefault = state.defaultLang === lang;
-    const isPrimary = state.primaryLang === lang;
-    if (isDefault || isPrimary) {
-      _pendingDisable = { slug, lang, checkbox };
-      const roles = [];
-      if (isDefault) roles.push('la langue affichée');
-      if (isPrimary) roles.push('la langue admin');
-      document.getElementById('modal-msg').innerHTML =
-        '<strong>'+escapeHtml(LANG_LABELS[lang]||lang)+'</strong> est actuellement '+roles.join(' et ')+'.<br>Choisissez une langue de remplacement :';
-      document.getElementById('modal-sel').innerHTML = remaining.map(l => '<option value="'+escapeHtml(l)+'">'+(LANG_LABELS[l]||escapeHtml(l))+'</option>').join('');
-      document.getElementById('lang-modal').classList.add('open');
-      return;
-    }
-  }
-  await writeEnabledLang(slug, lang, checkbox.checked);
-}
 
 async function confirmLangDisable() {
   if (!_pendingDisable) return;
@@ -5135,97 +4972,6 @@ window.cancelThemeDisable = function() {
 // ════════════════════════════════════════════════════
 let _variantSlug = null, _variantFamily = null;
 
-function openVariantPopup(slug, themeId) {
-  const tv = THEME_VARIANTS.find(t => t.family === themeId);
-  _variantSlug = slug; _variantFamily = themeId;
-
-  const saved      = (_clientVariants[slug] && _clientVariants[slug][themeId]) || {};
-  const hiddenV    = saved.hidden || {};
-  const hiddenU    = saved.hiddenUniversal || {};
-  const curDef     = saved.default || (tv ? tv.variants[0].id : null);
-  const curDefHex  = saved.defaultHex || null;
-  const themeEntry = ALL_THEMES_LIST.find(t => t.id === themeId) || {};
-  const themeName  = tv ? tv.name : (themeEntry.name || themeId);
-
-  document.getElementById('variant-modal-title').textContent = themeName + ' — Couleurs';
-
-  // Swatch Standard actuelle
-  let stdColor, stdLabel;
-  if (curDefHex) {
-    stdColor = curDefHex;
-    const idx = _CTRL_COLORS.indexOf(curDefHex);
-    stdLabel = idx >= 0 ? _CTRL_NAMES[idx] : curDefHex;
-  } else if (tv) {
-    const defVariant = tv.variants.find(v => v.id === curDef) || tv.variants[0];
-    stdColor = defVariant.color;
-    stdLabel = defVariant.name;
-  } else {
-    stdColor = themeEntry.accent || '#c8a44e';
-    stdLabel = themeEntry.name || themeId;
-  }
-  document.getElementById('variant-std-dot').style.background = stdColor;
-  document.getElementById('variant-std-name').textContent = stdLabel;
-
-  const refColors = tv ? tv.variants.map(v => v.color) : [themeEntry.accent || '#c8a44e'];
-  const list = document.getElementById('variant-all-list');
-  list.innerHTML = '';
-
-  function makeItem(colorVal, colorLabel, dataType, isHidden, isStd, dataId) {
-    const keyVal = dataId !== undefined ? dataId : colorVal;
-    const item = document.createElement('div');
-    item.className = 'variant-item' + (isHidden ? ' is-hidden-color' : '');
-    const dot = document.createElement('div');
-    dot.className = 'variant-dot'; dot.style.background = colorVal;
-    if (isHidden) dot.style.opacity = '0.35';
-    const lbl = document.createElement('span');
-    lbl.className = 'variant-name'; lbl.textContent = colorLabel;
-    if (isHidden) lbl.style.opacity = '0.45';
-    const eye = document.createElement('button');
-    eye.className = 'variant-eye-btn' + (isHidden ? ' is-hidden' : '');
-    eye.textContent = isHidden ? '🙈' : '👁';
-    eye.dataset.val = keyVal; eye.dataset.type = dataType;
-    eye.title = isHidden ? 'Afficher' : 'Masquer';
-    eye.addEventListener('click', () => {
-      const nowHidden = eye.classList.toggle('is-hidden');
-      eye.textContent = nowHidden ? '🙈' : '👁';
-      eye.title = nowHidden ? 'Afficher' : 'Masquer';
-      item.classList.toggle('is-hidden-color', nowHidden);
-      dot.style.opacity = nowHidden ? '0.35' : '';
-      lbl.style.opacity = nowHidden ? '0.45' : '';
-      if (nowHidden) star.classList.remove('is-std');
-    });
-    const star = document.createElement('button');
-    star.className = 'variant-star-btn' + (isStd ? ' is-std' : '');
-    star.textContent = '⭐';
-    star.dataset.val = keyVal; star.dataset.type = dataType;
-    star.addEventListener('click', () => {
-      if (eye.classList.contains('is-hidden')) return;
-      list.querySelectorAll('.variant-star-btn').forEach(b => b.classList.remove('is-std'));
-      star.classList.add('is-std');
-      document.getElementById('variant-std-dot').style.background = colorVal;
-      document.getElementById('variant-std-name').textContent = colorLabel;
-    });
-    item.appendChild(dot); item.appendChild(lbl); item.appendChild(eye); item.appendChild(star);
-    return item;
-  }
-
-  if (tv) {
-    tv.variants.forEach(v => {
-      const isHidden = !!hiddenV[v.id];
-      const isStd = !isHidden && !curDefHex && v.id === curDef;
-      list.appendChild(makeItem(v.color, v.name, 'variant', isHidden, isStd, v.id));
-    });
-  }
-
-  _CTRL_COLORS.forEach((hex, i) => {
-    if (refColors.some(rc => _colorDist(hex, rc) < 55)) return;
-    const isHidden = !!hiddenU[hex.replace('#','')];
-    const isStd = !isHidden && curDefHex === hex;
-    list.appendChild(makeItem(hex, _CTRL_NAMES[i], 'univ', isHidden, isStd));
-  });
-
-  document.getElementById('variant-modal').classList.add('open');
-}
 
 // buildDefSel removed
 
@@ -6002,6 +5748,8 @@ function _checkControlTokenInFirebase() {
   }
 }
 
+const _FCM_SAVE_MAX_RETRIES = 5;
+let _fcmSaveRetries = 0;
 function saveControlToken(tokenValue) {
   if (!_saasDb) { _pendingFcmToken = tokenValue; return; }
   const deviceId = tokenValue.slice(-16).replace(/[^a-zA-Z0-9]/g, '_');
@@ -6010,6 +5758,7 @@ function saveControlToken(tokenValue) {
   localStorage.setItem('ctrl_fcm_last_reg', String(Date.now()));
   _saasDb.ref('control/fcm_tokens/' + deviceId).set({ token: tokenValue, ts: Date.now() })
     .then(() => {
+      _fcmSaveRetries = 0;
       if (isNew) showToast('🔔 Notifications activées');
       refreshNotifStatus();
     })
@@ -6017,7 +5766,15 @@ function saveControlToken(tokenValue) {
       console.error('FCM token save error:', err);
       const fb = document.getElementById('notif-renewal-fb');
       if (fb) { fb.textContent = '⚠ Erreur sauvegarde token : ' + (err && err.message || err); fb.style.color = '#e74c3c'; }
-      setTimeout(() => saveControlToken(tokenValue), 5000);
+      // Plafonné : un échec permanent (règle refusée, token invalide) ne doit pas retenter
+      // indéfiniment toutes les 5s tant que l'app reste ouverte.
+      _fcmSaveRetries++;
+      if (_fcmSaveRetries < _FCM_SAVE_MAX_RETRIES) {
+        setTimeout(() => saveControlToken(tokenValue), 5000);
+      } else {
+        console.error('FCM token save: max retries reached, giving up.');
+        if (fb) { fb.textContent = '⚠ Notifications indisponibles — réinstallez l\'application si le problème persiste'; fb.style.color = '#e74c3c'; }
+      }
     });
 }
 

@@ -6765,7 +6765,6 @@ function _normalizeStyle(m) {
   if (m === 'paper' || m === 'simple') return m;
   return 'paper';
 }
-function _styleAttr(m) { return m === 'paper' ? 'papier' : 'photo'; }
 const isDemo = new URLSearchParams(location.search).get('demo') === '1';
 
 /* ── URL PARAMS DÉMO ── */
@@ -8549,6 +8548,26 @@ function _effectivePrice(item, dose) {
   return { price: p, priceNum: parsePrice(p) };
 }
 
+// Le panier est persisté (localStorage) avec le prix figé au moment de l'ajout —
+// sans ceci, un article ajouté pendant une Happy Hour puis commandé après sa fin
+// (ou l'inverse) partirait au mauvais prix. Recalcule chaque ligne par rapport au
+// produit courant (ITEMS) avant tout affichage/envoi de commande.
+function _revalidateCartPrices() {
+  let changed = false;
+  cartItems.forEach(function(ci) {
+    const item = ITEMS.find(it => it.id === ci.id);
+    if (!item) return;
+    const ep = _effectivePrice(item, ci.dose);
+    if (ep.priceNum !== ci.priceNum || ep.price !== ci.price) {
+      ci.price = ep.price;
+      ci.priceNum = ep.priceNum;
+      changed = true;
+    }
+  });
+  if (changed) saveCart();
+  return changed;
+}
+
 function addToCart(item, dose, sugar) {
   if (navigator.vibrate) navigator.vibrate(60);
   if (item.doseOption && dose === undefined) {
@@ -8772,6 +8791,7 @@ function updateCartBar() {
 }
 
 function renderCartModal() {
+  _revalidateCartPrices();
   const list = document.getElementById('cart-items-list');
   const tot  = document.getElementById('cart-total-val');
   const t    = UI[lang];
@@ -8799,12 +8819,6 @@ function renderCartModal() {
     </div>`;
   }).join('');
   if (tot) tot.textContent = getCartTotal().toFixed(2) + ' €';
-}
-
-function addToCartById(itemId) {
-  const item = ITEMS.find(it => it.id === itemId);
-  if (item) addToCart(item);
-  renderCartModal();
 }
 
 function promptTableNumber(t) {
@@ -8885,9 +8899,10 @@ function _analyticsDay() {
 
 async function confirmOrder() {
   if (isDemo) { showDemoAction(); return; }
+  if (cartItems.length === 0) return;
+  if (_revalidateCartPrices()) renderCartModal();
   const t          = UI[lang];
   const btn        = document.getElementById('cart-confirm-btn');
-  if (cartItems.length === 0) return;
 
   // Destination : À emporter ou À table
   const isTakeaway = document.getElementById('cart-dest-takeaway')?.classList.contains('active');
@@ -9739,21 +9754,6 @@ function setupPreloader() {
 }
 
 /* Défilement fluide avec easing cubic */
-function smoothScrollTo(target, duration) {
-  const start = window.scrollY;
-  if (start >= target - 20) return;
-  const distance = target - start;
-  let t0 = null;
-  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
-  function step(ts) {
-    if (!t0) t0 = ts;
-    const p = Math.min((ts - t0) / duration, 1);
-    window.scrollTo(0, start + distance * ease(p));
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
 /* ================================================
    AUTO-SCROLL HERO → MENU (style dynamique uniquement)
 ================================================ */
@@ -9907,6 +9907,23 @@ function changeLang(l) {
   filterItems();
   updateNoteBar();
   if (_pdFabActive) pdRefreshTexts();
+  // La fiche produit (sheet) garde son propre texte si elle est ouverte pendant
+  // un changement de langue — la retraduire sans la refermer.
+  if (sheetItem && document.getElementById('sheet')?.classList.contains('on')) {
+    _refreshSheetTexts();
+  }
+}
+
+function _refreshSheetTexts() {
+  if (!sheetItem) return;
+  const t = UI[lang];
+  const item = sheetItem;
+  document.getElementById('sh-name').textContent = _esc(item.name[lang]||item.name.fr||'');
+  const _shEl = document.getElementById('sh-price'); if (_shEl) _shEl.innerHTML = _priceHtml(item);
+  document.getElementById('sh-desc').textContent = item.full[lang]||item.full.fr||item.desc[lang]||item.desc.fr||'';
+  document.getElementById('al-lbl').textContent = t.alLabel;
+  const shAddBtn = document.getElementById('sh-add-btn');
+  if (shAddBtn) shAddBtn.textContent = t.addBtn || 'Ajouter';
 }
 
 function applyTranslations() {
@@ -10180,7 +10197,7 @@ function _cardCinema(item) {
   card.style.transitionDelay = '0s';
   if (src) {
     card.innerHTML = `
-      <div class="cinema-bg" style="background-image:url('${_esc(src)}')"></div>
+      <div class="cinema-bg" style="background-image:url('${_esc(src).replace(/'/g, '%27')}')"></div>
       <div class="cinema-overlay"></div>
       <div class="cinema-content">
         ${badges ? `<div class="cinema-badges">${badges}</div>` : ''}
@@ -10873,18 +10890,12 @@ function setupSheet() {
 
 function openSheet(item) {
   sheetItem = item;
-  const t = UI[lang];
   const shImg = document.getElementById('sh-img');
   shImg.alt = '';
   shImg.onerror = () => { shImg.style.display = 'none'; };
   shImg.onload  = () => { shImg.style.display = ''; };
   shImg.src = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http')) ? item.photo : `https://images.unsplash.com/${item.photo}?w=800&h=500&fit=crop`;
-  document.getElementById('sh-name').textContent = _esc(item.name[lang]||item.name.fr||'');
-  const _shEl=document.getElementById('sh-price');if(_shEl){_shEl.innerHTML=_priceHtml(item);}
-  document.getElementById('sh-desc').textContent = item.full[lang]||item.full.fr||item.desc[lang]||item.desc.fr||'';
-  document.getElementById('al-lbl').textContent = t.alLabel;
-  const shAddBtn = document.getElementById('sh-add-btn');
-  if (shAddBtn) shAddBtn.textContent = t.addBtn || 'Ajouter';
+  _refreshSheetTexts();
 
   // Bouton + dans le popup (mode commande)
   const c = cartItems.find(ci => ci.id === item.id);
