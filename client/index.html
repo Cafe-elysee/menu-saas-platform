@@ -6310,6 +6310,9 @@
   <svg class="cfab-ico"><use href="#ico-bell"/></svg>
 </button>
 
+<!-- Toast d'erreur générique (réseau indisponible sur une action optimiste) -->
+<div id="app-toast" role="status" aria-live="polite" style="display:none;position:fixed;left:50%;bottom:max(90px, env(safe-area-inset-bottom) + 90px);transform:translateX(-50%);z-index:9999;background:#2a2622;color:#f0e4c8;border:1px solid rgba(231,76,60,0.4);border-radius:12px;padding:10px 16px;font-size:0.78rem;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.35)"></div>
+
 <!-- FAB -->
 <button id="fab" aria-label="Scroll to top">
   <svg><use href="#ico-up"/></svg>
@@ -6384,6 +6387,7 @@
       <button class="cart-dest-btn" id="cart-dest-takeaway">🥡 À emporter</button>
     </div>
     <button class="cart-confirm-btn" id="cart-confirm-btn">Envoyer la commande</button>
+    <div id="cart-order-err" style="display:none;font-size:0.76rem;color:#e74c3c;text-align:center;margin-top:8px"></div>
   </div>
 </div>
 
@@ -6472,7 +6476,9 @@ const UI = {
     histPending:'Σε αναμονή', histProgress:'Σε εξέλιξη', histDone:'Ολοκληρώθηκε', histTakeaway:'Σερβίρισμα', histTable:'Τραπέζι',
     histReorder:'Παραγγελία ξανά', addBtn:'Προσθήκη στο καλάθι',
     cartEmpty:'Το καλάθι είναι άδειο', cartSending:'Αποστολή…', cartSent:'Η παραγγελία εστάλη!',
+    cartOrderErr:'⚠ Αδύνατη η σύνδεση — ελέγξτε το δίκτυό σας και δοκιμάστε ξανά',
     tblInfo:'Ο σερβιτόρος λαμβάνει αμέσως ειδοποίηση στο τηλέφωνό του.',
+    callWaiterErr:'⚠ Αδύνατη η σύνδεση — δοκιμάστε ξανά αν ο σερβιτόρος δεν έρθει',
     cartInfo:'Η παραγγελία σας εμφανίζεται αμέσως στην εφαρμογή του σερβιτόρου.',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'Χωρίς ζάχαρη', sugarMedium:'Μέτρια', sugarSweet:'Γλυκό', dosePopupTitle:'Προσαρμογή παραγγελίας', doseLabel:'Δόση', sugarLabel:'Ζάχαρη', doseCancel:'Ακύρωση',
   },
@@ -6505,7 +6511,9 @@ const UI = {
     histPending:'En attente', histProgress:'En cours', histDone:'Terminée', histTakeaway:'À emporter', histTable:'Table',
     histReorder:'Commander à nouveau', addBtn:'Ajouter au panier',
     cartEmpty:'Votre panier est vide', cartSending:'Envoi en cours…', cartSent:'Commande envoyée !',
+    cartOrderErr:'⚠ Connexion impossible — vérifiez votre réseau et réessayez',
     tblInfo:'Le serveur reçoit une notification instantanée sur son téléphone.',
+    callWaiterErr:'⚠ Connexion impossible — réessayez si le serveur ne vient pas',
     cartInfo:'Votre commande apparaît immédiatement sur l\'application du serveur.',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'Sans sucre', sugarMedium:'Sucre moyen', sugarSweet:'Sucré', dosePopupTitle:'Personnaliser votre commande', doseLabel:'Dose', sugarLabel:'Sucre', doseCancel:'Annuler',
   },
@@ -6538,7 +6546,9 @@ const UI = {
     histPending:'Pending', histProgress:'In progress', histDone:'Done', histTakeaway:'Takeaway', histTable:'Table',
     histReorder:'Order again', addBtn:'Add to cart',
     cartEmpty:'Your cart is empty', cartSending:'Sending…', cartSent:'Order sent!',
+    cartOrderErr:'⚠ Connection failed — check your network and try again',
     tblInfo:'The server receives an instant notification on their phone.',
+    callWaiterErr:'⚠ Connection failed — try again if the waiter doesn\'t come',
     cartInfo:'Your order appears immediately on the server\'s app.',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'No sugar', sugarMedium:'Medium', sugarSweet:'Sweet', dosePopupTitle:'Customize your order', doseLabel:'Dose', sugarLabel:'Sugar', doseCancel:'Cancel',
   },
@@ -6571,7 +6581,9 @@ const UI = {
     histPending:'En espera', histProgress:'En preparación', histDone:'Finalizado', histTakeaway:'Para llevar', histTable:'Mesa',
     histReorder:'Volver a pedir', addBtn:'Añadir al carrito',
     cartEmpty:'El carrito está vacío', cartSending:'Enviando…', cartSent:'¡Pedido enviado!',
+    cartOrderErr:'⚠ Conexión imposible — compruebe su red e inténtelo de nuevo',
     tblInfo:'El camarero recibe una notificación instantánea en su teléfono.',
+    callWaiterErr:'⚠ Conexión imposible — inténtelo de nuevo si el camarero no viene',
     cartInfo:'Su pedido aparece inmediatamente en la app del camarero.',
     doseSingle:'Simple', doseDouble:'Doble', sugarNone:'Sin azúcar', sugarMedium:'Medio', sugarSweet:'Azucarado', dosePopupTitle:'Personalizar su pedido', doseLabel:'Dosis', sugarLabel:'Azúcar', doseCancel:'Cancelar',
   },
@@ -6604,7 +6616,9 @@ const UI = {
     histPending:'Ausstehend', histProgress:'In Bearbeitung', histDone:'Abgeschlossen', histTakeaway:'Zum Mitnehmen', histTable:'Tisch',
     histReorder:'Erneut bestellen', addBtn:'In den Warenkorb',
     cartEmpty:'Ihr Warenkorb ist leer', cartSending:'Wird gesendet…', cartSent:'Bestellung gesendet!',
+    cartOrderErr:'⚠ Verbindung fehlgeschlagen — Netzwerk prüfen und erneut versuchen',
     tblInfo:'Der Kellner erhält sofort eine Benachrichtigung auf sein Telefon.',
+    callWaiterErr:'⚠ Verbindung fehlgeschlagen — versuchen Sie es erneut, falls der Kellner nicht kommt',
     cartInfo:'Ihre Bestellung erscheint sofort in der Kellner-App.',
     doseSingle:'Single', doseDouble:'Doppelt', sugarNone:'Ohne Zucker', sugarMedium:'Mittel', sugarSweet:'Süß', dosePopupTitle:'Bestellung anpassen', doseLabel:'Dosis', sugarLabel:'Zucker', doseCancel:'Abbrechen',
   },
@@ -8897,12 +8911,34 @@ function _analyticsDay() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
+// Un wifi connecté mais sans vrai accès Internet ne fait jamais échouer une écriture
+// Firebase (le SDK attend indéfiniment la reconnexion) — sans ceci, le bouton resterait
+// bloqué sur "Envoi en cours…" pour toujours, sans le moindre message d'erreur.
+let _appToastTimer = null;
+function _showAppToast(msg) {
+  const el = document.getElementById('app-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = '';
+  clearTimeout(_appToastTimer);
+  _appToastTimer = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+function _withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+  ]);
+}
+
 async function confirmOrder() {
   if (isDemo) { showDemoAction(); return; }
   if (cartItems.length === 0) return;
   if (_revalidateCartPrices()) renderCartModal();
   const t          = UI[lang];
   const btn        = document.getElementById('cart-confirm-btn');
+  const errEl      = document.getElementById('cart-order-err');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
 
   // Destination : À emporter ou À table
   const isTakeaway = document.getElementById('cart-dest-takeaway')?.classList.contains('active');
@@ -8947,7 +8983,7 @@ async function confirmOrder() {
 
   try {
     await ensureAnonAuth();
-    await _rref('orders/' + orderId).set(order);
+    await _withTimeout(_rref('orders/' + orderId).set(order), 10000);
 
     // Analytics agrégat — fire-and-forget, n'impacte pas le flux commande
     try {
@@ -8989,6 +9025,10 @@ async function confirmOrder() {
   } catch(e) {
     btn.disabled = false;
     btn.textContent = t.cartSend || 'Envoyer la commande';
+    if (errEl) {
+      errEl.textContent = t.cartOrderErr || '⚠ Connexion impossible — vérifiez votre réseau et réessayez';
+      errEl.style.display = '';
+    }
   }
 }
 
@@ -9265,6 +9305,7 @@ function openCartModal() {
         <button class="cart-dest-btn" id="cart-dest-takeaway">${t.destTakeaway || '🥡 À emporter'}</button>
       </div>
       <button class="cart-confirm-btn" id="cart-confirm-btn">${t.cartSend || 'Envoyer la commande'}</button>
+      <div id="cart-order-err" style="display:none;font-size:0.76rem;color:#e74c3c;text-align:center;margin-top:8px"></div>
       <div id="cart-order-info" style="font-size:0.71rem;color:var(--cream);opacity:0.5;text-align:center;margin-top:6px;line-height:1.45">${t.cartInfo || ''}</div>`;
     document.getElementById('cart-confirm-btn')?.addEventListener('click', confirmOrder);
     setupCartDest();
@@ -11282,16 +11323,24 @@ async function confirmTableCall() {
   } catch(e) {}
 
   // 2. Firebase Realtime Database — app ouverte (temps réel)
+  // Le check vert du FAB (ci-dessus) est optimiste et déjà affiché — si ces écritures
+  // échouent réellement (réseau coupé), le client doit quand même en être informé après
+  // coup plutôt que de croire à tort que le serveur a reçu son appel.
   try {
     await ensureAnonAuth();
     const _callTs = Date.now();
-    _rref('calls/lastCall').set({ table: String(num), ts: _callTs, lang: lang || 'fr' });
-    _rref('calls/' + _callTs).set({ table: String(num), ts: _callTs, lang: lang || 'fr', status: 'received', createdAt: _callTs });
-    // Analytics agrégat — fire-and-forget
+    const t = UI[lang];
+    await _withTimeout(Promise.all([
+      _rref('calls/lastCall').set({ table: String(num), ts: _callTs, lang: lang || 'fr' }),
+      _rref('calls/' + _callTs).set({ table: String(num), ts: _callTs, lang: lang || 'fr', status: 'received', createdAt: _callTs })
+    ]), 10000);
+    // Analytics agrégat — fire-and-forget, n'impacte pas la confirmation de l'appel
     const _aDay = _analyticsDay();
     _rref('analytics/' + _aDay + '/createdAt').transaction(v => v || _callTs);
     _rref('analytics/' + _aDay + '/calls/' + String(num)).transaction(v => (v||0) + 1);
-  } catch(e) {}
+  } catch(e) {
+    _showAppToast((UI[lang] && UI[lang].callWaiterErr) || '⚠ Connexion impossible — réessayez si le serveur ne vient pas');
+  }
 
   // 3. Vercel Function → FCM — app fermée (notification push)
   // keepalive:true : la requête aboutit même si le navigateur ferme la page
