@@ -3238,7 +3238,8 @@ const ADMIN_UI = {
     settingsPwd:'Κωδικός πρόσβασης', settingsSave:'Ενημέρωση', settingsSaved:'✅ Αποθηκεύτηκε', settingsErr:'❌ Σφάλμα',
     ridSelSaved:'Αποθηκευμένα IDs', ridSelNew:'Εισαγωγή άλλου ID', ridSelPlaceholder: '', ridSelConnect:'Σύνδεση', ridSelContinue:'Συνέχεια', ridSelErr:'Μη έγκυρος κωδικός: μόνο πεζά γράμματα, αριθμοί και παύλες, χωρίς κενά.',
     pwdConfirmTitle:'Αλλαγή κωδικού', pwdConfirmMsg:'Αυτή η αλλαγή θα σας αποσυνδέσει από όλες τις συσκευές. Θα χρειαστεί να συνδεθείτε ξανά με τον νέο κωδικό.', pwdConfirmOk:'Επιβεβαίωση', pwdConfirmCancel:'Ακύρωση', pwdChangedLogout:'✅ Κωδικός άλλαξε — συνδεθείτε ξανά',
-    pinConfirmTitle:'Αλλαγή PIN προσωπικού', pinConfirmMsg:'Οι ήδη συνδεδεμένες συσκευές θα χρειαστεί να εισάγουν τον νέο κωδικό.', pinChanged:'✅ Το PIN άλλαξε',
+    pinConfirmTitle:'Αλλαγή PIN προσωπικού', pinConfirmMsg:'Ο νέος κωδικός θα ζητείται σε κάθε νέα σύνδεση.', pinChanged:'✅ Το PIN άλλαξε',
+    pinDisconnectTitle:'Αποσύνδεση του ήδη συνδεδεμένου προσωπικού;', pinDisconnectMsg:'Οι συσκευές του προσωπικού που είναι ήδη συνδεδεμένες θα χρειαστεί να εισάγουν τον νέο κωδικό για να συνεχίσουν να χρησιμοποιούν την Εφαρμογή Σερβιτόρου.', pinDisconnectOk:'Ναι, αποσύνδεση', pinDisconnectCancel:'Όχι, να παραμείνουν συνδεδεμένοι',
     pinDisableConfirmTitle:'Απενεργοποίηση PIN προσωπικού', pinDisableConfirmMsg:'Η εφαρμογή Σερβιτόρου δεν θα ζητά πλέον κωδικό κατά την εγκατάσταση.', pinDisabled:'✅ Το PIN απενεργοποιήθηκε',
     staffPinHint:'Αυτός ο κωδικός προστατεύει την πρόσβαση στην Εφαρμογή Σερβιτόρου, ξεχωριστά από τον κωδικό πρόσβασης διαχειριστή. Απενεργοποιημένος, οποιαδήποτε συσκευή που γνωρίζει το αναγνωριστικό του εστιατορίου σας μπορεί να εγκαταστήσει και να χρησιμοποιήσει την εφαρμογή χωρίς κωδικό — ενεργοποιήστε τον αν θέλετε να περιορίσετε την πρόσβαση στην ομάδα σας.', staffPinLearnMore:'Μάθετε περισσότερα',
     changeIdBtn:'Αποσύνδεση', changeIdConfirmTitle:'Αποσύνδεση', changeIdConfirmMsg:'Θα μεταφερθείτε στην οθόνη σύνδεσης. Η συνεδρία σας είναι αποθηκευμένη — επιστρέψτε χωρίς να εισάγετε ξανά τον κωδικό.', changeIdConfirmOk:'Επιβεβαίωση', changeIdConfirmCancel:'Ακύρωση',
@@ -3390,7 +3391,8 @@ const ADMIN_UI = {
     settingsPwd:'Mot de passe d\'accès', settingsSave:'Mettre à jour', settingsSaved:'✅ Enregistré', settingsErr:'❌ Erreur',
     ridSelSaved:'IDs enregistrés', ridSelNew:'Entrer un autre ID', ridSelPlaceholder: '', ridSelConnect:'Se connecter', ridSelContinue:'Continuer', ridSelErr:'Code invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, sans espaces.',
     pwdConfirmTitle:'Changer de mot de passe', pwdConfirmMsg:'Ce changement vous déconnectera de tous les appareils. Vous devrez vous reconnecter avec le nouveau mot de passe.', pwdConfirmOk:'Confirmer', pwdConfirmCancel:'Annuler', pwdChangedLogout:'✅ Mot de passe modifié — reconnectez-vous',
-    pinConfirmTitle:'Changer le code PIN du personnel', pinConfirmMsg:'Les appareils déjà connectés devront ressaisir le nouveau code.', pinChanged:'✅ Code PIN modifié',
+    pinConfirmTitle:'Changer le code PIN du personnel', pinConfirmMsg:'Le nouveau code sera demandé à toute nouvelle connexion.', pinChanged:'✅ Code PIN modifié',
+    pinDisconnectTitle:'Déconnecter le personnel déjà connecté ?', pinDisconnectMsg:"Les appareils du personnel déjà connectés devront ressaisir le nouveau code pour continuer à utiliser l'application Serveur.", pinDisconnectOk:'Oui, déconnecter', pinDisconnectCancel:'Non, les laisser connectés',
     pinDisableConfirmTitle:'Désactiver le code PIN du personnel', pinDisableConfirmMsg:"L'application Serveur ne demandera plus aucun code à l'installation.", pinDisabled:'✅ Code PIN désactivé',
     staffPinHint:"Ce code protège l'accès à l'application Serveur, séparément de votre mot de passe admin. Désactivé, n'importe quel appareil connaissant votre identifiant de restaurant peut installer et utiliser l'application sans code — activez-le si vous voulez restreindre l'accès à votre équipe.", staffPinLearnMore:'En savoir plus',
     changeIdBtn:'Déconnexion', changeIdConfirmTitle:'Se déconnecter', changeIdConfirmMsg:'Vous serez redirigé vers l\'écran de connexion. Votre session est sauvegardée — revenez ici sans ressaisir votre mot de passe.', changeIdConfirmOk:'Confirmer', changeIdConfirmCancel:'Annuler',
@@ -3542,7 +3544,8 @@ const ADMIN_UI = {
     settingsPwd:'Access password', settingsSave:'Update', settingsSaved:'✅ Saved', settingsErr:'❌ Error',
     ridSelSaved:'Saved IDs', ridSelNew:'Enter another ID', ridSelPlaceholder: '', ridSelConnect:'Sign in', ridSelContinue:'Continue', ridSelErr:'Invalid code: use only lowercase letters, numbers and hyphens, no spaces.',
     pwdConfirmTitle:'Change password', pwdConfirmMsg:'This change will sign you out of all devices. You will need to sign in again with the new password.', pwdConfirmOk:'Confirm', pwdConfirmCancel:'Cancel', pwdChangedLogout:'✅ Password changed — please sign in again',
-    pinConfirmTitle:'Change staff PIN code', pinConfirmMsg:'Devices already signed in will need to enter the new code.', pinChanged:'✅ PIN code changed',
+    pinConfirmTitle:'Change staff PIN code', pinConfirmMsg:'The new code will be required for any new sign-in.', pinChanged:'✅ PIN code changed',
+    pinDisconnectTitle:'Disconnect already signed-in staff?', pinDisconnectMsg:'Staff devices already signed in will need to enter the new code to keep using the Waiter App.', pinDisconnectOk:'Yes, disconnect', pinDisconnectCancel:'No, keep them signed in',
     pinDisableConfirmTitle:'Disable staff PIN code', pinDisableConfirmMsg:'The Staff app will no longer ask for a code on install.', pinDisabled:'✅ PIN code disabled',
     staffPinHint:'This code protects access to the Waiter App, separately from your admin password. Disabled, any device that knows your restaurant ID can install and use the app with no code — turn it on if you want to restrict access to your team.', staffPinLearnMore:'Learn more',
     changeIdBtn:'Log out', changeIdConfirmTitle:'Log out', changeIdConfirmMsg:'You will be redirected to the login screen. Your session is saved — return here without re-entering your password.', changeIdConfirmOk:'Confirm', changeIdConfirmCancel:'Cancel',
@@ -3694,7 +3697,8 @@ const ADMIN_UI = {
     settingsPwd:'Zugangspasswort', settingsSave:'Aktualisieren', settingsSaved:'✅ Gespeichert', settingsErr:'❌ Fehler',
     ridSelSaved:'Gespeicherte IDs', ridSelNew:'Andere ID eingeben', ridSelPlaceholder: '', ridSelConnect:'Anmelden', ridSelContinue:'Weiter', ridSelErr:'Ungültiger Code: nur Kleinbuchstaben, Zahlen und Bindestriche erlaubt, keine Leerzeichen.',
     pwdConfirmTitle:'Passwort ändern', pwdConfirmMsg:'Diese Änderung meldet Sie auf allen Geräten ab. Sie müssen sich mit dem neuen Passwort erneut anmelden.', pwdConfirmOk:'Bestätigen', pwdConfirmCancel:'Abbrechen', pwdChangedLogout:'✅ Passwort geändert — bitte erneut anmelden',
-    pinConfirmTitle:'Personal-PIN ändern', pinConfirmMsg:'Bereits angemeldete Geräte müssen den neuen Code eingeben.', pinChanged:'✅ PIN-Code geändert',
+    pinConfirmTitle:'Personal-PIN ändern', pinConfirmMsg:'Der neue Code wird bei jeder neuen Anmeldung verlangt.', pinChanged:'✅ PIN-Code geändert',
+    pinDisconnectTitle:'Bereits angemeldetes Personal abmelden?', pinDisconnectMsg:'Bereits angemeldete Personal-Geräte müssen den neuen Code eingeben, um die Kellner-App weiter zu nutzen.', pinDisconnectOk:'Ja, abmelden', pinDisconnectCancel:'Nein, angemeldet lassen',
     pinDisableConfirmTitle:'Personal-PIN deaktivieren', pinDisableConfirmMsg:'Die Personal-App fragt bei der Installation keinen Code mehr ab.', pinDisabled:'✅ PIN-Code deaktiviert',
     staffPinHint:'Dieser Code schützt den Zugang zur Kellner-App, getrennt von Ihrem Admin-Passwort. Deaktiviert, kann jedes Gerät, das Ihre Restaurant-ID kennt, die App ohne Code installieren und nutzen — aktivieren Sie ihn, wenn Sie den Zugang auf Ihr Team beschränken möchten.', staffPinLearnMore:'Mehr erfahren',
     changeIdBtn:'Abmelden', changeIdConfirmTitle:'Abmelden', changeIdConfirmMsg:'Sie werden zur Anmeldeseite weitergeleitet. Ihre Sitzung ist gespeichert — kehren Sie ohne erneute Passworteingabe zurück.', changeIdConfirmOk:'Bestätigen', changeIdConfirmCancel:'Abbrechen',
@@ -3846,7 +3850,8 @@ const ADMIN_UI = {
     settingsPwd:'Contraseña de acceso', settingsSave:'Actualizar', settingsSaved:'✅ Guardado', settingsErr:'❌ Error',
     ridSelSaved:'IDs guardados', ridSelNew:'Introducir otro ID', ridSelPlaceholder: '', ridSelConnect:'Iniciar sesión', ridSelContinue:'Continuar', ridSelErr:'Código inválido: use solo minúsculas, números y guiones, sin espacios.',
     pwdConfirmTitle:'Cambiar contraseña', pwdConfirmMsg:'Este cambio cerrará su sesión en todos los dispositivos. Deberá iniciar sesión de nuevo con la nueva contraseña.', pwdConfirmOk:'Confirmar', pwdConfirmCancel:'Cancelar', pwdChangedLogout:'✅ Contraseña cambiada — inicie sesión de nuevo',
-    pinConfirmTitle:'Cambiar el PIN del personal', pinConfirmMsg:'Los dispositivos ya conectados deberán introducir el nuevo código.', pinChanged:'✅ Código PIN cambiado',
+    pinConfirmTitle:'Cambiar el PIN del personal', pinConfirmMsg:'El nuevo código se pedirá en cada nueva conexión.', pinChanged:'✅ Código PIN cambiado',
+    pinDisconnectTitle:'¿Desconectar al personal ya conectado?', pinDisconnectMsg:'Los dispositivos del personal ya conectados deberán introducir el nuevo código para seguir usando la aplicación de camarero.', pinDisconnectOk:'Sí, desconectar', pinDisconnectCancel:'No, mantenerlos conectados',
     pinDisableConfirmTitle:'Desactivar el PIN del personal', pinDisableConfirmMsg:'La app de Personal ya no pedirá ningún código al instalarse.', pinDisabled:'✅ Código PIN desactivado',
     staffPinHint:'Este código protege el acceso a la aplicación de camarero, de forma independiente a su contraseña de administrador. Desactivado, cualquier dispositivo que conozca el identificador de su restaurante puede instalar y usar la aplicación sin código — actívelo si quiere restringir el acceso a su equipo.', staffPinLearnMore:'Saber más',
     changeIdBtn:'Cerrar sesión', changeIdConfirmTitle:'Cerrar sesión', changeIdConfirmMsg:'Irá a la pantalla de inicio de sesión. Su sesión está guardada — vuelva aquí sin introducir la contraseña de nuevo.', changeIdConfirmOk:'Confirmar', changeIdConfirmCancel:'Cancelar',
@@ -9043,7 +9048,7 @@ async function saveStaffPin() {
   }
   _showAdmConfirm(
     t.pinConfirmTitle || 'Changer le code PIN du personnel',
-    t.pinConfirmMsg   || 'Les appareils déjà connectés devront ressaisir le nouveau code.',
+    t.pinConfirmMsg   || 'Le nouveau code sera demandé à toute nouvelle connexion.',
     t.pwdConfirmOk    || 'Confirmer',
     t.pwdConfirmCancel|| 'Annuler',
     async () => {
@@ -9051,12 +9056,24 @@ async function saveStaffPin() {
       try {
         const hash = await _hashPwd(val);
         await _rref('/config/staffPinHash').set(hash);
-        fetch('/api/revoke-admin-sessions', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rid: _RID, role: 'staff' })
-        }).catch(() => {});
         inp.value = '';
         if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.pinChanged || '✅ Code PIN modifié'; }
+        // Deuxième confirmation, distincte : déconnexion immédiate (ou non) du
+        // personnel déjà connecté avec l'ancien code / sans code (transition douce).
+        setTimeout(() => {
+          _showAdmConfirm(
+            t.pinDisconnectTitle  || 'Déconnecter le personnel déjà connecté ?',
+            t.pinDisconnectMsg    || "Les appareils du personnel déjà connectés devront ressaisir le nouveau code pour continuer à utiliser l'application Serveur.",
+            t.pinDisconnectOk     || 'Oui, déconnecter',
+            t.pinDisconnectCancel || 'Non, les laisser connectés',
+            () => {
+              fetch('/api/revoke-admin-sessions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rid: _RID, role: 'staff' })
+              }).catch(() => {});
+            }
+          );
+        }, 300);
       } catch(e) {
         if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
       }
