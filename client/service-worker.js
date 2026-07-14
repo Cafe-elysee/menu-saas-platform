@@ -7,8 +7,8 @@ const CACHE = 'menu-saas-v1';
 const ASSETS = [
   'app.html',
   'manifest.json',
-  'icon.svg',
-  'icon-maskable.svg'
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 /* ── INSTALL : mise en cache ── */
@@ -64,8 +64,8 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(title, {
       body,
-      icon:  '/icon.svg',
-      badge: '/icon.svg',
+      icon:  '/icon-192.png',
+      badge: '/icon-192.png',
       tag:   'ce-call-' + table,
       renotify: true,
       requireInteraction: true,

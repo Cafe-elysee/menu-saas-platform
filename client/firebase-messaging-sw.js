@@ -53,8 +53,8 @@ self.addEventListener('push', e => {
 
       return self.registration.showNotification(title, {
         body,
-        icon:  '/icon.svg',
-        badge: '/icon.svg',
+        icon:  '/icon-192.png',
+        badge: '/icon-192.png',
         tag:   rid + '-' + table + '-' + Date.now(),
         renotify:           true,
         requireInteraction: true,
