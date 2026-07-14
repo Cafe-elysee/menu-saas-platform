@@ -1205,6 +1205,8 @@
     }
     .dp-del-btn {
       padding: 0.52rem 0.6rem;
+      min-width: 44px; min-height: 44px; /* zone tactile mobile minimale (audit 2026-07-15) */
+      display: inline-flex; align-items: center; justify-content: center;
       background: rgba(239,83,80,0.07); border: 1px solid rgba(239,83,80,0.22);
       border-radius: 8px; color: rgba(239,83,80,0.55); font-size: 0.8rem;
       cursor: pointer; flex-shrink: 0; font-family: inherit;
@@ -1699,6 +1701,11 @@
   /* ── Login subtitle "Control" — lisible en light et dark ── */
   .gn-login-subtitle{ opacity:1; }
   html.light .gn-login-subtitle{ color:#8a6520; }
+  /* ── Textes gold utilisés comme TEXTE (pas accent) — contraste ~2.1:1 en light sans ceci,
+     même famille de bug que .gn-login-subtitle ci-dessus (audit accessibilité 2026-07-15) ── */
+  html.light .hist-title{ color:#8a6520; }
+  html.light .del-name{ color:#8a6520; }
+  html.light .settings-label{ color:#8a6520 !important; } /* !important requis : style inline */
   /* ── Icônes et états vides — visibilité améliorée ── */
   .commande-empty-icon{ opacity:0.65; }
   .dp-cam svg{ opacity:0.62; }
@@ -1910,27 +1917,27 @@
           <div class="dp-item">
             <div class="dp-num">Photo 1</div>
             <div class="dp-preview" id="dp-prev-demo-1"><img id="dp-img-demo-1" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-1"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',1,'demo')" title="Supprimer">✕</button></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',1,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',1,'demo')" title="Supprimer" aria-label="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 2</div>
             <div class="dp-preview" id="dp-prev-demo-2"><img id="dp-img-demo-2" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-2"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',2,'demo')" title="Supprimer">✕</button></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',2,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',2,'demo')" title="Supprimer" aria-label="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 3</div>
             <div class="dp-preview" id="dp-prev-demo-3"><img id="dp-img-demo-3" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-3"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',3,'demo')" title="Supprimer">✕</button></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',3,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',3,'demo')" title="Supprimer" aria-label="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 4</div>
             <div class="dp-preview" id="dp-prev-demo-4"><img id="dp-img-demo-4" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-4"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',4,'demo')" title="Supprimer">✕</button></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',4,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',4,'demo')" title="Supprimer" aria-label="Supprimer">✕</button></div>
           </div>
           <div class="dp-item">
             <div class="dp-num">Photo 5</div>
             <div class="dp-preview" id="dp-prev-demo-5"><img id="dp-img-demo-5" alt=""><div class="dp-cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:26px;height:26px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span></div><div class="dp-loading" id="dp-load-demo-5"><div class="dp-spinner"></div></div></div>
-            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer">✕</button></div>
+            <div class="dp-btns"><label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadDemoPhoto('demo',5,this)"></label><button class="dp-del-btn" onclick="deleteDemoPhoto('demo',5,'demo')" title="Supprimer" aria-label="Supprimer">✕</button></div>
           </div>
         </div>
       </div>
@@ -3197,7 +3204,14 @@ function _cancelScheduledDowngrade(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
-    if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
+    if (r && r.ok) {
+      // Efface le badge "programmé" du cache local AVANT de re-rendre — sinon la carte
+      // affiche encore brièvement le badge/bouton "Annuler" pendant le court délai avant
+      // que _pollCommandesOnce() ne rattrape la vraie donnée serveur (flash confirmé en
+      // audit du 2026-07-15, même famille que les flashs déjà corrigés sur ce projet).
+      _commandesCache[cmdKey] = Object.assign({}, d, { pendingForfaitChange: null });
+      showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce();
+    }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
 }
@@ -3220,7 +3234,18 @@ function _confirmUpgradePaid(cmdKey) {
         email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
         paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
       }).then(function(r) {
-        if (r && r.ok) { showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
+        if (r && r.ok) {
+          // Même correctif anti-flash que _cancelScheduledDowngrade : refléter le résultat
+          // connu (forfait/mode déjà déterminés par le devis) avant de re-rendre, plutôt que
+          // de laisser le badge "en attente de paiement" visible pendant le court délai avant
+          // le prochain sondage.
+          _commandesCache[cmdKey] = Object.assign({}, d, {
+            forfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || d.forfait,
+            paymentMode: (d.pendingUpgrade && d.pendingUpgrade.newMode) || d.paymentMode,
+            pendingUpgrade: null
+          });
+          showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce();
+        }
         else { showToast('❌ Erreur'); }
       }).catch(function() { showToast('❌ Erreur réseau'); })
         .finally(function() { delete _upgradeConfirmInFlight[cmdKey]; });
@@ -3233,7 +3258,10 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
-    if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
+    if (r && r.ok) {
+      _commandesCache[cmdKey] = Object.assign({}, d, { pendingUpgrade: null });
+      showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce();
+    }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
 }
@@ -5125,6 +5153,24 @@ async function changeClientId(oldSlug, inputId) {
     const snap = await _saasDb.ref('restaurants/' + oldSlug).once('value');
     await _saasDb.ref('restaurants/' + newSlug).set(snap.val());
     await _saasDb.ref('restaurants/' + oldSlug).remove();
+    // 🔴 Bug corrigé (audit 2026-07-15) : le nœud restaurant migre bien, mais la commande
+    // CONTROL_DB associée (forfait/abonnement/historique de paiement, tout ce qui alimente
+    // la carte client) référençait encore l'ANCIEN slug via clientCree.rid/emailData.rid.
+    // Sans cette mise à jour, _findCommandeForClient(newSlug) ne retrouve plus jamais cette
+    // commande — la section Forfait & Abonnement affiche "aucune commande" et le bouton
+    // Suspendre échoue silencieusement, à partir de ce changement d'ID et pour toujours.
+    const cmdKey = _findCommandeForClient(oldSlug);
+    if (cmdKey) {
+      const d = _commandesCache[cmdKey];
+      const update = {};
+      if (d.clientCree) update.clientCree = Object.assign({}, d.clientCree, { rid: newSlug });
+      if (d.emailData)  update.emailData  = Object.assign({}, d.emailData,  { rid: newSlug });
+      if (Object.keys(update).length > 0) {
+        await _controlWrite('/commandes/' + cmdKey, 'update', update);
+        _commandesCache[cmdKey] = Object.assign({}, d, update);
+        if (_lastCreatedClients[cmdKey]) _lastCreatedClients[cmdKey] = Object.assign({}, _lastCreatedClients[cmdKey], { rid: newSlug });
+      }
+    }
     warnEl.style.color = 'var(--green)';
     warnEl.textContent = '✓ ID changé. Les server-apps connectés doivent entrer le nouvel ID.';
   } catch(e) {
@@ -5462,7 +5508,7 @@ function _cpSlotHtml(itemKey, slot, label) {
     '</div>' +
     '<div class="dp-btns">' +
       '<label class="dp-upload-btn">📷<input type="file" accept="image/*" style="display:none" onchange="uploadContentPhoto(\'' + itemKey + '\',\'' + slot + '\',this)"></label>' +
-      '<button class="dp-del-btn" onclick="deleteContentPhoto(\'' + itemKey + '\',\'' + slot + '\')" title="Supprimer">✕</button>' +
+      '<button class="dp-del-btn" onclick="deleteContentPhoto(\'' + itemKey + '\',\'' + slot + '\')" title="Supprimer" aria-label="Supprimer">✕</button>' +
     '</div>' +
   '</div>';
 }
@@ -5604,7 +5650,7 @@ function _guSlotHtml(item) {
       '</div>' +
       '<div class="dp-btns">' +
         '<label class="dp-upload-btn">📷<input type="file" accept="image/*" style="display:none" onchange="uploadGuidePhoto(\'' + item.key + '\',this)"></label>' +
-        '<button class="dp-del-btn" onclick="deleteGuidePhoto(\'' + item.key + '\')" title="Supprimer">✕</button>' +
+        '<button class="dp-del-btn" onclick="deleteGuidePhoto(\'' + item.key + '\')" title="Supprimer" aria-label="Supprimer">✕</button>' +
       '</div>' +
     '</div></div>' +
   '</div>';
@@ -5723,7 +5769,7 @@ function _thItemHtml(item) {
     '</div>' +
     '<div class="dp-btns">' +
       '<label class="dp-upload-btn">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="uploadThemePhoto(\'' + item.id + '\',this)"></label>' +
-      '<button class="dp-del-btn" onclick="deleteThemePhoto(\'' + item.id + '\')" title="Supprimer">✕</button>' +
+      '<button class="dp-del-btn" onclick="deleteThemePhoto(\'' + item.id + '\')" title="Supprimer" aria-label="Supprimer">✕</button>' +
     '</div>' +
     '<input type="text" class="th-inp th-name-inp" id="th-name-' + item.id + '" placeholder="Nom du thème" value="' + item.name + '" ' +
       'onchange="_saveThemeText(\'' + item.id + '\',\'name\',this.value,this)" ' +
