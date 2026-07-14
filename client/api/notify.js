@@ -199,13 +199,27 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST')    { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   try {
-    const { restaurantId, table, lang, type, message } = req.body || {};
+    const { restaurantId, table, lang, type, message, sid } = req.body || {};
 
     // Validation
     if (!restaurantId || typeof restaurantId !== 'string' || !/^[a-z0-9_-]+$/.test(restaurantId)) {
       res.status(400).json({ error: 'Missing or invalid restaurantId' }); return;
     }
     if (!table) { res.status(400).json({ error: 'Missing table' }); return; }
+
+    // 'bell'/'order' restent publics (déclenchés par un client au menu, jamais connecté).
+    // 'message' est un canal admin (staff→staff) : sans ceci, `restaurantId` (visible dans
+    // l'URL publique du QR code) suffisait à quiconque pour pousser un texte arbitraire au
+    // staff d'un restaurant tiers et le stocker de façon permanente (audit 2026-07-16).
+    if (type === 'message') {
+      const { verifyIdToken } = require('./_lib/firebaseAdmin');
+      let authorized = false;
+      try {
+        const payload = await verifyIdToken(sid, 'menu-saas-platform');
+        authorized = !!payload && payload.rid === restaurantId;
+      } catch (e) { authorized = false; }
+      if (!authorized) { res.status(401).json({ error: 'Unauthorized' }); return; }
+    }
 
     console.log(`Notify: rid=${restaurantId} table=${table} type=${type}`);
 

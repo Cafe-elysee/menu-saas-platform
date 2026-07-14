@@ -430,6 +430,7 @@
       background:rgba(239,83,80,0.12); color:var(--red);
       border:1px solid rgba(239,83,80,0.3); border-radius:8px;
       padding:6px 12px; font-size:0.78rem; font-family:inherit; cursor:pointer;
+      min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
       transition:transform 0.15s, box-shadow 0.15s;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.1);
     }
@@ -839,6 +840,13 @@
     .commande-client-pause-badge {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 5px 10px; border-radius: 8px;
+      background: rgba(255,152,0,0.12); color: #ff9800;
+      font-size: 0.72rem; font-weight: 600;
+      border: 1px solid rgba(255,152,0,0.25);
+    }
+    .commande-menu-upload-failed {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 8px; margin-top: 6px;
       background: rgba(255,152,0,0.12); color: #ff9800;
       font-size: 0.72rem; font-weight: 600;
       border: 1px solid rgba(255,152,0,0.25);
@@ -3431,11 +3439,12 @@ function buildCommandeCard(key, d) {
       '<div class="commande-body">' +
         '<div class="commande-body-inner">' +
           '<div class="commande-langue-row">🌐 ' + escapeHtml(langLabel) + (d.email ? ' · ' + escapeHtml(d.email) : '') + '</div>' +
+          (d.menuUploadFailed ? '<div class="commande-menu-upload-failed">⚠️ Envoi des photos du menu échoué — redemander au client</div>' : '') +
           '<div class="commande-actions">' +
             statusSel +
             emailBtn + waBtn + viberBtn +
             '<button class="commande-action-btn btn-creer-client" data-rest="' + restEsc + '" data-key="' + key + '" onclick="showNewClientModalFromCommande(this,this.dataset.rest,this.dataset.key)">＋ Créer ce client</button>' +
-            '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')">🗑️</button>' +
+            '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')" title="Supprimer" aria-label="Supprimer">🗑️</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -3473,10 +3482,11 @@ function buildCommandeCard(key, d) {
     '</div>' +
     '<div class="commande-body">' +
       '<div class="commande-body-inner">' +
+        (d.menuUploadFailed ? '<div class="commande-menu-upload-failed">⚠️ Envoi des photos du menu échoué — redemander au client</div>' : '') +
         '<div class="commande-actions">' +
           statusSel +
           retourBtn +
-          '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')">🗑️</button>' +
+          '<button class="btn-del-commande" onclick="deleteCommande(\'' + key + '\')" title="Supprimer" aria-label="Supprimer">🗑️</button>' +
         '</div>' +
       '</div>' +
     '</div>' +

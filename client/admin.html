@@ -5529,11 +5529,12 @@ function setupNotifFab() {
     sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><circle cx="12" cy="12" r="10"/></svg> ${tn.notifSending}`;
 
     try {
+      const sid = await _sessionId();
       const res = await fetch('/api/notify', {
         method: 'POST',
         keepalive: true,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ restaurantId: _RID, table: 'info', message: msg, lang: currentLang || 'el', type: 'message' })
+        body: JSON.stringify({ restaurantId: _RID, table: 'info', message: msg, lang: currentLang || 'el', type: 'message', sid })
       });
       const data = await res.json();
 

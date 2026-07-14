@@ -175,7 +175,7 @@
     }
     html[data-menu-theme="prestige"].light {
       --bg:#faf8f4; --bg2:#f0ebe0; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(250,248,244,0.97);
-      --gold:#c8a44e; --gold-lt:#dfc27a; --gold-dk:#a07d28;
+      --gold:#7a5018; --gold-lt:#a06828; --gold-dk:#543408;
       --cream:#2a1e04; --muted:rgba(42,30,4,0.70); --border:rgba(200,164,78,0.18); --border2:rgba(200,164,78,0.36);
       --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(200,164,78,0.15),0 4px 14px rgba(0,0,0,0.1);
     }
@@ -7534,6 +7534,16 @@ const _ARIA_LABELS = {
   addCart:    { fr:'Ajouter au panier', en:'Add to cart',       de:'In den Warenkorb',   el:'Προσθήκη στο καλάθι',   es:'Add to cart'  },
   removeCart: { fr:'Retirer du panier', en:'Remove from cart',  de:'Aus dem Warenkorb',  el:'Αφαίρεση από το καλάθι',es:'Remove from cart' },
   googleReview: { fr:'Laisser un avis Google', en:'Leave a Google review', de:'Google-Bewertung abgeben', el:'Αφήστε μια κριτική στο Google', es:'Dejar una reseña en Google' },
+  viewCart:   { fr:'Voir le panier',    en:'View cart',         de:'Warenkorb ansehen',  el:'Προβολή καλαθιού',      es:'Ver el carrito' },
+  callWaiter: { fr:'Appeler le serveur',en:'Call the waiter',   de:'Kellner rufen',      el:'Κλήση σερβιτόρου',      es:'Llamar al camarero' },
+  myOrders:   { fr:'Mes commandes',     en:'My orders',         de:'Meine Bestellungen', el:'Οι παραγγελίες μου',    es:'Mis pedidos' },
+  tableNum:   { fr:'Numéro de table',   en:'Table number',      de:'Tischnummer',        el:'Αριθμός τραπεζιού',     es:'Número de mesa' },
+  backHome:   { fr:'Retour à l\'accueil', en:'Back to home',    de:'Zurück zur Startseite', el:'Επιστροφή στην αρχική', es:'Volver al inicio' },
+  prevPage:   { fr:'Page précédente',   en:'Previous page',     de:'Vorherige Seite',    el:'Προηγούμενη σελίδα',    es:'Página anterior' },
+  nextPage:   { fr:'Page suivante',     en:'Next page',         de:'Nächste Seite',      el:'Επόμενη σελίδα',        es:'Página siguiente' },
+  cartModal:  { fr:'Panier',            en:'Cart',              de:'Warenkorb',          el:'Καλάθι',                es:'Carrito' },
+  doseModal:  { fr:'Personnaliser',     en:'Customize',         de:'Anpassen',           el:'Προσαρμογή',            es:'Personalizar' },
+  themeModal: { fr:'Thème',             en:'Theme',             de:'Design',             el:'Θέμα',                  es:'Tema' },
 };
 function _aria(key) { const m=_ARIA_LABELS[key]||{}; return m[lang]||m.fr||''; }
 
@@ -10000,6 +10010,21 @@ function applyTranslations() {
     _hcDesc.textContent = _desc;
     _hcDesc.style.display = _desc ? '' : 'none';
   }
+  // aria-label des boutons icône-seule/modales — figés en français avant cet audit (2026-07-16),
+  // jamais retraduits au changement de langue malgré le mécanisme _aria() déjà en place ailleurs.
+  const _ariaSetById = (id, key) => { const el = document.getElementById(id); if (el) el.setAttribute('aria-label', _aria(key)); };
+  _ariaSetById('table-chip', 'tableNum');
+  _ariaSetById('paper-home-btn', 'backHome');
+  _ariaSetById('paper-prev-btn', 'prevPage');
+  _ariaSetById('paper-next-btn', 'nextPage');
+  _ariaSetById('sh-cart-btn', 'viewCart');
+  _ariaSetById('call-fab', 'callWaiter');
+  _ariaSetById('hist-fab', 'myOrders');
+  _ariaSetById('cart-fab', 'viewCart');
+  _ariaSetById('cart-modal', 'cartModal');
+  _ariaSetById('hist-modal', 'myOrders');
+  _ariaSetById('dose-modal', 'doseModal');
+  _ariaSetById('pd-theme-modal', 'themeModal');
   // Bouton "Avis Google" — libellé/aria-label traduits (dépend de la langue active)
   if (_reviewSrc) {
     const _hcReviewLabel = document.getElementById('hc-review-cta-label');
@@ -10908,8 +10933,8 @@ function filterItems() {
       const itemId = parseInt(card.dataset.item);
       const item = ITEMS.find(i => i.id === itemId);
       if (!item) { card.classList.add('hide'); return; }
-      const name = _searchNorm(item.name && item.name[lang]);
-      const desc = _searchNorm(item.desc && item.desc[lang]);
+      const name = _searchNorm((item.name && (item.name[lang] || item.name.fr)) || '');
+      const desc = _searchNorm((item.desc && (item.desc[lang] || item.desc.fr)) || '');
       const haystack = name + ' ' + desc + ' ' + catName;
       const match = tokens.length === 0 || tokens.every(tok => haystack.indexOf(tok) !== -1);
       card.classList.toggle('hide', !match);
