@@ -3196,7 +3196,7 @@ function _cancelScheduledDowngrade(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
+  _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
     if (r && r.ok) { showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3215,7 +3215,7 @@ function _confirmUpgradePaid(cmdKey) {
       _upgradeConfirmInFlight[cmdKey] = true;
       var rid = _getSlugFromCmdKey(cmdKey);
       _callNotifyForfait({
-        rid: rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
+        rid: rid, cmdKey: cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
         newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
         email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
         paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
@@ -3232,7 +3232,7 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   var d = _commandesCache[cmdKey];
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
+  _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
     if (r && r.ok) { showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce(); }
     else { showToast('❌ Erreur'); }
   }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3598,11 +3598,15 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   if (!d || _comboChangeInFlight[cmdKey]) return;
   const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
   const normMode    = (mode === 'annual') ? 'annual' : 'monthly';
-  if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'monthly')) return;
+  // Défaut aligné sur le serveur (curMode = cmdData.paymentMode || 'annual', notify-forfait.js)
+  // — jamais 'monthly' ici : ce projet n'a plus que le mode annuel (Fix #161), un défaut
+  // différent entre client et serveur pouvait faire diverger silencieusement la décision
+  // "déjà actif ?" du garde local de celle, faisant foi, du serveur.
+  if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'annual')) return;
 
   const rid = _getSlugFromCmdKey(cmdKey);
   const payload = {
-    rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
+    rid, cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
     paymentMode: normMode, actor: 'malek',
     // Depuis la carte client (control-app), un downgrade s'applique TOUJOURS immédiatement —
@@ -3658,9 +3662,16 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   }
 
   if (result.case === 'no-op') {
-    // Rien n'a été écrit (ex: même forfait avec un mode non couvert par cette grille) —
-    // ne jamais afficher un faux succès (trouvé en audit). Rien n'a non plus été affiché
-    // avant cet instant, donc rien à annuler.
+    // Le serveur a comparé le NOUVEAU forfait demandé au forfait RÉEL déjà en base
+    // (CONTROL_DB, jamais celui du cache local control-app) et les a trouvés identiques —
+    // rien à écrire. Ne jamais afficher un faux succès (trouvé en audit), MAIS ne jamais
+    // non plus rester silencieux (bug confirmé par Malek, 2026-07-14 : clic sans aucun
+    // retour visible, cache local visiblement désynchronisé de l'état serveur réel).
+    // Toujours prévenir explicitement + forcer une resynchro immédiate du cache local sur
+    // la vraie donnée serveur, pour que la carte s'auto-corrige au lieu de rester figée
+    // sur un état périmé qui continuerait à provoquer le même "rien ne se passe" en boucle.
+    showToast('ℹ️ Déjà sur ce forfait — carte resynchronisée');
+    _pollCommandesOnce().then(function() { _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); });
     return;
   }
 
@@ -3696,7 +3707,7 @@ async function _forceApplyDowngrade(cmdKey) {
   const pfc = d.pendingForfaitChange;
   try {
     const result = await _callNotifyForfait({
-      rid, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: pfc.forfait,
+      rid, cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: pfc.forfait,
       email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
       paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
     });

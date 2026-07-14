@@ -676,7 +676,7 @@ module.exports = async function handler(req, res) {
 
   const {
     rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode, isTrial, sid,
-    actor, confirm, cancelUpgrade, confirmUpgradePayment, immediate
+    actor, confirm, cancelUpgrade, confirmUpgradePayment, immediate, cmdKey: reqCmdKey
   } = req.body || {};
   if (!rid || !newForfait) return res.status(400).json({ error: 'Missing rid or newForfait' });
 
@@ -710,8 +710,35 @@ module.exports = async function handler(req, res) {
     try {
       const commandes = await fbGet(CONTROL_DB, '/commandes', secret);
       if (commandes) {
-        const entry = Object.entries(commandes).find(([, d]) => d?.clientCree?.rid === rid);
-        if (entry) { cmdKey = entry[0]; cmdData = entry[1]; }
+        // 🔴 BUG RACINE TROUVÉ ET CORRIGÉ ICI (2026-07-14) : cette recherche ne comparait
+        // QUE 'clientCree.rid' — or control-app met TOUJOURS 'clientCree' à null dès la
+        // toute première connexion réelle du restaurateur (_watchFirstOpen(), déclenché par
+        // firstOpen=true, control-app/index.html — comportement normal et permanent, pas un
+        // bug de cette fonction-là). Conséquence : pour absolument TOUT client qui a déjà
+        // ouvert son espace admin/menu au moins une fois — donc pratiquement chaque vrai
+        // client payant, et chaque client de test réutilisé — cette recherche ne trouvait
+        // JAMAIS sa commande, cmdData restait null, et tout le calcul en aval retombait sur
+        // des valeurs par défaut fictives (curForfait='menu-qr', pas de paidAt/trialEndAt) au
+        // lieu du vrai état. Un downgrade Commandes→Menu QR sur un tel client était alors
+        // silencieusement traité comme un no-op (le serveur croyait le client déjà en
+        // Menu QR) — exactement le symptôme confirmé par Malek : clic sans aucun effet.
+        // Fix : 'emailData.rid', lui, n'est JAMAIS remis à null (vérifié par grep dans tout
+        // control-app/index.html) — l'utiliser en repli systématique, en plus de 'clientCree.rid'
+        // pour les tout nouveaux clients qui n'ont pas encore ouvert leur app.
+        const ridMatches = (d) => !!d && ((d.clientCree && d.clientCree.rid === rid) || (d.emailData && d.emailData.rid === rid));
+        // control-app connaît en plus le nœud CONTROL_DB exact de la carte cliquée (cmdKey) —
+        // le préférer quand il est fourni et valide, plutôt que de le redeviner par recherche
+        // sur 'rid' : un rid peut en théorie correspondre à plusieurs entrées 'commandes'
+        // (recréation, doublon de test) — Object.entries().find() choisirait alors
+        // arbitrairement la première trouvée, potentiellement différente de la carte que
+        // Malek a sous les yeux.
+        if (reqCmdKey && ridMatches(commandes[reqCmdKey])) {
+          cmdKey = reqCmdKey;
+          cmdData = commandes[reqCmdKey];
+        } else {
+          const entry = Object.entries(commandes).find(([, d]) => ridMatches(d));
+          if (entry) { cmdKey = entry[0]; cmdData = entry[1]; }
+        }
       }
     } catch(e) { /* non-bloquant */ }
   }
