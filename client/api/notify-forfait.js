@@ -920,11 +920,19 @@ module.exports = async function handler(req, res) {
 
     if (cls.case === 'mid-cycle-downgrade') {
       if (actor === 'malek' && immediate === true) {
-        const newNextReminderAt = Date.now() + (safeMode === 'annual' ? 365 : 30) * 24 * 3600 * 1000;
+        // Application immédiate = un downgrade programmé qui arrive juste plus tôt, PAS un
+        // avantage financier supplémentaire pour le client : le cycle déjà payé (nextReminderAt/
+        // endDate) reste EXACTEMENT celui déjà en base, jamais remis à un cycle plein à partir
+        // d'aujourd'hui (bug corrigé le 2026-07-14 — avant ce fix, forcer un downgrade offrait
+        // silencieusement un cycle complet gratuit, quel que soit le temps réellement restant).
+        // Comme pour toute autre application immédiate de ce fichier (essai/fenêtre), le client
+        // reçoit le même email de confirmation que s'il avait fait ce changement lui-même —
+        // aucun paiement n'est demandé (ce n'est pas un upgrade), seulement une information.
+        const keptNextReminderAt = (cmdData && cmdData.nextReminderAt) || null;
         if (cmdKey && secret) {
           try {
             await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret,
-              { forfait: newForfait, price, paymentMode: safeMode, nextReminderAt: newNextReminderAt, pendingForfaitChange: null });
+              { forfait: newForfait, price, paymentMode: safeMode, pendingForfaitChange: null });
             await _logForfaitChange(secret, cmdKey, {
               type: 'downgrade-immediate',
               fromForfait: cmdData?.forfait || 'menu-qr', toForfait: newForfait,
@@ -939,14 +947,25 @@ module.exports = async function handler(req, res) {
             await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/features', mainToken,
               { callBtn: false, orderUI: false, tableSystem: false, qrOrdering: false });
             await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken,
-              { forfait: newForfait, price, paymentMode: safeMode, endDate: newNextReminderAt, pendingChange: null, lastForfaitChange: Date.now() });
+              { forfait: newForfait, price, paymentMode: safeMode, pendingChange: null, lastForfaitChange: Date.now() });
+          } catch(e) {}
+        }
+        if (email) {
+          try {
+            const { subject, html } = buildForfaitEmail(safeLang, safeName, curForfait, newForfait, false, safeMode, effectivePriceObj, false);
+            await createTransport().sendMail({
+              from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
+              text: safeName + ' — Forfait modifié\n\nGeNext — ' + process.env.GMAIL_USER,
+              headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
+              attachments: [LOGO_ATTACHMENT]
+            });
           } catch(e) {}
         }
         return res.status(200).json({
-          ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: newNextReminderAt,
+          ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: keptNextReminderAt,
           mainWrite: {
             features: { callBtn: false, orderUI: false, tableSystem: false, qrOrdering: false },
-            subscription: { forfait: newForfait, price, paymentMode: safeMode, endDate: newNextReminderAt, pendingChange: null, lastForfaitChange: Date.now() }
+            subscription: { forfait: newForfait, price, paymentMode: safeMode, pendingChange: null, lastForfaitChange: Date.now() }
           }
         });
       }

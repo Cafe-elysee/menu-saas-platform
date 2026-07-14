@@ -3609,12 +3609,14 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     rid, cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
     email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
     paymentMode: normMode, actor: 'malek',
-    // Depuis la carte client (control-app), un downgrade s'applique TOUJOURS immédiatement —
-    // contrairement à admin.html (client self-service), qui ne doit jamais pouvoir se
-    // downgrader lui-même immédiatement (seulement programmer en fin de période, cf. cls.case
-    // 'mid-cycle-downgrade' sans immediate). Le serveur n'honore ce drapeau QUE pour
-    // actor:'malek', donc sans effet sur les autres appelants même s'il était présent.
-    immediate: true,
+    // Depuis la carte client (control-app), le changement suit désormais EXACTEMENT les mêmes
+    // règles que le client verrait dans admin.html — mêmes emails, même popup de devis au
+    // prorata pour un upgrade, même programmation en fin de période pour un downgrade (2026-07-14,
+    // sur demande explicite de Malek : "respecte les mêmes règles... et tout le comportement").
+    // La SEULE différence : après programmation d'un downgrade, Malek reçoit EN PLUS le choix
+    // de l'appliquer immédiatement (voir plus bas, cas 'mid-cycle-downgrade') — jamais envoyé
+    // ici dès le départ, jamais possible pour le client lui-même (admin.html n'envoie jamais ce
+    // drapeau).
   };
 
   // AUCUNE mise à jour optimiste ici : la vraie décision (application immédiate, devis au
@@ -3676,9 +3678,10 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
   }
 
   if (result.case === 'mid-cycle-downgrade') {
-    // Ne devrait plus jamais arriver depuis control-app (immediate:true toujours envoyé
-    // ci-dessus) — gardé en filet défensif seulement. Programmé pour la fin de période, le
-    // forfait ACTIF ne change PAS : on pose juste le badge "pending" via la réponse serveur.
+    // Exactement le même résultat que si le client avait programmé ce downgrade lui-même
+    // depuis admin.html (même email "changement programmé", même échéance de paiement
+    // inchangée à la date de renouvellement déjà prévue) — le forfait ACTIF ne change PAS
+    // maintenant, on pose juste le badge "pending" via la réponse serveur.
     _commandesCache[cmdKey] = Object.assign({}, d, {
       pendingForfaitChange: { forfait: normForfait, price: result.newPrice, mode: 'downgrade-end-of-period', scheduledAt: result.scheduledFor }
     });
@@ -3686,11 +3689,24 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     _doRenderPaiements();
     _pollCommandesOnce();
     showToast('📅 Changement programmé en fin de période');
+    // Seule différence avec l'expérience client (demande explicite de Malek, 2026-07-14) :
+    // proposer EN PLUS le choix d'appliquer tout de suite plutôt que d'attendre le renouvellement
+    // — jamais automatique, toujours une action volontaire supplémentaire de Malek. Réutilise
+    // _forceApplyDowngrade(), déjà le mécanisme du bouton "Forcer maintenant" sur le badge
+    // programmé — aucune duplication de logique, aucun paiement demandé, email envoyé pareil.
+    const scheduledDateStr = result.scheduledFor ? new Date(result.scheduledFor).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : 'la fin de la période en cours';
+    _showCtrlConfirm(
+      'Appliquer dès maintenant ?',
+      'Le changement a été programmé pour le ' + scheduledDateStr + ' — comme le ferait le client. Voulez-vous plutôt l\'appliquer immédiatement (aucun paiement requis) ?',
+      'Appliquer maintenant',
+      function() { _forceApplyDowngrade(cmdKey); },
+      false
+    );
     return;
   }
 
-  // Application instantanée : downgrade immédiat (immediate:true, toujours le cas depuis
-  // control-app), ou essai gratuit / fenêtre de 7j non encore utilisée. Le forfait a
+  // Application instantanée : essai gratuit ou fenêtre de 7j non encore utilisée (même
+  // comportement que si le client l'avait fait lui-même depuis admin.html). Le forfait a
   // réellement changé côté serveur, on reflète maintenant ce vrai résultat.
   _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
   _rerenderClientBillingSection(cmdKey);
@@ -3966,6 +3982,16 @@ function _hideHistModal() {
   document.getElementById('hist-modal').style.display = 'none';
 }
 
+// Un upgrade au prorata en attente de paiement (carte client) est un VRAI paiement dû,
+// distinct du cycle normal (essai/renouvellement) que _trialInfo() connaît déjà — jusqu'ici
+// il n'apparaissait QUE dans la carte du client, jamais dans l'onglet Paiements, risquant de
+// passer inaperçu (bug confirmé par Malek, 2026-07-14). Le cron B_UPG_TIMEOUT efface
+// pendingUpgrade après le deadline (7j) s'il n'est pas confirmé — tant qu'il existe, il est
+// donc par construction toujours réellement en attente.
+function _hasPendingUpgrade(d) {
+  return !!(d && d.pendingUpgrade && d.pendingUpgrade.prorata);
+}
+
 function _doRenderPaiements() {
   const listEl  = document.getElementById('paiements-list');
   const emptyEl = document.getElementById('paiements-empty');
@@ -3975,15 +4001,20 @@ function _doRenderPaiements() {
   function _gt(k) { if (!_tc[k]) _tc[k] = _trialInfo(_commandesCache[k], k); return _tc[k]; }
 
   const pendingKeys = Object.keys(_commandesCache).filter(function(k) {
-    return !_gt(k).noTrial;
+    return !_gt(k).noTrial || _hasPendingUpgrade(_commandesCache[k]);
   }).sort(function(a, b) {
-    const ta = _gt(a);
-    const tb = _gt(b);
-    // Expirés en premier (plus urgents)
-    if (ta.isExpired !== tb.isExpired) return ta.isExpired ? -1 : 1;
+    const da = _commandesCache[a], db = _commandesCache[b];
+    const ua = _hasPendingUpgrade(da), ub = _hasPendingUpgrade(db);
+    const ta = _gt(a), tb = _gt(b);
+    // Priorité : retard réel (expiré) > upgrade en attente de paiement > échéance à venir
+    const rankA = ta.isExpired ? 0 : (ua ? 1 : 2);
+    const rankB = tb.isExpired ? 0 : (ub ? 1 : 2);
+    if (rankA !== rankB) return rankA - rankB;
     // Suspendus après les non-suspendus dans chaque groupe
     if (ta.isSuspended !== tb.isSuspended) return ta.isSuspended ? 1 : -1;
-    return (ta.ts || 0) - (tb.ts || 0);
+    const tsA = ua ? da.pendingUpgrade.deadline : (ta.ts || 0);
+    const tsB = ub ? db.pendingUpgrade.deadline : (tb.ts || 0);
+    return tsA - tsB;
   });
 
   // Nav visibility
@@ -4009,11 +4040,40 @@ function _doRenderPaiements() {
     var created = d.clientCree || _lastCreatedClients[k];
     var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
     var name = d.restaurant || (d.emailData && d.emailData.name) || '—';
+    var ridEsc0 = escapeHtml(rid);
+    var suspTag0 = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
+
+    if (_hasPendingUpgrade(d)) {
+      // Upgrade au prorata en attente de paiement — même bouton "Marqué payé" que sur la
+      // carte client (_confirmUpgradePaid), jamais dupliqué : marquer payé ici ou depuis la
+      // carte produit exactement le même résultat, les deux vues se resynchronisent ensemble.
+      var pu = d.pendingUpgrade;
+      var puAmount = pu.prorata ? pu.prorata.amountDue : 0;
+      var puForfaitLbl = pu.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
+      var puDeadlineStr = pu.deadline ? new Date(pu.deadline).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' }) : '—';
+      var cardU = document.createElement('div');
+      cardU.className = 'commande-card'; cardU.dataset.cmdkey = k;
+      cardU.innerHTML =
+        '<div class="commande-card-header">' +
+          '<div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(name)+suspTag0+'</div>' +
+          '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">ID : <code style="color:var(--gold)">'+ridEsc0+'</code> &middot; Upgrade &#8594; '+escapeHtml(puForfaitLbl)+' &middot; '+puAmount+' &#8364;</div>' +
+          '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc0 + '\')">&#128100; Voir le client</button>' +
+        '</div>' +
+        '<div class="commande-card-body-padded">' +
+          '<div style="margin-bottom:10px"><span class="paie-badge-yellow">&#11014;&#65039; Upgrade en attente &middot; avant le ' + puDeadlineStr + '</span></div>' +
+          '<div class="commande-trial-action" style="flex-direction:column;gap:6px">' +
+            '<button class="commande-paid-btn" style="width:100%" onclick="_confirmUpgradePaid(\'' + k + '\')">&#9989; Marquer comme pay&#233; (' + puAmount + ' &#8364;)</button>' +
+          '</div>' +
+        '</div>';
+      frag.appendChild(cardU);
+      return;
+    }
+
     var displayPrice = _getCommandePrice(d);
     var displayPhase = trial.paymentType === 'subscription' ? '1er abonnement' : 'Abonnement';
     var displayUnit  = '/' + (d.paymentMode === 'annual' ? 'an' : 'mois');
     var paidBtnLabel = '&#9989; Marquer comme pay&#233; (' + displayPrice + ' &#8364;' + displayUnit + ')';
-    var suspTag = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
+    var suspTag = suspTag0;
     var paieBadge;
     if (trial.isExpired) {
       var expAt = (trial.ts||0) + 7*24*3600*1000, od = Math.max(0,Math.floor((_now-expAt)/86400000));
@@ -4021,7 +4081,7 @@ function _doRenderPaiements() {
     } else {
       paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]\s*/u,'') + ' restant</span>';
     }
-    var ridEsc = escapeHtml(rid);
+    var ridEsc = ridEsc0;
     var suspendPaieBtn = trial.isSuspended
       ? '<button class="commande-suspend-btn reactivate-action" style="width:100%" onclick="_toggleSuspend(\'' + k + '\')">&#9654; R&#233;activer le compte</button>'
       : '<button class="commande-suspend-btn suspend-action" style="width:100%" onclick="_toggleSuspend(\'' + k + '\')">&#9208; Suspendre</button>';
