@@ -4677,6 +4677,15 @@ function sanitizeItems(items) {
   });
 }
 
+// Même utilitaire que client/index.html (_withTimeout) — dupliqué volontairement,
+// projet vanilla JS sans module partagé entre les fichiers déployés séparément.
+function _withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+  ]);
+}
+
 function saveData() {
   (adminData.cats || []).forEach(cat => { cat.names = _sanitizeNameMap(cat.names); });
   adminData.items = sanitizeItems(adminData.items);
@@ -4692,7 +4701,8 @@ function saveData() {
     s.textContent = '@keyframes fabSpin{to{transform:rotate(360deg)}}';
     document.head.appendChild(s);
   }
-  function _afterSave(toast) {
+  const _diskIconSvg = '<path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>';
+  function _afterSaveOk(toast) {
     localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
     localStorage.setItem(_PFX+'tx_hashes', JSON.stringify(adminData._txHashes || {}));
     localStorage.setItem(_PFX+'tx_lock',   JSON.stringify(adminData._txLock   || {}));
@@ -4705,14 +4715,29 @@ function saveData() {
       if (fabSvg) fabSvg.innerHTML = '<polyline points="5 13 10 18 21 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
       setTimeout(() => {
         fab.classList.remove('fab-success');
-        if (fabSvg) fabSvg.innerHTML = '<path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>';
+        if (fabSvg) fabSvg.innerHTML = _diskIconSvg;
       }, 1400);
     }
     showToast(toast);
   }
-  _rref('menu').set(adminData)
-    .then(() => _afterSave((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved))
-    .catch(() => _afterSave('⚠️ Sauvegarde locale uniquement (pas de connexion)'));
+  // Un wifi connecté mais sans vrai accès Internet ne fait jamais échouer une écriture
+  // Firebase (le SDK attend indéfiniment la reconnexion) — même piège déjà documenté et
+  // corrigé dans client/index.html (_withTimeout sur confirmOrder/confirmTableCall), jamais
+  // repris ici (bug confirmé par audit du 2026-07-15) : le bouton Enregistrer restait bloqué
+  // en spinner indéfiniment, sans jamais confirmer ni infirmer.
+  function _afterSaveError(toast) {
+    // NE JAMAIS effacer 'unsaved' ni jouer l'animation de succès (coche) ici — le
+    // changement n'a RÉELLEMENT PAS atteint Firebase, donc pas atteint les clients du
+    // restaurateur non plus. Un faux succès visuel identique au vrai était le cœur du bug.
+    if (fab) {
+      fab.classList.add('unsaved');
+      if (fabSvg) fabSvg.innerHTML = _diskIconSvg;
+    }
+    showToast(toast);
+  }
+  _withTimeout(_rref('menu').set(adminData), 10000)
+    .then(() => _afterSaveOk((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved))
+    .catch(() => _afterSaveError('⚠️ Échec de la sauvegarde — vérifiez votre connexion et réessayez'));
 }
 
 function markUnsaved() {

@@ -82,7 +82,18 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST')    { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   try {
-    const { title, body: bodyText, type } = req.body || {};
+    const { title, body: bodyText, type, secret } = req.body || {};
+
+    // Endpoint appelé UNIQUEMENT serveur-à-serveur (demo-page/api/notify-commande.js,
+    // notify-devis.js, client/api/notify-forfait.js) — jamais depuis un navigateur/app.
+    // N'avait auparavant AUCUNE authentification : `title`/`body` en texte libre relayés
+    // tels quels dans une vraie notification push vers le téléphone de Malek, déclenchable
+    // par quiconque connaît l'URL (visible dans le bundle JS public de demo-page). Réutilise
+    // le secret déjà partagé et déjà configuré sur les 2 projets Vercel (client + demo-page)
+    // pour l'écriture CONTROL_DB — aucune nouvelle variable d'environnement à créer.
+    if (!secret || secret !== process.env.FIREBASE_CONTROL_SECRET) {
+      res.status(401).json({ error: 'Unauthorized' }); return;
+    }
 
     const notifTitle = title || '🆕 Nouvelle commande';
     const notifBody  = bodyText || 'Un client a envoyé une commande.';

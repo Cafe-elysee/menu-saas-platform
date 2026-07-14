@@ -1082,7 +1082,7 @@ module.exports = async function handler(req, res) {
       await httpsPost('https://menu-saas-platform.vercel.app/api/notify-control', {}, {
         title: '💳 Changement de mode de paiement',
         body: `${safeName} → ${safeMode === 'annual' ? 'Annuel' : 'Mensuel'}`,
-        type: 'forfait'
+        type: 'forfait', secret: process.env.FIREBASE_CONTROL_SECRET
       });
       results.fcm = 'sent';
     } catch(e) { results.fcm = 'error'; }
@@ -1135,7 +1135,7 @@ module.exports = async function handler(req, res) {
       await httpsPost('https://menu-saas-platform.vercel.app/api/notify-control', {}, {
         title: '📅 Changement programmé',
         body: `${safeName} → ${forfaitLabel} (fin de période)`,
-        type: 'forfait'
+        type: 'forfait', secret: process.env.FIREBASE_CONTROL_SECRET
       });
       results.fcm = 'sent';
     } catch(e) { results.fcm = 'error'; }
@@ -1182,7 +1182,7 @@ module.exports = async function handler(req, res) {
       await httpsPost('https://menu-saas-platform.vercel.app/api/notify-control', {}, {
         title: '🔄 Changement de forfait',
         body: `${safeName} → ${forfaitLabel}`,
-        type: 'forfait'
+        type: 'forfait', secret: process.env.FIREBASE_CONTROL_SECRET
       });
       results.fcm = 'sent';
     } catch(e) { results.fcm = 'error'; }

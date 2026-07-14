@@ -10110,13 +10110,18 @@ function applyTranslations() {
 function _isInSchedule(s) {
   if (!s || !s.enabled) return true;
   const now = new Date();
-  if (!(s.days & (1 << now.getDay()))) return false;
   const cur = now.getHours() * 60 + now.getMinutes();
-  if (!s.from || !s.to) return true;
+  if (!s.from || !s.to) return !!(s.days & (1 << now.getDay()));
   const [fh, fm] = s.from.split(':').map(Number);
   const [th, tm] = s.to.split(':').map(Number);
   const from = fh * 60 + fm, to = th * 60 + tm;
-  return from <= to ? (cur >= from && cur < to) : (cur >= from || cur < to);
+  if (from <= to) return !!(s.days & (1 << now.getDay())) && cur >= from && cur < to;
+  // Créneau traversant minuit (ex. 22h-2h) : coché sur le jour de DÉBUT du créneau — passé
+  // minuit (cur < to), ce jour de début est celui d'HIER, pas aujourd'hui (bug confirmé
+  // 2026-07-15 : comparait toujours au jour courant, faisant disparaître le créneau ~1h30
+  // avant l'heure de fin annoncée dans les réglages admin, ex. Happy Hour/carte de nuit).
+  const dayBit = cur >= from ? now.getDay() : (now.getDay() + 6) % 7;
+  return !!(s.days & (1 << dayBit)) && (cur >= from || cur < to);
 }
 
 function buildCatPills() {
