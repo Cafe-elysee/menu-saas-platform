@@ -287,7 +287,12 @@ function computeUpgradeProrata({ cmdData, priceObj, now, oldForfait, oldMode, ne
   };
 }
 
-function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymentMode, priceObj = PRICE, isTrial = false) {
+// paymentPending : contrôle UNIQUEMENT l'affichage du paragraphe "vous avez 7 jours pour
+// payer" — DOIT être false chaque fois qu'aucun paiement n'est réellement encore dû au moment
+// de l'envoi (essai gratuit, downgrade — jamais payant, ou upgrade déjà confirmé payé), jamais
+// déduit d'un simple "c'est un vrai changement de forfait" (bug confirmé par Malek, 2026-07-15 :
+// l'email "upgrade confirmé PAYÉ" affichait quand même "vous avez 7 jours pour payer").
+function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymentMode, priceObj = PRICE, paymentPending = false) {
   const isCS    = newForfait === 'commandes-services';
   const safeName = escHtml(name);
   const payM = PAY_METHODS_F[lang] || PAY_METHODS_F.fr;
@@ -320,35 +325,35 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
       intro: isUpgrade
         ? `Votre forfait a été mis à niveau vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`
         : `Votre forfait a été modifié vers <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: paymentPending ? weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>' : null,
       features: isCS ? `Vos nouvelles fonctionnalités : prise de commandes en ligne, bouton d'appel, système de tables et QR ordering.` : `Votre menu digital reste actif. Les fonctionnalités de commande et d'appel ont été désactivées.`,
       closing: `L'équipe GeNext`
     },
     en: {
       greeting: `Hello ${safeName} 👋`,
       intro: isUpgrade ? `Your plan has been upgraded to <strong>${newLabel}</strong> (${modeLabel} — €${price}).` : `Your plan has been changed to <strong>${newLabel}</strong> (${modeLabel} — €${price}).`,
-      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: paymentPending ? weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>' : null,
       features: isCS ? `Your new features: online ordering, call button, table system and QR ordering.` : `Your digital menu remains active. Ordering and call features have been disabled.`,
       closing: `The GeNext Team`
     },
     el: {
       greeting: `Γεια σας ${safeName} 👋`,
       intro: isUpgrade ? `Η συνδρομή σας αναβαθμίστηκε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Η συνδρομή σας άλλαξε σε <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: paymentPending ? weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>' : null,
       features: isCS ? `Νέες λειτουργίες: online παραγγελίες, κουμπί κλήσης, σύστημα τραπεζιών και QR παραγγελία.` : `Το ψηφιακό σας μενού παραμένει ενεργό. Οι λειτουργίες παραγγελίας και κλήσης έχουν απενεργοποιηθεί.`,
       closing: `Η ομάδα GeNext`
     },
     de: {
       greeting: `Guten Tag ${safeName} 👋`,
       intro: isUpgrade ? `Ihr Plan wurde auf <strong>${newLabel}</strong> aktualisiert (${modeLabel} — ${price}€).` : `Ihr Plan wurde auf <strong>${newLabel}</strong> geändert (${modeLabel} — ${price}€).`,
-      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: paymentPending ? weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>' : null,
       features: isCS ? `Ihre neuen Funktionen: Online-Bestellungen, Anrufschaltfläche, Tischsystem und QR-Bestellung.` : `Ihr digitales Menü bleibt aktiv. Bestell- und Anruffunktionen wurden deaktiviert.`,
       closing: `Das GeNext Team`
     },
     es: {
       greeting: `¡Hola ${safeName} 👋`,
       intro: isUpgrade ? `Su plan ha sido actualizado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).` : `Su plan ha cambiado a <strong>${newLabel}</strong> (${modeLabel} — ${price}€).`,
-      payment: isTrial ? null : weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>',
+      payment: paymentPending ? weekP + '<br><span style="color:#6b5a3a;font-size:0.85rem">' + payM + '</span>' : null,
       features: isCS ? `Sus nuevas funciones: pedidos en línea, botón de llamada, sistema de mesas y pedido QR.` : `Su menú digital sigue activo. Las funciones de pedido y llamada han sido desactivadas.`,
       closing: `El equipo GeNext`
     }
@@ -846,6 +851,9 @@ module.exports = async function handler(req, res) {
       }
       if (email) {
         try {
+          // paymentPending:false — le paiement vient JUSTEMENT d'être confirmé (c'est le but
+          // même de cet appel) : ne jamais répéter "vous avez 7 jours pour payer" ici (bug
+          // confirmé par Malek, 2026-07-15).
           const { subject, html } = buildForfaitEmail(safeLang, safeName, curForfait, pu.forfait, true, upgradeMode, effectivePriceObj, false);
           await createTransport().sendMail({
             from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
@@ -952,6 +960,7 @@ module.exports = async function handler(req, res) {
         }
         if (email) {
           try {
+            // paymentPending:false — un downgrade n'exige jamais de paiement (Malek, 2026-07-15).
             const { subject, html } = buildForfaitEmail(safeLang, safeName, curForfait, newForfait, false, safeMode, effectivePriceObj, false);
             await createTransport().sendMail({
               from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
@@ -1135,7 +1144,11 @@ module.exports = async function handler(req, res) {
     // ── Mode immédiat : email + sync commande + FCM ─────────────────────────────
     if (email) {
       try {
-        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, effectivePriceObj, !!isTrial);
+        // paymentPending = !isTrial : préserve EXACTEMENT le comportement historique de cette
+        // branche legacy (payait avant, sauf en essai) après le renommage/inversion du paramètre
+        // ci-dessus — zéro changement de comportement voulu ici, seulement sur les 2 appels de
+        // la nouvelle architecture (upgrade confirmé payé + downgrade immédiat, jamais dus).
+        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, effectivePriceObj, !isTrial);
         await createTransport().sendMail({
           from:    `"GeNext" <${process.env.GMAIL_USER}>`,
           replyTo: process.env.GMAIL_USER,
