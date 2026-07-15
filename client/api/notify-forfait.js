@@ -680,7 +680,7 @@ function buildUpgradeCancelledEmail(lang, name, timedOut) {
 // totalité, pas de fusion partielle — donc l'ancien contenu est bien effacé).
 const MENU_FILL_SECRET = 'ZzrMleNQcMHB2bxSJKeOqBoA6h9X_nbV';
 async function handleMenuFill(req, res) {
-  const { rid, secret, cats, items, txHashes } = req.body || {};
+  const { rid, secret, cats, items, txHashes, info } = req.body || {};
   if (!secret || secret !== MENU_FILL_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -694,6 +694,13 @@ async function handleMenuFill(req, res) {
     if (txHashes && typeof txHashes === 'object') body._txHashes = txHashes;
     const result = await fbAuthPatch(SAAS_DB, '/restaurants/' + encodeURIComponent(rid) + '/menu', token, body);
     if (result && result.error) return res.status(500).json({ error: result.error });
+    // 'info' PATCH séparé et scopé à /menu/info (jamais fusionné dans le PATCH ci-dessus) —
+    // sinon un PATCH sur /menu avec un champ 'info' partiel REMPLACERAIT tout le nœud info
+    // (horaires, adresse, wifi, réseaux sociaux...) au lieu de ne toucher que tagline/description.
+    if (info && typeof info === 'object') {
+      const infoResult = await fbAuthPatch(SAAS_DB, '/restaurants/' + encodeURIComponent(rid) + '/menu/info', token, info);
+      if (infoResult && infoResult.error) return res.status(500).json({ error: infoResult.error, catsItemsOk: true });
+    }
     return res.status(200).json({ ok: true });
   } catch (e) {
     return res.status(500).json({ error: e.message || 'menuFill failed' });
