@@ -1090,103 +1090,30 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, onlyPaymentMode: true, ...results, mainWrite: { subscription: { paymentMode: safeMode, price } } });
   }
 
-  // ── Mode annulation de pendingForfaitChange ─────────────────────────────────
+  // ── Mode annulation de pendingForfaitChange (legacy — conservé en secours) ──────
+  // admin.html envoie désormais 'actor:client' pour ce cas (2026-07-15), qui route vers
+  // l'équivalent moderne ~ligne 782 avant d'atteindre ce point. Cette branche ne devrait
+  // donc plus jamais être atteinte par un appel légitime — laissée intacte (comportement
+  // identique) au cas où un appelant non recensé l'utiliserait encore.
   if (pending === 'cancel') {
     if (cmdKey && secret) {
       try {
         await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { pendingForfaitChange: null });
       } catch(e) { /* non-bloquant */ }
     }
-    // mainWrite requis pour que admin.html (_cancelScheduledForfait, appel SANS 'actor'
-    // volontairement) efface bien la bannière côté MAIN_DB — bug confirmé par audit : sans
-    // ce champ, le client cliquait "Annuler" sans jamais voir la bannière disparaître.
     return res.status(200).json({ ok: true, sync: 'cancelled', mainWrite: { subscription: { pendingChange: null } } });
   }
 
-  if (isPending) {
-    // ── Mode différé : stocker pendingForfaitChange pour application fin de période ──
-    if (cmdKey && secret) {
-      try {
-        await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { pendingForfaitChange: { forfait: newForfait, price } });
-        results.sync = 'pending-set';
-      } catch(e) { results.sync = 'error: ' + e.message; }
-    } else {
-      results.sync = cmdKey ? 'no-secret' : 'commande-not-found';
-    }
-
-    if (email) {
-      try {
-        const { subject, html } = buildPendingEmail(safeLang, safeName, newForfait, safeMode, effectivePriceObj);
-        await createTransport().sendMail({
-          from:    `"GeNext" <${process.env.GMAIL_USER}>`,
-          replyTo: process.env.GMAIL_USER,
-          to: email, subject, html,
-          text:    safeName + ' — Changement de forfait programmé vers ' + forfaitLabel + ' (fin de période)\n\nGeNext — ' + process.env.GMAIL_USER,
-          headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
-          attachments: [LOGO_ATTACHMENT]
-        });
-        results.email = 'sent';
-      } catch(e) { results.email = 'error: ' + e.message; }
-    } else {
-      results.email = 'no-email';
-    }
-
-    try {
-      await httpsPost('https://menu-saas-platform.vercel.app/api/notify-control', {}, {
-        title: '📅 Changement programmé',
-        body: `${safeName} → ${forfaitLabel} (fin de période)`,
-        type: 'forfait', secret: process.env.FIREBASE_CONTROL_SECRET
-      });
-      results.fcm = 'sent';
-    } catch(e) { results.fcm = 'error'; }
-
-  } else {
-    // ── Mode immédiat : email + sync commande + FCM ─────────────────────────────
-    if (email) {
-      try {
-        // paymentPending = !isTrial : préserve EXACTEMENT le comportement historique de cette
-        // branche legacy (payait avant, sauf en essai) après le renommage/inversion du paramètre
-        // ci-dessus — zéro changement de comportement voulu ici, seulement sur les 2 appels de
-        // la nouvelle architecture (upgrade confirmé payé + downgrade immédiat, jamais dus).
-        const { subject, html } = buildForfaitEmail(safeLang, safeName, oldForfait, newForfait, isUpgrade, safeMode, effectivePriceObj, !isTrial);
-        await createTransport().sendMail({
-          from:    `"GeNext" <${process.env.GMAIL_USER}>`,
-          replyTo: process.env.GMAIL_USER,
-          to: email, subject, html,
-          text:    safeName + ' — Forfait ' + (isUpgrade ? 'mis à niveau' : 'modifié') + ' vers ' + forfaitLabel + '\n\nGeNext — ' + process.env.GMAIL_USER,
-          headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
-          attachments: [LOGO_ATTACHMENT]
-        });
-        results.email = 'sent';
-      } catch(e) { results.email = 'error: ' + e.message; }
-    } else {
-      results.email = 'no-email';
-    }
-
-    // Sync commande : forfait + price + paymentMode (+ reset reminder si upgrade)
-    if (cmdKey && secret) {
-      try {
-        const update = { forfait: newForfait, price, paymentMode: safeMode };
-        if (isUpgrade && !isTrial) {
-          update.nextReminderAt = Date.now() + 7 * 24 * 3600 * 1000;
-          update.lastReminderSent = null;
-        }
-        await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, update);
-        results.sync = 'ok';
-      } catch(e) { results.sync = 'error: ' + e.message; }
-    } else {
-      results.sync = cmdKey ? 'no-secret' : 'commande-not-found';
-    }
-
-    try {
-      await httpsPost('https://menu-saas-platform.vercel.app/api/notify-control', {}, {
-        title: '🔄 Changement de forfait',
-        body: `${safeName} → ${forfaitLabel}`,
-        type: 'forfait', secret: process.env.FIREBASE_CONTROL_SECRET
-      });
-      results.fcm = 'sent';
-    } catch(e) { results.fcm = 'error'; }
-  }
-
-  return res.status(200).json({ ok: true, isPending, ...results });
+  // ── Garde de fermeture (2026-07-15) ──────────────────────────────────────────────
+  // Au-delà de ce point, un vrai changement de forfait serait appliqué SANS passer par
+  // classifyForfaitChange()/le calcul au prorata (branches historiques ci-dessous, d'avant
+  // la refonte du système d'abonnement). Tous les appelants réels connus (admin.html,
+  // control-app) passent désormais 'actor', ou 'onlyPaymentMode'/'pending:cancel' déjà
+  // traités ci-dessus — plus aucun d'entre eux n'atteint ce point légitimement. Le laisser
+  // ouvert permettrait à un client déjà authentifié (session valide sur son propre rid) de
+  // rejouer la requête sans 'actor' (DevTools) pour contourner le prorata d'un upgrade ou
+  // obtenir un changement de forfait instantané non facturé. Fermé ici plutôt que supprimé :
+  // aucun appelant recensé n'est cassé par ce refus, et le code legacy reste disponible en
+  // lecture si un appelant oublié devait un jour être découvert et migré proprement.
+  return res.status(400).json({ error: 'Missing actor — this legacy forfait-change path is disabled' });
 };

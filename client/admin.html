@@ -8582,14 +8582,17 @@ async function _doScheduleForfait(newForfait) {
 }
 
 async function _cancelScheduledForfait() {
-  // Pas de 'actor' ici volontairement — passe par l'ancienne branche pending:'cancel'
-  // (oldForfait/newForfait factices, non utilisés par cette branche, jamais interprétés
-  // comme un vrai changement de forfait par la nouvelle classification server-side).
+  // 'actor:client' route désormais vers la branche pending:'cancel' de la nouvelle
+  // architecture (client/api/notify-forfait.js ~ligne 782) — même écriture CONTROL_DB
+  // (pendingForfaitChange:null) + même mainWrite (pendingChange:null) que l'ancienne
+  // branche historique, avec en plus une écriture MAIN_DB best-effort côté serveur.
+  // Migré (2026-07-15) pour fermer l'ancienne route sans 'actor' — voir
+  // [[feedback_client_delete_email_forever]] pour le contexte de cet audit.
   try {
     const result = await _callNotifyForfait({
       rid: _RID, name: '', oldForfait: '', newForfait: _subData?.forfait || 'menu-qr',
       email: null, lang: currentLang, paymentMode: _subData?.paymentMode || 'annual',
-      pending: 'cancel', sid: await _sessionId()
+      pending: 'cancel', actor: 'client', sid: await _sessionId()
     });
     if (result && result.ok) setTimeout(() => _loadSubscriptionSection(), 400);
   } catch(e) {
