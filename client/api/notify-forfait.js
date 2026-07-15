@@ -672,12 +672,41 @@ function buildUpgradeCancelledEmail(lang, name, timedOut) {
   return { subject: t.subject, html: _emailShell(t.greeting, card, t.closing) };
 }
 
+// ── Remplissage de menu (bulk write) — outil interne serveur-à-serveur, jamais exposé à aucun
+// client (APK ou navigateur) : le secret ci-dessous ne vit que dans ce fichier côté Vercel, il
+// n'est envoyé nulle part. Sert exclusivement aux opérations de remplissage initial de menu
+// (Claude Code / Malek), voir [[skill_expert_menu_hospitality_2026]]. Remplace ENTIÈREMENT
+// menu/cats + menu/items (un PATCH Firebase sur /menu remplace les enfants nommés dans leur
+// totalité, pas de fusion partielle — donc l'ancien contenu est bien effacé).
+const MENU_FILL_SECRET = 'ZzrMleNQcMHB2bxSJKeOqBoA6h9X_nbV';
+async function handleMenuFill(req, res) {
+  const { rid, secret, cats, items, txHashes } = req.body || {};
+  if (!secret || secret !== MENU_FILL_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  if (!rid || !Array.isArray(cats) || !Array.isArray(items)) {
+    return res.status(400).json({ error: 'Missing rid/cats/items' });
+  }
+  try {
+    const token = await getMainDbToken();
+    if (!token) return res.status(500).json({ error: 'Main DB token unavailable' });
+    const body = { cats, items };
+    if (txHashes && typeof txHashes === 'object') body._txHashes = txHashes;
+    const result = await fbAuthPatch(SAAS_DB, '/restaurants/' + encodeURIComponent(rid) + '/menu', token, body);
+    if (result && result.error) return res.status(500).json({ error: result.error });
+    return res.status(200).json({ ok: true });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'menuFill failed' });
+  }
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.body && req.body.op === 'menuFill') return handleMenuFill(req, res);
 
   const {
     rid, name, oldForfait, newForfait, email, lang, paymentMode, pending, onlyPaymentMode, isTrial, sid,
