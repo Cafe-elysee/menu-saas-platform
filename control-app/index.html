@@ -4264,7 +4264,11 @@ async function restoreClient(slug, d) {
         // la réactiver préserve tel quel le cycle d'abonnement réel (nextReminderAt,
         // trialEndAt, pendingUpgrade/pendingForfaitChange...) au lieu de repartir sur un
         // essai gratuit neuf comme le faisait l'ancienne reconstruction générique.
-        await _controlWrite('/commandes/' + d.cmdKey, 'update', { clientDeleted: false, clientDeletedAt: null, restaurant: d.name || slug }).catch(function() {});
+        // Écriture CRITIQUE, jamais silencieuse ici : si elle échoue, la commande d'origine
+        // reste clientDeleted:true et le cron n'enverra plus JAMAIS aucun rappel/facture à ce
+        // client pourtant restauré et actif — mirroir exact du bug de suppression ci-dessus.
+        // Laisser l'erreur remonter au catch englobant plutôt que de prétendre "Restauré ✅".
+        await _controlWrite('/commandes/' + d.cmdKey, 'update', { clientDeleted: false, clientDeletedAt: null, restaurant: d.name || slug });
         delete _deletedClients[d.cmdKey];
         localStorage.removeItem('ctrl_cmd_del_' + d.cmdKey);
         // N'observer un "premier login" que si le client n'avait jamais réellement ouvert son
@@ -4850,9 +4854,22 @@ async function confirmDeleteClient() {
       devices: null, orders: null, calls: null, logs: null, messages: null,
       analytics: null, config: null, menu: null, profile: null, sessions: null, firstOpen: null
     });
-    // Supprimer le paiement en attente de la commande liée
+    // Bloquer les emails automatiques (cron) sur la commande liée — écriture CRITIQUE :
+    // sans elle, le cron continue de traiter ce client comme actif et lui envoie des
+    // rappels de paiement À VIE, sans qu'aucune trace ne signale l'échec. Réessayée une
+    // fois avant d'alerter Malek explicitement (jamais de silence sur cet échec précis).
     if (_dCk) {
-      _controlWrite('/commandes/' + _dCk, 'update', { clientDeleted: true }).catch(function() {});
+      const _delFlag = { clientDeleted: true, clientDeletedAt: Date.now() };
+      try {
+        await _controlWrite('/commandes/' + _dCk, 'update', _delFlag);
+      } catch(e) {
+        try {
+          await new Promise(function(r) { setTimeout(r, 1500); });
+          await _controlWrite('/commandes/' + _dCk, 'update', _delFlag);
+        } catch(e2) {
+          showToast('⚠️ Client supprimé mais le blocage des emails automatiques a échoué — commande ' + _dCk + ' à vérifier manuellement (risque de rappels de paiement envoyés à vie)');
+        }
+      }
     }
     closeDelModal();
     // Retirer la carte du DOM immédiatement ; le listener Firebase reconstruit CLIENTS
