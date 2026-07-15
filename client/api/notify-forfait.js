@@ -958,9 +958,14 @@ module.exports = async function handler(req, res) {
               { forfait: newForfait, price, paymentMode: safeMode, pendingChange: null, lastForfaitChange: Date.now() });
           } catch(e) {}
         }
+        // Statut de l'email tracé explicitement (2026-07-15) — jamais avalé en silence :
+        // signalé par Malek comme manquant sur ce cas précis, plus aucune marge d'incertitude
+        // acceptée ici. 'no-email' distingue le cas normal (commande sans adresse connue,
+        // rien à envoyer) d'un vrai échec technique ('error: ...') — le premier n'est pas une
+        // anomalie, le second doit être visible immédiatement dans l'UI de Malek.
+        let emailStatus = 'no-email';
         if (email) {
           try {
-            // paymentPending:false — un downgrade n'exige jamais de paiement (Malek, 2026-07-15).
             const { subject, html } = buildForfaitEmail(safeLang, safeName, curForfait, newForfait, false, safeMode, effectivePriceObj, false);
             await createTransport().sendMail({
               from: `"GeNext" <${process.env.GMAIL_USER}>`, replyTo: process.env.GMAIL_USER, to: email, subject, html,
@@ -968,10 +973,14 @@ module.exports = async function handler(req, res) {
               headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
               attachments: [LOGO_ATTACHMENT]
             });
-          } catch(e) {}
+            emailStatus = 'sent';
+          } catch(e) {
+            emailStatus = 'error: ' + e.message;
+            console.error('⚠ mid-cycle-downgrade-immediate email erreur ' + cmdKey + ':', e.message);
+          }
         }
         return res.status(200).json({
-          ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: keptNextReminderAt,
+          ok: true, case: 'mid-cycle-downgrade-immediate', newEndDate: keptNextReminderAt, emailStatus,
           mainWrite: {
             features: { callBtn: false, orderUI: false, tableSystem: false, qrOrdering: false },
             subscription: { forfait: newForfait, price, paymentMode: safeMode, pendingChange: null, lastForfaitChange: Date.now() }
@@ -986,6 +995,7 @@ module.exports = async function handler(req, res) {
       if (mainToken) {
         try { await fbAuthPatch(SAAS_DB, '/restaurants/' + rid + '/config/subscription', mainToken, { pendingChange: pendingC, pendingUpgrade: null }); } catch(e) {}
       }
+      let emailStatusSched = 'no-email';
       if (email) {
         try {
           const { subject, html } = buildPendingEmail(safeLang, safeName, newForfait, safeMode, effectivePriceObj);
@@ -995,10 +1005,14 @@ module.exports = async function handler(req, res) {
             headers: { 'List-Unsubscribe': '<mailto:' + process.env.GMAIL_USER + '?subject=unsubscribe>' },
             attachments: [LOGO_ATTACHMENT]
           });
-        } catch(e) {}
+          emailStatusSched = 'sent';
+        } catch(e) {
+          emailStatusSched = 'error: ' + e.message;
+          console.error('⚠ mid-cycle-downgrade (programmé) email erreur ' + cmdKey + ':', e.message);
+        }
       }
       return res.status(200).json({
-        ok: true, case: 'mid-cycle-downgrade', scheduledFor: scheduledAt, newPrice: price,
+        ok: true, case: 'mid-cycle-downgrade', scheduledFor: scheduledAt, newPrice: price, emailStatus: emailStatusSched,
         mainWrite: { subscription: { pendingChange: pendingC, pendingUpgrade: null } }
       });
     }

@@ -3765,7 +3765,20 @@ async function _forceApplyDowngrade(cmdKey) {
       email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
       paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
     });
-    if (result && result.ok) { showToast('✅ Changement appliqué immédiatement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
+    if (result && result.ok) {
+      // emailStatus tracé explicitement côté serveur (2026-07-15, signalé par Malek : le
+      // changement s'appliquait mais l'email de confirmation manquait sans aucune trace).
+      // Ne jamais afficher "✅" seul si l'email a réellement échoué — Malek doit le savoir
+      // immédiatement, pas le découvrir des jours plus tard via une plainte du client.
+      if (result.emailStatus && result.emailStatus.indexOf('error') === 0) {
+        showToast('⚠️ Changement appliqué, mais l\'email de confirmation a échoué — préviens le client manuellement');
+      } else if (result.emailStatus === 'no-email') {
+        showToast('✅ Changement appliqué (aucun email sur ce compte, rien envoyé)');
+      } else {
+        showToast('✅ Changement appliqué immédiatement');
+      }
+      _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce();
+    }
     else { showToast('❌ Erreur'); }
   } catch(e) { showToast('❌ Erreur réseau'); }
 }
