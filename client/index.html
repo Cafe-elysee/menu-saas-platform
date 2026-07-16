@@ -11248,10 +11248,12 @@ function _setupHeroFabHide() {
 ================================================ */
 let _cardObserver = null;
 let _catObserver  = null;
+let _revealScrollHandler = null; // complément à l'IntersectionObserver — voir plus bas pourquoi
 
 function setupScrollObserver() {
   if (_cardObserver) { _cardObserver.disconnect(); _cardObserver = null; }
   if (_catObserver)  { _catObserver.disconnect();  _catObserver  = null; }
+  if (_revealScrollHandler) { window.removeEventListener('scroll', _revealScrollHandler); _revealScrollHandler = null; }
 
   // Toutes les cartes démarrent cachées
   document.querySelectorAll('.card').forEach(card => {
@@ -11337,6 +11339,31 @@ function setupScrollObserver() {
 
   document.querySelectorAll('.card').forEach(card => _cardObserver.observe(card));
   document.querySelectorAll('.cat-sec').forEach(cat => _catObserver.observe(cat));
+
+  // Filet de sécurité pendant le scroll actif : sur certains moteurs mobiles (notamment WebKit/iOS),
+  // la livraison des callbacks IntersectionObserver peut être retardée jusqu'à l'arrêt du scroll,
+  // laissant des cartes/catégories invisibles pendant tout le geste (déjà vu sur ce projet pour
+  // les écrans de chargement rAF pendant un scroll actif — voir feedback_splash_scroll_freeze).
+  // On révèle donc aussi en continu à chaque frame de scroll (rAF, jamais un debounce/setTimeout
+  // qui attendrait la fin du scroll — ce serait reproduire exactement le bug à corriger).
+  const _forceRevealVisible = () => {
+    const vh = window.innerHeight;
+    document.querySelectorAll('.card.pre-rv').forEach(card => {
+      const r = card.getBoundingClientRect();
+      if (r.top < vh + 180 && r.bottom > 0) animateCard(card, 0);
+    });
+    document.querySelectorAll('.cat-sec:not(.cr)').forEach(cat => {
+      const r = cat.getBoundingClientRect();
+      if (r.top < vh + 180 && r.bottom > 0) cat.classList.add('cr');
+    });
+  };
+  let _revealTicking = false;
+  _revealScrollHandler = () => {
+    if (_revealTicking) return;
+    _revealTicking = true;
+    requestAnimationFrame(() => { _forceRevealVisible(); _revealTicking = false; });
+  };
+  window.addEventListener('scroll', _revealScrollHandler, { passive: true });
 }
 
 /* ================================================

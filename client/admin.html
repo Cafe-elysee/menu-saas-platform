@@ -775,10 +775,12 @@
     }
     .sec-hd:hover .sec-chevron { color:var(--gold); }
     .adm-section.collapsed .sec-hd .sec-chevron { transform:rotate(-90deg); }
-    /* Contenu animé */
+    /* Contenu animé — max-height piloté dynamiquement en JS (setupCollapsible), jamais une valeur fixe :
+       un plafond statique tronquerait silencieusement une section avec beaucoup de contenu (ex: menu avec
+       beaucoup de produits/catégories) sans aucune erreur ni indice visuel. */
     .sec-body {
       overflow:hidden;
-      max-height:8000px;
+      max-height:none;
       transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);
     }
     .adm-section.collapsed .sec-body { max-height:0 !important; transition:max-height 0.35s cubic-bezier(0.65,0,0.35,1); }
@@ -5410,12 +5412,29 @@ function renderHeroImageSection() {
       section.classList.add('collapsed');
       requestAnimationFrame(() => { body.style.transition = ''; });
     }
+    // Ouverte par défaut (ex: sec-cats au 1er login) : aucun plafond numérique posé, contenu illimité d'emblée.
 
-    // Toggle + sauvegarde
+    // Toggle + sauvegarde — anime toujours entre 2 valeurs numériques concrètes (0 ↔ hauteur mesurée),
+    // jamais entre 'none' et 0 (non-animable), puis relâche le plafond une fois ouverte pour ne jamais
+    // limiter une section dont le contenu grandit ensuite (ex: ajout de produits pendant que c'est ouvert).
     hd.addEventListener('click', () => {
-      section.classList.toggle('collapsed');
+      const opening = section.classList.contains('collapsed');
+      if (opening) {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        section.classList.remove('collapsed');
+        const releaseCap = (e) => {
+          if (e.target !== body || e.propertyName !== 'max-height') return;
+          if (!section.classList.contains('collapsed')) body.style.maxHeight = 'none';
+          body.removeEventListener('transitionend', releaseCap);
+        };
+        body.addEventListener('transitionend', releaseCap);
+      } else {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        void body.offsetHeight; // force le navigateur à figer cette valeur avant l'animation vers 0
+        requestAnimationFrame(() => { section.classList.add('collapsed'); });
+      }
       if (id) {
-        saved[id] = section.classList.contains('collapsed');
+        saved[id] = opening ? false : true;
         localStorage.setItem(STORE_KEY_SEC, JSON.stringify(saved));
       }
     });
