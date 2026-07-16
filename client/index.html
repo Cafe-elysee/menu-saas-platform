@@ -7003,6 +7003,11 @@ function loadAdminData() {
 
   // Variantes de thème : toujours toutes visibles — plus de restriction par licence
   _rref('/config/features/themeVariants').on('value', snap => {
+    // Même règle de priorité que le listener /menu voisin : un choix explicite du visiteur
+    // (popup thème pagedemo/généralisé) prime toujours sur une modification faite par
+    // l'admin dans Firebase — sinon masquer une variante réinitialisait aussi le thème d'un
+    // visiteur qui avait pourtant choisi lui-même une AUTRE variante encore visible.
+    if (_pdHasVisitorOverride()) return;
     const themeVariants = snap.val() || {};
     const family = _themeFamily(menuTheme);
     const varConfig      = themeVariants[family] || {};
@@ -10037,6 +10042,18 @@ function applyTranslations() {
   _ariaSetById('hist-modal', 'myOrders');
   _ariaSetById('dose-modal', 'doseModal');
   _ariaSetById('pd-theme-modal', 'themeModal');
+  // Modal "Appeler le serveur" — fixée une seule fois à l'ouverture (openTableModal), jamais
+  // retraduite si la langue change PENDANT qu'elle est déjà ouverte (déclenché en direct par les
+  // listeners Firebase config/defaultLang ou config/enabledLangs, pas seulement par un choix
+  // utilisateur). Répliqué ici sans toucher à l'état d'ouverture/l'historique/le focus.
+  const _tblTitleEl = document.getElementById('tbl-title');
+  if (_tblTitleEl) {
+    _tblTitleEl.textContent = t.tableTitle;
+    const _tblInfoEl = document.getElementById('tbl-info'); if (_tblInfoEl) _tblInfoEl.textContent = t.tblInfo || '';
+    document.getElementById('tbl-confirm').textContent = t.tableConfirm;
+    document.getElementById('tbl-cancel').textContent = t.tableCancel;
+    document.getElementById('tbl-desc').textContent = _TID ? (t.callConfirmQR || t.tableTitle + ' ?') : t.tableDesc;
+  }
   // Bouton "Avis Google" — libellé/aria-label traduits (dépend de la langue active)
   if (_reviewSrc) {
     const _hcReviewLabel = document.getElementById('hc-review-cta-label');

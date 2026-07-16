@@ -801,6 +801,10 @@
     .table-url-copy:active,.table-url-copy.copied { background:rgba(200,164,78,0.15); color:var(--gold); border-color:var(--gold); }
     html.light .tables-count-input { background:var(--bg2); }
     html.light .table-url-row { background:var(--bg2); }
+    /* Texte gold nu (pas un badge à fond opaque) sur fond clair : var(--gold) seul ≈2.3:1,
+       sous le seuil AA — même correctif que le reste du projet (#6b5218 ≈5-6:1). */
+    html.light .table-url-num,
+    html.light .qr-pdf-btn { color:#6b5218; }
     .qr-pdf-btn { margin-left:auto; font-size:0.74rem; color:var(--gold); background:transparent; padding:6px 13px; border:1px solid rgba(200,164,78,0.38); border-radius:9px; cursor:pointer; font-family:inherit; transition:all 0.2s; display:inline-flex; align-items:center; gap:5px; font-weight:600; }
     .qr-pdf-btn:hover { border-color:var(--gold); background:rgba(200,164,78,0.1); transform:translateY(-1px); }
     /* ── QR MODAL ── */
@@ -1145,6 +1149,7 @@
     .prod-top-info { flex:1; min-width:0; }
     .prod-top-name { font-size:0.92rem; font-weight:400; color:var(--cream); }
     .prod-top-price { font-size:0.78rem; color:var(--gold); margin-top:3px; }
+    html.light .prod-top-price { color:#6b5218; }
     .prod-expand-ico { color:var(--muted); transition:transform 0.3s; flex-shrink:0; }
     .prod-expand-ico svg { width:18px; height:18px; }
     .prod-card.open .prod-expand-ico { transform:rotate(180deg); }
@@ -4812,34 +4817,49 @@ function syncVisToggles() {
   }
 }
 
+// Écriture Firebase d'un toggle avec rollback + alerte visible en cas d'échec réseau —
+// sans ça, un toggle admin peut passer visuellement "off" alors que Firebase n'a jamais reçu
+// l'écriture (wifi connecté sans accès réel, par ex.) : le menu public continue d'afficher ce
+// que l'admin croit avoir masqué, silencieusement.
+function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) {
+  applyLocal();
+  syncVisToggles();
+  _rref(path).set(newVal).catch(() => {
+    revertLocal();
+    syncVisToggles();
+    const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+    showToastMsg(t.settingsErr || '❌ Erreur', true);
+  });
+}
+
 /* ── Listeners des boutons de visibilité (sauvegarde instantanée) ── */
 (function() {
   document.getElementById('toggle-call-btn').addEventListener('click', () => {
     if (!adminData) return;
     if (!adminData.info) adminData.info = {};
-    const newVal = adminData.info.showCallBtn === false ? true : false;
-    adminData.info.showCallBtn = newVal;
-    _rref('menu/info/showCallBtn').set(newVal);
-    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    syncVisToggles();
+    const oldVal = adminData.info.showCallBtn;
+    const newVal = oldVal === false ? true : false;
+    _writeToggleField('menu/info/showCallBtn', newVal, oldVal,
+      () => { adminData.info.showCallBtn = newVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); },
+      () => { adminData.info.showCallBtn = oldVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); });
   });
   document.getElementById('toggle-photos-btn').addEventListener('click', () => {
     if (!adminData) return;
     if (!adminData.info) adminData.info = {};
-    const newVal = adminData.info.showPhotos === false ? true : false;
-    adminData.info.showPhotos = newVal;
-    _rref('menu/info/showPhotos').set(newVal);
-    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    syncVisToggles();
+    const oldVal = adminData.info.showPhotos;
+    const newVal = oldVal === false ? true : false;
+    _writeToggleField('menu/info/showPhotos', newVal, oldVal,
+      () => { adminData.info.showPhotos = newVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); },
+      () => { adminData.info.showPhotos = oldVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); });
   });
   document.getElementById('toggle-order-btn').addEventListener('click', () => {
     if (!adminData) return;
     if (!adminData.info) adminData.info = {};
-    const newVal = adminData.info.showOrderUI === false ? true : false;
-    adminData.info.showOrderUI = newVal;
-    _rref('menu/info/showOrderUI').set(newVal);
-    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    syncVisToggles();
+    const oldVal = adminData.info.showOrderUI;
+    const newVal = oldVal === false ? true : false;
+    _writeToggleField('menu/info/showOrderUI', newVal, oldVal,
+      () => { adminData.info.showOrderUI = newVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); },
+      () => { adminData.info.showOrderUI = oldVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); });
   });
 })();
 
@@ -4849,9 +4869,15 @@ function syncVisToggles() {
 function toggleThemeFabFeature(checked) {
   if (!adminData) return;
   if (!adminData.info) adminData.info = {};
-  adminData.info.themeFabEnabled = checked;
-  _rref('menu/info/themeFabEnabled').set(checked);
-  localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+  const oldVal = adminData.info.themeFabEnabled;
+  _writeToggleField('menu/info/themeFabEnabled', checked, oldVal,
+    () => { adminData.info.themeFabEnabled = checked; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); },
+    () => {
+      adminData.info.themeFabEnabled = oldVal;
+      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      const cb = document.getElementById('theme-fab-toggle');
+      if (cb) cb.checked = oldVal === true;
+    });
 }
 
 /* ─── SECTION NOTE CLIENTS ─── */
@@ -8519,8 +8545,9 @@ async function _cancelPendingUpgrade() {
   })
     .then(result => {
       if (result && result.ok) { showToast('↩️ ' + (t.subUpgradeCancelled || 'Retour à votre forfait actuel')); _loadSubscriptionSection(); }
+      else { showToastMsg(t.subUpgradeError || '❌ Erreur', true); }
     })
-    .catch(() => {});
+    .catch(() => { showToastMsg(t.subUpgradeError || '❌ Erreur', true); });
 }
 
 // ── Application immédiate (essai libre ou fenêtre de paiement) — seule autorité : le serveur ──
