@@ -673,15 +673,17 @@ function buildUpgradeCancelledEmail(lang, name, timedOut) {
 }
 
 // ── Remplissage de menu (bulk write) — outil interne serveur-à-serveur, jamais exposé à aucun
-// client (APK ou navigateur) : le secret ci-dessous ne vit que dans ce fichier côté Vercel, il
-// n'est envoyé nulle part. Sert exclusivement aux opérations de remplissage initial de menu
+// client (APK ou navigateur). Sert exclusivement aux opérations de remplissage initial de menu
 // (Claude Code / Malek), voir [[skill_expert_menu_hospitality_2026]]. Remplace ENTIÈREMENT
 // menu/cats + menu/items (un PATCH Firebase sur /menu remplace les enfants nommés dans leur
 // totalité, pas de fusion partielle — donc l'ancien contenu est bien effacé).
-const MENU_FILL_SECRET = 'ZzrMleNQcMHB2bxSJKeOqBoA6h9X_nbV';
+// Secret lu UNIQUEMENT depuis la variable d'environnement Vercel MENU_FILL_SECRET (jamais codé
+// en dur dans le code source commité) — si elle est absente, l'endpoint refuse tout, jamais de
+// repli permissif.
 async function handleMenuFill(req, res) {
   const { rid, secret, cats, items, txHashes, info } = req.body || {};
-  if (!secret || secret !== MENU_FILL_SECRET) {
+  const _menuFillSecret = process.env.MENU_FILL_SECRET;
+  if (!_menuFillSecret || !secret || secret !== _menuFillSecret) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   if (!rid || !Array.isArray(cats) || !Array.isArray(items)) {

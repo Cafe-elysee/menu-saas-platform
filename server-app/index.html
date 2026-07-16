@@ -630,6 +630,14 @@
   /* ── Icônes nav inactives — plus visibles ── */
   .nav-btn{ color:rgba(244,234,210,0.78); }
   html.light .nav-btn{ color:rgba(28,23,16,0.60); }
+  /* ── Onglet actif en light mode — html.light .nav-btn (ci-dessus) a une spécificité CSS
+     supérieure à .nav-btn.on seul et l'écrasait, rendant l'onglet actif indiscernable des
+     autres en mode clair. Contraste vérifié ≥5:1 (même valeur que les autres textes gold sur
+     fond clair du projet). ── */
+  html.light .nav-btn.on{ color:#6b5218; }
+  /* ── Texte gold sur fond clair — contraste insuffisant avec var(--gold) seul (~2.3:1) ── */
+  html.light .call-badge-num,
+  html.light .order-item-price{ color:#6b5218; }
   /* ── État vide — texte et icône lisibles ── */
   .empty-state{ color:rgba(244,234,210,0.85); }
   .empty-state-icon{ opacity:0.60; filter:none; }
@@ -1761,14 +1769,20 @@ function startOrdersListener() {
   });
 }
 
-function _applyInitialTab() {
-  _rref('/config/features').once('value').then(function(snap) {
-    var feat         = snap.val() || {};
-    var callEnabled  = feat.callBtn !== false;
-    var orderEnabled = feat.orderUI !== false;
+// Affiche/masque l'écran "Accès limité" (forfait Menu QR sans service serveur) selon les
+// features courantes — appelée à la fois au chargement (_applyInitialTab, une lecture unique)
+// et en direct à chaque changement de forfait pendant que l'app est déjà ouverte (voir le
+// listener .on('value') dans _startApp) : sans ce 2e appel, un changement de forfait fait
+// depuis control-app pendant qu'un serveur a déjà l'app ouverte n'était jamais reflété tant
+// que l'app n'était pas complètement fermée puis relancée.
+function _applyFeatureGate(feat) {
+  feat = feat || {};
+  var callEnabled  = feat.callBtn !== false;
+  var orderEnabled = feat.orderUI !== false;
+  var fs = document.getElementById('srv-forfait-screen');
 
-    // Forfait Menu QR : aucun service serveur — afficher écran bloquant
-    if (!callEnabled && !orderEnabled) {
+  if (!callEnabled && !orderEnabled) {
+    if (fs) {
       var _FORFAIT = {
         fr: { title:'Accès limité', msg:'Cet abonnement inclut uniquement le menu numérique.<br>Contactez l\'administrateur pour activer les appels et les commandes.', changeId:"Changer de restaurant" },
         en: { title:'Limited access', msg:'This plan includes the digital menu only.<br>Contact the administrator to enable calls and orders.',                         changeId:'Change restaurant' },
@@ -1777,17 +1791,26 @@ function _applyInitialTab() {
         es: { title:'Acceso limitado', msg:'Este plan incluye solo el menú digital.<br>Contacte al administrador para activar llamadas y pedidos.',                    changeId:'Cambiar restaurante' }
       };
       var fp = _FORFAIT[lang] || _FORFAIT.fr;
-      var fs = document.getElementById('srv-forfait-screen');
-      if (fs) {
-        document.getElementById('srv-forfait-title').textContent = fp.title;
-        document.getElementById('srv-forfait-msg').style.whiteSpace = 'pre-line';
-        document.getElementById('srv-forfait-msg').textContent = fp.msg.replace(/<br\s*\/?>/gi, '\n');
-        document.getElementById('srv-forfait-change-btn').textContent = fp.changeId;
-        _hideSrvLoading();
-        fs.style.display = 'flex';
-      }
-      return;
+      document.getElementById('srv-forfait-title').textContent = fp.title;
+      document.getElementById('srv-forfait-msg').style.whiteSpace = 'pre-line';
+      document.getElementById('srv-forfait-msg').textContent = fp.msg.replace(/<br\s*\/?>/gi, '\n');
+      document.getElementById('srv-forfait-change-btn').textContent = fp.changeId;
+      fs.style.display = 'flex';
     }
+  } else if (fs && fs.style.display !== 'none') {
+    // Le forfait vient d'être élargi (upgrade) pendant que l'app était déjà ouverte sur l'écran bloquant
+    fs.style.display = 'none';
+  }
+
+  return { callEnabled: callEnabled, orderEnabled: orderEnabled };
+}
+
+function _applyInitialTab() {
+  _rref('/config/features').once('value').then(function(snap) {
+    var gate = _applyFeatureGate(snap.val());
+
+    // Forfait Menu QR : aucun service serveur — écran bloquant déjà affiché par _applyFeatureGate
+    if (!gate.callEnabled && !gate.orderEnabled) { _hideSrvLoading(); return; }
 
     var hasPendingCalls  = calls.some(function(c) { return c.status !== 'done'; });
     var hasPendingOrders = Object.values(orders).some(function(o) { return o.status !== 'done'; });
@@ -1795,8 +1818,8 @@ function _applyInitialTab() {
     var tab;
     if      (hasPendingOrders)            tab = 'orders';
     else if (hasPendingCalls)             tab = 'calls';
-    else if (orderEnabled)                tab = 'orders';
-    else if (callEnabled)                 tab = 'calls';
+    else if (gate.orderEnabled)           tab = 'orders';
+    else if (gate.callEnabled)            tab = 'calls';
     else                                  tab = localStorage.getItem(_PFX + 'last_tab') || 'calls';
 
     if (tab !== currentTab) switchTab(tab);
@@ -2202,15 +2225,17 @@ function init() {
     return;
   }
 
-  // Vérifier statut du compte au démarrage (avant tout chargement)
-  _rref('config').once('value').then(function(snap) {
-    var cfg    = snap.val();
+  // Vérifier statut du compte au démarrage (avant tout chargement) — lecture ciblée sur
+  // profile/config.active uniquement (jamais le noeud config entier : il contient des
+  // champs sensibles — adminHash, staffPinHash — qui ne doivent être lus qu'après une vraie
+  // authentification, voir _startApp()/_ensureStaffAuth() plus bas).
+  _rref('profile').once('value').then(function(profileSnap) {
     var screen = document.getElementById('srv-pause-screen');
     var icoEl  = document.getElementById('srv-pause-icon');
     var titEl  = document.getElementById('srv-pause-title');
     var msgEl  = document.getElementById('srv-pause-msg');
 
-    if (cfg === null) {
+    if (profileSnap.val() === null) {
       // Restaurant supprimé — ID inconnu
       var _DEL = {
         fr: { icon:'🚫', title:'Compte introuvable',       msg:'Ce restaurant n&#39;existe plus.<br>Veuillez contacter le service client.',           btnChange:'Changer de restaurant' },
@@ -2230,30 +2255,32 @@ function init() {
       return;
     }
 
-    if (cfg.active === false) {
-      // Restaurant suspendu
-      var _PAUSE = {
-        fr: { icon:'⏸', title:'Service en pause',          msg:'Ce restaurant est momentanément en pause.<br>Merci de contacter l&#39;administrateur.',        btnChange:'Changer de restaurant' },
-        en: { icon:'⏸', title:'Service paused',            msg:'This restaurant is currently paused.<br>Please contact the administrator.',                   btnChange:'Change restaurant' },
-        el: { icon:'⏸', title:'Σε παύση',                  msg:'Αυτό το εστιατόριο είναι σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.',           btnChange:'Αλλαγή εστιατορίου' },
-        de: { icon:'⏸', title:'Service pausiert',          msg:'Dieses Restaurant ist pausiert.<br>Bitte kontaktieren Sie den Administrator.',                 btnChange:'Restaurant wechseln' },
-        es: { icon:'⏸', title:'Servicio en pausa',           msg:'Este restaurante está momentáneamente en pausa.<br>Por favor contacte al administrador.',       btnChange:'Cambiar restaurante' }
-      };
-      var p = _PAUSE[lang] || _PAUSE.fr;
-      if (icoEl) icoEl.textContent = p.icon;
-      if (titEl) titEl.textContent = p.title;
-      if (msgEl) msgEl.innerHTML   = p.msg;
-      var _pChgBtn2 = document.getElementById('srv-pause-change-btn');
-      if (_pChgBtn2) _pChgBtn2.textContent = p.btnChange;
-      _hideSrvLoading();
-      if (screen) screen.style.display = 'flex';
-      return;
-    }
+    _rref('config/active').once('value').then(function(activeSnap) {
+      if (activeSnap.val() === false) {
+        // Restaurant suspendu
+        var _PAUSE = {
+          fr: { icon:'⏸', title:'Service en pause',          msg:'Ce restaurant est momentanément en pause.<br>Merci de contacter l&#39;administrateur.',        btnChange:'Changer de restaurant' },
+          en: { icon:'⏸', title:'Service paused',            msg:'This restaurant is currently paused.<br>Please contact the administrator.',                   btnChange:'Change restaurant' },
+          el: { icon:'⏸', title:'Σε παύση',                  msg:'Αυτό το εστιατόριο είναι σε παύση.<br>Παρακαλώ επικοινωνήστε με τον διαχειριστή.',           btnChange:'Αλλαγή εστιατορίου' },
+          de: { icon:'⏸', title:'Service pausiert',          msg:'Dieses Restaurant ist pausiert.<br>Bitte kontaktieren Sie den Administrator.',                 btnChange:'Restaurant wechseln' },
+          es: { icon:'⏸', title:'Servicio en pausa',           msg:'Este restaurante está momentáneamente en pausa.<br>Por favor contacte al administrador.',       btnChange:'Cambiar restaurante' }
+        };
+        var p = _PAUSE[lang] || _PAUSE.fr;
+        if (icoEl) icoEl.textContent = p.icon;
+        if (titEl) titEl.textContent = p.title;
+        if (msgEl) msgEl.innerHTML   = p.msg;
+        var _pChgBtn2 = document.getElementById('srv-pause-change-btn');
+        if (_pChgBtn2) _pChgBtn2.textContent = p.btnChange;
+        _hideSrvLoading();
+        if (screen) screen.style.display = 'flex';
+        return;
+      }
 
-    // Compte actif — démarrage normal, après vérification du code PIN du personnel
-    // (transition douce : si le restaurateur n'a pas encore défini de code, l'accès
-    // est accordé sans rien demander — voir client/api/staff-login.js)
-    _ensureStaffAuth().then(function() { _startApp(true); });
+      // Compte actif — démarrage normal, après vérification du code PIN du personnel
+      // (transition douce : si le restaurateur n'a pas encore défini de code, l'accès
+      // est accordé sans rien demander — voir client/api/staff-login.js)
+      _ensureStaffAuth().then(function() { _startApp(true); });
+    });
   }).catch(function() {
     // Erreur réseau → démarrer quand même pour ne pas bloquer (sans écrire firstOpen)
     _startApp(false);
@@ -2396,6 +2423,13 @@ function _startApp(confirmed) {
     } else if (v === true) {
       location.reload();
     }
+  });
+
+  // Listener temps réel : un changement de forfait (upgrade/downgrade) fait depuis control-app
+  // pendant que cette session server-app est déjà ouverte doit se refléter immédiatement,
+  // pas seulement au prochain lancement de l'app (voir _applyFeatureGate ci-dessus).
+  _rref('/config/features').on('value', function(snap) {
+    _applyFeatureGate(snap.val());
   });
 }
 document.addEventListener('DOMContentLoaded', init);

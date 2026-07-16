@@ -1,10 +1,9 @@
 {
   "rules": {
     "restaurants": {
-      ".read": true,
-
       "$rid": {
         "devices": {
+          ".read": true,
           ".write": "!newData.exists()",
           "$deviceId": {
             ".write": "auth != null",
@@ -13,6 +12,7 @@
         },
 
         "orders": {
+          ".read": true,
           ".write": "!newData.exists()",
           "$orderId": {
             ".write": "auth != null",
@@ -21,6 +21,7 @@
         },
 
         "calls": {
+          ".read": true,
           ".write": "!newData.exists()",
           "$callId": {
             ".write": "auth != null",
@@ -29,6 +30,7 @@
         },
 
         "logs": {
+          ".read": true,
           ".write": "!newData.exists()",
           "errors": {
             ".write": true,
@@ -41,6 +43,7 @@
         },
 
         "messages": {
+          ".read": true,
           ".write": "!newData.exists()",
           "$msgId": {
             ".write": "auth != null",
@@ -49,6 +52,7 @@
         },
 
         "analytics": {
+          ".read": true,
           ".write": true,
           "$dateKey": {
             ".validate": "!newData.exists() || newData.child('createdAt').isNumber()"
@@ -56,21 +60,26 @@
         },
 
         "config": {
+          ".read": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
           ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
           "adminPwd": {
             ".validate": "!newData.exists()"
-          }
+          },
+          "active":       { ".read": true },
+          "defaultLang":  { ".read": true },
+          "enabledLangs": { ".read": true },
+          "features":     { ".read": true }
         },
 
-        "menu":      { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "profile":   { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "sessions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "firstOpen": { ".write": true, ".validate": "newData.isBoolean()" }
+        "menu":      { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "profile":   { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "sessions":  { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "firstOpen": { ".read": true, ".write": true, ".validate": "newData.isBoolean()" }
       }
     },
 
     "archivedClients": {
-      ".read": true,
+      ".read": "auth != null && auth.token.role === 'platform'",
       "$slug": {
         ".write": "auth != null && auth.token.role === 'platform'"
       }
