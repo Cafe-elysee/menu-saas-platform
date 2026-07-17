@@ -6323,7 +6323,7 @@
 <div id="sheet" role="dialog" aria-modal="true">
   <div class="sh-handle"></div>
   <div class="sh-img-w">
-    <img class="sh-img" id="sh-img" src="" alt="" loading="lazy">
+    <img class="sh-img" id="sh-img" src="" alt="" loading="lazy" decoding="async">
     <div class="sh-img-grad"></div>
   </div>
   <div class="sh-body">
@@ -8282,7 +8282,7 @@ function buildFlipBook() {
       const qtyClass = qty > 0 ? ' has-qty' : '';
       const photoEnabled = showPhotos && (item.showPhoto !== false);
       const src = photoEnabled ? _getPhotoSrc(item) : '';
-      const thumbHtml = src ? `<div class="fp-item-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>` : '';
+      const thumbHtml = src ? `<div class="fp-item-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>` : '';
       // Bloc qty rendu inconditionnellement ; le CSS le masque si showOrderUI est off.
       const qtyHtml = `
         <div class="fp-item-qty${qtyClass}" data-fp-qty="${item.id}" aria-label="${_aria('qty')}">
@@ -9932,6 +9932,16 @@ function _setupHeroParallax() {
   let ticking = false;
   let _heroDone = false; // true quand le hero est sorti du viewport
 
+  // 🔴 Round 8 (2026-07-17) : heroH était lu via hero.offsetHeight À CHAQUE frame de scroll, sur
+  // TOUTE la page (pas seulement près du hero) — un layout thrashing potentiel à chaque tick dès
+  // qu'un AUTRE listener de scroll (setupStickyNav/setupFAB/setupScrollObserver) avait déjà écrit
+  // dans le DOM plus tôt dans la même frame. Même pattern déjà corrigé ailleurs dans ce fichier
+  // (voir setupStickyNav._recalcHeroH) : mis en cache, recalculé seulement au resize/premier calcul.
+  let heroH = 0;
+  const _recalcHeroH = () => { heroH = hero.offsetHeight; };
+  requestAnimationFrame(() => requestAnimationFrame(_recalcHeroH));
+  window.addEventListener('resize', _recalcHeroH, { passive: true });
+
   function _resetHero() {
     content.style.transform  = '';
     content.style.opacity    = '';
@@ -9951,8 +9961,7 @@ function _setupHeroParallax() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      const sy    = window.scrollY;
-      const heroH = hero.offsetHeight;
+      const sy = window.scrollY;
       if (sy <= 0) {
         // Hero pleinement visible : activer will-change pour le parallax à venir
         if (_heroDone) {
@@ -10446,7 +10455,7 @@ function _cardStrip(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="strip-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="strip-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="strip-no-photo">${_camSvg}</div>`
       : '';
@@ -10479,7 +10488,7 @@ function _cardForest(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="forest-img-wrap"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="forest-img-wrap"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="forest-no-photo">${_camSvg}</div>`
       : '';
@@ -10506,7 +10515,7 @@ function _cardRose(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="por-img-w"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="por-img-w"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="por-no-photo">${_camSvg}</div>`
       : '';
@@ -10530,7 +10539,7 @@ function _cardEnseigne(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="ens-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="ens-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="ens-no-thumb">${_camSvg}</div>`
       : '';
@@ -10562,7 +10571,7 @@ function _cardVelvet(item, idx) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const imgBlock = src
-    ? `<div class="vel-img-w"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="vel-img-w"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="vel-no-photo">${_camSvg}</div>`
       : '';
@@ -10592,7 +10601,7 @@ function _cardAurora(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const photoCol = src
-    ? `<div class="aurora-photo-col"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="aurora-photo-col"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="aurora-photo-col"><div class="aurora-no-photo">${_camSvg}</div></div>`
       : '';
@@ -10628,7 +10637,7 @@ function _cardPrestige(item) {
   card.innerHTML = `
     <div class="card-top">
       ${src
-        ? `<div class="c-img-w"><img class="c-img" src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+        ? `<div class="c-img-w"><img class="c-img" src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
         : photoEnabled
           ? `<div class="c-img-empty">${_camSvg}</div>`
           : ''}
@@ -10656,7 +10665,7 @@ function _cardSantorin(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="san-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="san-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="san-no-thumb">${_camSvg}</div>`
       : '';
@@ -10687,7 +10696,7 @@ function _cardClassique(item) {
   card.className = 'card card-classique' + (src ? ' has-thumb' : '');
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  const thumbBlock = src ? `<div class="cls-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>` : '';
+  const thumbBlock = src ? `<div class="cls-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>` : '';
   const body = `
     <div class="cls-row">
       <div class="cls-name-cell">
@@ -10713,7 +10722,7 @@ function _cardSommelier(item) {
   card.className = 'card card-sommelier';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  const thumbBlock = src ? '<div class="som-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
+  const thumbBlock = src ? '<div class="som-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
     thumbBlock +
     '<div class="som-main">' +
@@ -10743,7 +10752,7 @@ function _cardBento(item) {
       '<div class="ben-price">' + _priceHtml(item) + '</div>' +
     '</div>';
   card.innerHTML = src
-    ? '<div class="ben-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="ben-body">' + body + '</div>'
+    ? '<div class="ben-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="ben-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10767,7 +10776,7 @@ function _cardTelegraphe(item) {
     (desc ? '<div class="tel-desc">' + desc + '</div>' : '') +
     (badges ? '<div class="tel-badges">' + badges + '</div>' : '');
   card.innerHTML = src
-    ? '<div class="tel-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="tel-body">' + body + '</div>'
+    ? '<div class="tel-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="tel-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10794,7 +10803,7 @@ function _cardCouture(item, idx) {
       '<div class="cou-price">' + _priceHtml(item) + '</div>' +
     '</div>';
   card.innerHTML = src
-    ? '<div class="cou-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="cou-body">' + body + '</div>'
+    ? '<div class="cou-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="cou-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10811,7 +10820,7 @@ function _cardJournal(item) {
   card.className = 'card card-dva';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  const thumbBlock = src ? '<div class="dva-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
+  const thumbBlock = src ? '<div class="dva-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
     '<div class="dva-price-block' + priceWide + '"><div class="dva-price">' + _priceHtml(item) + '</div></div>' +
     thumbBlock +
@@ -10838,7 +10847,7 @@ function _cardVoyage(item) {
   card.className = 'card card-voyage';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
-  const thumbBlock = src ? '<div class="voy-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>' : '';
+  const thumbBlock = src ? '<div class="voy-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>' : '';
   card.innerHTML =
     thumbBlock +
     '<div class="voy-main">' +
@@ -10868,7 +10877,7 @@ function _cardArtisan(item) {
     (desc ? '<div class="art-desc">' + desc + '</div>' : '') +
     '<div class="art-bottom"><div class="art-dash"></div><div class="art-price">' + _priceHtml(item) + '</div></div>';
   card.innerHTML = src
-    ? '<div class="art-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="art-body">' + body + '</div>'
+    ? '<div class="art-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="art-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10892,7 +10901,7 @@ function _cardArdoise(item) {
     '<div class="ard-name">' + (_esc(item.name[lang]||item.name.fr||'')) + '</div>' +
     (desc ? '<div class="ard-desc">' + desc + '</div>' : '');
   card.innerHTML = src
-    ? '<div class="ard-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="ard-body">' + body + '</div>'
+    ? '<div class="ard-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="ard-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10917,7 +10926,7 @@ function _cardMaroc(item) {
     '</div>' +
     (desc ? '<div class="marc-desc">' + desc + '</div>' : '');
   card.innerHTML = src
-    ? '<div class="marc-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" onerror="_menuImgErr(this)"></div><div class="marc-body">' + body + '</div>'
+    ? '<div class="marc-thumb"><img src="' + _esc(src) + '" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div><div class="marc-body">' + body + '</div>'
     : body;
   _setupCardEvents(card, item);
   return card;
@@ -10934,7 +10943,7 @@ function _cardEditorial(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   const thumbBlock = src
-    ? `<div class="edt-thumb"><img src="${_esc(src)}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    ? `<div class="edt-thumb"><img src="${_esc(src)}" alt="" loading="lazy" decoding="async" onerror="_menuImgErr(this)"></div>`
     : photoEnabled
       ? `<div class="edt-no-thumb">${_camSvg}</div>`
       : '';
@@ -11425,8 +11434,17 @@ function setupScrollObserver() {
   });
 
   const animateCard = (card, delay) => {
+    // 🔴 CAUSE RACINE du bug "écran figé puis saute" au fling rapide (round 8, 2026-07-17) :
+    // ce `void card.offsetWidth` forçait un reflow synchrone PAR CARTE révélée. Inutile ici —
+    // chaque carte n'obtient 'card-enter' qu'UNE SEULE fois (jamais retirée puis réappliquée sur
+    // le même élément, voir le fix round 5 ci-dessous qui garantit "révélée = pour toujours") et
+    // le keyframe cardIn démarre déjà à opacity:0/translateY(22px)/scale(0.97), soit EXACTEMENT
+    // l'état visuel de .pre-rv — aucun rendu intermédiaire à forcer avant l'animation. Pendant un
+    // fling rapide, _forceRevealVisible() (plus bas) doit rattraper d'un coup toutes les cartes
+    // entrées dans le viewport pendant le geste : avec ce reflow forcé, révéler 10-15 cartes en
+    // une frame déclenchait 10-15 layouts synchrones bloquants en série sur le thread principal —
+    // exactement le gel d'écran (frames figées) suivi d'un saut brutal capturé en vidéo par Malek.
     card.classList.remove('pre-rv', 'rv', 'card-enter');
-    void card.offsetWidth;
     card.style.animationDelay = delay > 0 ? delay + 's' : '';
     card.classList.add('card-enter');
     card.addEventListener('animationend', () => {
@@ -11509,15 +11527,26 @@ function setupScrollObserver() {
   // On révèle donc aussi en continu à chaque frame de scroll (rAF, jamais un debounce/setTimeout
   // qui attendrait la fin du scroll — ce serait reproduire exactement le bug à corriger).
   const _forceRevealVisible = () => {
+    // 🔴 Round 8 : lecture (getBoundingClientRect) et écriture (classList/animation) séparées en
+    // deux passes distinctes. Avant : lecture+écriture ALTERNÉES carte par carte dans un seul
+    // forEach — dès la 1ère écriture, le layout est invalidé, donc la lecture de LA CARTE SUIVANTE
+    // forçait un nouveau reflow synchrone (layout thrashing classique), même après avoir retiré le
+    // reflow forcé explicite ci-dessus. En séparant complètement les deux phases, TOUTES les
+    // lectures utilisent le même layout déjà calculé (une seule purge, pas N), puis toutes les
+    // écritures s'appliquent sans qu'aucune lecture ne vienne les interrompre entre-temps.
     const vh = window.innerHeight;
+    const cardsToReveal = [];
     document.querySelectorAll('.card.pre-rv').forEach(card => {
       const r = card.getBoundingClientRect();
-      if (r.top < vh + 180 && r.bottom > 0) { animateCard(card, 0); _cardObserver.unobserve(card); }
+      if (r.top < vh + 180 && r.bottom > 0) cardsToReveal.push(card);
     });
+    const catsToReveal = [];
     document.querySelectorAll('.cat-sec:not(.cr)').forEach(cat => {
       const r = cat.getBoundingClientRect();
-      if (r.top < vh + 180 && r.bottom > 0) { cat.classList.add('cr'); _catObserver.unobserve(cat); }
+      if (r.top < vh + 180 && r.bottom > 0) catsToReveal.push(cat);
     });
+    cardsToReveal.forEach(card => { animateCard(card, 0); _cardObserver.unobserve(card); });
+    catsToReveal.forEach(cat => { cat.classList.add('cr'); _catObserver.unobserve(cat); });
   };
   let _revealTicking = false;
   _revealScrollHandler = () => {
