@@ -9168,7 +9168,7 @@ async function confirmOrder() {
   sendNotify();
 
   try {
-    await ensureAnonAuth();
+    await _withTimeout(ensureAnonAuth(), 10000);
     await _withTimeout(_rref('orders/' + orderId).set(order), 10000);
 
     // Analytics agrégat — fire-and-forget, n'impacte pas le flux commande
@@ -11769,7 +11769,7 @@ async function confirmTableCall() {
   // échouent réellement (réseau coupé), le client doit quand même en être informé après
   // coup plutôt que de croire à tort que le serveur a reçu son appel.
   try {
-    await ensureAnonAuth();
+    await _withTimeout(ensureAnonAuth(), 10000);
     const _callTs = Date.now();
     const t = UI[lang];
     await _withTimeout(Promise.all([

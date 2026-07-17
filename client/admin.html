@@ -4231,8 +4231,19 @@ async function checkLogin() {
         const idTokenResult = await user.getIdTokenResult();
         const claims = idTokenResult.claims;
         if (claims.rid !== _RID && claims.role !== 'platform') { _hideAdmLoadingScreen(); resolve(); return; }
-        const actSnap = await _rref('/config/active').once('value');
-        if (actSnap.val() === false || actSnap.val() === null) {
+        // Lecture protégée par timeout : une session Firebase Auth valide ne doit jamais
+        // retomber sur l'écran de mot de passe simplement parce que cette vérification
+        // annexe est lente (ex: connexion tout juste rétablie). On ne signe l'admin
+        // que sur une réponse EXPLICITE (false/null reçus du serveur) — jamais sur une
+        // absence de réponse, qui est traitée comme "toujours actif" (fail-open).
+        let actVal;
+        try {
+          actVal = await Promise.race([
+            _rref('/config/active').once('value').then(s => s.val()),
+            new Promise(resolve2 => setTimeout(() => resolve2(undefined), 8000))
+          ]);
+        } catch(e) { actVal = undefined; }
+        if (actVal === false || actVal === null) {
           await firebase.auth().signOut();
           _hideAdmLoadingScreen(); resolve(); return;
         }
