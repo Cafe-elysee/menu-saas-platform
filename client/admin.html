@@ -4407,9 +4407,22 @@ function showAdmin() {
     _adminActiveWatching = true;
     _rref('/config/active').on('value', snap => {
       const v = snap.val();
-      if (v === false || v === null) {
-        _closeSession().then(() => location.reload()).catch(() => location.reload());
-      }
+      if (v !== false && v !== null) return;
+      // Confirmation avant déconnexion réelle : une lecture isolée false/null peut être
+      // un artefact transitoire de reconnexion (ex: juste après un cycle goOffline/
+      // goOnline forcé au retour d'un changement d'onglet, voir _admRecoverConnection
+      // plus bas dans ce fichier) — pas forcément une vraie suspension/suppression du
+      // compte. On revérifie après un court délai avant d'agir : élimine les faux
+      // positifs (qui redemandaient le mot de passe sans raison) sans retarder
+      // perceptiblement le vrai cas (compte réellement suspendu/supprimé).
+      setTimeout(() => {
+        _rref('/config/active').once('value').then(s2 => {
+          const v2 = s2.val();
+          if (v2 === false || v2 === null) {
+            _closeSession().then(() => location.reload()).catch(() => location.reload());
+          }
+        }).catch(() => {});
+      }, 4000);
     });
     // Sauvegarder l'ID dans la liste mémorisée après login réussi
     _addSavedId(_RID);
