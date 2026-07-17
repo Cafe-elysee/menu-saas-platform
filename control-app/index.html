@@ -6228,6 +6228,15 @@ document.addEventListener('deviceready', () => {
       if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
       _CapApp.exitApp();
     });
+
+    // Retour au premier plan : force un vrai cycle de reconnexion RTDB (coupe puis
+    // rouvre) pour éviter une connexion Firebase figée après une longue mise en
+    // arrière-plan — même fix que server-app (resume) et admin.html (visibilitychange).
+    // Reconnexion 100% silencieuse : jamais de location.reload() (redemanderait le
+    // mot de passe), jamais de popup.
+    _CapApp.addListener('resume', () => {
+      try { firebase.database(_getSaasApp()).goOffline(); firebase.database(_getSaasApp()).goOnline(); } catch(e) {}
+    });
   }
 
   // Pré-initialise _saasDb pour sauvegarder le token FCM même avant le login
