@@ -1686,7 +1686,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script>
-    firebase.initializeApp({
+    // 🔴🔴 App Firebase NOMMÉE, jamais l'app par défaut (2026-07-18) — cause racine
+    // trouvée avec Malek : client/index.html (le menu, même origine/même projet
+    // Firebase) se connecte automatiquement en visiteur anonyme dès son ouverture
+    // (ensureAnonAuth) sur l'app PAR DÉFAUT. Si admin.html utilisait aussi l'app par
+    // défaut, les deux pages PARTAGENT la même session Firebase Auth persistée
+    // (IndexedDB, scopée par origine+app) — visiter le menu puis revenir sur l'admin
+    // remplaçait silencieusement la vraie identité admin par l'identité anonyme du
+    // menu, cassant toute écriture (permissions différentes) sans jamais redemander
+    // le mot de passe ni afficher d'erreur claire. Même pattern déjà utilisé avec
+    // succès dans control-app (_getSaasApp()) : une app nommée a sa PROPRE session
+    // isolée, totalement indépendante de celle du menu. firebase.auth()/
+    // firebase.database() sont redéfinis juste en dessous pour cibler cette app par
+    // défaut dans TOUT le reste du fichier, sans avoir à changer chaque appel existant.
+    const _adminFbApp = firebase.initializeApp({
       apiKey:            "AIzaSyCM6SiQoWQfsq_t-80EfiVplXV9p534_eI",
       authDomain:        "menu-saas-platform.firebaseapp.com",
       projectId:         "menu-saas-platform",
@@ -1694,7 +1707,12 @@
       messagingSenderId: "460781372428",
       appId:             "1:460781372428:web:55c33bfb6f8f8d5582da29",
       databaseURL:       "https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app"
-    });
+    }, 'admin-panel');
+    (function() {
+      const _origAuth = firebase.auth, _origDb = firebase.database;
+      firebase.auth     = (app) => _origAuth(app || _adminFbApp);
+      firebase.database = (app) => _origDb(app || _adminFbApp);
+    })();
     const _db   = firebase.database();
     // ── SaaS : restaurantId depuis URL param ?rid=xxx
     const _RID  = new URLSearchParams(location.search).get('rid') || 'demo';
