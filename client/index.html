@@ -7633,6 +7633,13 @@ function applyAdminData(data) {
         if (themeFab) { themeFab.classList.remove('show'); themeFab.style.display = 'none'; }
       }
 
+      // Bouton Accueil — exclusif à pagedemo, piloté par menu/info/pdHomeBtnVisible
+      // (toggle admin dédié). Défaut visible (true) si le champ est absent.
+      if (_RID === _PD_RID) {
+        _pdHomeBtnVisible = data.info.pdHomeBtnVisible !== false;
+        _pdApplyHomeBtnVisibility();
+      }
+
       // Barre de note / annonce
       _adminInfo = data.info;
       updateNoteBar();
@@ -7714,6 +7721,24 @@ const _PD_COLOR_KEY = _RID + '_visitor_color';
 // neutre, corrigée dès que les données admin (cache ou Firebase) arrivent.
 let _pdFabActive = false;
 let _pdFabInitialized = false;
+// Visibilité du bouton Accueil — piloté par le toggle admin exclusif à pagedemo
+// (menu/info/pdHomeBtnVisible), lu dans applyAdminData(). Défaut à `true` :
+// avant toute donnée admin (cache ou Firebase), reproduit le comportement
+// historique (bouton toujours visible) — jamais un flash caché->visible.
+let _pdHomeBtnVisible = true;
+let _pdHomeBtnReady   = false;
+function _pdApplyHomeBtnVisibility() {
+  if (!_pdHomeBtnReady) return;
+  const btn = document.getElementById('pd-home-btn');
+  if (!btn) return;
+  if (_pdHomeBtnVisible) {
+    btn.style.display = 'flex';
+    requestAnimationFrame(() => btn.classList.add('show'));
+  } else {
+    btn.classList.remove('show');
+    btn.style.display = 'none';
+  }
+}
 function _pdEnsureFabInit() {
   if (!_pdFabActive || _pdFabInitialized) return;
   _pdFabInitialized = true;
@@ -8118,9 +8143,9 @@ function pdInitHomeBtn() {
   let inIframe = false;
   try { inIframe = window.self !== window.top; } catch (e) { inIframe = false; }
   if (inIframe) return;
-  btn.style.display = 'flex';
+  _pdHomeBtnReady = true;
+  _pdApplyHomeBtnVisibility();
   pdRefreshTexts();
-  requestAnimationFrame(() => btn.classList.add('show'));
   // ?instant=1 : demo-page saute son splash de chargement (1400ms+2000ms) pour un retour immédiat
   btn.addEventListener('click', () => { location.href = 'https://genext-qr.com/?instant=1#themes'; });
 }
