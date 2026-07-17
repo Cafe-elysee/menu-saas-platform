@@ -5358,7 +5358,12 @@
     }
     .card-qty-ctrl.has-qty .card-qty-num { display:block; }
     /* ── Light mode : qty-ctrl frosted glass + couleur du thème ── */
-    html.light .card-qty-ctrl { background: rgba(255,255,255,0.28); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-color: rgba(255,255,255,0.55); box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); }
+    /* 🔴 Round 14 (light mode) : backdrop-filter RETIRÉ ICI — même coût de recalcul GPU en
+       temps réel que le round 13 (genext) et le fix #nav (commit 7347869), mais celui-ci était
+       universel à TOUS les thèmes/styles (Liste et Élégant) car .card-qty-ctrl n'est pas scopé
+       par thème — explique le "seulement en light mode, tous les thèmes" signalé par Malek.
+       Remplacé par un fond opaque (plus de flou à recalculer derrière chaque carte). */
+    html.light .card-qty-ctrl { background: rgba(245,242,237,0.94); border-color: rgba(255,255,255,0.55); box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); }
     html.light .card-qty-ctrl .card-qty-num { color: var(--cream); }
     html.light .card-qty-ctrl .card-qty-minus { color: var(--gold); }
     html.light .card-qty-ctrl .card-add-btn { background: var(--gold); color: #fff; }
@@ -5601,7 +5606,9 @@
     }
     #hist-fab.show { opacity:1; transform:scale(1) translateZ(0); }
     html[dir="rtl"] #hist-fab { right:auto; left:14px; }
-    html.light #hist-fab { background: rgba(255,255,255,0.28); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: var(--gold); color: var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); }
+    /* 🔴 Round 14 (light mode) : backdrop-filter RETIRÉ ICI — même famille de coût que
+       .card-qty-ctrl ci-dessus, FAB position:fixed toujours visible pendant le scroll. */
+    html.light #hist-fab { background: rgba(245,242,237,0.94); border-color: var(--gold); color: var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); }
     #hist-modal {
       position:fixed; inset:0; z-index:402;
       background:rgba(0,0,0,0.72); backdrop-filter:blur(8px);
