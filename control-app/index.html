@@ -2432,8 +2432,17 @@ function _buildRidTs(name, extraLetters) {
   const ts = p(d.getUTCDate()) + p(d.getUTCMonth() + 1) + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + String(d.getUTCFullYear()).slice(2);
   return letters + ts;
 }
-function _buildPwdDefault(name) {
-  return _nameInitials(name, 2) + new Date().getFullYear();
+// 🔴 Sécurité (2026-07-17) : l'ancien mot de passe était PRÉVISIBLE (initiales + année,
+// ex. "Café Mozarre" → "cm2026") — calculable par quiconque connaît le nom public du
+// restaurant. Remplacé par un mot de passe aléatoire (Web Crypto), jamais devinable —
+// même correctif que côté demo-page (notify-commande.js, buildPwdDefault).
+function _buildPwdDefault() {
+  const ALPHABET = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'; // sans 0/O/1/l/i ambigus
+  const bytes = new Uint8Array(10);
+  (window.crypto || window.msCrypto).getRandomValues(bytes);
+  let pwd = '';
+  for (let i = 0; i < 10; i++) pwd += ALPHABET[bytes[i] % ALPHABET.length];
+  return pwd;
 }
 
 // ════════════════════════════════════════════════════
@@ -3092,9 +3101,15 @@ function _refreshPricingSettingsUI() {
 // ── Sauvegarder un prix de plan global ───────────────────────────────────────
 function _saveGlobalPlanPrice(key, rawVal) {
   const price = Math.max(0, parseInt(rawVal, 10) || 0);
+  const oldPrice = _GLOBAL_PLAN_PRICES[key];
   _GLOBAL_PLAN_PRICES[key] = price;
-  if (_saasDb) _saasDb.ref('demoPage/pricing/prices/' + key).set(price).catch(function() { showToast('⚠ Erreur synchronisation Firebase'); });
-  showToast('💾 Prix ' + key + ' : ' + price + ' €');
+  if (!_saasDb) { showToast('💾 Prix ' + key + ' : ' + price + ' €'); return; }
+  _saasDb.ref('demoPage/pricing/prices/' + key).set(price).then(function() {
+    showToast('💾 Prix ' + key + ' : ' + price + ' €');
+  }).catch(function() {
+    _GLOBAL_PLAN_PRICES[key] = oldPrice; // rollback — évite un prix affiché désynchronisé de Firebase
+    showToast('⚠ Erreur synchronisation Firebase');
+  });
 }
 
 // ── Debounce pour oninput des champs tarification ─────────────────────────────
@@ -4002,6 +4017,12 @@ function _markPaid(key) {
 
       _controlWrite('/commandes/' + key, 'update', update)
         .then(function() {
+          // 🔴 Fix audit 2026-07-17 (même défaut déjà corrigé sur _saveComboPrice le
+          // 2026-07-19) : le toast de succès s'affichait inconditionnellement plus bas,
+          // AVANT même que cette écriture n'aboutisse — un échec (hors-ligne) laissait
+          // voir "✅ Paiement enregistré" puis, seulement après, un toast d'erreur
+          // contradictoire. Déplacé ici, dans le vrai chemin de succès.
+          showToast('✅ Paiement enregistré');
           _controlWrite('/commandes/' + key + '/paiements', 'push', payEntry).catch(function() {
             showToast('⚠ Paiement enregistré mais absent de l\'historique — vérifiez manuellement');
           });
@@ -4042,7 +4063,6 @@ function _markPaid(key) {
           _rerenderCommandeCard(key);
           showToast('⚠ Erreur de synchronisation — réessayez.');
         });
-      showToast('✅ Paiement enregistré');
     },
     false
   );
@@ -4314,7 +4334,7 @@ async function restoreClient(slug, d) {
       _showCtrlConfirm('Restauration impossible', 'Un restaurant actif utilise déjà l\'ID <code>'+escapeHtml(rid)+'</code>. Supprimez-le ou changez son ID avant de restaurer cet ex-client.', 'OK', null, false);
       return;
     }
-    var pwd = _buildPwdDefault(d.name||slug);
+    var pwd = _buildPwdDefault();
     var hash = await ncHashPwd(pwd);
 
     if (d.snapshot) {
@@ -4551,7 +4571,9 @@ function _doCtrlConfirm() {
 
 function deleteCommande(key) {
   _showCtrlConfirm('Supprimer la commande', 'Cette commande sera supprimée définitivement.', 'Supprimer', () => {
-    _controlWrite('/commandes/' + key, 'remove').catch(function() {});
+    _controlWrite('/commandes/' + key, 'remove').catch(function() {
+      showToast('⚠ Échec de la suppression — réessayez (vérifiez la connexion).');
+    });
     localStorage.removeItem('ctrl_cmd_done_' + key);
     localStorage.removeItem('ctrl_cmd_del_' + key);
     localStorage.removeItem('ctrl_cmd_pause_' + key);
@@ -4567,12 +4589,14 @@ function deleteCommande(key) {
 }
 
 function markCommandeRead(key) {
-  _controlWrite('/commandes/' + key + '/lu', 'set', true).catch(function() {});
+  _controlWrite('/commandes/' + key + '/lu', 'set', true).catch(function() { console.warn('markCommandeRead échoué pour', key); });
 }
 
 function setCommandeStatus(key, sel) {
   const status = sel.value;
-  _controlWrite('/commandes/' + key, 'update', { statut: status, lu: true }).catch(function() {});
+  _controlWrite('/commandes/' + key, 'update', { statut: status, lu: true }).catch(function() {
+    showToast('⚠ Échec de la mise à jour du statut — réessayez.');
+  });
   const card = document.querySelector('.commande-card[data-key="' + key + '"]');
   if (!card) return;
 
@@ -4632,7 +4656,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
       if (ex2.exists()) { showToast('Conflit ID — réessaie dans 1 s.'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = '＋ Créer ce client'; } return; }
     }
 
-    const pwd  = _buildPwdDefault(restaurantName);
+    const pwd  = _buildPwdDefault();
     const hash = await ncHashPwd(pwd);
     const ts   = Date.now();
     const cmdData = _commandesCache[commandeKey] || {};
@@ -4693,7 +4717,7 @@ function recreerClientDepuisCommande(btnEl) {
           btnEl.disabled = false; btnEl.textContent = '↩ Retour';
           return;
         }
-        const pwd  = _buildPwdDefault(restaurantName);
+        const pwd  = _buildPwdDefault();
         const hash = await ncHashPwd(pwd);
         const ts   = Date.now();
         const cmdData = _commandesCache[commandeKey] || {};
