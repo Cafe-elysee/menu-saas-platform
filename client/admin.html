@@ -1171,6 +1171,8 @@
     }
     .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--gold); }
     .form-textarea { resize:vertical; min-height:86px; line-height:1.6; }
+    .form-input[readonly], .form-textarea[readonly] { background:rgba(255,255,255,0.02); color:var(--muted); cursor:not-allowed; }
+    .lang-lock-badge { opacity:0.75; margin-left:2px; cursor:help; }
     .form-select option { background:#181612; }
 
     /* Photo preview — compact */
@@ -6385,6 +6387,20 @@ function renderProductsSection() {
   injectSVG();
 }
 
+// Injecte une transformation Cloudinary (format/qualité auto, largeur plafonnée) sur les URL
+// /image/upload/... sans transformation — les photos produits (notamment celles sourcées
+// récemment) pèsent parfois plusieurs Mo en original alors qu'affichées en vignette ~200px ici ;
+// voir la même fonction dans client/index.html (root cause du flash blanc pendant le scroll).
+function _cldOptim(url, width) {
+  if (!url) return url;
+  const marker = '/image/upload/';
+  const i = url.indexOf(marker);
+  if (i === -1) return url;
+  const after = url.slice(i + marker.length);
+  if (/^[a-z0-9_,]+\//i.test(after) && /(^|,)(w_|q_|f_)/i.test(after.split('/')[0])) return url;
+  return url.slice(0, i + marker.length) + 'f_auto,q_auto,w_' + (width || 800) + '/' + after;
+}
+
 function renderProdCard(container, item, ci) {
   const card = document.createElement('div');
   card.className = 'prod-card';
@@ -6392,7 +6408,7 @@ function renderProdCard(container, item, ci) {
 
   const imgSrc = item.photo
     ? (item.photo.startsWith('data:') || item.photo.startsWith('http')
-        ? item.photo
+        ? _cldOptim(item.photo, 200)
         : `https://images.unsplash.com/${item.photo}?w=200&h=200&fit=crop`)
     : '';
 
@@ -6695,30 +6711,45 @@ function renderProdCard(container, item, ci) {
   });
 }
 
+// Verrou traductions — scoped à un rid précis pour ne pas impacter les autres clients.
+// Ajouter d'autres rid ici si Malek demande le même verrou ailleurs.
+const _LANG_LOCKED_RIDS = ['pagedemo'];
+function _isLangLocked(lang) {
+  return lang !== 'fr' && _LANG_LOCKED_RIDS.includes(_RID);
+}
+
 function buildProdForm(item) {
   const firstLang = currentLang;
   const t = ADMIN_UI[currentLang] || ADMIN_UI.el;
 
   // Multilang fields (name + shortDesc + fullDesc) — per lang panel
-  const langFields = LANGS.map(l => `
-    <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
+  // Verrou traductions (pagedemo uniquement) : le FR reste éditable, les autres
+  // langues sont en lecture seule pour ne jamais écraser une traduction corrigée
+  // manuellement — voir _isLangLocked() / collectProdForm().
+  const langFields = LANGS.map(l => {
+    const locked = _isLangLocked(l);
+    const roAttr = locked ? ' readonly title="Verrouillé — traduction corrigée manuellement, non modifiable ici"' : '';
+    const lockBadge = locked ? ' <span class="lang-lock-badge" title="Verrouillé — traduction corrigée manuellement">🔒</span>' : '';
+    return `
+    <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}${locked?' lang-locked':''}" data-lang="${l}">
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblName">${t.lblName} (${l.toUpperCase()})</div>
+        <div class="form-lbl" data-uitxt="lblName">${t.lblName} (${l.toUpperCase()})${lockBadge}</div>
         <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName" maxlength="100"
-          value="${esc(item.name?.[l] || '')}" placeholder="${t.phName}">
+          value="${esc(item.name?.[l] || '')}" placeholder="${t.phName}"${roAttr}>
       </div>
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblShortDesc">${t.lblShortDesc} (${l.toUpperCase()})</div>
+        <div class="form-lbl" data-uitxt="lblShortDesc">${t.lblShortDesc} (${l.toUpperCase()})${lockBadge}</div>
         <input class="form-input prod-desc-input" data-field="desc" data-lang="${l}" data-uiph="phShortDesc"
-          value="${esc(item.desc?.[l] || '')}" placeholder="${t.phShortDesc}">
+          value="${esc(item.desc?.[l] || '')}" placeholder="${t.phShortDesc}"${roAttr}>
       </div>
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblFullDesc">${t.lblFullDesc} (${l.toUpperCase()})</div>
+        <div class="form-lbl" data-uitxt="lblFullDesc">${t.lblFullDesc} (${l.toUpperCase()})${lockBadge}</div>
         <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:80px" data-uiph="phFullDesc"
-          placeholder="${t.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
+          placeholder="${t.phFullDesc}"${roAttr}>${esc(item.full?.[l] || '')}</textarea>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Price parts
   const CURLST = ['—','€','$','£','CHF','DT','DA','MAD','SAR','AED','TL'];
@@ -6755,7 +6786,7 @@ function buildProdForm(item) {
   // Photo
   const photoId  = item.photo || '';
   const photoSrc = photoId
-    ? (photoId.startsWith('data:') || photoId.startsWith('http') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
+    ? (photoId.startsWith('data:') || photoId.startsWith('http') ? _cldOptim(photoId, 600) : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
     : '';
 
   return `
@@ -7017,6 +7048,7 @@ function collectProdForm(card, item) {
 
   card.querySelectorAll('[data-field][data-lang]').forEach(el => {
     const { field, lang } = el.dataset;
+    if (_isLangLocked(lang)) return; // ne jamais réécrire une langue verrouillée (traduction corrigée manuellement)
     if (field === 'allergens') {
       item.allergens[lang] = el.value.split(',').map(s => s.trim()).filter(Boolean);
     } else {

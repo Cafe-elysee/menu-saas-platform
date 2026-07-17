@@ -10372,10 +10372,28 @@ function _getBadges(item) {
   return parts.join('');
 }
 
+// Injecte une transformation Cloudinary (format auto, qualité auto, largeur plafonnée) sur les
+// URL /image/upload/... qui n'en ont pas déjà — les photos produits étaient jusqu'ici livrées en
+// poids original (jusqu'à 5-7 Mo pour certaines photos sourcées récemment), ce qui, combiné au
+// lazy-loading (loading="lazy") des <img>, provoque un flash blanc prolongé pendant le scroll sur
+// réseau mobile : la carte est bien révélée (animation OK) mais sa photo met plusieurs secondes à
+// arriver, symptôme visuellement indiscernable du bug de re-masquage déjà corrigé (round 5) — mais
+// une cause totalement différente (poids réseau, pas timing d'animation). w_800 est largement
+// suffisant pour l'affichage carte (jamais plus de quelques centaines de px de large à l'écran).
+function _cldOptim(url, width) {
+  if (!url) return url;
+  const marker = '/image/upload/';
+  const i = url.indexOf(marker);
+  if (i === -1) return url; // pas une URL Cloudinary /image/upload/ → inchangée
+  const after = url.slice(i + marker.length);
+  if (/^[a-z0-9_,]+\//i.test(after) && /(^|,)(w_|q_|f_)/i.test(after.split('/')[0])) return url; // déjà transformée
+  return url.slice(0, i + marker.length) + 'f_auto,q_auto,w_' + (width || 800) + '/' + after;
+}
+
 function _getPhotoSrc(item) {
   if (!item.photo) return '';
   return (item.photo.startsWith('data:') || item.photo.startsWith('http'))
-    ? item.photo
+    ? _cldOptim(item.photo)
     : `https://images.unsplash.com/${item.photo}?w=600&h=400&fit=crop`;
 }
 
@@ -11102,7 +11120,7 @@ function openSheet(item) {
   shImg.alt = '';
   shImg.onerror = () => { shImg.style.display = 'none'; };
   shImg.onload  = () => { shImg.style.display = ''; };
-  shImg.src = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http')) ? item.photo : `https://images.unsplash.com/${item.photo}?w=800&h=500&fit=crop`;
+  shImg.src = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http')) ? _cldOptim(item.photo) : `https://images.unsplash.com/${item.photo}?w=800&h=500&fit=crop`;
   _refreshSheetTexts();
 
   // Bouton + dans le popup (mode commande)
