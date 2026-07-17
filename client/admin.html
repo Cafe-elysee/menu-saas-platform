@@ -4281,6 +4281,24 @@ async function checkLogin() {
     showAdmin(); return;
   }
 
+  // 🔴 Accès optimiste (2026-07-18, round 4) — restaure le comportement de l'ancien
+  // système (avant la sécurisation Firebase Auth) : si un mot de passe est déjà
+  // mémorisé sur cet appareil pour ce restaurant, afficher l'admin IMMÉDIATEMENT sans
+  // attendre la confirmation réseau — la vraie session se vérifie/s'établit en arrière-
+  // plan, et ne redemande le mot de passe QUE si le serveur la rejette explicitement
+  // (mauvais mot de passe confirmé, ou compte suspendu/supprimé). Corrige le symptôme
+  // confirmé par Malek : contrairement à l'ancien système (qui faisait confiance à
+  // l'appareil et vérifiait après coup, en acceptant même de continuer sur une erreur
+  // réseau), le nouveau système attendait une confirmation AVANT de laisser passer —
+  // un simple retard/échec de cette vérification bloquait tout l'accès au lieu de
+  // laisser Malek travailler pendant que ça se confirme derrière.
+  const _optimisticPwd = _getSavedPwd();
+  if (_optimisticPwd && !firebase.auth().currentUser) {
+    showAdmin();
+    _silentReauth(_optimisticPwd); // établit/confirme la vraie session en arrière-plan, best-effort
+    return;
+  }
+
   // Session Firebase Auth déjà active (persistance native du SDK, survit aux
   // rechargements) — remplace l'ancien système sessions/{sid} + sessionStorage/localStorage.
   await new Promise(resolve => {
