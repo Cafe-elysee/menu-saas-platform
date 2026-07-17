@@ -3198,29 +3198,23 @@
       transition:box-shadow 0.32s ease, border-color 0.32s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
-      /* Sur un menu à beaucoup de produits, chaque carte (image + ombre 24px + bordure arrondie)
-         représente un coût de peinture non négligeable ; avec des dizaines de cartes simultanément
-         dans le DOM, le budget de rasterisation d'un mobile d'entrée/milieu de gamme peut être
-         dépassé pendant un scroll rapide, ce qui laisse des tuiles non peintes (zones blanches —
-         confirmé par capture vidéo réelle, 2026-07-17, indépendamment du fix setupStickyNav
-         ci-dessous). content-visibility:auto dispense le navigateur de tout travail de mise en
-         page/peinture pour les cartes suffisamment loin de l'écran (repris automatiquement à
-         l'approche du scroll, sans latence perceptible) — libère le budget de rendu pour les
-         cartes réellement visibles. contain-intrinsic-size réserve une hauteur estimée pour éviter
-         tout saut de mise en page tant qu'une carte n'a pas encore été peinte au moins une fois.
-         Sans effet sur IntersectionObserver (setupScrollObserver ci-dessous continue de fonctionner
-         normalement, la position en layout des cartes reste valide même non peintes) ni sur les
-         navigateurs qui ne supportent pas la propriété (dégradation neutre, aucune régression). */
-      content-visibility:auto;
-      contain-intrinsic-size:0 180px; /* repli — navigateurs sans support de "auto <length>" (<Chrome 108) */
-      /* "auto" (Chrome 108+, 2022) active la "taille mémorisée" : après un 1er rendu réel,
-         le navigateur retient la vraie hauteur de CETTE carte et l'utilise comme intrinsèque
-         au lieu du plafond 180px générique ci-dessus (qui va de 70px sur les thèmes compacts
-         à 190px+ sur les thèmes photo — un écart pouvant atteindre 3x selon le thème/le texte)
-         — réduit le saut de mise en page au moment où la carte sort de l'état "skipped" pendant
-         le scroll. Si cette valeur n'est pas reconnue, la déclaration ci-dessus reste active
-         (dégradation neutre, comportement identique à avant — audit 2026-07-19). */
-      contain-intrinsic-size:auto 0 auto 180px;
+      /* 🔴 content-visibility:auto (rounds 3-5) RETIRÉ ICI (round 7, 2026-07-17) — capture
+         d'écran réelle de Malek (scroll rapide) montrant de larges rectangles totalement VIDES
+         (aucun fond, aucune ombre, aucun texte) à l'emplacement de plusieurs cartes consécutives,
+         symptôme distinct du "checkerboard" gris que content-visibility:auto visait à corriger.
+         Cause : content-visibility:auto place une carte hors du viewport proche en état "skipped"
+         (aucun layout/paint), qui n'est levé qu'à l'approche du viewport — sur un scroll rapide,
+         le navigateur peut ne pas avoir eu le temps de repeindre la carte avant qu'elle soit
+         montrée à l'écran, laissant exactement ce rectangle vide (contain-intrinsic-size réserve
+         la hauteur mais pas le contenu). Ce mécanisme est TOTALEMENT INDÉPENDANT des classes
+         .pre-rv/.rv (round 5) : une carte déjà révélée (opacity:1, .rv) peut quand même être en
+         état "skipped" content-visibility et donc rendue vide — ce qui explique pourquoi ni le
+         fix round 5 (animation) ni le fix round 6 (poids des photos, voir plus bas _cldOptim)
+         n'avaient résolu ce symptôme précis. Les photos étant désormais ~60-150 Ko au lieu de
+         plusieurs Mo (round 6), le coût de peinture réel par carte a chuté d'un ordre de
+         grandeur — le risque de dépassement du budget de rasterisation qui justifiait
+         content-visibility:auto est donc lui aussi largement résorbé, sans les vides visibles
+         que cette propriété provoque en contrepartie. */
     }
     /* Animation d'entrée pour les cartes déjà dans le viewport au chargement */
     @keyframes cardIn {
