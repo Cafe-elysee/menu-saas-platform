@@ -943,6 +943,10 @@
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.07) 40%,rgba(200,164,78,0.13) 50%,rgba(200,164,78,0.07) 60%,transparent 100%);
       animation:gnBarFlow 7s ease-in-out infinite;
     }
+    /* Mis en pause pendant un scroll actif — voir setupStickyNav() (JS) : une animation continue
+       sur la barre sticky entre en concurrence avec la rasterisation du contenu qui défile
+       dessous, contributeur probable au checkerboarding observé pendant le scroll (2026-07-17). */
+    html[data-menu-theme="genext"] body.is-scrolling #nav::before { animation-play-state:paused; }
     html[data-menu-theme="genext"].light #nav::before {
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.04) 40%,rgba(200,164,78,0.08) 50%,rgba(200,164,78,0.04) 60%,transparent 100%);
     }
@@ -3007,13 +3011,13 @@
     #nav {
       position:sticky; top:0; z-index:100;
       background:var(--bg-nav);
-      /* --bg-nav est déjà quasi-opaque (alpha 0.88-0.97 selon thème) : le flou d'origine
-         (24px + saturate 180%) coûtait un échantillonnage GPU complet à chaque frame de scroll
-         pour un gain visuel marginal (peu de contenu transparaît réellement à cette opacité).
-         Réduit à un flou léger — coût de composition très inférieur, rendu "verre dépoli"
-         quasi identique. Contributeur probable au rendu blanc/non peint pendant le scroll actif
-         (captures Malek, 2026-07-17), en complément du fix de setupStickyNav() ci-dessous. */
-      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      /* --bg-nav est déjà quasi-opaque (alpha 0.88-0.97 selon thème) : même réduit à blur(8px),
+         le flou continuait de coûter un échantillonnage GPU de tout le contenu défilant
+         derrière un élément sticky visible en permanence — checkerboarding (tuiles grises non
+         rasterisées) toujours confirmé par capture vidéo réelle après cette 1ʳᵉ réduction
+         (2026-07-17). Retiré entièrement : le gain visuel du flou était de toute façon marginal
+         à cette opacité, alors que le coût de composition, lui, était payé à chaque frame de
+         scroll sur la totalité du contenu sous la barre. */
       border-bottom:1px solid var(--border);
       border-top:1px solid rgba(255,255,255,0.06);
       transition:background 0.4s ease;
@@ -3147,7 +3151,16 @@
       margin-bottom:14px;
     }
     html[dir="rtl"] .cat-div { background:linear-gradient(270deg,var(--gold),rgba(200,164,78,0.1),transparent); }
-    .cards { display:flex; flex-direction:column; gap:11px; perspective:1200px; }
+    .cards { display:flex; flex-direction:column; gap:11px; }
+    /* perspective était appliqué en permanence à TOUTE la liste de cartes, sur tous les
+       appareils, alors qu'il ne sert qu'au léger effet 3D au survol (.card:hover ci-dessous,
+       lui-même déjà limité à @media(hover:hover)) — un contexte de rendu 3D actif en continu
+       sur un conteneur pouvant contenir des dizaines de cartes est un coût de composition inutile
+       sur mobile (aucun survol possible), contributeur probable au retard de rasterisation pendant
+       le scroll (zones grises "checkerboard" confirmées par capture vidéo réelle, 2026-07-17).
+       Restreint aux appareils qui peuvent réellement survoler (desktop/souris) — comportement
+       visuel strictement identique là où il s'applique, supprimé là où il ne sert jamais. */
+    @media(hover:hover) { .cards { perspective:1200px; } }
 
     /* ================================================
        MENU CARDS
@@ -11182,8 +11195,23 @@ function setupStickyNav() {
     }
   }
 
+  // Le thème GeNext anime en continu un dégradé (#nav::before, gnBarFlow) sur la barre sticky —
+  // décoratif, mais tourne à l'infini même quand la barre est simplement pinnée en haut pendant
+  // qu'on scrolle le reste du menu, en concurrence directe avec la rasterisation des cartes qui
+  // entrent dans l'écran. Mis en pause pendant un scroll actif (reprend ~200ms après le dernier
+  // événement scroll, décalage purement décoratif donc jamais perceptible), pour libérer tout le
+  // budget de composition disponible au moment où il compte le plus. Sans effet sur les thèmes
+  // qui n'ont pas cette animation (la classe est inoffensive si rien ne la cible en CSS).
+  let _scrollStopTimer = null;
+  function _markScrolling() {
+    document.body.classList.add('is-scrolling');
+    clearTimeout(_scrollStopTimer);
+    _scrollStopTimer = setTimeout(() => document.body.classList.remove('is-scrolling'), 200);
+  }
+
   let _ticking = false;
   function onScroll() {
+    _markScrolling();
     if (_ticking) return;
     _ticking = true;
     requestAnimationFrame(() => { update(); _ticking = false; });
