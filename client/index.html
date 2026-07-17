@@ -983,11 +983,18 @@
     }
     /* ── Pas de photo perso sur le hero : le bokeh suffit ── */
     html[data-menu-theme="genext"] #hero-bg-img { display:none !important; }
-    /* ── Cartes produit : léger flou seulement, pas de saturation ── */
-    html[data-menu-theme="genext"] .card {
-      backdrop-filter:blur(4px);
-      -webkit-backdrop-filter:blur(4px);
-    }
+    /* 🔴 Round 13 (2026-07-17) : backdrop-filter:blur() RETIRÉ ICI — vidéo réelle de Malek
+       (après rounds 8-12) montrant des boutons "+" (ajout panier) flottants visibles SEULS,
+       sans le fond/l'ombre/la photo de leur carte parente autour — signature d'un vrai
+       "checkerboarding" compositeur (tuile non rasterisée à temps), le même phénomène
+       diagnostiqué round 3 mais jamais résolu à sa vraie source depuis : backdrop-filter
+       (contrairement à box-shadow, déjà réduit round 10) force le navigateur à RECALCULER en
+       temps réel le flou de tout ce qu'il y a DERRIÈRE chaque carte, y compris pendant le
+       scroll — un des coûts de composition les plus élevés qui existent sur GPU mobile,
+       largement supérieur à un box-shadow statique (qui peut être mis en cache une fois
+       rasterisé). Appliqué à CHAQUE carte du thème genext/Prestige (celui que Malek teste,
+       "Élégant") sans exception. Effet visuel : léger flou décoratif derrière la carte, perdu
+       ici au profit d'un scroll réellement fluide — même compromis déjà accepté round 9/10. */
     /* ── Photo 88×88 : bordure gold subtile ── */
     html[data-menu-theme="genext"] .c-img-w {
       border:1px solid rgba(200,164,78,0.25);
@@ -3215,6 +3222,13 @@
       transition:box-shadow 0.32s ease, border-color 0.32s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
+      /* 🔴 Round 13 suite : contain:layout paint — aucun impact visuel, indique au navigateur
+         que le contenu d'une carte n'affecte JAMAIS rien à l'extérieur de ses propres limites
+         (et inversement), lui permettant d'isoler et d'optimiser la rasterisation par carte
+         indépendamment des autres — sans le risque de "skip" vide de content-visibility:auto
+         déjà écarté round 7. Bonne pratique standard pour des listes d'éléments répétés
+         visuellement autonomes comme des cartes produit. */
+      contain:layout paint;
       /* 🔴 content-visibility:auto (rounds 3-5) RETIRÉ ICI (round 7, 2026-07-17) — capture
          d'écran réelle de Malek (scroll rapide) montrant de larges rectangles totalement VIDES
          (aucun fond, aucune ombre, aucun texte) à l'emplacement de plusieurs cartes consécutives,
