@@ -4837,7 +4837,22 @@ function saveData() {
   }
   _withTimeout(_rref('menu').set(adminData), 10000)
     .then(() => _afterSaveOk((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved))
-    .catch(() => _afterSaveError('⚠️ Échec de la sauvegarde — vérifiez votre connexion et réessayez'));
+    .catch(async () => {
+      // Auto-réparation (2026-07-18) — même principe que _writeToggleField : un échec
+      // peut venir d'une connexion/jeton périmés après un changement d'onglet, pas d'un
+      // vrai problème réseau. On rafraîchit le jeton + reconnecte avant de réessayer
+      // UNE fois — l'utilisateur ne voit un échec que si ce 2e essai échoue aussi.
+      try {
+        const user = firebase.auth().currentUser;
+        if (user) await user.getIdToken(true);
+        firebase.database().goOffline();
+        firebase.database().goOnline();
+        await _withTimeout(_rref('menu').set(adminData), 10000);
+        _afterSaveOk((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
+      } catch (e2) {
+        _afterSaveError('⚠️ Échec de la sauvegarde — vérifiez votre connexion et réessayez');
+      }
+    });
 }
 
 function markUnsaved() {
