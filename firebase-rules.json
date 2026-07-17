@@ -1,6 +1,7 @@
 {
   "rules": {
     "restaurants": {
+      ".read": "auth != null && auth.token.role === 'platform'",
       "$rid": {
         "devices": {
           ".read": true,
