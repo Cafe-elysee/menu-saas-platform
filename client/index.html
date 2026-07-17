@@ -3163,6 +3163,21 @@
       transition:box-shadow 0.32s ease, border-color 0.32s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
+      /* Sur un menu à beaucoup de produits, chaque carte (image + ombre 24px + bordure arrondie)
+         représente un coût de peinture non négligeable ; avec des dizaines de cartes simultanément
+         dans le DOM, le budget de rasterisation d'un mobile d'entrée/milieu de gamme peut être
+         dépassé pendant un scroll rapide, ce qui laisse des tuiles non peintes (zones blanches —
+         confirmé par capture vidéo réelle, 2026-07-17, indépendamment du fix setupStickyNav
+         ci-dessous). content-visibility:auto dispense le navigateur de tout travail de mise en
+         page/peinture pour les cartes suffisamment loin de l'écran (repris automatiquement à
+         l'approche du scroll, sans latence perceptible) — libère le budget de rendu pour les
+         cartes réellement visibles. contain-intrinsic-size réserve une hauteur estimée pour éviter
+         tout saut de mise en page tant qu'une carte n'a pas encore été peinte au moins une fois.
+         Sans effet sur IntersectionObserver (setupScrollObserver ci-dessous continue de fonctionner
+         normalement, la position en layout des cartes reste valide même non peintes) ni sur les
+         navigateurs qui ne supportent pas la propriété (dégradation neutre, aucune régression). */
+      content-visibility:auto;
+      contain-intrinsic-size:0 180px;
     }
     /* Animation d'entrée pour les cartes déjà dans le viewport au chargement */
     @keyframes cardIn {
