@@ -3222,6 +3222,7 @@ function _cancelScheduledDowngrade(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
+    if (_mainWriteFailedGuard(r, rid)) return;
     if (r && r.ok) {
       // Efface le badge "programmé" du cache local AVANT de re-rendre — sinon la carte
       // affiche encore brièvement le badge/bouton "Annuler" pendant le court délai avant
@@ -3252,6 +3253,7 @@ function _confirmUpgradePaid(cmdKey) {
         email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
         paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
       }).then(function(r) {
+        if (_mainWriteFailedGuard(r, rid)) return;
         if (r && r.ok) {
           // Même correctif anti-flash que _cancelScheduledDowngrade : refléter le résultat
           // connu (forfait/mode déjà déterminés par le devis) avant de re-rendre, plutôt que
@@ -3276,6 +3278,7 @@ function _cancelPendingUpgradeCtrl(cmdKey) {
   if (!d) return;
   var rid = _getSlugFromCmdKey(cmdKey);
   _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
+    if (_mainWriteFailedGuard(r, rid)) return;
     if (r && r.ok) {
       _commandesCache[cmdKey] = Object.assign({}, d, { pendingUpgrade: null });
       showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce();
@@ -3631,13 +3634,48 @@ async function _callNotifyForfait(payload) {
   // Le serveur décide QUOI écrire (calculs/règles) mais l'écriture MAIN_DB elle-même se
   // fait ici, côté control-app déjà connecté à Firebase — canal fiable, indépendant de la
   // disponibilité du compte de service serveur (best-effort côté serveur en secours).
+  // 🔴 Fix audit 2026-07-19 : cette écriture était en best-effort totalement silencieux (un
+  // simple console.error) — le serveur a déjà validé/facturé le changement (result.ok=true)
+  // pendant qu'un aléa réseau ici pouvait laisser le forfait/l'abonnement RÉEL du restaurant
+  // totalement inchangé, sans que rien ne le signale (tous les appelants ne regardent que
+  // result.ok pour afficher leur toast de succès). 1 réessai automatique après 1,5s, puis
+  // alerte explicite si l'échec persiste — jamais plus de silence sur un chemin qui
+  // déclenche une vraie facturation (même discipline que _markPaid/_toggleSuspend).
   if (result && result.ok && result.mainWrite && payload.rid) {
+    const _doMainWrite = () => Promise.all([
+      result.mainWrite.features     ? _saasDb.ref('restaurants/' + payload.rid + '/config/features').update(result.mainWrite.features) : null,
+      result.mainWrite.subscription ? _saasDb.ref('restaurants/' + payload.rid + '/config/subscription').update(result.mainWrite.subscription) : null
+    ]);
     try {
-      if (result.mainWrite.features)     await _saasDb.ref('restaurants/' + payload.rid + '/config/features').update(result.mainWrite.features);
-      if (result.mainWrite.subscription) await _saasDb.ref('restaurants/' + payload.rid + '/config/subscription').update(result.mainWrite.subscription);
-    } catch(e) { console.error('_callNotifyForfait mainWrite error', e); }
+      await _doMainWrite();
+    } catch(e) {
+      console.error('_callNotifyForfait mainWrite error, réessai dans 1.5s', e);
+      await new Promise(r => setTimeout(r, 1500));
+      try {
+        await _doMainWrite();
+      } catch(e2) {
+        console.error('_callNotifyForfait mainWrite error (2e essai, abandon)', e2);
+        // Ne PAS afficher le toast ici : l'appelant afficherait juste après son propre toast
+        // de succès, qui écraserait immédiatement celui-ci (même showToast(), même timer) —
+        // le drapeau est exposé pour que CHAQUE appelant l'affiche à la place de son toast
+        // de succès habituel, jamais les deux en même temps.
+        result.mainWriteFailed = true;
+      }
+    }
   }
   return result;
+}
+
+// Garde partagée par tous les appelants de _callNotifyForfait (audit 2026-07-19) : si le
+// serveur a validé/facturé le changement mais que l'écriture MAIN_DB réelle a échoué même
+// après réessai (result.mainWriteFailed), alerter explicitement au lieu d'afficher un faux
+// succès, et forcer une resynchro (_pollCommandesOnce) plutôt que de mettre à jour le cache
+// local de façon optimiste sur un état qui ne reflète pas la réalité du restaurant.
+function _mainWriteFailedGuard(r, rid) {
+  if (!r || !r.mainWriteFailed) return false;
+  showToast('⚠️ Confirmé côté serveur mais NON appliqué au restaurant (' + (rid || '') + ') — réessayez ou vérifiez manuellement');
+  _pollCommandesOnce();
+  return true;
 }
 
 const _comboChangeInFlight = {};
@@ -3692,6 +3730,7 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
     showToast(result && result.case === 'window-already-used' ? '❌ Déjà changé une fois cette fenêtre' : '❌ Erreur');
     return;
   }
+  if (_mainWriteFailedGuard(result, rid)) return;
 
   // Upgrade en cours de cycle payé : devis reçu, RIEN n'a encore été écrit — on demande
   // confirmation à Malek avec le montant exact avant de créer le paiement en attente.
@@ -3703,6 +3742,7 @@ async function _setActiveCombo(cmdKey, forfait, mode) {
       'Confirmer',
       function() {
         _callNotifyForfait(Object.assign({}, payload, { confirm: true })).then(function(r2) {
+          if (_mainWriteFailedGuard(r2, rid)) return;
           if (r2 && r2.ok) { showToast('⏳ Upgrade en attente de paiement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
           else { showToast('❌ Erreur'); }
         }).catch(function() { showToast('❌ Erreur réseau'); });
@@ -3775,6 +3815,7 @@ async function _forceApplyDowngrade(cmdKey) {
       email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
       paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
     });
+    if (_mainWriteFailedGuard(result, rid)) return;
     if (result && result.ok) {
       // emailStatus tracé explicitement côté serveur (2026-07-15, signalé par Malek : le
       // changement s'appliquait mais l'email de confirmation manquait sans aucune trace).
@@ -3812,14 +3853,23 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   var isActiveCombo = (comboKey === activeComboKey);
   _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
   const slug = _getSlugFromCmdKey(cmdKey);
-  if (isActiveCombo) {
-    _controlWrite('/commandes/' + cmdKey, 'update', { price: price, prices: prices }).catch(function() {});
-    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices });
-  } else {
-    _controlWrite('/commandes/' + cmdKey + '/prices', 'update', { [comboKey]: price }).catch(function() {});
-    if (slug) _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price });
-  }
-  showToast('&#128190; Prix enregistré : ' + price + ' €');
+  // 🔴 Fix audit 2026-07-19 : ces 2 écritures étaient soit en catch vide (_controlWrite),
+  // soit totalement sans filet (_saasDb.ref) — le toast "Prix enregistré" s'affichait
+  // inconditionnellement, avant même que les écritures n'aboutissent. Désormais attendues
+  // ensemble, toast de succès seulement après confirmation réelle, rollback du cache local
+  // + alerte explicite si l'une des deux échoue.
+  const writes = isActiveCombo
+    ? [ _controlWrite('/commandes/' + cmdKey, 'update', { price: price, prices: prices }),
+        slug ? _saasDb.ref('restaurants/' + slug + '/config/subscription').update({ price: price, prices: prices }) : Promise.resolve() ]
+    : [ _controlWrite('/commandes/' + cmdKey + '/prices', 'update', { [comboKey]: price }),
+        slug ? _saasDb.ref('restaurants/' + slug + '/config/subscription/prices').update({ [comboKey]: price }) : Promise.resolve() ];
+  Promise.all(writes).then(function() {
+    showToast('💾 Prix enregistré : ' + price + ' €');
+  }).catch(function(e) {
+    console.error('_saveComboPrice error', e);
+    _commandesCache[cmdKey] = Object.assign({}, d); // rollback — l'écriture réelle a échoué
+    showToast('❌ Erreur : prix non enregistré, réessayez');
+  });
 }
 
 // ── Date d'anniversaire ─────────────────────────────────────────────────────

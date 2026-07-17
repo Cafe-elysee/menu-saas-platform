@@ -1975,6 +1975,14 @@ function _doConfirm() {
   _hideConfirm();
   if (cb) cb();
 }
+// Fermeture clavier (Échap) — audit 2026-07-19 : cette modale de confirmation était la seule
+// du projet sans ce raccourci (déjà présent sur control-app/guide.html). Un utilisateur clavier/
+// lecteur d'écran n'avait aucun moyen de la fermer autrement qu'en tabulant jusqu'au bouton.
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  var modal = document.getElementById('confirm-modal');
+  if (modal && modal.style.display !== 'none') _hideConfirm();
+});
 
 /* ── CHANGEMENT DE RESTAURANT ── */
 function changeRestaurant() {

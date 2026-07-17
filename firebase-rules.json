@@ -73,7 +73,7 @@
 
         "menu":      { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
         "profile":   { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "sessions":  { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "sessions":  { ".read": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')", ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
         "firstOpen": { ".read": true, ".write": true, ".validate": "newData.isBoolean()" }
       }
     },
