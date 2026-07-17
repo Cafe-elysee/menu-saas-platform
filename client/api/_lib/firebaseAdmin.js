@@ -28,8 +28,24 @@ function getServiceAccount() {
   try { return JSON.parse(raw); } catch (e) { return null; }
 }
 
+// 🔴 Jeton d'accès Google mis en cache (2026-07-18) — cette fonction est appelée à
+// CHAQUE connexion admin (manuelle ou reconnexion silencieuse automatique) ; sans
+// cache, chaque appel refaisait un aller-retour réseau complet vers Google (en plus
+// des lectures Firebase qui suivent), ajoutant de la latence et un point d'échec
+// supplémentaire à chaque tentative — un facteur plausible d'échecs intermittents,
+// d'autant plus visible depuis que la reconnexion automatique augmente la fréquence
+// des appels à cet endpoint. Le jeton reste valide 1h (exp: now+3600) ; réutilisé tant
+// qu'il reste au moins 2 minutes de marge, sinon renouvelé normalement. Le cache vit
+// au niveau du module — profite des invocations "chaudes" (conteneur Vercel réutilisé),
+// sans effet néfaste si le conteneur est froid (retombe simplement sur un appel normal).
+let _accessTokenCache = null;
+let _accessTokenExpiresAt = 0;
 function getAccessToken(sa) {
-  const now = Math.floor(Date.now() / 1000);
+  const nowMs = Date.now();
+  if (_accessTokenCache && _accessTokenExpiresAt - nowMs > 120000) {
+    return Promise.resolve(_accessTokenCache);
+  }
+  const now = Math.floor(nowMs / 1000);
   const jwt = signJwt(sa, {
     iss: sa.client_email, sub: sa.client_email,
     aud: 'https://oauth2.googleapis.com/token',
@@ -44,9 +60,18 @@ function getAccessToken(sa) {
     };
     const req = https.request(opts, res => {
       let data = ''; res.on('data', d => data += d);
-      res.on('end', () => { try { resolve(JSON.parse(data).access_token); } catch (e) { reject(e); } });
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (!parsed.access_token) { reject(new Error('No access_token in response: ' + data.slice(0, 200))); return; }
+          _accessTokenCache = parsed.access_token;
+          _accessTokenExpiresAt = nowMs + ((parsed.expires_in || 3600) * 1000);
+          resolve(parsed.access_token);
+        } catch (e) { reject(e); }
+      });
     });
     req.on('error', reject);
+    req.setTimeout(8000, () => req.destroy(new Error('Google OAuth request timed out')));
     req.write(body);
     req.end();
   });
@@ -81,6 +106,7 @@ function fbRequest(db, path, method, token, body) {
       res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { resolve(null); } });
     });
     req.on('error', reject);
+    req.setTimeout(8000, () => req.destroy(new Error('Firebase REST request timed out')));
     if (bodyStr) req.write(bodyStr);
     req.end();
   });
