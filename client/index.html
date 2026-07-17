@@ -7058,8 +7058,22 @@ function loadAdminData() {
   });
 
   // Puis mettre à jour depuis Firebase en arrière-plan
+  // Garde anti-reconstruction inutile : Firebase RTDB refait redescendre la valeur COMPLÈTE de
+  // 'menu' à chaque reconnexion (coupure réseau/changement d'antenne 5G-LTE, très fréquent en
+  // mobilité), même si RIEN n'a réellement changé côté admin. Sans cette garde, renderMenu()
+  // (appelé plus bas) vide entièrement #menu-secs (innerHTML='') puis reconstruit toutes les
+  // cartes, et setupScrollObserver() les repasse TOUTES en opacity:0 ('.pre-rv') avant de les
+  // ré-afficher — si ce cycle se déclenche pendant que le visiteur scrolle activement, tout
+  // l'écran vide brutalement puis se repeuple, un symptôme indiscernable visuellement d'un
+  // problème de performance de rendu (confirmé : 3 correctifs de performance successifs sans
+  // effet, cause réelle ici — session #113, 2026-07-17). Comparaison par JSON stringifié : coût
+  // négligeable (déclenché uniquement sur événement Firebase, jamais dans le hot-path du scroll).
+  let _lastMenuDataRaw = null;
   _rref('menu').on('value', snap => {
     const data = snap.val();
+    const _rawJson = JSON.stringify(data || null);
+    if (_rawJson === _lastMenuDataRaw) return; // valeur strictement identique → rien à refaire
+    _lastMenuDataRaw = _rawJson;
     if (!data) {
       try { localStorage.removeItem(_PFX+'admin_data_v1'); } catch(_) {}
       applyAdminData({});
