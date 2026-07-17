@@ -4923,11 +4923,11 @@ function renderNoteSection() {
   // Bouton Afficher dans le menu — sauvegarde instantanée
   card.querySelector('.note-status').addEventListener('click', () => {
     if (!adminData.info) adminData.info = {};
-    const newVal = !adminData.info.showNote;
-    adminData.info.showNote = newVal;
-    _rref('menu/info/showNote').set(newVal);
-    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    syncVisToggles();
+    const oldVal = adminData.info.showNote;
+    const newVal = !oldVal;
+    _writeToggleField('menu/info/showNote', newVal, oldVal,
+      () => { adminData.info.showNote = newVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); syncVisToggles(); },
+      () => { adminData.info.showNote = oldVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); syncVisToggles(); });
   });
 
   // Tabs langue
@@ -5176,9 +5176,10 @@ function renderSocialLinksSection() {
 function toggleGoogleReviewFeature(checked) {
   if (!adminData) return;
   if (!adminData.info) adminData.info = {};
-  adminData.info.showGoogleReview = checked;
-  _rref('menu/info/showGoogleReview').set(checked);
-  localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+  const oldVal = adminData.info.showGoogleReview;
+  _writeToggleField('menu/info/showGoogleReview', checked, oldVal,
+    () => { adminData.info.showGoogleReview = checked; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); },
+    () => { adminData.info.showGoogleReview = oldVal; localStorage.setItem(STORE_KEY, JSON.stringify(adminData)); const el = document.getElementById('review-toggle'); if (el) el.checked = !!oldVal; });
 }
 
 /* ─── GeNext : pas de photo d'accueil — masque l'upload, simule le bokeh du thème ─── */
@@ -7574,8 +7575,10 @@ let _variantConfigCache = {};
 let _adm_colorModalTheme = null;
 
 function saveMenuColor(hex) {
-  currentMenuColor = hex;
-  _rref('menu/menuColor').set(hex);
+  const oldVal = currentMenuColor;
+  _writeToggleField('menu/menuColor', hex, oldVal,
+    () => { currentMenuColor = hex; },
+    () => { currentMenuColor = oldVal; renderThemeSelector(); });
 }
 
 function loadMenuColor() {
@@ -7625,15 +7628,16 @@ function loadMenuTheme() {
 }
 
 function saveMenuTheme(themeId) {
+  const _themeWriteErr = () => { const t = ADMIN_UI[currentLang] || ADMIN_UI.fr; showToastMsg(t.settingsErr || '❌ Erreur', true); };
   currentMenuTheme = themeId;
-  _rref('menu/menuTheme').set(themeId);
+  _rref('menu/menuTheme').set(themeId).catch(_themeWriteErr);
   // Déduire le style automatiquement selon la famille du thème
   const isLayout = LAYOUTS_DATA.some(l => l.variants.some(v => v.id === themeId));
   const _CARTE_IDS_SET = new Set(['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc','genext']);
   const deduced  = (isLayout || _CARTE_IDS_SET.has(themeId)) ? 'simple' : 'paper';
   if (deduced !== currentMenuMode) {
     currentMenuMode = deduced;
-    _rref('menu/menuStyle').set(deduced);
+    _rref('menu/menuStyle').set(deduced).catch(_themeWriteErr);
     syncStyleAdminUI(deduced);
   }
   renderThemeSelector();
@@ -7679,9 +7683,10 @@ function renderEventsChips() {
 }
 
 function saveActiveEvent(eventId) {
-  currentActiveEvent = eventId;
-  _rref('menu/activeEvent').set(eventId || null);
-  renderEventsChips();
+  const oldVal = currentActiveEvent;
+  _writeToggleField('menu/activeEvent', eventId || null, oldVal,
+    () => { currentActiveEvent = eventId; renderEventsChips(); },
+    () => { currentActiveEvent = oldVal; renderEventsChips(); });
 }
 
 function loadActiveEvent() {
@@ -9126,8 +9131,12 @@ function toggleOrderCard(cardId) {
 }
 
 function setOrderStatus(orderId, status) {
-  _rref('orders/' + orderId + '/status').set(status);
-  _logAction('order_status', { orderId, status });
+  _rref('orders/' + orderId + '/status').set(status).then(() => {
+    _logAction('order_status', { orderId, status });
+  }).catch(() => {
+    const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+    showToastMsg(t.settingsErr || '❌ Erreur', true);
+  });
 }
 
 function _logAction(type, extra) {
@@ -9156,7 +9165,10 @@ function loadTableSystem() {
     const input = document.getElementById('tables-count-input');
     const n = parseInt(input?.value) || 0;
     if (n < 1 || n > 99) return;
-    _rref('config/tableCount').set(n);
+    _rref('config/tableCount').set(n).catch(() => {
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    });
   });
 }
 
