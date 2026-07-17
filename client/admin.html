@@ -10241,31 +10241,33 @@ async function _admRecoverConnection() {
 // (2) Changement de visibilité de l'onglet — toujours reconnecter dès que l'onglet
 // redevient visible, quelle que soit la durée passée caché (opération peu coûteuse et
 // silencieuse ; ne pas essayer de deviner un seuil "sûr", source des bugs précédents).
+// Filet de sécurité supplémentaire : si le panneau admin est visiblement caché
+// (display:none) alors que l'utilisateur est censé être connecté, le remontrer
+// explicitement — ne doit plus jamais arriver depuis le retrait du hide-on-pagehide
+// ci-dessus, mais coûte rien et garantit qu'aucune autre cause future ne puisse
+// laisser l'admin bloqué invisible après un retour sur la page.
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
   _admRecoverConnection();
+  const wrap = document.getElementById('adm-wrap');
+  const loginScreen = document.getElementById('login-screen');
+  const loggedIn = loginScreen && loginScreen.classList.contains('hidden');
+  if (wrap && wrap.style.display === 'none' && loggedIn) wrap.style.display = '';
 });
 
-/* ── (1) bfcache : évite le flash de l'onglet précédent au retour navigateur ── */
-window.addEventListener('pagehide', () => {
-  const wrap = document.getElementById('adm-wrap');
-  if (wrap) wrap.style.display = 'none';
-});
-window.addEventListener('pageshow', event => {
-  if (!event.persisted) return;
-  _admRecoverConnection();
-  // Restauration bfcache — remettre l'onglet par défaut sans flash
-  _adminCurrentTab = 'display';
-  ['display','orders','settings'].forEach(t => {
-    const p = document.getElementById('admin-panel-' + t);
-    if (p) p.style.display = t === 'display' ? '' : 'none';
-    document.getElementById('admin-tab-' + t)?.classList.toggle('on', t === 'display');
-  });
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  const wrap = document.getElementById('adm-wrap');
-  if (wrap) wrap.style.display = '';
-  _updateScFabVisibility?.();
-});
+/* 🔴🔴 RETIRÉ (2026-07-18, round 6) — cause racine réelle trouvée avec Malek.
+   L'astuce "cacher #adm-wrap au pagehide, ne le remontrer qu'au pageshow persisted"
+   (pur cosmétique, évitait un flash de l'ancien contenu au retour arrière navigateur)
+   rendait TOUT le panneau admin durablement invisible/inutilisable sur mobile : sur
+   Android Chrome, `pagehide` peut se déclencher sur un simple changement d'onglet/mise
+   en arrière-plan (pas seulement une vraie navigation), alors que `pageshow` ne revient
+   PAS forcément avec `persisted:true` dans ce cas précis (parfois il ne se déclenche
+   même pas du tout) — `#adm-wrap` restait alors bloqué à `display:none` indéfiniment,
+   ce qui explique exactement le symptôme "plus aucun bouton ne répond après un retour
+   sur la page". Un simple polish visuel ne vaut pas le risque de bloquer tout l'admin —
+   supprimé sans remplacement. La reconnexion réseau reste gérée séparément par le
+   listener `visibilitychange` (_admRecoverConnection) plus bas, qui lui n'a jamais
+   touché à la visibilité du panneau. ── */
 
 
 /* ── SWIPE ADMIN (mobile uniquement) ── */
