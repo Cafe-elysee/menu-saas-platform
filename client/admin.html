@@ -4876,15 +4876,33 @@ function syncVisToggles() {
 // sans ça, un toggle admin peut passer visuellement "off" alors que Firebase n'a jamais reçu
 // l'écriture (wifi connecté sans accès réel, par ex.) : le menu public continue d'afficher ce
 // que l'admin croit avoir masqué, silencieusement.
-function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) {
+// 🔴 Auto-réparation (2026-07-17) : un changement d'onglet/mise en arrière-plan prolongé peut
+// laisser la connexion Firebase ET le jeton d'authentification périmés — un simple goOffline/
+// goOnline ne suffit pas toujours à réparer une écriture qui a déjà échoué une première fois.
+// Plutôt que de deviner à l'avance QUAND reconnecter (pari toujours imparfait), toute écriture
+// qui échoue est désormais réessayée UNE fois, après un rafraîchissement forcé du jeton
+// d'authentification + une reconnexion complète — l'utilisateur ne voit une erreur que si
+// cette 2e tentative échoue aussi (vrai problème réseau, pas une simple connexion périmée).
+async function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) {
   applyLocal();
   syncVisToggles();
-  _rref(path).set(newVal).catch(() => {
-    revertLocal();
-    syncVisToggles();
-    const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-    showToastMsg(t.settingsErr || '❌ Erreur', true);
-  });
+  try {
+    await _rref(path).set(newVal);
+  } catch (e) {
+    try {
+      const user = firebase.auth().currentUser;
+      if (user) await user.getIdToken(true);
+      firebase.database().goOffline();
+      firebase.database().goOnline();
+      await _rref(path).set(newVal);
+      return; // 2e tentative réussie — aucune erreur affichée, l'utilisateur ne voit rien
+    } catch (e2) {
+      revertLocal();
+      syncVisToggles();
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
+  }
 }
 
 /* ── Listeners des boutons de visibilité (sauvegarde instantanée) ── */
@@ -10108,19 +10126,25 @@ document.addEventListener('DOMContentLoaded', () => {
    forcer Firebase à couper puis rouvrir sa connexion (goOffline/goOnline, méthode
    officielle recommandée) — jamais de reload, jamais de risque de redemander le mot
    de passe, et aucune perte de travail en cours puisque rien n'est jamais rechargé. ── */
-function _admRecoverConnection() {
+// 🔴 Renforcé (2026-07-17, round 2) : un simple goOffline/goOnline sur la connexion
+// Firebase ne suffisait pas toujours — le JETON d'authentification lui-même peut être
+// périmé après une longue mise en arrière-plan (les timers JS sont gelés pendant ce
+// temps, donc le rafraîchissement automatique du SDK n'a pas pu se déclencher à temps).
+// On force maintenant EXPLICITEMENT un jeton frais avant de rouvrir la connexion —
+// c'est ce qui manquait pour réparer vraiment les écritures, pas seulement le socket.
+async function _admRecoverConnection() {
+  try {
+    const user = firebase.auth().currentUser;
+    if (user) await user.getIdToken(true);
+  } catch (e) {}
   try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
 }
 
-// (2) Changement de visibilité de l'onglet — seuil de 20s pour ne jamais reconnecter
-// sur un simple aller-retour rapide entre onglets (connexion encore vivante à coup sûr).
-let _admHiddenAt = null;
+// (2) Changement de visibilité de l'onglet — toujours reconnecter dès que l'onglet
+// redevient visible, quelle que soit la durée passée caché (opération peu coûteuse et
+// silencieuse ; ne pas essayer de deviner un seuil "sûr", source des bugs précédents).
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { _admHiddenAt = Date.now(); return; }
-  if (_admHiddenAt === null) return;
-  const hiddenMs = Date.now() - _admHiddenAt;
-  _admHiddenAt = null;
-  if (hiddenMs < 20000) return;
+  if (document.hidden) return;
   _admRecoverConnection();
 });
 
