@@ -10076,6 +10076,17 @@ window.addEventListener('pagehide', () => {
 });
 window.addEventListener('pageshow', event => {
   if (!event.persisted) return;
+  // 🔴 Fix : après une restauration bfcache (retour navigateur/changement d'onglet puis
+  // retour), la connexion Firebase (websocket) reste figée/périmée — toute écriture
+  // échoue alors silencieusement avec une erreur générique tant qu'un rechargement
+  // manuel (F5) n'a pas réparé la connexion (confirmé en conditions réelles, 2026-07-17).
+  // Si aucune modification non enregistrée n'est en cours (cas normal), un rechargement
+  // complet reproduit exactement ce qui fonctionne déjà manuellement — sans aucun risque
+  // de perte puisqu'il n'y a rien en attente. Si une édition est en cours, ne JAMAIS
+  // recharger (perdrait le travail non enregistré) — on se contente de forcer une
+  // reconnexion Firebase, qui suffit dans la majorité des cas.
+  if (!unsaved) { location.reload(); return; }
+  try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
   // Restauration bfcache — remettre l'onglet par défaut sans flash
   _adminCurrentTab = 'display';
   ['display','orders','settings'].forEach(t => {
