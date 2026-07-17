@@ -947,6 +947,28 @@
        sur la barre sticky entre en concurrence avec la rasterisation du contenu qui défile
        dessous, contributeur probable au checkerboarding observé pendant le scroll (2026-07-17). */
     html[data-menu-theme="genext"] body.is-scrolling #nav::before { animation-play-state:paused; }
+    /* Généralisé (audit 2026-07-19) à TOUTES les animations gradient/pulse continues du fichier,
+       pas seulement la barre genext ci-dessus — chacune anime background-position ou box-shadow,
+       deux propriétés qui forcent une repeinture à chaque frame et qui restaient actives sur
+       TOUS les thèmes pendant un scroll actif. .c-price est présent sur CHAQUE carte produit
+       affichée à l'écran — plusieurs dizaines de gradients repeints en continu, en concurrence
+       directe avec la rasterisation des cartes qui défilent, contributeur probable du
+       "checkerboarding" déjà observé (rounds précédents) et jamais traité au-delà du thème
+       genext. Reprend automatiquement ~200ms après le dernier événement scroll (voir
+       _markScrolling() dans setupStickyNav()), décalage jamais perceptible. */
+    body.is-scrolling .c-price,
+    body.is-scrolling .cat-pill.on,
+    body.is-scrolling .social-link,
+    body.is-scrolling .ft-social-btn,
+    body.is-scrolling .bdg-l,
+    body.is-scrolling .bdg-hh,
+    body.is-scrolling .bdg-sale,
+    body.is-scrolling #call-fab,
+    body.is-scrolling #cart-fab,
+    body.is-scrolling #pd-theme-fab,
+    html[data-menu-theme="genext"] body.is-scrolling .sh-price {
+      animation-play-state:paused;
+    }
     html[data-menu-theme="genext"].light #nav::before {
       background:linear-gradient(90deg,transparent 0%,rgba(200,164,78,0.04) 40%,rgba(200,164,78,0.08) 50%,rgba(200,164,78,0.04) 60%,transparent 100%);
     }
@@ -3190,7 +3212,15 @@
          normalement, la position en layout des cartes reste valide même non peintes) ni sur les
          navigateurs qui ne supportent pas la propriété (dégradation neutre, aucune régression). */
       content-visibility:auto;
-      contain-intrinsic-size:0 180px;
+      contain-intrinsic-size:0 180px; /* repli — navigateurs sans support de "auto <length>" (<Chrome 108) */
+      /* "auto" (Chrome 108+, 2022) active la "taille mémorisée" : après un 1er rendu réel,
+         le navigateur retient la vraie hauteur de CETTE carte et l'utilise comme intrinsèque
+         au lieu du plafond 180px générique ci-dessus (qui va de 70px sur les thèmes compacts
+         à 190px+ sur les thèmes photo — un écart pouvant atteindre 3x selon le thème/le texte)
+         — réduit le saut de mise en page au moment où la carte sort de l'état "skipped" pendant
+         le scroll. Si cette valeur n'est pas reconnue, la déclaration ci-dessus reste active
+         (dégradation neutre, comportement identique à avant — audit 2026-07-19). */
+      contain-intrinsic-size:auto 0 auto 180px;
     }
     /* Animation d'entrée pour les cartes déjà dans le viewport au chargement */
     @keyframes cardIn {
@@ -7036,7 +7066,16 @@ function loadAdminData() {
   setupEventsOverlay();
 
   // Variantes de thème : toujours toutes visibles — plus de restriction par licence
+  let _lastThemeVariantsRaw = null;
   _rref('/config/features/themeVariants').on('value', snap => {
+    // Même garde anti-reconstruction inutile que le listener /menu plus bas (voir son
+    // commentaire détaillé) : ce listener peut lui aussi renvoyer un événement 'value'
+    // strictement identique sur une reconnexion RTDB sans qu'aucun changement réel n'ait eu
+    // lieu côté admin — audit 2026-07-19, défense en profondeur en plus de l'auto-protection
+    // déjà présente ci-dessous (menuTheme mis à jour localement dès le 1er passage).
+    const _tvRaw = JSON.stringify(snap.val() || null);
+    if (_tvRaw === _lastThemeVariantsRaw) return;
+    _lastThemeVariantsRaw = _tvRaw;
     // Même règle de priorité que le listener /menu voisin : un choix explicite du visiteur
     // (popup thème pagedemo/généralisé) prime toujours sur une modification faite par
     // l'admin dans Firebase — sinon masquer une variante réinitialisait aussi le thème d'un
@@ -11261,10 +11300,21 @@ function setupFAB() {
     if (rect.top < window.innerHeight) callFab.classList.add('show');
   }
 
-  // Vérifier au scroll
+  // Vérifier au scroll — throttlé par requestAnimationFrame (même schéma que setupStickyNav/
+  // setupScrollObserver, déjà validés sur ce fichier) : sans throttle, checkCallFab() fait un
+  // getBoundingClientRect() sur CHAQUE événement scroll natif (jusqu'à 60+/s pendant un fling),
+  // un layout-thrashing resté actif malgré les 4 correctifs précédents qui visaient tous
+  // setupStickyNav/content-visibility/animations sans jamais toucher ce listener-ci (audit du
+  // 2026-07-19).
+  let _fabTicking = false;
   window.addEventListener('scroll', () => {
-    fab.classList.toggle('show', window.scrollY > 400);
-    checkCallFab();
+    if (_fabTicking) return;
+    _fabTicking = true;
+    requestAnimationFrame(() => {
+      fab.classList.toggle('show', window.scrollY > 400);
+      checkCallFab();
+      _fabTicking = false;
+    });
   }, { passive: true });
 
   // Vérifier après chaque rendu du menu (layout terminé au prochain frame)
@@ -11386,24 +11436,28 @@ function setupScrollObserver() {
     // Délai de base pour laisser hero-card + catégories apparaître en premier
     const base = (_fcr && menuStyle !== 'paper') ? 0.5 : 0;
     let staggerIdx = 0;
+    // 🔴 CAUSE RACINE du bug "vide pendant le scroll" (audit du 2026-07-19) : cette fonction
+    // remettait une carte sortie par le BAS du viewport (top>0, donc pas encore vue "à nouveau")
+    // en .pre-rv (opacity:0) pour "rejouer" l'animation au prochain passage — mais l'API
+    // IntersectionObserver ne garantit PAS l'ordre/latence de ses callbacks pendant un scroll
+    // rapide : une carte déjà révélée peut voir un événement isIntersecting=false transitoire
+    // (franchissement du seuil 0.05 en fling, ou scroll VERS LE HAUT qui fait repasser top de
+    // négatif à positif) puis se retrouver hors du DOM peint le temps qu'elle soit re-détectée
+    // et ré-animée — exactement le symptôme "carte/catégorie vide puis apparaît en retard"
+    // signalé par Malek, reproductible par un simple scroll ordinaire (haut/bas), SANS aucun
+    // rapport avec Firebase/perf de rendu — ce qui explique pourquoi les 4 correctifs
+    // précédents (layout thrashing, content-visibility, animations, reconstruction Firebase)
+    // n'ont eu aucun effet : ils ciblaient tous des causes plausibles mais pas celle-ci.
+    // Fix : une carte révélée reste révélée pour toujours, plus jamais remise à .pre-rv ici.
+    // L'animation d'entrée (cardIn) ne joue donc plus qu'UNE SEULE FOIS par carte, comme
+    // attendu — et unobserve() dès la révélation évite tout futur callback inutile sur cette
+    // carte (économie de travail IntersectionObserver en plus de la correction du bug).
     sorted.forEach(entry => {
       const card = entry.target;
-      const top  = entry.boundingClientRect.top;
-
-      if (entry.isIntersecting) {
-        if (card.classList.contains('pre-rv')) {
-          animateCard(card, base + Math.min(staggerIdx * 0.05, 0.15));
-          staggerIdx++;
-        }
-        // Déjà .rv → rien à faire, reste visible
-      } else {
-        if (top > 0) {
-          // Sous le viewport → reset pour rejouer au prochain scroll bas
-          card.classList.remove('card-enter', 'rv');
-          card.style.animationDelay = '';
-          card.classList.add('pre-rv');
-        }
-        // Au-dessus → reste visible (ne pas toucher)
+      if (entry.isIntersecting && card.classList.contains('pre-rv')) {
+        animateCard(card, base + Math.min(staggerIdx * 0.05, 0.15));
+        staggerIdx++;
+        _cardObserver.unobserve(card);
       }
     });
     _fcr = false;
@@ -11415,24 +11469,20 @@ function setupScrollObserver() {
     // Délai de base + stagger pour l'effet cascade au premier chargement
     const catBase = (_fkr && menuStyle !== 'paper') ? 0.35 : 0;
     let sIdx = 0;
+    // Même correction racine que le card observer ci-dessus (voir son commentaire détaillé) :
+    // une catégorie révélée reste révélée pour toujours, jamais remise à zéro ici.
     sorted.forEach(entry => {
-      if (entry.isIntersecting) {
-        const cat = entry.target;
-        if (!cat.classList.contains('cr')) {
-          const delay = catBase + Math.min(sIdx * 0.1, 0.3);
-          sIdx++;
-          if (delay > 0) {
-            cat.style.transitionDelay = delay + 's';
-            setTimeout(() => { cat.style.transitionDelay = ''; }, (delay + 0.55) * 1000);
-          }
-          cat.classList.add('cr');
-        }
-      } else if (entry.boundingClientRect.top > 0) {
-        // Sous le viewport → reset pour rejouer au prochain scroll bas
-        entry.target.classList.remove('cr');
-        entry.target.style.transitionDelay = '';
+      if (!entry.isIntersecting) return;
+      const cat = entry.target;
+      if (cat.classList.contains('cr')) return;
+      const delay = catBase + Math.min(sIdx * 0.1, 0.3);
+      sIdx++;
+      if (delay > 0) {
+        cat.style.transitionDelay = delay + 's';
+        setTimeout(() => { cat.style.transitionDelay = ''; }, (delay + 0.55) * 1000);
       }
-      // Au-dessus → reste visible
+      cat.classList.add('cr');
+      _catObserver.unobserve(cat);
     });
     _fkr = false;
   }, { threshold: 0.05, rootMargin: '0px 0px 180px 0px' });
@@ -11450,11 +11500,11 @@ function setupScrollObserver() {
     const vh = window.innerHeight;
     document.querySelectorAll('.card.pre-rv').forEach(card => {
       const r = card.getBoundingClientRect();
-      if (r.top < vh + 180 && r.bottom > 0) animateCard(card, 0);
+      if (r.top < vh + 180 && r.bottom > 0) { animateCard(card, 0); _cardObserver.unobserve(card); }
     });
     document.querySelectorAll('.cat-sec:not(.cr)').forEach(cat => {
       const r = cat.getBoundingClientRect();
-      if (r.top < vh + 180 && r.bottom > 0) cat.classList.add('cr');
+      if (r.top < vh + 180 && r.bottom > 0) { cat.classList.add('cr'); _catObserver.unobserve(cat); }
     });
   };
   let _revealTicking = false;
