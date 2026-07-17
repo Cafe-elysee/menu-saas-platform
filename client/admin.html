@@ -4197,7 +4197,12 @@ function _clearSavedPwd() { try { localStorage.removeItem(_PFX + 'admin_pwd'); }
 // Reconnexion silencieuse via le mot de passe mémorisé — même appel serveur que le
 // login manuel (aucun contournement de la vérification), juste sans que l'utilisateur
 // ait à retaper quoi que ce soit. Retourne true si la connexion a réussi.
-async function _silentLogin(password) {
+// Ré-authentification silencieuse PURE (ne touche jamais à l'affichage) — réutilisée à
+// la fois par le login initial (_silentLogin, qui affiche l'admin après coup) et par
+// les réparations de connexion EN COURS de session (_ensureAuthed ci-dessous), qui ne
+// doivent jamais redéclencher l'affichage initial puisque l'utilisateur est déjà dans
+// l'admin à ce moment-là.
+async function _silentReauth(password) {
   try {
     const resp = await fetch('/api/admin-login', {
       method: 'POST',
@@ -4211,11 +4216,33 @@ async function _silentLogin(password) {
       return false;
     }
     await firebase.auth().signInWithCustomToken(data.customToken);
-    showAdmin();
     return true;
   } catch(e) {
     return false; // erreur réseau — mot de passe conservé, réessaiera au prochain chargement
   }
+}
+async function _silentLogin(password) {
+  const ok = await _silentReauth(password);
+  if (ok) showAdmin();
+  return ok;
+}
+
+// 🔴 Garantit une authentification Firebase valide avant une action d'écriture — cas
+// réel confirmé par Malek (2026-07-18) : après un changement d'onglet prolongé, la
+// session Firebase Auth peut être ENTIÈREMENT perdue (firebase.auth().currentUser
+// devient null), pas juste "périmée" — un simple rafraîchissement de jeton ne répare
+// alors RIEN puisqu'il n'y a plus aucun jeton à rafraîchir. Dans ce cas, seule une
+// reconnexion complète via le mot de passe mémorisé sur cet appareil peut réparer la
+// session — exactement comme au premier chargement de la page (_silentLogin), mais
+// sans jamais réafficher/réinitialiser le panneau admin déjà ouvert.
+async function _ensureAuthed() {
+  const user = firebase.auth().currentUser;
+  if (user) {
+    try { await user.getIdToken(true); return true; } catch(e) { /* session invalide malgré un user en mémoire — tenter la reconnexion complète ci-dessous */ }
+  }
+  const savedPwd = _getSavedPwd();
+  if (!savedPwd) return false;
+  return await _silentReauth(savedPwd);
 }
 async function checkLogin() {
   // Phase 1 : pas de ?rid= dans l'URL
@@ -4838,13 +4865,13 @@ function saveData() {
   _withTimeout(_rref('menu').set(adminData), 10000)
     .then(() => _afterSaveOk((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved))
     .catch(async () => {
-      // Auto-réparation (2026-07-18) — même principe que _writeToggleField : un échec
-      // peut venir d'une connexion/jeton périmés après un changement d'onglet, pas d'un
-      // vrai problème réseau. On rafraîchit le jeton + reconnecte avant de réessayer
-      // UNE fois — l'utilisateur ne voit un échec que si ce 2e essai échoue aussi.
+      // Auto-réparation (2026-07-18, round 2) — un échec peut venir d'une session
+      // Firebase Auth ENTIÈREMENT perdue (pas juste un jeton périmé) après un
+      // changement d'onglet prolongé — _ensureAuthed() gère les deux cas (rafraîchit
+      // le jeton si une session existe encore, ou se reconnecte entièrement via le mot
+      // de passe mémorisé si elle a disparu). On réessaie UNE fois avant d'abandonner.
       try {
-        const user = firebase.auth().currentUser;
-        if (user) await user.getIdToken(true);
+        await _ensureAuthed();
         firebase.database().goOffline();
         firebase.database().goOnline();
         await _withTimeout(_rref('menu').set(adminData), 10000);
@@ -4946,8 +4973,7 @@ async function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) 
     await _rref(path).set(newVal);
   } catch (e) {
     try {
-      const user = firebase.auth().currentUser;
-      if (user) await user.getIdToken(true);
+      await _ensureAuthed();
       firebase.database().goOffline();
       firebase.database().goOnline();
       await _rref(path).set(newVal);
@@ -10183,17 +10209,14 @@ document.addEventListener('DOMContentLoaded', () => {
    forcer Firebase à couper puis rouvrir sa connexion (goOffline/goOnline, méthode
    officielle recommandée) — jamais de reload, jamais de risque de redemander le mot
    de passe, et aucune perte de travail en cours puisque rien n'est jamais rechargé. ── */
-// 🔴 Renforcé (2026-07-17, round 2) : un simple goOffline/goOnline sur la connexion
-// Firebase ne suffisait pas toujours — le JETON d'authentification lui-même peut être
-// périmé après une longue mise en arrière-plan (les timers JS sont gelés pendant ce
-// temps, donc le rafraîchissement automatique du SDK n'a pas pu se déclencher à temps).
-// On force maintenant EXPLICITEMENT un jeton frais avant de rouvrir la connexion —
-// c'est ce qui manquait pour réparer vraiment les écritures, pas seulement le socket.
+// 🔴 Renforcé (2026-07-18, round 3) : un simple rafraîchissement de jeton ne suffit
+// pas si la session Firebase Auth a été ENTIÈREMENT perdue (currentUser déjà null,
+// pas juste un jeton périmé) — cas réel confirmé par Malek. _ensureAuthed() gère les
+// deux cas (rafraîchit si une session existe, se reconnecte entièrement via le mot de
+// passe mémorisé sinon) — appelé ici de façon PROACTIVE dès que l'onglet redevient
+// visible, pour que la session soit déjà réparée avant même la prochaine action.
 async function _admRecoverConnection() {
-  try {
-    const user = firebase.auth().currentUser;
-    if (user) await user.getIdToken(true);
-  } catch (e) {}
+  try { await _ensureAuthed(); } catch (e) {}
   try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
 }
 
