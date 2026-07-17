@@ -4184,6 +4184,39 @@ function _doAdmConfirm() {
 /* ═══════════════════════════════════════════
    LOGIN + SESSION FIREBASE
 ═══════════════════════════════════════════ */
+// ── Mot de passe mémorisé par appareil/navigateur (localStorage, scopé par restaurant
+// via _PFX) — permet une reconnexion automatique et silencieuse tant que le Firebase
+// Auth SDK n'a pas déjà restauré la session lui-même. Effacé UNIQUEMENT quand le mot
+// de passe est changé, ou si une tentative de reconnexion automatique est explicitement
+// rejetée par le serveur (mauvais mot de passe / compte suspendu) — jamais sur une
+// simple erreur réseau, pour ne pas désapprendre l'appareil à tort. ──
+function _getSavedPwd() { try { return localStorage.getItem(_PFX + 'admin_pwd') || ''; } catch(e) { return ''; } }
+function _saveSavedPwd(pwd) { try { localStorage.setItem(_PFX + 'admin_pwd', pwd); } catch(e) {} }
+function _clearSavedPwd() { try { localStorage.removeItem(_PFX + 'admin_pwd'); } catch(e) {} }
+
+// Reconnexion silencieuse via le mot de passe mémorisé — même appel serveur que le
+// login manuel (aucun contournement de la vérification), juste sans que l'utilisateur
+// ait à retaper quoi que ce soit. Retourne true si la connexion a réussi.
+async function _silentLogin(password) {
+  try {
+    const resp = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rid: _RID, password })
+    });
+    if (resp.status === 429) return false; // trop de tentatives récentes — réessaiera plus tard, mot de passe conservé
+    const data = await resp.json();
+    if (resp.status === 403 || !data.ok || !data.customToken) {
+      _clearSavedPwd(); // mot de passe changé ailleurs, ou compte suspendu — ne plus réessayer silencieusement
+      return false;
+    }
+    await firebase.auth().signInWithCustomToken(data.customToken);
+    showAdmin();
+    return true;
+  } catch(e) {
+    return false; // erreur réseau — mot de passe conservé, réessaiera au prochain chargement
+  }
+}
 async function checkLogin() {
   // Phase 1 : pas de ?rid= dans l'URL
   if (!new URLSearchParams(location.search).get('rid')) {
@@ -4226,7 +4259,14 @@ async function checkLogin() {
   await new Promise(resolve => {
     const unsub = firebase.auth().onAuthStateChanged(async (user) => {
       unsub();
-      if (!user) { _hideAdmLoadingScreen(); resolve(); return; }
+      if (!user) {
+        // Firebase Auth n'a pas restauré de session (rare, mais déjà observé après une
+        // longue mise en veille de l'appareil) — reconnexion silencieuse via le mot de
+        // passe mémorisé sur CET appareil, plutôt que de redemander à l'utilisateur.
+        const savedPwd = _getSavedPwd();
+        if (savedPwd && await _silentLogin(savedPwd)) { resolve(); return; }
+        _hideAdmLoadingScreen(); resolve(); return;
+      }
       try {
         const idTokenResult = await user.getIdTokenResult();
         const claims = idTokenResult.claims;
@@ -4373,6 +4413,9 @@ async function doLogin() {
     }
 
     await firebase.auth().signInWithCustomToken(data.customToken);
+    // Mémorise le mot de passe sur CET appareil — reconnexion automatique et silencieuse
+    // les prochaines fois (voir _silentLogin dans checkLogin()), tant qu'il n'est pas changé.
+    _saveSavedPwd(val);
     _logAction('login');
     showAdmin();
   } catch(e) {
@@ -4876,12 +4919,10 @@ function syncVisToggles() {
 // sans ça, un toggle admin peut passer visuellement "off" alors que Firebase n'a jamais reçu
 // l'écriture (wifi connecté sans accès réel, par ex.) : le menu public continue d'afficher ce
 // que l'admin croit avoir masqué, silencieusement.
-// 🔴 Auto-réparation (2026-07-17) : un changement d'onglet/mise en arrière-plan prolongé peut
-// laisser la connexion Firebase ET le jeton d'authentification périmés — un simple goOffline/
-// goOnline ne suffit pas toujours à réparer une écriture qui a déjà échoué une première fois.
-// Plutôt que de deviner à l'avance QUAND reconnecter (pari toujours imparfait), toute écriture
-// qui échoue est désormais réessayée UNE fois, après un rafraîchissement forcé du jeton
-// d'authentification + une reconnexion complète — l'utilisateur ne voit une erreur que si
+// 🔴 Auto-réparation : un changement d'onglet/mise en arrière-plan prolongé peut laisser
+// la connexion Firebase ET le jeton d'authentification périmés — toute écriture qui
+// échoue est réessayée UNE fois, après un rafraîchissement forcé du jeton + une
+// reconnexion complète, avant d'abandonner. L'utilisateur ne voit une erreur que si
 // cette 2e tentative échoue aussi (vrai problème réseau, pas une simple connexion périmée).
 async function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) {
   applyLocal();
@@ -8941,6 +8982,7 @@ async function saveAdminPassword() {
         }).catch(() => {});
         // Retirer cet ID de la liste mémorisée (nouvelle connexion requise)
         _removeSavedId(_RID);
+        _clearSavedPwd(); // ancien mot de passe mémorisé sur cet appareil — plus valide
         await firebase.auth().signOut().catch(() => {});
         inp.value = '';
         if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.pwdChangedLogout || '✅ Mot de passe modifié — reconnectez-vous'; }
