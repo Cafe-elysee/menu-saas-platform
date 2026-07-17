@@ -3007,7 +3007,13 @@
     #nav {
       position:sticky; top:0; z-index:100;
       background:var(--bg-nav);
-      backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%);
+      /* --bg-nav est déjà quasi-opaque (alpha 0.88-0.97 selon thème) : le flou d'origine
+         (24px + saturate 180%) coûtait un échantillonnage GPU complet à chaque frame de scroll
+         pour un gain visuel marginal (peu de contenu transparaît réellement à cette opacité).
+         Réduit à un flou léger — coût de composition très inférieur, rendu "verre dépoli"
+         quasi identique. Contributeur probable au rendu blanc/non peint pendant le scroll actif
+         (captures Malek, 2026-07-17), en complément du fix de setupStickyNav() ci-dessous. */
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
       border-bottom:1px solid var(--border);
       border-top:1px solid rgba(255,255,255,0.06);
       transition:background 0.4s ease;
@@ -3090,16 +3096,29 @@
     ================================================ */
     #menu-wrap { max-width:560px; margin:0 auto; padding:0 14px 72px; overflow:hidden; contain:paint; }
     .cat-sec { margin-bottom:28px; }
-    /* Catégories toujours visibles dès le rendu — plus d'animation d'apparition liée au
-       scroll (retirée sur demande explicite de Malek, 2026-07-17 : provoquait un menu
-       vide pendant le geste de scroll sur certains moteurs mobiles). */
-    .cat-sec { opacity:1; transform:none; }
-    /* Sortie catégorie au changement de section (animation de filtre — sans lien avec le
-       scroll, conservée telle quelle) */
+    /* Reveal catégorie : monte + fondu */
+    .cat-sec {
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 0.5s cubic-bezier(0.22,1,0.36,1),
+                 transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .cat-sec.cr { opacity:1; transform:translateY(0); }
+    /* Sortie catégorie au changement de section */
     @keyframes catExit { to { opacity:0; transform:translateY(-8px); } }
     .cat-sec.cat-exit { animation:catExit 0.15s ease forwards; pointer-events:none; }
-    .cat-hd { opacity:1; transform:none; }
-    .cat-div { transform:none; }
+    /* En-tête catégorie : glisse depuis la gauche avec léger retard */
+    .cat-hd {
+      opacity:0; transform:translateX(-14px);
+      transition:opacity 0.45s ease 0.12s, transform 0.45s ease 0.12s;
+    }
+    .cat-sec.cr .cat-hd { opacity:1; transform:translateX(0); }
+    /* Ligne de séparation : se dessine de gauche à droite */
+    .cat-div {
+      transform:scaleX(0); transform-origin:left center;
+      transition:transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.22s;
+    }
+    .cat-sec.cr .cat-div { transform:scaleX(1); }
     .cat-hd {
       display:flex; align-items:flex-start; gap:13px;
       padding:22px 0 14px;
@@ -3146,8 +3165,17 @@
       touch-action:manipulation;
     }
     /* Animation d'entrée pour les cartes déjà dans le viewport au chargement */
-    /* Cartes toujours visibles dès le rendu — plus d'animation d'apparition liée au scroll
-       (retirée sur demande explicite de Malek, 2026-07-17), voir .cat-sec ci-dessus. */
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(22px) scale(0.97); }
+      to   { opacity:1; transform:none; }
+    }
+    .card.card-enter { animation: cardIn 0.5s cubic-bezier(0.34,1.2,0.64,1) both; }
+    /* Cartes sous le viewport au chargement : cachées jusqu'au scroll */
+    .card.pre-rv {
+      opacity:0; transform:translateY(22px) scale(0.97);
+      /* transition héritée de .card base → toujours présente quand .pre-rv est retiré */
+    }
+    .card.rv { opacity:1; transform:none; }
     .card::before {
       content:''; position:absolute; inset:0; border-radius:inherit;
       background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(200,164,78,0.07),transparent 70%);
@@ -10213,6 +10241,8 @@ function renderMenu() {
   // jamais de page blanche silencieuse, toujours un message explicite (bug d'audit confirmé).
   const _menuEmptyEl = document.getElementById('menu-empty');
   if (_menuEmptyEl) _menuEmptyEl.classList.toggle('show', container.children.length === 0);
+  // IntersectionObserver gère l'apparition (plus rapide, pas de setTimeout)
+  setupScrollObserver();
   // Animation d'entrée hero-card (styles non-paper : Carte, List, etc.)
   if (menuStyle !== 'paper') {
     const _hc = document.getElementById('hero-card');
@@ -11111,10 +11141,23 @@ function setupStickyNav() {
   spacer.id = 'nav-spacer';
   nav.after(spacer);
 
+  // heroH est mis en cache (recalculé seulement au resize/premier calcul de layout) — jamais lu
+  // à chaque scroll : un getter comme offsetHeight force une purge de layout synchrone (layout
+  // thrashing) s'il est appelé sur CHAQUE événement scroll natif (jusqu'à 60+/s pendant un fling),
+  // ce qui bloque le thread principal en concurrence directe avec le rendu du navigateur et
+  // provoque des zones blanches/non peintes pendant le scroll (confirmé par captures Malek,
+  // 2026-07-17 — la frontière hero→nav où ce recalcul se déclenche correspond exactement à la
+  // zone blanche observée). Même schéma de limitation par requestAnimationFrame que
+  // _setupHeroParallax() ci-dessus, déjà validé sur ce fichier.
+  let heroH = 0;
+  const _recalcHeroH = () => { heroH = hero.offsetHeight; };
+
+  let _fixed = false; // état déjà appliqué — évite toute lecture/écriture DOM redondante
   function update() {
-    const heroH = hero.offsetHeight;
-    // heroH must be > 0 (layout computed) — prevents false-positive on init
-    if (heroH > 0 && window.scrollY >= heroH) {
+    const shouldFix = heroH > 0 && window.scrollY >= heroH;
+    if (shouldFix === _fixed) return;
+    _fixed = shouldFix;
+    if (shouldFix) {
       const navH = nav.getBoundingClientRect().height;
       nav.classList.add('nav-fixed');
       spacer.style.height = navH + 'px';
@@ -11124,10 +11167,17 @@ function setupStickyNav() {
     }
   }
 
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update, { passive: true });
+  let _ticking = false;
+  function onScroll() {
+    if (_ticking) return;
+    _ticking = true;
+    requestAnimationFrame(() => { update(); _ticking = false; });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { _recalcHeroH(); onScroll(); }, { passive: true });
   // Attendre que le layout soit calculé avant le premier appel
-  requestAnimationFrame(() => requestAnimationFrame(update));
+  requestAnimationFrame(() => requestAnimationFrame(() => { _recalcHeroH(); update(); }));
 }
 
 /* ================================================
@@ -11234,6 +11284,129 @@ function _setupHeroFabHide() {
     }, { threshold: 0.01 });
     cards.forEach(card => _cardFabObserver.observe(card));
   }
+}
+
+/* ================================================
+   SCROLL REVEAL
+================================================ */
+let _cardObserver = null;
+let _catObserver  = null;
+let _revealScrollHandler = null; // complément à l'IntersectionObserver — voir plus bas pourquoi
+
+function setupScrollObserver() {
+  if (_cardObserver) { _cardObserver.disconnect(); _cardObserver = null; }
+  if (_catObserver)  { _catObserver.disconnect();  _catObserver  = null; }
+  if (_revealScrollHandler) { window.removeEventListener('scroll', _revealScrollHandler); _revealScrollHandler = null; }
+
+  // Toutes les cartes démarrent cachées
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('rv', 'card-enter');
+    card.style.animationDelay = '';
+    card.classList.add('pre-rv');
+  });
+
+  const animateCard = (card, delay) => {
+    card.classList.remove('pre-rv', 'rv', 'card-enter');
+    void card.offsetWidth;
+    card.style.animationDelay = delay > 0 ? delay + 's' : '';
+    card.classList.add('card-enter');
+    card.addEventListener('animationend', () => {
+      card.classList.remove('card-enter');
+      card.classList.add('rv');
+      card.style.animationDelay = '';
+    }, { once: true });
+  };
+
+  // Flags : n'ajouter le délai de base qu'au premier reveal (chargement initial)
+  let _fcr = true; // first card reveal
+  let _fkr = true; // first cat reveal
+
+  _cardObserver = new IntersectionObserver((entries) => {
+    // Trier par position pour stagger naturel
+    const sorted = [...entries].sort((a, b) =>
+      a.boundingClientRect.top - b.boundingClientRect.top
+    );
+    // Délai de base pour laisser hero-card + catégories apparaître en premier
+    const base = (_fcr && menuStyle !== 'paper') ? 0.5 : 0;
+    let staggerIdx = 0;
+    sorted.forEach(entry => {
+      const card = entry.target;
+      const top  = entry.boundingClientRect.top;
+
+      if (entry.isIntersecting) {
+        if (card.classList.contains('pre-rv')) {
+          animateCard(card, base + Math.min(staggerIdx * 0.05, 0.15));
+          staggerIdx++;
+        }
+        // Déjà .rv → rien à faire, reste visible
+      } else {
+        if (top > 0) {
+          // Sous le viewport → reset pour rejouer au prochain scroll bas
+          card.classList.remove('card-enter', 'rv');
+          card.style.animationDelay = '';
+          card.classList.add('pre-rv');
+        }
+        // Au-dessus → reste visible (ne pas toucher)
+      }
+    });
+    _fcr = false;
+  }, { threshold: 0.05, rootMargin: '0px 0px 180px 0px' });
+
+  _catObserver = new IntersectionObserver((entries) => {
+    // Trier par position pour cascade naturelle du haut vers le bas
+    const sorted = [...entries].sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    // Délai de base + stagger pour l'effet cascade au premier chargement
+    const catBase = (_fkr && menuStyle !== 'paper') ? 0.35 : 0;
+    let sIdx = 0;
+    sorted.forEach(entry => {
+      if (entry.isIntersecting) {
+        const cat = entry.target;
+        if (!cat.classList.contains('cr')) {
+          const delay = catBase + Math.min(sIdx * 0.1, 0.3);
+          sIdx++;
+          if (delay > 0) {
+            cat.style.transitionDelay = delay + 's';
+            setTimeout(() => { cat.style.transitionDelay = ''; }, (delay + 0.55) * 1000);
+          }
+          cat.classList.add('cr');
+        }
+      } else if (entry.boundingClientRect.top > 0) {
+        // Sous le viewport → reset pour rejouer au prochain scroll bas
+        entry.target.classList.remove('cr');
+        entry.target.style.transitionDelay = '';
+      }
+      // Au-dessus → reste visible
+    });
+    _fkr = false;
+  }, { threshold: 0.05, rootMargin: '0px 0px 180px 0px' });
+
+  document.querySelectorAll('.card').forEach(card => _cardObserver.observe(card));
+  document.querySelectorAll('.cat-sec').forEach(cat => _catObserver.observe(cat));
+
+  // Filet de sécurité pendant le scroll actif : sur certains moteurs mobiles (notamment WebKit/iOS),
+  // la livraison des callbacks IntersectionObserver peut être retardée jusqu'à l'arrêt du scroll,
+  // laissant des cartes/catégories invisibles pendant tout le geste (déjà vu sur ce projet pour
+  // les écrans de chargement rAF pendant un scroll actif — voir feedback_splash_scroll_freeze).
+  // On révèle donc aussi en continu à chaque frame de scroll (rAF, jamais un debounce/setTimeout
+  // qui attendrait la fin du scroll — ce serait reproduire exactement le bug à corriger).
+  const _forceRevealVisible = () => {
+    const vh = window.innerHeight;
+    document.querySelectorAll('.card.pre-rv').forEach(card => {
+      const r = card.getBoundingClientRect();
+      if (r.top < vh + 180 && r.bottom > 0) animateCard(card, 0);
+    });
+    document.querySelectorAll('.cat-sec:not(.cr)').forEach(cat => {
+      const r = cat.getBoundingClientRect();
+      if (r.top < vh + 180 && r.bottom > 0) cat.classList.add('cr');
+    });
+  };
+  let _revealTicking = false;
+  _revealScrollHandler = () => {
+    if (_revealTicking) return;
+    _revealTicking = true;
+    requestAnimationFrame(() => { _forceRevealVisible(); _revealTicking = false; });
+  };
+  window.addEventListener('scroll', _revealScrollHandler, { passive: true });
 }
 
 /* ================================================
