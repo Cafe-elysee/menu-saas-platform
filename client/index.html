@@ -10309,10 +10309,47 @@ function filterCat(cat) {
 /* ================================================
    RENDER MENU
 ================================================ */
+// 🔴 Round 12 (2026-07-17) : construction paresseuse des catégories, PAR CATÉGORIE — cause
+// racine du gel round 8-11 sur un gros menu (confirmé par Malek : 76 produits pagedemo bloque
+// encore sur téléphone milieu de gamme après tous les fix de coût-par-carte ; un menu client
+// réel plus petit, même téléphone, même style = fluide). Les fix précédents réduisaient le coût
+// PAR carte (JS, ombre, résolution photo) mais le coût TOTAL grandit quand même avec le nombre
+// de produits, car TOUTES les cartes étaient construites (createCard, DOM, images) dès le
+// chargement, même celles jamais encore vues. Ici : seules les 2 premières catégories sont
+// construites immédiatement (couvre large l'écran initial, quel que soit l'appareil) ; le reste
+// est construit à la volée, catégorie par catégorie, seulement quand elle approche du viewport
+// (voir _tryBuildAheadCategories() dans setupScrollObserver()) — le coût de construction reste
+// donc BORNÉ par la vitesse de scroll, jamais proportionnel à la taille TOTALE du menu, quel
+// que soit le nombre de produits (20 ou 200). Aucune carte déjà construite n'est jamais retirée
+// (contrairement à une vraie virtualisation) : zéro risque pour la recherche/les pastilles
+// panier une fois qu'une catégorie est construite — voir filterItems() et _buildCatCards().
+const _EAGER_CAT_COUNT = 2;
+let _pendingCatBuild = new Map(); // ci (string) -> items[] pas encore construits
+
+function _buildCatCards(ci) {
+  ci = String(ci);
+  const sec = document.querySelector(`.cat-sec[data-cat="${ci}"]`);
+  if (!sec || sec.dataset.built === '1') return;
+  sec.dataset.built = '1';
+  const items = _pendingCatBuild.get(ci);
+  _pendingCatBuild.delete(ci);
+  if (!items || !items.length) return;
+  const cardsEl = sec.querySelector('.cards');
+  items.forEach((item, idx) => {
+    const card = createCard(item, idx);
+    card.classList.add('pre-rv');
+    cardsEl.appendChild(card);
+    if (_cardObserver) _cardObserver.observe(card);
+    if (_cardFabObserver) _cardFabObserver.observe(card);
+  });
+}
+
 function renderMenu() {
   const t = UI[lang];
   const container = document.getElementById('menu-secs');
   container.innerHTML = '';
+  _pendingCatBuild = new Map();
+  let _visIdx = 0;
   CATS.forEach((cat, ci) => {
     if (cat.visible === false) return;
     if (!_isInSchedule(cat.schedule)) return;
@@ -10333,10 +10370,17 @@ function renderMenu() {
     `;
     container.appendChild(sec);
     const cardsEl = document.getElementById(`cards-${ci}`);
-    catItems.forEach((item, idx) => {
-      const card = createCard(item, idx);
-      cardsEl.appendChild(card);
-    });
+    if (_visIdx < _EAGER_CAT_COUNT || menuStyle === 'paper') {
+      // Mode papier (flipbook) non concerné par ce mécanisme — reconstruit intégralement par
+      // buildFlipBook() plus bas de toute façon ; on construit donc tout de suite par simplicité,
+      // sans changer son comportement existant.
+      catItems.forEach((item, idx) => cardsEl.appendChild(createCard(item, idx)));
+      sec.dataset.built = '1';
+    } else {
+      sec.dataset.built = '0';
+      _pendingCatBuild.set(String(ci), catItems);
+    }
+    _visIdx++;
   });
   // Menu totalement vide (nouveau restaurant sans catégorie, ou tout masqué/hors-horaire) —
   // jamais de page blanche silencieuse, toujours un message explicite (bug d'audit confirmé).
@@ -11043,7 +11087,14 @@ function createCard(item, idx) {
   const qtyNum = document.createElement('span');
   qtyNum.className = 'card-qty-num';
   qtyNum.dataset.badgeId = item.id;
-  qtyNum.textContent = '0';
+  // 🔴 Round 12 : calculée depuis l'état RÉEL du panier dès la création, au lieu d'un '0' figé
+  // corrigé après coup par le premier appel à updateCardBadges() qui suit renderMenu(). Cette
+  // carte peut désormais aussi être créée plus tard, à la volée (construction paresseuse d'une
+  // catégorie pendant le scroll, voir _buildCatCards()) — hors de tout appel à
+  // updateCardBadges(), donc ce '0' provisoire ne serait sinon jamais corrigé pour elle.
+  const _initQty = cartItems.filter(ci => ci.id === item.id).reduce((s, ci) => s + ci.qty, 0);
+  qtyNum.textContent = _initQty;
+  if (_initQty > 0) { qtyCtrl.classList.add('has-qty'); card.classList.add('card-has-qty'); }
 
   const addBtn = document.createElement('button');
   addBtn.className = 'card-add-btn';
@@ -11081,6 +11132,13 @@ function setupSearch() {
 }
 
 function filterItems() {
+  // 🔴 Round 12 : la recherche ET le filtre par pastille de catégorie passent tous deux par cette
+  // fonction — elle opère sur le DOM réel (querySelectorAll('.card')), donc une catégorie pas
+  // encore construite (voir renderMenu()/_buildCatCards, construction paresseuse) serait
+  // invisible à la recherche. Un search/filtre est une action délibérée de l'utilisateur (pas un
+  // scroll passif) : construire tout ce qui reste ici, une seule fois, garantit une recherche
+  // toujours exhaustive sans jamais réintroduire le coût de tout construire au chargement.
+  document.querySelectorAll('.cat-sec[data-built="0"]').forEach(sec => _buildCatCards(sec.dataset.cat));
   const tokens = _searchTokens(document.getElementById('search').value);
   const t = UI[lang];
   const secs = document.querySelectorAll('.cat-sec');
@@ -11572,8 +11630,31 @@ function setupScrollObserver() {
       const r = cat.getBoundingClientRect();
       if (r.top < vh + 180 && r.bottom > 0) catsToReveal.push(cat);
     });
+    // 🔴 Round 12 : même discipline lecture-puis-écriture pour la construction paresseuse des
+    // catégories (voir renderMenu()/_buildCatCards) — marge de 1400px, bien plus large que la
+    // marge de révélation (180px) ci-dessus, car construire une catégorie (createCard sur chaque
+    // produit) prend un temps réel non négligeable, contrairement à un simple changement
+    // d'opacité : il faut que ce soit terminé BIEN avant que la catégorie n'entre à l'écran,
+    // même pendant un fling rapide qui couvre plusieurs milliers de px d'un coup.
+    // Pas de condition `r.bottom > 0` ici (contrairement à cardsToReveal/catsToReveal ci-dessus) :
+    // une catégorie DÉJÀ scrollée au-delà de l'écran (fling qui saute par-dessus sa fenêtre de
+    // construction en un seul mouvement) doit quand même être construite — juste "en retard" mais
+    // jamais oubliée. Un filet de sécurité supplémentaire (tout construire près du bas de page)
+    // couvre le cas extrême d'un scroll direct jusqu'en bas.
+    const catsToBuild = [];
+    document.querySelectorAll('.cat-sec[data-built="0"]').forEach(cat => {
+      const r = cat.getBoundingClientRect();
+      if (r.top < vh + 1400) catsToBuild.push(cat);
+    });
+    const nearBottom = window.scrollY + vh >= document.body.scrollHeight - 300;
+    if (nearBottom) {
+      document.querySelectorAll('.cat-sec[data-built="0"]').forEach(cat => {
+        if (!catsToBuild.includes(cat)) catsToBuild.push(cat);
+      });
+    }
     cardsToReveal.forEach(card => { animateCard(card, 0); _cardObserver.unobserve(card); });
     catsToReveal.forEach(cat => { cat.classList.add('cr'); _catObserver.unobserve(cat); });
+    catsToBuild.forEach(cat => _buildCatCards(cat.dataset.cat));
   };
   let _revealTicking = false;
   _revealScrollHandler = () => {
@@ -11582,6 +11663,13 @@ function setupScrollObserver() {
     requestAnimationFrame(() => { _forceRevealVisible(); _revealTicking = false; });
   };
   window.addEventListener('scroll', _revealScrollHandler, { passive: true });
+
+  // 🔴 Round 12 : appel immédiat (pas seulement au premier scroll) — sur un grand écran (desktop,
+  // tablette, téléphone en paysage), le viewport initial peut déjà couvrir plus que les 2
+  // catégories construites immédiatement par renderMenu(), et aucun événement scroll ne se
+  // déclenche tant que rien n'a encore bougé. requestAnimationFrame pour attendre que le layout
+  // du rendu initial soit calculé (même précaution que _recalcHeroH ailleurs dans ce fichier).
+  requestAnimationFrame(() => requestAnimationFrame(_forceRevealVisible));
 }
 
 /* ================================================
