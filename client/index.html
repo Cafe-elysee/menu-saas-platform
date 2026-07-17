@@ -966,6 +966,15 @@
     body.is-scrolling #call-fab,
     body.is-scrolling #cart-fab,
     body.is-scrolling #pd-theme-fab,
+    /* 🔴 Round 9 (2026-07-17) : .gn-menu-bok (8 cercles décoratifs flous, filter:blur, présents
+       sur TOUTES les pages peu importe le thème — injectés inconditionnellement en tout début de
+       <body>) tournaient en animation CONTINUE, jamais mis en pause pendant le scroll, contrairement
+       à tout le reste de cette liste. Un filter:blur() animé en continu est un des coûts de
+       recomposition GPU les plus chers qui existent — 8 instances actives en permanence, en
+       concurrence directe avec la rasterisation des nouvelles cartes pendant un fling rapide, sur
+       TOUS les restaurants (pas seulement genext). Ajouté ici par cohérence avec le principe déjà
+       appliqué au reste du fichier. */
+    body.is-scrolling .gn-menu-bok,
     html[data-menu-theme="genext"] body.is-scrolling .sh-price {
       animation-play-state:paused;
     }
