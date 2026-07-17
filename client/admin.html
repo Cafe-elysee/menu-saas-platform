@@ -10073,23 +10073,22 @@ document.addEventListener('DOMContentLoaded', () => {
    (1) retour navigateur/bouton précédent sur le même onglet (bfcache, pageshow) ;
    (2) l'onglet admin est resté ouvert en arrière-plan pendant que Malek naviguait
        ailleurs (même onglet vers une autre page, OU un tout autre onglet), puis
-       redevient visible (visibilitychange) — AUCUN des deux ne recharge la page
-       tout seul par défaut, donc la connexion websocket Firebase reste périmée et
-       toute écriture échoue avec une erreur générique tant qu'un F5 manuel n'a pas
-       réparé la connexion (confirmé en conditions réelles, 2026-07-17 — un premier
-       correctif limité au seul cas (1) s'est révélé insuffisant, le cas (2) était
-       le scénario réellement rencontré).
-   Si aucune modification n'est en cours (cas normal), un rechargement complet
-   reproduit exactement ce qui fonctionne déjà quand Malek rafraîchit manuellement —
-   sans aucun risque de perte puisqu'il n'y a rien en attente. Si une édition est en
-   cours, ne JAMAIS recharger (perdrait le travail non enregistré) — on se contente de
-   forcer une reconnexion Firebase, qui suffit dans la majorité des cas. ── */
+       redevient visible (visibilitychange) — la connexion websocket Firebase reste
+       périmée dans ce cas, et toute écriture échoue avec une erreur générique tant
+       que la connexion n'est pas explicitement forcée à se rétablir.
+   🔴 IMPORTANT (2026-07-17) : un premier correctif rechargeait la page dans ce cas —
+   RETIRÉ, car ça relance `checkLogin()` à chaque fois, qui redemande le mot de passe
+   de façon disproportionnée (Firebase Auth persiste bien la session normalement, mais
+   `checkLogin()` re-vérifie aussi `config/active` à chaque chargement, un point plus
+   fragile juste après un retour de mise en veille). On se contente maintenant de
+   forcer Firebase à couper puis rouvrir sa connexion (goOffline/goOnline, méthode
+   officielle recommandée) — jamais de reload, jamais de risque de redemander le mot
+   de passe, et aucune perte de travail en cours puisque rien n'est jamais rechargé. ── */
 function _admRecoverConnection() {
-  if (!unsaved) { location.reload(); return; }
   try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
 }
 
-// (2) Changement de visibilité de l'onglet — seuil de 20s pour ne jamais recharger
+// (2) Changement de visibilité de l'onglet — seuil de 20s pour ne jamais reconnecter
 // sur un simple aller-retour rapide entre onglets (connexion encore vivante à coup sûr).
 let _admHiddenAt = null;
 document.addEventListener('visibilitychange', () => {
@@ -10109,7 +10108,6 @@ window.addEventListener('pagehide', () => {
 window.addEventListener('pageshow', event => {
   if (!event.persisted) return;
   _admRecoverConnection();
-  if (!unsaved) return; // reload() déjà déclenché par _admRecoverConnection(), inutile de continuer
   // Restauration bfcache — remettre l'onglet par défaut sans flash
   _adminCurrentTab = 'display';
   ['display','orders','settings'].forEach(t => {
