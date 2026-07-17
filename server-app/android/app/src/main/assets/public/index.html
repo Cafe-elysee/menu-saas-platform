@@ -2446,11 +2446,15 @@ document.addEventListener('deviceready', function() {
   setupNativePush();
   _checkServerTokenInFirebase();
   // Force la reconnexion Firebase au retour au premier plan (l'app peut rester
-  // visuellement "connectée" mais figée après une longue mise en arrière-plan)
+  // visuellement "connectée" mais figée après une longue mise en arrière-plan).
+  // goOffline() avant goOnline() force un vrai cycle de reconnexion (coupe puis
+  // rouvre la connexion) au lieu de compter uniquement sur goOnline(), qui peut
+  // être un no-op si le SDK pense encore être en ligne alors que le socket réel
+  // est mort (même correctif que admin.html, session #123).
   var _CapApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
   if (_CapApp) {
     _CapApp.addListener('resume', function() {
-      try { firebase.database().goOnline(); } catch(e) {}
+      try { firebase.database().goOffline(); firebase.database().goOnline(); } catch(e) {}
     });
   }
 }, false);
