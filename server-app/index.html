@@ -1828,7 +1828,12 @@ function _applyInitialTab() {
 
 function setOrderStatus(orderId, status) {
   nativeVibrate([50, 30, 80]);
-  _rref('orders/' + orderId + '/status').set(status);
+  _rref('orders/' + orderId + '/status').set(status).catch(function() {
+    // Écriture échouée (réseau) : un seul essai de reconnexion + nouvelle tentative,
+    // comme pour les autres écritures silencieuses corrigées lors de l'audit #123.
+    try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
+    _rref('orders/' + orderId + '/status').set(status).catch(function() {});
+  });
 }
 
 function cleanupOrders() {

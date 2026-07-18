@@ -2826,13 +2826,17 @@ function _findCmdKeyForRid(rid) {
 let _firstOpenWatchersSetup = false;
 
 function _watchFirstOpen(rid, cmdKey) {
-  _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
-    if (snap.val() === true && _commandesCache[cmdKey]) {
-      const _foTs = Date.now();
-      const _trialEnd = _addMonths(_foTs, 1);
-      // Essai gratuit : nextReminderAt = fin du mois d'essai (premier paiement dû à trialEndAt)
-      _controlWrite('/commandes/' + cmdKey, 'update', { statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd }).catch(function() {});
-      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _trialEnd, trialEndAt: _trialEnd });
+  function _commitFirstOpen(attemptsLeft) {
+    const _foTs = Date.now();
+    const _trialEnd = _addMonths(_foTs, 1);
+    // Essai gratuit : nextReminderAt = fin du mois d'essai (premier paiement dû à trialEndAt).
+    // Les deux écritures (date pivot de facturation) doivent réussir AVANT de détacher le
+    // listener — sinon un échec réseau laisserait le client sans trialEndAt/nextReminderAt,
+    // sans jamais se re-déclencher (firstOpen ne repasse pas à true une 2e fois).
+    Promise.all([
+      _controlWrite('/commandes/' + cmdKey, 'update', { statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd }),
+      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _trialEnd, trialEndAt: _trialEnd })
+    ]).then(function() {
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
       localStorage.removeItem('ctrl_cmd_done_' + cmdKey);
@@ -2840,7 +2844,15 @@ function _watchFirstOpen(rid, cmdKey) {
       delete _lastCreatedClients[cmdKey];
       delete _pausedClients[cmdKey];
       setTimeout(function() { _rerenderCommandeCard(cmdKey); }, 100);
-    }
+    }).catch(function() {
+      if (attemptsLeft > 0) {
+        setTimeout(function() { _commitFirstOpen(attemptsLeft - 1); }, 4000);
+      }
+      // Sinon : listener laissé attaché, retentera au prochain déclenchement disponible.
+    });
+  }
+  _saasDb.ref('restaurants/' + rid + '/firstOpen').on('value', function(snap) {
+    if (snap.val() === true && _commandesCache[cmdKey]) _commitFirstOpen(3);
   });
   localStorage.setItem('ctrl_fopen_' + rid, cmdKey);
 }
