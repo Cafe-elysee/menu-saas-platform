@@ -30,6 +30,16 @@ const WEEK_PAYMENT_F = {
   de: 'Sie haben <strong>7 Tage</strong> Zeit, Ihre Zahlung zu leisten.',
   es: 'Tiene <strong>7 días</strong> para completar su pago.'
 };
+// Même lien que l'email de bienvenue (demo-page/api/notify-commande.js, deliveryHtml) —
+// garder les deux synchronisés si l'URL de distribution change un jour (ex. Play Store).
+const APK_URL_F = 'https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk';
+const APK_BLOCK_F = {
+  fr: { t: 'Application serveur', s: "Nouveau avec ce forfait : téléchargez l'application pour que votre personnel puisse recevoir les commandes et les appels de vos clients en temps réel.", btn: '📱 Télécharger l\'application serveur' },
+  en: { t: 'Server application', s: 'New with this plan: download the app so your staff can receive your customers\' orders and calls in real time.', btn: '📱 Download server app' },
+  el: { t: 'Εφαρμογή σερβιτόρων', s: 'Νέο με αυτό το πακέτο: κατεβάστε την εφαρμογή για να λαμβάνει το προσωπικό σας τις παραγγελίες και τις κλήσεις των πελατών σας σε πραγματικό χρόνο.', btn: '📱 Λήψη εφαρμογής' },
+  de: { t: 'Server-App', s: 'Neu mit diesem Plan: Laden Sie die App herunter, damit Ihr Personal die Bestellungen und Anrufe Ihrer Gäste in Echtzeit empfangen kann.', btn: '📱 Server-App herunterladen' },
+  es: { t: 'Aplicación de camareros', s: 'Novedad de este plan: descargue la aplicación para que su personal reciba los pedidos y llamadas de sus clientes en tiempo real.', btn: '📱 Descargar aplicación' }
+};
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -373,6 +383,19 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
   const paymentBlock = t.payment
     ? `<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdf9f2" style="background-color:#fdf9f2;border:1px solid #e8dfc8;border-left:3px solid #c8a44e;border-radius:0 8px 8px 0;margin:16px 0 4px"><tr><td style="padding:12px 16px;font-size:0.88rem;color:#2a1f10;line-height:1.6">${t.payment}</td></tr></table>`
     : '';
+  // L'app Serveur n'a de sens QUE si ce changement fait réellement GAGNER Commandes & Services
+  // au restaurant (jamais montré s'il l'avait déjà, ni sur un downgrade) — un client parti sur
+  // Menu QR Code puis qui upgrade ne reçoit sinon JAMAIS cette info (l'email de bienvenue ne
+  // l'inclut que si Commandes & Services est choisi dès la création, voir deliveryHtml()).
+  const gainsServerApp = isCS && oldForfait !== 'commandes-services';
+  const apkT = APK_BLOCK_F[lang] || APK_BLOCK_F.fr;
+  const apkBlock = gainsServerApp
+    ? `<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8f4ec" style="background-color:#f8f4ec;border:1px solid #e8dfc8;border-radius:10px;margin:16px 0 4px"><tr><td style="padding:14px 16px">
+  <p style="margin:0 0 4px;font-weight:700;color:#2a1f10;font-size:0.92rem">${apkT.t}</p>
+  <p style="margin:0 0 12px;color:#6b5a3a;font-size:0.85rem;line-height:1.5">${apkT.s}</p>
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center"><a href="${APK_URL_F}" style="display:inline-block;background-color:#2a5ab8;color:#fff;text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:700;font-size:0.88rem">${apkT.btn}</a></td></tr></table>
+</td></tr></table>`
+    : '';
 
   const html = `<!DOCTYPE html><html dir="${dir}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -390,6 +413,7 @@ function buildForfaitEmail(lang, name, oldForfait, newForfait, isUpgrade, paymen
   <p style="color:#4a3728;font-size:0.9rem;line-height:1.6;margin:0 0 4px">${t.intro}</p>
   ${paymentBlock}
   <p style="color:#7a6555;font-size:0.88rem;line-height:1.6;margin:12px 0 0">${t.features}</p>
+  ${apkBlock}
 </td></tr>
 <tr><td bgcolor="#f2ece0" align="center" style="background-color:#f2ece0;background-size:cover;background-position:center;padding:14px 32px;border-top:1px solid #ead9b8">
   <p style="color:#9a8060;font-size:0.78rem;margin:0">${t.closing} · GeNext</p>
