@@ -4614,7 +4614,13 @@ let _lastLocalSave = 0;
 let _menuListener  = null;
 
 function applyMenuSnapshot(data) {
-  if (data && data.cats && data.cats.length > 0) {
+  // Array.isArray (pas .length > 0) : un menu légitimement vidé de toutes ses catégories
+  // (dernière catégorie supprimée puis enregistrée par un autre onglet/appareil) doit être
+  // appliqué normalement, sinon cet onglet garde ses anciennes catégories "fantômes" en
+  // mémoire et risque de les réécrire dans Firebase à la prochaine sauvegarde — perte de
+  // données silencieuse en édition concurrente. On ne se protège que contre `data` réellement
+  // absent/malformé (ex. lecture Firebase transitoirement vide), pas contre un tableau vide.
+  if (data && Array.isArray(data.cats)) {
     adminData = data;
     if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
     if (!adminData.items) adminData.items = [];
@@ -5017,6 +5023,28 @@ async function _writeToggleField(path, newVal, oldVal, applyLocal, revertLocal) 
     } catch (e2) {
       revertLocal();
       syncVisToggles();
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
+  }
+}
+
+// Variante de _writeToggleField pour les écritures "fire-and-forget" qui n'ont pas
+// de paire applyLocal/revertLocal dédiée (l'état local est déjà appliqué par l'appelant
+// avant l'appel) — même retry (reconnexion + nouvelle tentative) avant d'abandonner
+// silencieusement, pour éviter les écritures Firebase perdues sur coupure réseau passagère.
+async function _writeOrRemove(path, value) {
+  try {
+    if (value === undefined) await _rref(path).remove();
+    else await _rref(path).set(value);
+  } catch (e) {
+    try {
+      await _ensureAuthed();
+      firebase.database().goOffline();
+      firebase.database().goOnline();
+      if (value === undefined) await _rref(path).remove();
+      else await _rref(path).set(value);
+    } catch (e2) {
       const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
       showToastMsg(t.settingsErr || '❌ Erreur', true);
     }
@@ -5555,6 +5583,11 @@ function renderHeroImageSection() {
   _updateHeroSectionForTheme();
 
   // Upload fichier → recadrage (Cropper.js) → compression canvas → Cloudinary
+  // _changeBound évite les listeners multiples (renderAll() peut être appelé plusieurs
+  // fois), même pattern que renderLogoSection() (fix A-4) — sans ça, après quelques
+  // changements d'onglet, un seul upload déclenchait 2-3 écritures/uploads Cloudinary dupliqués.
+  if (fileInput._changeBound) return;
+  fileInput._changeBound = true;
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
     if (!file) return;
@@ -6426,11 +6459,7 @@ function renderCatsSection() {
       adminData.cats[i].visible = nextVisible;
       // Sauvegarde directe dans Firebase pour effet immédiat dans le menu client
       _lastLocalSave = Date.now();
-      if (nextVisible) {
-        _rref('menu/cats/' + i + '/visible').remove();
-      } else {
-        _rref('menu/cats/' + i + '/visible').set(false);
-      }
+      _writeOrRemove('menu/cats/' + i + '/visible', nextVisible ? undefined : false);
       btn.classList.toggle('on', nextVisible);
       const eyeOpen  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
       const eyeClosed = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
@@ -6441,11 +6470,7 @@ function renderCatsSection() {
     const _schedSaveToFirebase = (ci) => {
       const s = adminData.cats[ci].schedule;
       _lastLocalSave = Date.now();
-      if (!s || !s.enabled) {
-        _rref('menu/cats/' + ci + '/schedule').remove();
-      } else {
-        _rref('menu/cats/' + ci + '/schedule').set({ enabled:true, days:s.days, from:s.from, to:s.to });
-      }
+      _writeOrRemove('menu/cats/' + ci + '/schedule', (!s || !s.enabled) ? undefined : { enabled:true, days:s.days, from:s.from, to:s.to });
     };
     const schedChk = row.querySelector('.sched-enabled-chk');
     const schedBody = row.querySelector('.cat-sched-body');

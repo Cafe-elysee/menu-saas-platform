@@ -2281,11 +2281,20 @@ function _getSlugFromCmdKey(key) {
 function _setupSubSyncListener(slug, cmdKey) {
   if (_subSyncActive[slug]) return;
   _subSyncActive[slug] = true;
-  _saasDb.ref('restaurants/' + slug + '/config/subscription').on('value', function(snap) {
+  var _subSyncRef = _saasDb.ref('restaurants/' + slug + '/config/subscription');
+  _subSyncRef.on('value', function(snap) {
     var sub = snap.val();
     if (!sub) return;
     var d = _commandesCache[cmdKey];
-    if (!d) return;
+    if (!d) {
+      // La commande liée (cmdKey) a été supprimée entre-temps (ex. deleteCommande()) —
+      // ce listener est devenu inerte pour de bon. On le détache et on libère le verrou
+      // slug pour qu'un futur _setupSubSyncListener(slug, nouveauCmdKey) puisse en poser
+      // un nouveau, sinon la sync prix/forfait resterait cassée pour ce client à vie.
+      _subSyncRef.off();
+      delete _subSyncActive[slug];
+      return;
+    }
     var changed = false;
     if (sub.price != null && sub.price !== d.price)           { d.price = sub.price; changed = true; }
     if (sub.forfait && sub.forfait !== d.forfait)             { d.forfait = sub.forfait; changed = true; }
@@ -4012,13 +4021,16 @@ function _markPaid(key) {
         const base = d.trialEndAt || d.nextReminderAt || now;
         let nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         if (nextReminderAt <= now) nextReminderAt = isMonthly ? _addMonths(now, 1) : _addMonths(now, 12);
-        update = { paidAt: now, nextReminderAt, suspendu: false };
+        // Nouveau cycle réellement payé : efface l'ancrage d'un éventuel changement de mode
+        // de paiement "seul" du cycle précédent (voir notify-forfait.js computeUpgradeProrata),
+        // sinon un futur upgrade mi-cycle continuerait de se baser sur un cycle déjà révolu.
+        update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
         // Récurrent — partir de nextReminderAt si dans le futur, sinon de now
         const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
-        update = { paidAt: now, nextReminderAt, suspendu: false };
+        update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
         payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       }
 
@@ -5293,6 +5305,18 @@ async function changeClientId(oldSlug, inputId) {
   try {
     const snap = await _saasDb.ref('restaurants/' + oldSlug).once('value');
     await _saasDb.ref('restaurants/' + newSlug).set(snap.val());
+    // Fenêtre de course : une commande/appel client peut arriver sous l'ANCIEN slug entre
+    // la lecture ci-dessus et la suppression ci-dessous (table qui scanne le QR pendant la
+    // migration). Un second instantané juste avant le remove() capture ces écritures
+    // tardives et les fusionne dans la copie, pour ne jamais perdre une commande.
+    const snap2 = await _saasDb.ref('restaurants/' + oldSlug).once('value');
+    const v1 = snap.val() || {}, v2 = snap2.val() || {};
+    const late = {};
+    ['orders', 'calls'].forEach(function(node) {
+      const o1 = v1[node] || {}, o2 = v2[node] || {};
+      Object.keys(o2).forEach(function(k) { if (!(k in o1)) late[node + '/' + k] = o2[k]; });
+    });
+    if (Object.keys(late).length > 0) await _saasDb.ref('restaurants/' + newSlug).update(late);
     await _saasDb.ref('restaurants/' + oldSlug).remove();
     // 🔴 Bug corrigé (audit 2026-07-15) : le nœud restaurant migre bien, mais la commande
     // CONTROL_DB associée (forfait/abonnement/historique de paiement, tout ce qui alimente

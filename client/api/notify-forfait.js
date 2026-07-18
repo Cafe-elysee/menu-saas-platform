@@ -266,17 +266,25 @@ function classifyForfaitChange({ cmdData, now, newForfait, oldForfait, newMode, 
 // Montant dû = prix plein du nouveau forfait (carte client) − valeur non utilisée
 // de l'ancien forfait déjà payé, calculée au prorata des jours restants du cycle.
 function computeUpgradeProrata({ cmdData, priceObj, now, oldForfait, oldMode, newForfait, newMode }) {
-  const oldKey = (oldForfait === 'commandes-services' ? 'srv' : 'qr') + '-' + oldMode;
+  // Si un changement de "mode de paiement seul" a eu lieu pendant ce cycle payé,
+  // cmdData.paymentMode/price ne reflètent plus ce qui a RÉELLEMENT été payé pour ce cycle
+  // (nextReminderAt n'a pas bougé, lui) — on utilise l'ancrage figé au moment de ce
+  // changement (cycleAnchorMode/cycleAnchorPrice, voir la branche onlyPaymentMode) en
+  // priorité, sinon le mode/prix actuel reste fiable (aucun changement de mode ce cycle).
+  const effectiveOldMode = (cmdData && cmdData.cycleAnchorMode) || oldMode;
+  const oldKey = (oldForfait === 'commandes-services' ? 'srv' : 'qr') + '-' + effectiveOldMode;
   const newKey = (newForfait === 'commandes-services' ? 'srv' : 'qr') + '-' + newMode;
-  const oldPricePaid = (cmdData && cmdData.prices && cmdData.prices[oldKey] != null)
+  const oldPricePaid = (cmdData && cmdData.cycleAnchorPrice != null)
+    ? cmdData.cycleAnchorPrice
+    : (cmdData && cmdData.prices && cmdData.prices[oldKey] != null)
     ? cmdData.prices[oldKey]
-    : (cmdData && cmdData.price != null ? cmdData.price : priceObj[oldMode][oldForfait]);
+    : (cmdData && cmdData.price != null ? cmdData.price : priceObj[effectiveOldMode][oldForfait]);
   const newFullPrice = (cmdData && cmdData.prices && cmdData.prices[newKey] != null)
     ? cmdData.prices[newKey]
     : priceObj[newMode][newForfait];
   const oldNextReminderAt = (cmdData && cmdData.nextReminderAt) || now;
   const oldEndDate       = oldNextReminderAt;
-  const cycleLengthDays  = oldMode === 'annual' ? 365 : 30;
+  const cycleLengthDays  = effectiveOldMode === 'annual' ? 365 : 30;
   const daysRemaining    = Math.max(0, Math.ceil((oldEndDate - now) / 86400000));
   const rawUnused        = (oldPricePaid / cycleLengthDays) * daysRemaining;
   const unusedValue      = Math.min(oldPricePaid, Math.max(0, Math.round(rawUnused)));
@@ -867,7 +875,11 @@ module.exports = async function handler(req, res) {
         try {
           await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, {
             forfait: pu.forfait, price: pu.prorata.newFullPrice, paymentMode: upgradeMode, paidAt: Date.now(),
-            nextReminderAt: newNextReminderAt, pendingUpgrade: null
+            nextReminderAt: newNextReminderAt, pendingUpgrade: null,
+            // Nouveau cycle réellement payé qui démarre ici : on efface l'ancrage éventuel
+            // d'un changement de mode-seul antérieur, sinon un futur upgrade mi-cycle
+            // continuerait de se baser sur un ancien cycle déjà révolu (voir plus haut).
+            cycleAnchorMode: null, cycleAnchorPrice: null
           });
           await _logForfaitChange(secret, cmdKey, {
             type: 'upgrade-paid',
@@ -1098,9 +1110,22 @@ module.exports = async function handler(req, res) {
 
   // ── Mode "changement du mode de paiement uniquement" (forfait inchangé) ─────
   if (onlyPaymentMode === true) {
+    // 🔴 Bug trouvé par audit élite (2026-07-18) : ce changement écrase paymentMode/price
+    // SANS jamais toucher nextReminderAt (volontaire, "rien à perdre en cours de cycle").
+    // Si un upgrade mi-cycle est ensuite demandé, computeUpgradeProrata() utilisait
+    // aveuglément le NOUVEAU mode/prix pour calculer cycleLengthDays/oldPricePaid alors que
+    // le temps réellement restant (nextReminderAt) reflète encore l'ANCIEN cycle payé — le
+    // client pouvait se voir créditer une fraction du mauvais prix (écart constaté jusqu'à
+    // ~428€ dans un devis). On fige donc une seule fois par cycle payé (cmdData.cycleAnchorMode
+    // reste null tant qu'aucun changement de mode-seul n'a eu lieu depuis le dernier vrai
+    // renouvellement) le mode/prix RÉELLEMENT payé pour ce cycle, avant de l'écraser —
+    // computeUpgradeProrata() lit cet ancrage en priorité (voir plus haut).
+    const anchorPatch = (!cmdData || cmdData.cycleAnchorMode == null)
+      ? { cycleAnchorMode: (cmdData && cmdData.paymentMode) || safeMode, cycleAnchorPrice: (cmdData && cmdData.price != null) ? cmdData.price : price }
+      : null;
     if (cmdKey && secret) {
       try {
-        await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, { paymentMode: safeMode, price });
+        await fbPatch(CONTROL_DB, '/commandes/' + cmdKey, secret, Object.assign({ paymentMode: safeMode, price }, anchorPatch || {}));
         results.sync = 'ok';
       } catch(e) { results.sync = 'error: ' + e.message; }
     } else {

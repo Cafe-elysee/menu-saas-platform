@@ -1217,7 +1217,12 @@ function receiveCall(table, ts) {
 
 function nativeVibrate(pattern) {
   if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-    window.Capacitor.Plugins.Haptics.vibrate({ duration: 1500 }).catch(function() {
+    // L'API native Haptics.vibrate() n'accepte qu'une durée unique (pas un pattern rythmé
+    // comme navigator.vibrate) — on approxime en sommant le pattern, pour que le serveur
+    // continue de distinguer au toucher un appel entrant (long) d'un simple changement
+    // d'onglet (court) même sur build natif Android/iOS.
+    const duration = Array.isArray(pattern) ? pattern.reduce(function(a,b){return a+b;}, 0) : (pattern || 1500);
+    window.Capacitor.Plugins.Haptics.vibrate({ duration: Math.min(duration, 3000) }).catch(function() {
       if (navigator.vibrate) navigator.vibrate(pattern);
     });
   } else if (navigator.vibrate) {

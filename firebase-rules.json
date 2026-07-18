@@ -5,34 +5,34 @@
       "$rid": {
         "devices": {
           ".read": true,
-          ".write": "!newData.exists()",
+          ".write": "auth != null && (!data.exists() || (!newData.exists() && (auth.token.rid === $rid || auth.token.role === 'platform')))",
           "$deviceId": {
-            ".write": "auth != null",
+            ".write": "auth != null && (!data.exists() || newData.exists() || auth.token.rid === $rid || auth.token.role === 'platform')",
             ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
           }
         },
 
         "orders": {
           ".read": true,
-          ".write": "!newData.exists()",
+          ".write": "auth != null && (!data.exists() || (!newData.exists() && (auth.token.rid === $rid || auth.token.role === 'platform')))",
           "$orderId": {
-            ".write": "auth != null",
+            ".write": "auth != null && (!data.exists() || newData.exists() || auth.token.rid === $rid || auth.token.role === 'platform')",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
         "calls": {
           ".read": true,
-          ".write": "!newData.exists()",
+          ".write": "auth != null && (!data.exists() || (!newData.exists() && (auth.token.rid === $rid || auth.token.role === 'platform')))",
           "$callId": {
-            ".write": "auth != null",
+            ".write": "auth != null && (!data.exists() || newData.exists() || auth.token.rid === $rid || auth.token.role === 'platform')",
             ".validate": "!newData.exists() || (newData.hasChildren(['table','ts']) && newData.child('ts').isNumber())"
           }
         },
 
         "logs": {
           ".read": true,
-          ".write": "!newData.exists()",
+          ".write": "auth != null && (!data.exists() || (!newData.exists() && (auth.token.rid === $rid || auth.token.role === 'platform')))",
           "errors": {
             ".write": true,
             "$errId": {
@@ -40,14 +40,14 @@
             }
           },
           "actions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-          "receipts": { ".write": "auth != null" }
+          "receipts": { ".write": "auth != null && (!data.exists() || newData.exists() || auth.token.rid === $rid || auth.token.role === 'platform')" }
         },
 
         "messages": {
           ".read": true,
-          ".write": "!newData.exists()",
+          ".write": "auth != null && (!data.exists() || (!newData.exists() && (auth.token.rid === $rid || auth.token.role === 'platform')))",
           "$msgId": {
-            ".write": "auth != null",
+            ".write": "auth != null && (!data.exists() || newData.exists() || auth.token.rid === $rid || auth.token.role === 'platform')",
             ".validate": "!newData.exists() || (newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length < 500 && newData.child('ts').isNumber())"
           }
         },

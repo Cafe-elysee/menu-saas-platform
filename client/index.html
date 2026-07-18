@@ -8760,6 +8760,15 @@ function _effectivePrice(item, dose) {
 // produit courant (ITEMS) avant tout affichage/envoi de commande.
 function _revalidateCartPrices() {
   let changed = false;
+  // Retire du panier tout produit supprimé ou masqué (visible:false) côté admin depuis son
+  // ajout — sinon il resterait commandable avec un nom/prix figés à sa dernière valeur
+  // connue, alors que le restaurant vient justement de le retirer (rupture de stock, etc.).
+  const before = cartItems.length;
+  cartItems = cartItems.filter(function(ci) {
+    const item = ITEMS.find(it => it.id === ci.id);
+    return !!item && item.visible !== false;
+  });
+  if (cartItems.length !== before) changed = true;
   cartItems.forEach(function(ci) {
     const item = ITEMS.find(it => it.id === ci.id);
     if (!item) return;
@@ -9128,6 +9137,15 @@ function _withTimeout(promise, ms) {
   ]);
 }
 
+// Un retry manuel après un simple timeout réseau (l'écriture Firebase précédente peut
+// encore aboutir en arrière-plan, voir _withTimeout ci-dessous) réutilise le MÊME orderId
+// tant que le panier n'a pas changé — l'écriture devient idempotente (même chemin réécrit
+// avec les mêmes données) au lieu de créer une 2e commande distincte en cuisine.
+let _lastOrderAttempt = null; // { signature, orderId, ts }
+function _cartSignature(items, tableNum, isTakeaway) {
+  return JSON.stringify({ t: isTakeaway ? 'takeaway' : String(tableNum), i: items.map(function(ci) { return ci.id + ':' + ci.qty + ':' + ci.price + ':' + (ci.dose||'') + ':' + (ci.sugar||''); }) });
+}
+
 async function confirmOrder() {
   if (isDemo) { showDemoAction(); return; }
   if (cartItems.length === 0) return;
@@ -9153,9 +9171,7 @@ async function confirmOrder() {
   btn.disabled = true;
   btn.textContent = t.cartSending || 'Envoi en cours…';
 
-  const ts      = Date.now();
-  const orderId = ts + '_' + Math.random().toString(36).slice(2, 7);
-  const items   = cartItems.map(function(ci) {
+  const items = cartItems.map(function(ci) {
     const it = {
       id: ci.id,
       name: ci.nameObj ? (ci.nameObj.fr || ci.nameObj[lang] || Object.values(ci.nameObj)[0] || '') : (ci.name || ''),
@@ -9165,6 +9181,19 @@ async function confirmOrder() {
     if (ci.sugar) it.sugar = ci.sugar;
     return it;
   });
+
+  // Retry manuel sur le même panier (après un timeout réseau) : réutilise le même
+  // orderId/ts au lieu d'en générer un nouveau, pour que l'écriture Firebase reste
+  // idempotente même si la tentative précédente finit par aboutir en arrière-plan.
+  const _sig = _cartSignature(cartItems, tableNum, isTakeaway);
+  let ts, orderId;
+  if (_lastOrderAttempt && _lastOrderAttempt.signature === _sig) {
+    ts = _lastOrderAttempt.ts; orderId = _lastOrderAttempt.orderId;
+  } else {
+    ts = Date.now(); orderId = ts + '_' + Math.random().toString(36).slice(2, 7);
+    _lastOrderAttempt = { signature: _sig, orderId, ts };
+  }
+
   const total   = getCartTotal().toFixed(2) + ' €';
   const order   = { tableNum, table: isTakeaway ? 'takeaway' : String(tableNum), ts, items, total, status: 'pending', createdAt: ts };
 
@@ -9215,6 +9244,7 @@ async function confirmOrder() {
         <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">${isTakeaway ? (t.histTakeaway || 'À emporter') : (t.destTable || '🪑 À table')}</div>
       </div>`;
     cartItems = [];
+    _lastOrderAttempt = null;
     saveCart();
     updateCartBar();
     updateCardBadges();
@@ -10165,7 +10195,7 @@ function _refreshSheetTexts() {
   if (!sheetItem) return;
   const t = UI[lang];
   const item = sheetItem;
-  document.getElementById('sh-name').textContent = _esc(item.name[lang]||item.name.fr||'');
+  document.getElementById('sh-name').textContent = item.name[lang]||item.name.fr||'';
   const _shEl = document.getElementById('sh-price'); if (_shEl) _shEl.innerHTML = _priceHtml(item);
   document.getElementById('sh-desc').textContent = item.full[lang]||item.full.fr||item.desc[lang]||item.desc.fr||'';
   document.getElementById('al-lbl').textContent = t.alLabel;
