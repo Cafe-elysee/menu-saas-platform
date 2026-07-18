@@ -2743,7 +2743,7 @@
         <div class="settings-sec-hd" id="settings-staffmsg-hd" style="font-size:0.68rem;opacity:0.6;padding:0;margin-bottom:4px;font-weight:500;letter-spacing:0.04em">Message à l'équipe</div>
         <div id="settings-staffmsg-hint" style="font-size:0.74rem;color:var(--muted);margin-bottom:6px;line-height:1.5">Envoyez une note écrite, visible immédiatement dans l'onglet Messages de l'application Serveur, sur les téléphones de toute votre équipe.</div>
         <div style="display:flex;gap:8px;align-items:flex-end">
-          <textarea id="settings-staffmsg-input" class="inline-input" placeholder="Ex : rupture de stock du jour…" maxlength="500" rows="2" style="flex:1;resize:vertical;font-family:inherit;line-height:1.4;padding-top:8px"></textarea>
+          <textarea id="settings-staffmsg-input" class="inline-input" placeholder="Ex : rupture de stock du jour…" maxlength="499" rows="2" aria-labelledby="settings-staffmsg-hd" style="flex:1;resize:vertical;font-family:inherit;line-height:1.4;padding-top:8px"></textarea>
           <button id="settings-staffmsg-btn" class="btn-settings-gold" style="flex:0 0 auto" onclick="sendStaffMessage()">Envoyer</button>
         </div>
         <div id="settings-staffmsg-fb" style="font-size:0.74rem;min-height:1em;margin-top:2px"></div>
@@ -9171,14 +9171,17 @@ async function saveStaffPin() {
 async function sendStaffMessage() {
   const inp = document.getElementById('settings-staffmsg-input');
   const fb  = document.getElementById('settings-staffmsg-fb');
+  const btn = document.getElementById('settings-staffmsg-btn');
   const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
   const val = (inp?.value || '').trim();
   if (!val) {
     if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.staffMsgEmpty || 'Écrivez un message avant d\'envoyer.'; }
     return;
   }
-  const txt = val.length > 500 ? val.slice(0, 500) : val;
+  if (btn?.disabled) return; // évite le double-envoi si l'utilisateur clique plusieurs fois
+  const txt = val.length > 499 ? val.slice(0, 499) : val;
   if (fb) { fb.style.color = 'var(--muted)'; fb.textContent = '…'; }
+  if (btn) btn.disabled = true;
   try {
     const ts = Date.now();
     await _rref('messages/' + ts).set({ text: txt, ts: ts });
@@ -9186,6 +9189,8 @@ async function sendStaffMessage() {
     if (fb) { fb.style.color = 'var(--green)'; fb.textContent = t.staffMsgSent || '✅ Message envoyé à l\'équipe'; }
   } catch (e) {
     if (fb) { fb.style.color = 'var(--red)'; fb.textContent = t.settingsErr || '❌ Erreur'; }
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
