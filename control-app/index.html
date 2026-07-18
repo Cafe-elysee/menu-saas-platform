@@ -10,6 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Correctif police grecque — Cormorant Garamond/Outfit n'incluent aucun glyphe grec
+       (fallback système sinon, plus grand/incohérent). On complète uniquement la plage
+       Unicode grecque, aucune règle font-family existante n'est modifiée. */
+    @font-face{font-family:'Cormorant Garamond';src:url(https://fonts.gstatic.com/s/ebgaramond/v33/SlGUmQSNjdsmc35JDF1K5GR2SDktYw.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+    @font-face{font-family:'Outfit';src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+  </style>
   <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
@@ -5547,7 +5554,7 @@ async function confirmRetention() {
 // ════════════════════════════════════════════════════
 const DP_CLOUD  = 'dowi189l9';
 const DP_PRESET = 'menu_photos';
-const DP_MAX_W  = 1600;
+const DP_MAX_W  = 2400;
 
 function showDemoPhoto(id, n, url) {
   const img  = document.getElementById('dp-img-'+id+'-'+n);
@@ -5586,7 +5593,7 @@ function uploadDemoPhoto(id, n, input) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-      showDemoPhoto(id, n, canvas.toDataURL('image/jpeg', 0.82));
+      showDemoPhoto(id, n, canvas.toDataURL('image/jpeg', 0.94));
       _dpSetLoading(id, n, true);
       showToast('Upload en cours…');
 
@@ -5605,7 +5612,7 @@ function uploadDemoPhoto(id, n, input) {
           showDemoPhoto(id, n, '');
           showToast('Erreur upload : ' + err.message);
         }
-      }, 'image/jpeg', 0.82);
+      }, 'image/jpeg', 0.94);
     };
     img.src = e.target.result;
   };
@@ -5725,7 +5732,7 @@ function uploadContentPhoto(itemKey, slot, input) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-      showContentPhoto(itemKey, slot, canvas.toDataURL('image/jpeg', 0.82));
+      showContentPhoto(itemKey, slot, canvas.toDataURL('image/jpeg', 0.94));
       _cpSetLoading(itemKey, slot, true);
       showToast('Upload en cours…');
 
@@ -5744,7 +5751,7 @@ function uploadContentPhoto(itemKey, slot, input) {
           showContentPhoto(itemKey, slot, '');
           showToast('Erreur upload : ' + err.message);
         }
-      }, 'image/jpeg', 0.82);
+      }, 'image/jpeg', 0.94);
     };
     img.src = e.target.result;
   };
@@ -5865,7 +5872,7 @@ function uploadGuidePhoto(key, input) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-      showGuidePhoto(key, canvas.toDataURL('image/jpeg', 0.82));
+      showGuidePhoto(key, canvas.toDataURL('image/jpeg', 0.94));
       _guSetLoading(key, true);
       showToast('Upload en cours…');
 
@@ -5884,7 +5891,7 @@ function uploadGuidePhoto(key, input) {
           showGuidePhoto(key, '');
           showToast('Erreur upload : ' + err.message);
         }
-      }, 'image/jpeg', 0.82);
+      }, 'image/jpeg', 0.94);
     };
     img.src = e.target.result;
   };
@@ -5984,7 +5991,7 @@ function uploadThemePhoto(id, input) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-      showThemePhoto(id, canvas.toDataURL('image/jpeg', 0.82));
+      showThemePhoto(id, canvas.toDataURL('image/jpeg', 0.94));
       _thSetLoading(id, true);
       showToast('Upload en cours…');
 
@@ -6003,7 +6010,7 @@ function uploadThemePhoto(id, input) {
           showThemePhoto(id, '');
           showToast('Erreur upload : ' + err.message);
         }
-      }, 'image/jpeg', 0.82);
+      }, 'image/jpeg', 0.94);
     };
     img.src = e.target.result;
   };

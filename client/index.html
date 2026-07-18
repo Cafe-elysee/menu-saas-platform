@@ -43,6 +43,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
+    /* Correctif police grecque — Cormorant/Playfair Display/Outfit n'incluent aucun glyphe
+       grec (le navigateur bascule alors sur sa police système par défaut, visuellement plus
+       grande/incohérente avec le reste du design). On complète uniquement la plage Unicode
+       grecque avec une police assortie (EB Garamond pour les serifs, Inter pour Outfit) —
+       aucune règle font-family existante n'est modifiée, aucun impact sur les autres langues. */
+    @font-face{font-family:'Cormorant';src:url(https://fonts.gstatic.com/s/ebgaramond/v33/SlGUmQSNjdsmc35JDF1K5GR2SDktYw.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+    @font-face{font-family:'Playfair Display';src:url(https://fonts.gstatic.com/s/ebgaramond/v33/SlGUmQSNjdsmc35JDF1K5GR2SDktYw.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+    @font-face{font-family:'Outfit';src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+  </style>
+  <style>
     /* Respecte "réduire les animations" du système (WCAG 2.3.3) — coupe les
        animations/transitions décoratives (bokeh, glow, pulse...) sans casser
        l'affichage, quel que soit l'ordre des règles définies plus bas. */

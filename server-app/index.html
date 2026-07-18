@@ -10,6 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* Correctif police grecque — Crimson Pro/Outfit n'incluent aucun glyphe grec (fallback
+       système sinon, plus grand/incohérent). On complète uniquement la plage Unicode
+       grecque, aucune règle font-family existante n'est modifiée. */
+    @font-face{font-family:'Crimson Pro';src:url(https://fonts.gstatic.com/s/ebgaramond/v33/SlGUmQSNjdsmc35JDF1K5GR2SDktYw.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+    @font-face{font-family:'Outfit';src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF;font-display:swap}
+  </style>
+  <style>
     :root {
       --bg:      #0a0908;
       --bg2:     #111009;
