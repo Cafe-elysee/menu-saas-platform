@@ -9430,36 +9430,45 @@ function _logAction(type, extra) {
 let _tableCount = 0;
 
 function loadTableSystem() {
-  // 🔴 Fix (2026-07-22) : sans callback d'erreur, un PERMISSION_DENIED (session Firebase
-  // Auth périmée/invalide) laissait le badge et _tableCount bloqués silencieusement à 0
-  // pour toujours — aucune erreur nulle part, "Générer"/"PDF QR" semblaient ne rien faire.
-  // Voir feedback_pagedemo_tables_qr_investigation_2026_07_22.
-  _rref('config/tableCount').on('value', snap => {
-    const n = parseInt(snap.val()) || 0;
-    _tableCount = n;
-    const input = document.getElementById('tables-count-input');
-    if (input && n > 0) input.value = n;
-    const badge = document.getElementById('tables-count-badge');
-    if (badge) badge.textContent = n;
-    renderTableURLs(n);
-  }, () => {
-    // Lecture refusée/échouée (session périmée) — tenter une reconnexion silencieuse
-    // puis réessayer une fois, sans jamais laisser l'échec invisible pour l'utilisateur.
-    _ensureAuthed().then(() => {
-      _rref('config/tableCount').once('value').then(snap => {
-        const n = parseInt(snap.val()) || 0;
-        _tableCount = n;
-        const input = document.getElementById('tables-count-input');
-        if (input && n > 0) input.value = n;
-        const badge = document.getElementById('tables-count-badge');
-        if (badge) badge.textContent = n;
-        renderTableURLs(n);
-      }).catch(() => {
+  // 🔴 Fix (2026-07-22) : sans callback d'erreur, un PERMISSION_DENIED sur la toute
+  // première tentative (course possible avec l'accès optimiste — showAdmin() peut
+  // s'afficher AVANT que _silentReauth() ait fini de rétablir une vraie session Firebase
+  // Auth, voir _ensureAuthed()/checkLogin()) faisait annuler DÉFINITIVEMENT ce listener
+  // .on() côté Firebase (comportement natif : un .on() avec callback d'erreur se
+  // désabonne lui-même dès qu'il essuie un refus) — le badge/_tableCount restaient
+  // bloqués à 0 pour toujours, sans qu'aucune erreur ne soit jamais visible.
+  // 🔴 Round 2 (même jour) : un 1er correctif ne refaisait qu'une lecture UNIQUE
+  // (.once) après reconnexion au lieu de RÉABONNER une vraie écoute .on() — un nouvel
+  // Enregistrement réussissait (toast affiché) mais la liste ne se mettait plus jamais
+  // à jour toute seule tant que la page n'était pas rechargée manuellement (elle
+  // relance loadTableSystem() depuis zéro, ce qui donnait l'illusion d'un "fix" par
+  // rafraîchissement). Voir feedback_pagedemo_tables_qr_investigation_2026_07_22.
+  let _tblListenAttempts = 0;
+  function _attachTableListener() {
+    _rref('config/tableCount').on('value', snap => {
+      _tblListenAttempts = 0; // une lecture réussie remet le compteur à zéro
+      const n = parseInt(snap.val()) || 0;
+      _tableCount = n;
+      const input = document.getElementById('tables-count-input');
+      if (input && n > 0) input.value = n;
+      const badge = document.getElementById('tables-count-badge');
+      if (badge) badge.textContent = n;
+      renderTableURLs(n);
+    }, () => {
+      // Lecture refusée/échouée — reconnexion puis RÉABONNEMENT d'un nouveau listener
+      // .on() (jamais une simple lecture ponctuelle .once, qui laisserait les futurs
+      // changements invisibles sans rafraîchissement manuel). Plafonné à 3 tentatives
+      // pour ne jamais boucler indéfiniment si l'utilisateur est réellement déconnecté.
+      _tblListenAttempts++;
+      if (_tblListenAttempts > 3) {
         const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
         showToastMsg(t.settingsErr || '❌ Erreur', true);
-      });
+        return;
+      }
+      _ensureAuthed().then(() => { _attachTableListener(); });
     });
-  });
+  }
+  _attachTableListener();
 
   const saveBtn = document.getElementById('tables-count-save');
   if (saveBtn) saveBtn.addEventListener('click', async () => {
