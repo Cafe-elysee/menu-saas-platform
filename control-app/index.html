@@ -2602,6 +2602,10 @@ document.addEventListener('keydown', e => {
   if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
   var _vm = document.getElementById('variant-modal');
   if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
+  // 🔴 Fix (2026-07-22, audit SKILL.md) : oublié de cette liste — sans lui, Échap sur ce
+  // sheet ne faisait rien (aucun impact fonctionnel, juste pas de raccourci clavier).
+  var _qns = document.getElementById('quick-nav-sheet');
+  if (_qns && _qns.classList.contains('open')) { closeQuickNav(); return; }
 });
 document.getElementById('login-pw').addEventListener('keydown', e => {
   if (e.key === 'Enter') { _isFirstRun ? document.getElementById('login-pw2').focus() : tryLogin(); }
@@ -3984,6 +3988,9 @@ function _saveFirstOpenAt(key, newTs) {
 
   _controlWrite('/commandes/' + key, 'update', update)
     .then(function() {
+      // 🔴 Fix (2026-07-22, audit SKILL.md) : le toast de succès s'affichait avant, en
+      // synchrone, hors de ce .then() — même défaut déjà corrigé sur _markPaid/_saveComboPrice.
+      showToast('📅 Date d\'anniversaire mise à jour' + (!d.paidAt ? ' — cycle d\'essai recalculé' : ''));
       if (rid && Object.keys(mainUpdate).length > 0) {
         _saasDb.ref('restaurants/' + rid + '/config/subscription').update(mainUpdate).catch(function() {
           showToast('⚠ Date enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
@@ -3996,7 +4003,6 @@ function _saveFirstOpenAt(key, newTs) {
       _doRenderPaiements();
       showToast('⚠ Erreur de synchronisation — réessayez.');
     });
-  showToast('📅 Date d\'anniversaire mise à jour' + (!d.paidAt ? ' — cycle d\'essai recalculé' : ''));
 }
 
 function _markPaid(key) {
@@ -6269,6 +6275,11 @@ document.addEventListener('deviceready', () => {
       if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
       var _vm = document.getElementById('variant-modal');
       if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
+      // 🔴 Fix (2026-07-22, audit SKILL.md) : oublié de cette liste — le bouton retour
+      // physique fermait l'app ENTIÈRE au lieu du sheet quand celui-ci était ouvert
+      // (aucune des conditions ci-dessus ne matchait, donc _CapApp.exitApp() s'exécutait).
+      var _qns = document.getElementById('quick-nav-sheet');
+      if (_qns && _qns.classList.contains('open')) { closeQuickNav(); return; }
       _CapApp.exitApp();
     });
 

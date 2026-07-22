@@ -1239,11 +1239,23 @@ function nativeVibrate(pattern) {
 
 
 function addMessage(text, ts) {
-  messages.unshift({ id: Date.now(), text: text, ts: new Date(ts || Date.now()), read: false });
+  // 🔴 Fix (2026-07-22, audit SKILL.md) : même déduplication par proximité de ts que le
+  // listener Firebase temps réel (startMessagesListener, ligne ~1190) — sans elle, un
+  // message pouvait apparaître deux fois si le listener Firebase le traitait AVANT que
+  // la notification push FCM correspondante n'arrive (latence FCM plus longue que le
+  // temps réel Firebase, cas courant en arrière-plan prolongé/Doze Android).
+  var _msgTs = ts || Date.now();
+  var _dup = messages.some(function(m) {
+    var mTs = m.ts instanceof Date ? m.ts.getTime() : +m.ts;
+    return Math.abs(mTs - _msgTs) < 2000;
+  });
+  if (_dup) return false;
+  messages.unshift({ id: Date.now(), text: text, ts: new Date(_msgTs), read: false });
   if (messages.length > 100) messages.pop();
   saveMessages();
   renderMessages();
   updateMessagesBadge();
+  return true;
 }
 
 /* ── TIME HELPERS ── */
@@ -2472,6 +2484,18 @@ document.addEventListener('deviceready', function() {
   if (_CapApp) {
     _CapApp.addListener('resume', function() {
       try { firebase.database().goOffline(); firebase.database().goOnline(); } catch(e) {}
+    });
+    // 🔴 Fix (2026-07-22, audit SKILL.md) : ce fichier n'avait AUCUN listener backButton
+    // Capacitor — un serveur qui reçoit la popup de confirmation (#confirm-modal) et
+    // appuie sur le bouton retour physique fermait l'app entière au lieu de simplement
+    // annuler la popup (même pattern déjà en place sur control-app, jamais repris ici).
+    // Les écrans plein écran (setup/onboarding/pause) ne sont volontairement PAS
+    // interceptés — ce ne sont pas des dialogues annulables, quitter reste le
+    // comportement attendu du bouton retour dessus.
+    _CapApp.addListener('backButton', function() {
+      var modal = document.getElementById('confirm-modal');
+      if (modal && modal.style.display !== 'none') { _hideConfirm(); return; }
+      _CapApp.exitApp();
     });
   }
 }, false);

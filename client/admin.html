@@ -811,7 +811,13 @@
     /* Texte gold nu (pas un badge à fond opaque) sur fond clair : var(--gold) seul ≈2.3:1,
        sous le seuil AA — même correctif que le reste du projet (#6b5218 ≈5-6:1). */
     html.light .table-url-num,
-    html.light .qr-pdf-btn { color:#6b5218; }
+    html.light .qr-pdf-btn,
+    html.light .prod-top-qty,
+    html.light #adm-confirm-title { color:#6b5218; }
+    /* Même correctif pour les <strong style="color:var(--gold)"> inline (montants de
+       facturation, mots mis en avant dans un message) — !important nécessaire, un style
+       inline ne peut jamais être surchargé par une règle externe sans lui. */
+    html.light strong[style*="color:var(--gold)"] { color:#6b5218 !important; }
     .qr-pdf-btn { margin-left:auto; font-size:0.74rem; color:var(--gold); background:transparent; padding:6px 13px; border:1px solid rgba(200,164,78,0.38); border-radius:9px; cursor:pointer; font-family:inherit; transition:all 0.2s; display:inline-flex; align-items:center; gap:5px; font-weight:600; }
     .qr-pdf-btn:hover { border-color:var(--gold); background:rgba(200,164,78,0.1); transform:translateY(-1px); }
     /* ── QR MODAL ── */
@@ -6659,6 +6665,7 @@ function renderProdCard(container, item, ci) {
   const card = document.createElement('div');
   card.className = 'prod-card';
   card.dataset.id = item.id;
+  const _tProd = ADMIN_UI[currentLang] || ADMIN_UI.fr;
 
   const imgSrc = item.photo
     ? (item.photo.startsWith('data:') || item.photo.startsWith('http')
@@ -6681,7 +6688,7 @@ function renderProdCard(container, item, ci) {
   const _isVisible = item.visible !== false;
   card.innerHTML = `
     <div class="prod-card-top">
-      <div class="drag-handle" draggable="false" title="Maintenir pour déplacer">
+      <div class="drag-handle" draggable="false" title="${esc(_tProd.btnMove || '')}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
       </div>
       ${thumbHTML}
@@ -6690,10 +6697,10 @@ function renderProdCard(container, item, ci) {
         <div class="prod-top-price">${item.salePrice ? `<span style="text-decoration:line-through;opacity:0.5;font-size:0.85em;margin-right:4px">${esc(item.price||'')}</span><span style="color:#e05252">${esc(item.salePrice)}</span>` : esc(item.price||'')}</div>
       </div>
       <div class="prod-top-actions">
-        <button class="prod-vis-btn ${_isVisible ? 'on' : ''}" title="">
+        <button class="prod-vis-btn ${_isVisible ? 'on' : ''}" title="${esc(_tProd.prodVisibleLabel || '')}">
           ${_isVisible ? _eyeOn : _eyeOff}
         </button>
-        <button class="prod-del-btn" title="">✕</button>
+        <button class="prod-del-btn" title="${esc(_tProd.deleteTitle || '')}">✕</button>
       </div>
       <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
     </div>
@@ -6727,8 +6734,9 @@ function renderProdCard(container, item, ci) {
     const _idx = adminData.items.findIndex(it => it.id === item.id);
     if (_idx !== -1) {
       _lastLocalSave = Date.now();
-      if (nowVisible) _rref('menu/items/' + _idx + '/visible').remove();
-      else _rref('menu/items/' + _idx + '/visible').set(false);
+      // 🔴 Fix (2026-07-22, audit SKILL.md) : écriture brute sans gestion d'erreur, contrairement
+      // au toggle équivalent des catégories (déjà migré vers _writeOrRemove, avec retry).
+      _writeOrRemove('menu/items/' + _idx + '/visible', nowVisible ? undefined : false);
     }
   });
 
@@ -9064,26 +9072,63 @@ async function saveRestaurantName() {
   }
 }
 
+// 🔴 Fix (2026-07-22, audit SKILL.md) : ces 3 fonctions n'avaient aucun try/catch/toast —
+// une écriture Firebase échouée (réseau instable) laissait la case/le select dans l'état
+// visuel cliqué par l'utilisateur SANS que rien ne soit réellement enregistré, sans aucune
+// indication d'erreur. Même pattern déjà en place ailleurs dans ce fichier (_writeToggleField).
 async function adminToggleLang(lang, enabled) {
   const remaining = LANGS.filter(l => l !== lang && _settingsLangData.enabled[l] !== false);
   if (!enabled && remaining.length === 0) { _settingsRenderLangToggles(); return; }
-  await _rref('/config/enabledLangs/' + lang).set(enabled);
-  if (!enabled && _settingsLangData.default === lang) {
-    const rep = remaining[0] || 'fr';
-    await _rref('/config/defaultLang').set(rep);
-  }
-  if (!enabled && _settingsLangData.primary === lang) {
-    const rep = remaining[0] || 'fr';
-    await _rref('/config/primaryLang').set(rep);
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  try {
+    await _rref('/config/enabledLangs/' + lang).set(enabled);
+    if (!enabled && _settingsLangData.default === lang) {
+      const rep = remaining[0] || 'fr';
+      await _rref('/config/defaultLang').set(rep);
+    }
+    if (!enabled && _settingsLangData.primary === lang) {
+      const rep = remaining[0] || 'fr';
+      await _rref('/config/primaryLang').set(rep);
+    }
+  } catch (e) {
+    try {
+      await _ensureAuthed();
+      await _rref('/config/enabledLangs/' + lang).set(enabled);
+    } catch (e2) {
+      _settingsRenderLangToggles();
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
   }
 }
 
-function adminSetDefaultLang(lang) {
-  _rref('/config/defaultLang').set(lang);
+async function adminSetDefaultLang(lang) {
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  try {
+    await _rref('/config/defaultLang').set(lang);
+  } catch (e) {
+    try {
+      await _ensureAuthed();
+      await _rref('/config/defaultLang').set(lang);
+    } catch (e2) {
+      _settingsUpdateLangSelects();
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
+  }
 }
 
-function adminSetPrimaryLang(lang) {
-  _rref('/config/primaryLang').set(lang);
+async function adminSetPrimaryLang(lang) {
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  try {
+    await _rref('/config/primaryLang').set(lang);
+  } catch (e) {
+    try {
+      await _ensureAuthed();
+      await _rref('/config/primaryLang').set(lang);
+    } catch (e2) {
+      _settingsUpdateLangSelects();
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
+  }
 }
 
 async function saveAdminPassword() {
@@ -9380,9 +9425,14 @@ function renderOrdersAdmin(orders) {
     const tableLabel = isNum ? `${t.ordTable} ${o.tableNum}` : t.ordTakeaway;
     const isCollapsed = !expanded.has('oadm-' + o.id);
     const chevronSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    // 🔴 Fix sécurité (2026-07-22, audit SKILL.md) : o.id est la CLÉ Firebase du nœud
+    // orders/$orderId, choisie librement par quiconque écrit une commande (client
+    // anonyme) — jamais interpolée dans un attribut onclick (esc() ne protège pas le
+    // guillemet simple, qui casserait hors de la chaîne JS même échappé pour le HTML).
+    // Remplacé par data-oid + délégation d'événements (voir _setupOrdersAdminDelegation()).
     return `
-    <div class="order-adm-card ${statusClass}${isCollapsed ? ' collapsed' : ''}" id="oadm-${o.id}">
-      <div class="order-adm-hd" onclick="toggleOrderCard('oadm-${o.id}')">
+    <div class="order-adm-card ${statusClass}${isCollapsed ? ' collapsed' : ''}" id="oadm-${esc(o.id)}" data-oid="${esc(o.id)}">
+      <div class="order-adm-hd" data-oadm-toggle="1">
         <div class="order-adm-table">${tableLabel}</div>
         <div class="order-adm-time">${timeStr}</div>
         <div class="order-adm-total-hd">${esc(o.total || '—')}</div>
@@ -9394,15 +9444,41 @@ function renderOrdersAdmin(orders) {
           <div class="order-adm-body-pad">
             <div class="order-adm-items">${itemsHtml}</div>
             <div class="order-adm-btns">
-              <button class="order-adm-btn btn-pending ${o.status==='pending'?'active-btn':''}" onclick="setOrderStatus('${o.id}','pending')">${t.ordPending}</button>
-              <button class="order-adm-btn btn-progress ${o.status==='in_progress'?'active-btn':''}" onclick="setOrderStatus('${o.id}','in_progress')">${t.ordProgress}</button>
-              <button class="order-adm-btn btn-done ${o.status==='done'?'active-btn':''}" onclick="setOrderStatus('${o.id}','done')">${t.ordDone}</button>
+              <button class="order-adm-btn btn-pending ${o.status==='pending'?'active-btn':''}" data-oadm-status="pending">${t.ordPending}</button>
+              <button class="order-adm-btn btn-progress ${o.status==='in_progress'?'active-btn':''}" data-oadm-status="in_progress">${t.ordProgress}</button>
+              <button class="order-adm-btn btn-done ${o.status==='done'?'active-btn':''}" data-oadm-status="done">${t.ordDone}</button>
             </div>
           </div>
         </div>
       </div>
     </div>`;
   }).join('');
+  _setupOrdersAdminDelegation();
+}
+
+// Délégation d'événements unique (idempotent) pour la liste Commandes — jamais de
+// donnée Firebase interpolée dans un attribut onclick. `closest('[data-oid]')` retrouve
+// l'id de commande réel (jamais ré-échappé, lu tel quel via .dataset — immune à toute
+// injection HTML/JS puisqu'il ne passe jamais par une reconstruction de chaîne exécutée).
+let _ordersAdmDelegationSet = false;
+function _setupOrdersAdminDelegation() {
+  if (_ordersAdmDelegationSet) return;
+  _ordersAdmDelegationSet = true;
+  const list = document.getElementById('orders-admin-list');
+  if (!list) return;
+  list.addEventListener('click', e => {
+    const statusBtn = e.target.closest('[data-oadm-status]');
+    if (statusBtn) {
+      const card = statusBtn.closest('[data-oid]');
+      if (card) setOrderStatus(card.dataset.oid, statusBtn.dataset.oadmStatus);
+      return;
+    }
+    const hd = e.target.closest('[data-oadm-toggle]');
+    if (hd) {
+      const card = hd.closest('.order-adm-card');
+      if (card) card.classList.toggle('collapsed');
+    }
+  });
 }
 
 function toggleOrderCard(cardId) {

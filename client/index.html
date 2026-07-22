@@ -7708,6 +7708,8 @@ const _ARIA_LABELS = {
   cartModal:  { fr:'Panier',            en:'Cart',              de:'Warenkorb',          el:'Καλάθι',                es:'Carrito' },
   doseModal:  { fr:'Personnaliser',     en:'Customize',         de:'Anpassen',           el:'Προσαρμογή',            es:'Personalizar' },
   themeModal: { fr:'Thème',             en:'Theme',             de:'Design',             el:'Θέμα',                  es:'Tema' },
+  toggleTheme:{ fr:'Changer de thème',  en:'Toggle theme',      de:'Design wechseln',    el:'Εναλλαγή θέματος',      es:'Cambiar tema' },
+  scrollTop:  { fr:'Retour en haut',    en:'Scroll to top',     de:'Nach oben scrollen', el:'Επιστροφή στην κορυφή', es:'Volver arriba' },
 };
 function _aria(key) { const m=_ARIA_LABELS[key]||{}; return m[lang]||m.fr||''; }
 
@@ -10246,6 +10248,8 @@ function applyTranslations() {
   _ariaSetById('hist-modal', 'myOrders');
   _ariaSetById('dose-modal', 'doseModal');
   _ariaSetById('pd-theme-modal', 'themeModal');
+  _ariaSetById('theme-btn', 'toggleTheme');
+  _ariaSetById('fab', 'scrollTop');
   // Modal "Appeler le serveur" — fixée une seule fois à l'ouverture (openTableModal), jamais
   // retraduite si la langue change PENDANT qu'elle est déjà ouverte (déclenché en direct par les
   // listeners Firebase config/defaultLang ou config/enabledLangs, pas seulement par un choix
