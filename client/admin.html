@@ -3350,7 +3350,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
     chartProductsTitle:'Κορυφαία προϊόντα', chartEmpty:'Δεν υπάρχουν δεδομένα', chartTopN:'top 10',
     scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
-    btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια', tblGenFirst:'Δημιουργήστε πρώτα τα τραπέζια σας παρακάτω.',
+    btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblOpen:'↗ Άνοιγμα', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια', tblGenFirst:'Δημιουργήστε πρώτα τα τραπέζια σας παρακάτω.',
     btnDelLogo:    'Διαγραφή λογοτύπου',
     loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.',
     subPayBadge:'Πληρωμή σε εκκρεμότητα', subPayBtn:'Πληρωμή',
@@ -3511,7 +3511,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
     chartProductsTitle:'Produits les plus vendus', chartEmpty:'Aucune donnée sur cette période', chartTopN:'top 10',
     scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
-    btnGenerate:'Générer', tblLabel:'Table', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables', tblGenFirst:'Générez d\'abord vos tables ci-dessous.',
+    btnGenerate:'Générer', tblLabel:'Table', tblOpen:'↗ Ouvrir', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables', tblGenFirst:'Générez d\'abord vos tables ci-dessous.',
     btnDelLogo:    'Supprimer le logo',
     loginErrSuspended:'Ce compte est suspendu ou introuvable.',
     subPayBadge:'Paiement en attente', subPayBtn:'Payer',
@@ -3672,7 +3672,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
     chartProductsTitle:'Top products', chartEmpty:'No data for this period', chartTopN:'top 10',
     scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
-    btnGenerate:'Generate', tblLabel:'Table', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables', tblGenFirst:'Generate your tables below first.',
+    btnGenerate:'Generate', tblLabel:'Table', tblOpen:'↗ Open', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables', tblGenFirst:'Generate your tables below first.',
     btnDelLogo:    'Delete logo',
     loginErrSuspended:'This account is suspended or does not exist.',
     subPayBadge:'Payment pending', subPayBtn:'Pay now',
@@ -3833,7 +3833,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
     chartProductsTitle:'Top-Produkte', chartEmpty:'Keine Daten für diesen Zeitraum', chartTopN:'top 10',
     scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
-    btnGenerate:'Generieren', tblLabel:'Tisch', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische', tblGenFirst:'Erstellen Sie zuerst unten Ihre Tische.',
+    btnGenerate:'Generieren', tblLabel:'Tisch', tblOpen:'↗ Öffnen', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische', tblGenFirst:'Erstellen Sie zuerst unten Ihre Tische.',
     btnDelLogo:    'Logo löschen',
     loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.',
     subPayBadge:'Zahlung ausstehend', subPayBtn:'Zahlen',
@@ -3994,7 +3994,7 @@ const ADMIN_UI = {
     chartOrdersTitle:'Pedidos por mesa', chartCallsTitle:'Llamadas por mesa',
     chartProductsTitle:'Mejores productos', chartEmpty:'No hay datos para este período', chartTopN:'top 10',
     scAnalytics:'📊 Estadísticas', statsSectionTitle:'Estadísticas',
-    btnGenerate:'Generar', tblLabel:'Mesa', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas', tblGenFirst:'Genera primero tus mesas abajo.',
+    btnGenerate:'Generar', tblLabel:'Mesa', tblOpen:'↗ Abrir', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas', tblGenFirst:'Genera primero tus mesas abajo.',
     btnDelLogo:    'Eliminar logo',
     loginErrSuspended:'Esta cuenta está suspendida o no existe.',
     subPayBadge:'Pago pendiente', subPayBtn:'Pagar',
@@ -9589,7 +9589,7 @@ function renderTableURLs(n) {
       '<div class="table-url-row">' +
         '<div class="table-url-num">' + (t.tblLabel || 'Table') + ' ' + i + '</div>' +
         '<div class="table-url-link" title="' + url + '">' + url + '</div>' +
-        '<button class="table-url-open" onclick="window.open(\'' + url + '\',\'_blank\')">↗ Ouvrir</button>' +
+        '<button class="table-url-open" onclick="window.open(\'' + url + '\',\'_blank\')">' + (t.tblOpen || '↗ Ouvrir') + '</button>' +
         '<button class="table-url-copy" onclick="copyTableURL(this,\'' + url + '\')">' + (t.tblCopy || 'Copier') + '</button>' +
       '</div>');
   }
