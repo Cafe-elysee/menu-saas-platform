@@ -2195,18 +2195,6 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="theme-modal">
-  <div class="modal-box">
-    <h3>Thème en cours d'utilisation</h3>
-    <p id="theme-modal-msg"></p>
-    <select class="modal-sel" id="theme-modal-sel"></select>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="cancelThemeDisable()">Annuler</button>
-      <button class="modal-confirm" onclick="confirmThemeDisable()">Confirmer</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="variant-modal">
   <div class="modal-box variant-modal-box">
     <h3 id="variant-modal-title">Couleurs</h3>
@@ -2598,8 +2586,6 @@ document.addEventListener('keydown', e => {
   if (_rm && _rm.classList.contains('open')) { cancelRetention(); return; }
   var _lm = document.getElementById('lang-modal');
   if (_lm && _lm.classList.contains('open')) { cancelLangDisable(); return; }
-  var _tm = document.getElementById('theme-modal');
-  if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
   var _vm = document.getElementById('variant-modal');
   if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
   // 🔴 Fix (2026-07-22, audit SKILL.md) : oublié de cette liste — sans lui, Échap sur ce
@@ -5396,54 +5382,6 @@ function cancelLangDisable() {
 }
 
 // ════════════════════════════════════════════════════
-// THÈMES
-// ════════════════════════════════════════════════════
-let _pendingThemeDisable = null;
-
-window.toggleThemeVis = function(slug, themeId, isChecked) {
-  const db = getClientDb(slug);
-  if (!isChecked) {
-    db.ref('menu').once('value').then(snap => {
-      const data   = snap.val() || {};
-      const active = data.menuTheme || 'carte-classique';
-      const hidden = data.hiddenThemes || {};
-      if (active === themeId) {
-        _pendingThemeDisable = { slug, themeId, db };
-        document.getElementById('theme-modal-sel').innerHTML = ALL_THEMES_LIST
-          .filter(th => th.id !== themeId && !hidden[th.id])
-          .map(th => '<option value="'+th.id+'">'+th.name+'</option>').join('');
-        const name = (ALL_THEMES_LIST.find(t=>t.id===themeId)||{}).name || themeId;
-        document.getElementById('theme-modal-msg').textContent = 'Le thème "'+name+'" est actuellement utilisé. Choisissez un thème de remplacement :';
-        document.getElementById('theme-modal').classList.add('open');
-      } else {
-        db.ref('menu/hiddenThemes/'+themeId).set(true);
-      }
-    });
-  } else {
-    db.ref('menu/hiddenThemes/'+themeId).set(null);
-  }
-};
-
-window.confirmThemeDisable = function() {
-  if (!_pendingThemeDisable) return;
-  const { themeId, db } = _pendingThemeDisable;
-  const newTheme = document.getElementById('theme-modal-sel').value;
-  db.ref('menu').update({ menuTheme:newTheme, ['hiddenThemes/'+themeId]:true }).then(() => {
-    document.getElementById('theme-modal').classList.remove('open');
-    _pendingThemeDisable = null;
-  });
-};
-window.cancelThemeDisable = function() {
-  if (_pendingThemeDisable) {
-    const { slug, themeId } = _pendingThemeDisable;
-    const cb = document.querySelector('#theme-toggles-'+slug+' input[data-id="'+themeId+'"]');
-    if (cb) cb.checked = true;
-    _pendingThemeDisable = null;
-  }
-  document.getElementById('theme-modal').classList.remove('open');
-};
-
-// ════════════════════════════════════════════════════
 // VARIANTS
 // ════════════════════════════════════════════════════
 let _variantSlug = null, _variantFamily = null;
@@ -6291,8 +6229,6 @@ document.addEventListener('deviceready', () => {
       if (_rm && _rm.classList.contains('open')) { cancelRetention(); return; }
       var _lm = document.getElementById('lang-modal');
       if (_lm && _lm.classList.contains('open')) { cancelLangDisable(); return; }
-      var _tm = document.getElementById('theme-modal');
-      if (_tm && _tm.classList.contains('open')) { cancelThemeDisable(); return; }
       var _vm = document.getElementById('variant-modal');
       if (_vm && _vm.classList.contains('open')) { closeVariantModal(); return; }
       // 🔴 Fix (2026-07-22, audit SKILL.md) : oublié de cette liste — le bouton retour
