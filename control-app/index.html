@@ -5646,8 +5646,10 @@ function loadDemoPhotos() {
 const CP_SLOTS_1  = [{ slot: 'img1', label: 'Photo' }];
 const CP_SLOTS_2  = [{ slot: 'img1', label: 'Photo 1' }, { slot: 'img2', label: 'Photo 2' }];
 const CP_SLOTS_3  = [{ slot: 'img1', label: 'Photo 1' }, { slot: 'img2', label: 'Photo 2' }, { slot: 'img3', label: 'Photo 3' }];
+const CP_SLOTS_4  = [1,2,3,4].map(n => ({ slot: 'img' + n, label: 'Photo ' + n }));
 const CP_SLOTS_5  = [1,2,3,4,5].map(n => ({ slot: 'img' + n, label: 'Photo ' + n }));
 const CP_SLOTS_DM = [{ slot: 'desktop', label: 'Bureau' }, { slot: 'mobile', label: 'Mobile' }];
+const CP_SLOTS_D1M3 = [{ slot: 'desktop', label: 'Bureau' }, { slot: 'img1', label: 'Mobile 1' }, { slot: 'img2', label: 'Mobile 2' }, { slot: 'img3', label: 'Mobile 3' }];
 const CONTENT_ITEMS = {
   qr: [
     { key: 'qr-autonomy',  icon: '🏅', title: 'L\'image de marque : votre professionnalisme',            slots: CP_SLOTS_1 },
@@ -5655,7 +5657,7 @@ const CONTENT_ITEMS = {
     { key: 'qr-instant',   icon: '⏱️', title: 'L\'agilité totale : le menu qui s\'adapte en temps réel',  slots: CP_SLOTS_DM },
     { key: 'qr-multilang', icon: '👁️', title: 'La vitrine dynamique : vendez par l\'image',              slots: CP_SLOTS_3 },
     { key: 'qr-eco',       icon: '⚡', title: 'L\'expérience client premium : fluidité et autonomie',    slots: CP_SLOTS_1 },
-    { key: 'qr-image',     icon: '📊', title: 'Le pilotage par la donnée : décidez avec des chiffres',   slots: CP_SLOTS_DM }
+    { key: 'qr-image',     icon: '📊', title: 'Le pilotage par la donnée : décidez avec des chiffres',   slots: CP_SLOTS_D1M3 }
   ],
   gx: [
     { key: 'gx-identity', icon: '🪪', title: 'A1 · Interface premium (identité visuelle)',      slots: CP_SLOTS_2 },
@@ -5667,10 +5669,10 @@ const CONTENT_ITEMS = {
     { key: 'gx-notif',    icon: '📢', title: 'A7 · Communication & programmation',                slots: CP_SLOTS_DM },
     { key: 'gx-digital',  icon: '🔳', title: 'A8 · Menu prêt en 24h',                     slots: CP_SLOTS_3 },
     { key: 'gx-review',   icon: '⭐', title: 'A9 · Avis Google en un clic',                       slots: CP_SLOTS_DM },
-    { key: 'gx-order',    icon: '🔔', title: 'B1 · Commande & appel serveur',                     slots: CP_SLOTS_3 },
+    { key: 'gx-order',    icon: '🔔', title: 'B1 · Commande & appel serveur',                     slots: CP_SLOTS_4 },
     { key: 'gx-qrtable',  icon: '🔲', title: 'B2 · QR Code par table',                            slots: CP_SLOTS_DM },
-    { key: 'gx-server',   icon: '📲', title: 'B3 · Application serveur & suivi client',           slots: CP_SLOTS_2 },
-    { key: 'gx-stats',    icon: '📊', title: 'B4 · Statistiques & analyse',                       slots: CP_SLOTS_DM }
+    { key: 'gx-server',   icon: '📲', title: 'B3 · Application serveur & suivi client',           slots: CP_SLOTS_4 },
+    { key: 'gx-stats',    icon: '📊', title: 'B4 · Statistiques & analyse',                       slots: CP_SLOTS_D1M3 }
   ]
 };
 const CP_CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Ajouter</span>';
