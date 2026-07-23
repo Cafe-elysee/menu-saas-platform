@@ -5711,21 +5711,33 @@
     // _rref : préfixe tous les chemins Firebase avec restaurants/{rid}/
     const _rref = p => (firebase.database()).ref('restaurants/' + _RID + '/' + p.replace(/^\//, ''));
 
-    // Connexion anonyme Firebase — invisible pour le visiteur, aucun changement d'UX.
-    // Nécessaire pour que les règles Firebase puissent exiger auth != null sur orders/calls/logs
-    // sans dépendre uniquement de la connaissance du rid. Déclenchée dès le chargement de la page ;
-    // ensureAnonAuth() est ré-appelée (sans frais, déjà résolue) juste avant chaque écriture concernée.
-    let _anonAuthPromise = null;
-    function ensureAnonAuth() {
-      if (!_anonAuthPromise) {
-        _anonAuthPromise = new Promise(resolve => {
-          firebase.auth().onAuthStateChanged(user => { if (user) resolve(user); });
-          firebase.auth().signInAnonymously().catch(e => { console.error('anon auth failed', e); resolve(null); });
-        });
+    // Connexion Firebase scopée au restaurant visité — invisible pour le visiteur,
+    // aucun changement d'UX. Un jeton personnalisé {rid, role:'menu-client'} est minté
+    // côté serveur (/api/mint-menu-token) puis échangé ici — remplace l'ancienne
+    // connexion anonyme (signInAnonymously) qui ne portait aucun claim rid et ne
+    // permettait donc pas aux règles Firebase de distinguer "ce restaurant" de
+    // "n'importe quel autre restaurant" sur orders/calls/logs. Déclenchée dès le
+    // chargement de la page ; ensureScopedAuth() est ré-appelée (sans frais, déjà
+    // résolue) juste avant chaque écriture concernée.
+    let _scopedAuthPromise = null;
+    function ensureScopedAuth() {
+      if (!_scopedAuthPromise) {
+        _scopedAuthPromise = fetch('/api/mint-menu-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rid: _RID })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (!data || !data.customToken) throw new Error((data && data.error) || 'mint failed');
+            return firebase.auth().signInWithCustomToken(data.customToken);
+          })
+          .then(cred => cred.user)
+          .catch(e => { console.error('scoped auth failed', e); return null; });
       }
-      return _anonAuthPromise;
+      return _scopedAuthPromise;
     }
-    ensureAnonAuth();
+    ensureScopedAuth();
   </script>
 </head>
 <body>
@@ -9220,7 +9232,7 @@ async function confirmOrder() {
   sendNotify();
 
   try {
-    await _withTimeout(ensureAnonAuth(), 10000);
+    await _withTimeout(ensureScopedAuth(), 10000);
     await _withTimeout(_rref('orders/' + orderId).set(order), 10000);
 
     // Analytics agrégat — fire-and-forget, n'impacte pas le flux commande
@@ -11829,7 +11841,7 @@ async function confirmTableCall() {
   // échouent réellement (réseau coupé), le client doit quand même en être informé après
   // coup plutôt que de croire à tort que le serveur a reçu son appel.
   try {
-    await _withTimeout(ensureAnonAuth(), 10000);
+    await _withTimeout(ensureScopedAuth(), 10000);
     const _callTs = Date.now();
     const t = UI[lang];
     await _withTimeout(Promise.all([
