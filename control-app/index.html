@@ -5283,13 +5283,13 @@ function _colorDist(h1, h2) {
 }
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
-  getClientDb(slug).ref('/config/defaultLang').set(lang);
   const el = document.getElementById('default-lang-'+slug.replace(/-/g,'_')); if (el) el.value = lang;
+  return getClientDb(slug).ref('/config/defaultLang').set(lang);
 }
 function writePrimaryLang(slug, lang) {
   getClientState(slug).primaryLang = lang;
-  getClientDb(slug).ref('/config/primaryLang').set(lang);
   const el = document.getElementById('primary-lang-'+slug.replace(/-/g,'_')); if (el) el.value = lang;
+  return getClientDb(slug).ref('/config/primaryLang').set(lang);
 }
 async function writeEnabledLang(slug, lang, enabled) {
   getClientState(slug).enabledLangs[lang] = enabled;
@@ -5379,9 +5379,14 @@ async function confirmLangDisable() {
   const { slug, lang } = _pendingDisable;
   const state = getClientState(slug);
   const rep   = document.getElementById('modal-sel').value;
-  await writeEnabledLang(slug, lang, false);
-  if (state.defaultLang === lang) await writeDefaultLang(slug, rep);
-  if (state.primaryLang === lang) await writePrimaryLang(slug, rep);
+  try {
+    await writeEnabledLang(slug, lang, false);
+    if (state.defaultLang === lang) await writeDefaultLang(slug, rep);
+    if (state.primaryLang === lang) await writePrimaryLang(slug, rep);
+    showToast('Langue mise à jour ✅');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+  }
   document.getElementById('lang-modal').classList.remove('open');
   _pendingDisable = null;
 }
@@ -5548,9 +5553,14 @@ function cancelRetention() {
 async function confirmRetention() {
   if (!_pendingRetention) return;
   const { slug, type, newMs, prevMs } = _pendingRetention;
-  await getClientDb(slug).ref('/config/retention').update({
-    [type]:newMs, [type+'ChangedAt']:Date.now(), [type+'Previous']:prevMs, [type+'IsReduction']:newMs<prevMs
-  });
+  try {
+    await getClientDb(slug).ref('/config/retention').update({
+      [type]:newMs, [type+'ChangedAt']:Date.now(), [type+'Previous']:prevMs, [type+'IsReduction']:newMs<prevMs
+    });
+    showToast('Rétention enregistrée ✅');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+  }
   _pendingRetention = null;
   document.getElementById('retention-modal').classList.remove('open');
 }
@@ -6025,19 +6035,27 @@ function uploadThemePhoto(id, input) {
   reader.readAsDataURL(file);
 }
 async function deleteThemePhoto(id) {
-  await _saasDb.ref('demoPage/themes/' + id + '/img').set(null);
-  showThemePhoto(id, '');
-  showToast('Photo supprimée');
+  try {
+    await _saasDb.ref('demoPage/themes/' + id + '/img').set(null);
+    showThemePhoto(id, '');
+    showToast('Photo supprimée');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
+  }
 }
 async function _saveThemeText(id, field, value, inputEl) {
   const val = (value || '').trim();
   if (!val) { showToast('⚠ Le champ ne peut pas être vide'); return; }
-  await _saasDb.ref('demoPage/themes/' + id + '/' + field).set(val);
-  if (inputEl) {
-    inputEl.classList.add('th-saved-flash');
-    setTimeout(() => inputEl.classList.remove('th-saved-flash'), 900);
+  try {
+    await _saasDb.ref('demoPage/themes/' + id + '/' + field).set(val);
+    if (inputEl) {
+      inputEl.classList.add('th-saved-flash');
+      setTimeout(() => inputEl.classList.remove('th-saved-flash'), 900);
+    }
+    showToast('Enregistré ✓');
+  } catch(e) {
+    showToast('Erreur : ' + e.message);
   }
-  showToast('Enregistré ✓');
 }
 function loadThemeGallery() {
   if (!_saasDb) return;

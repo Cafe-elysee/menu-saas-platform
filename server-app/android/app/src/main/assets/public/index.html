@@ -1284,7 +1284,11 @@ function toggleStatus(id) {
   if (!c) return;
   var newStatus = c.status === 'done' ? 'received' : 'done';
   nativeVibrate([50, 30, 80]);
-  _rref('calls/' + id + '/status').set(newStatus).catch(function(e) { console.error(e); });
+  _rref('calls/' + id + '/status').set(newStatus).catch(function() {
+    // Même pattern que setOrderStatus() : un seul essai de reconnexion + nouvelle tentative.
+    try { firebase.database().goOffline(); firebase.database().goOnline(); } catch (e) {}
+    _rref('calls/' + id + '/status').set(newStatus).catch(function(e) { console.error(e); });
+  });
 }
 function renderCalls() {
   var list = document.getElementById('calls-list');

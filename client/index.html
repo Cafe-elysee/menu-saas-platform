@@ -11282,9 +11282,14 @@ function setupSheet() {
   const overlay = document.getElementById('overlay');
   overlay.addEventListener('click', closeSheet);
 
-  // Escape key closes sheet
+  // Escape key closes sheet / panier / historique (quel que soit celui ouvert)
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeSheet();
+    if (e.key !== 'Escape') return;
+    const cartEl = document.getElementById('cart-modal');
+    const histEl = document.getElementById('hist-modal');
+    if (cartEl && cartEl.classList.contains('show')) closeCartModal();
+    else if (histEl && histEl.classList.contains('show')) closeHistModal();
+    else closeSheet();
   });
 
   // Swipe down to close

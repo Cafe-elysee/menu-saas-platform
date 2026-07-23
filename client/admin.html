@@ -3355,7 +3355,7 @@ const ADMIN_UI = {
     loginErrSuspended:'Αυτός ο λογαριασμός είναι αναστολή ή δεν υπάρχει.',
     subPayBadge:'Πληρωμή σε εκκρεμότητα', subPayBtn:'Πληρωμή',
     payReminderTitle:'💳 Πληρωμή σε εκκρεμότητα', payReminderMsg:'Έχετε μια εκκρεμή πληρωμή. Μεταβείτε στις <strong>Ρυθμίσεις → Η συνδρομή μου</strong>.', payReminderAccueil:'Αρχική', payReminderPayNow:'Πληρωμή Τώρα',
-    loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη 30 δευτερόλεπτα.',
+    loginErrBlocked:'Πάρα πολλές προσπάθειες — πρόσβαση αποκλεισμένη {s} δευτερόλεπτα.',
     loginErrIncorrect:'Λανθασμένος κωδικός',
     pdfDownloaded: '✅ PDF ληφθέν',
     logoReceivedTitle:'✅ Λογότυπο μεταφορτώθηκε!', logoReceivedMsg:'Το λογότυπό σας εμφανίζεται τώρα στο μενού σας.', logoReceivedClose:'Τέλεια, ευχαριστώ', logoBgRemoved:'✨ Φόντο Διαφανές ανιχνεύθηκε και αφαιρέθηκε αυτόματα',
@@ -3516,7 +3516,7 @@ const ADMIN_UI = {
     loginErrSuspended:'Ce compte est suspendu ou introuvable.',
     subPayBadge:'Paiement en attente', subPayBtn:'Payer',
     payReminderTitle:'💳 Paiement en attente', payReminderMsg:'Vous avez un paiement en attente. Réglez-le depuis la section <strong>Réglages → Mon abonnement</strong>.', payReminderAccueil:'Accueil', payReminderPayNow:'Payer Maintenant',
-    loginErrBlocked:'Trop de tentatives — accès bloqué 30 secondes.',
+    loginErrBlocked:'Trop de tentatives — accès bloqué {s} secondes.',
     loginErrIncorrect:'Mot de passe incorrect',
     pdfDownloaded: '✅ PDF téléchargé',
     logoReceivedTitle:'✅ Logo uploadé !', logoReceivedMsg:'Votre logo s\'affiche maintenant dans votre menu.', logoReceivedClose:'Parfait, merci !', logoBgRemoved:'✨ Fond Transparent supprimé automatiquement',
@@ -3677,7 +3677,7 @@ const ADMIN_UI = {
     loginErrSuspended:'This account is suspended or does not exist.',
     subPayBadge:'Payment pending', subPayBtn:'Pay now',
     payReminderTitle:'💳 Payment pending', payReminderMsg:'You have a pending payment. Go to <strong>Settings → My subscription</strong> to complete it.', payReminderAccueil:'Home', payReminderPayNow:'Pay Now',
-    loginErrBlocked:'Too many attempts — access blocked for 30 seconds.',
+    loginErrBlocked:'Too many attempts — access blocked for {s} seconds.',
     loginErrIncorrect:'Incorrect password',
     pdfDownloaded: '✅ PDF downloaded',
     logoReceivedTitle:'✅ Logo uploaded!', logoReceivedMsg:'Your logo is now displayed in your menu.', logoReceivedClose:'Perfect, thank you!', logoBgRemoved:'✨ Transparent background removed automatically',
@@ -3838,7 +3838,7 @@ const ADMIN_UI = {
     loginErrSuspended:'Dieses Konto ist gesperrt oder existiert nicht.',
     subPayBadge:'Zahlung ausstehend', subPayBtn:'Zahlen',
     payReminderTitle:'💳 Zahlung ausstehend', payReminderMsg:'Sie haben eine ausstehende Zahlung. Gehen Sie zu <strong>Einstellungen → Mein Abonnement</strong>.', payReminderAccueil:'Startseite', payReminderPayNow:'Jetzt zahlen',
-    loginErrBlocked:'Zu viele Versuche — Zugang für 30 Sekunden gesperrt.',
+    loginErrBlocked:'Zu viele Versuche — Zugang für {s} Sekunden gesperrt.',
     loginErrIncorrect:'Falsches Passwort',
     pdfDownloaded: '✅ PDF heruntergeladen',
     logoReceivedTitle:'✅ Logo hochgeladen!', logoReceivedMsg:'Ihr Logo wird jetzt in Ihrem Menü angezeigt.', logoReceivedClose:'Prima, danke!', logoBgRemoved:'✨ Transparenter Hintergrund automatisch entfernt',
@@ -3999,7 +3999,7 @@ const ADMIN_UI = {
     loginErrSuspended:'Esta cuenta está suspendida o no existe.',
     subPayBadge:'Pago pendiente', subPayBtn:'Pagar',
     payReminderTitle:'💳 Pago pendiente', payReminderMsg:'Tiene un pago pendiente. Vaya a <strong>Ajustes → Mi suscripción</strong> para completarlo.', payReminderAccueil:'Inicio', payReminderPayNow:'Pagar Ahora',
-    loginErrBlocked:'Demasiados intentos — acceso bloqueado 30 segundos.',
+    loginErrBlocked:'Demasiados intentos — acceso bloqueado {s} segundos.',
     loginErrIncorrect:'Contraseña incorrecta',
     pdfDownloaded: '✅ PDF descargado',
     logoReceivedTitle:'✅ ¡Logo subido!', logoReceivedMsg:'Su logo se muestra ahora en su menú.', logoReceivedClose:'¡Perfecto, gracias!', logoBgRemoved:'✨ Fondo Transparente eliminado automáticamente',
@@ -4488,7 +4488,7 @@ async function doLogin() {
 
     if (resp.status === 429) {
       const secs = Math.ceil((data.retryInMs || 0) / 1000);
-      errEl.textContent = `Trop de tentatives — réessayez dans ${secs}s`;
+      errEl.textContent = (t.loginErrBlocked || 'Trop de tentatives — accès bloqué {s} secondes.').replace('{s}', secs);
       return;
     }
     if (resp.status === 403) {
@@ -7203,8 +7203,13 @@ function collectProdForm(card, item) {
   const curEl  = card.querySelector('[data-field="currency"]');
   const numEl  = card.querySelector('[data-field="price-num"]');
   if (numEl) {
-    const num = numEl.value.trim();
+    const rawNum = numEl.value.trim();
     const cur = curEl ? curEl.value : '';
+    // Un prix non numérique ("abc", symboles...) ne doit jamais être écrit tel quel
+    // dans Firebase — il s'afficherait incohérent sur le menu public d'un client.
+    // Un champ VIDE reste autorisé (produit volontairement sans prix affiché).
+    const num = (!rawNum || /^\d+([.,]\d{1,2})?$/.test(rawNum)) ? rawNum.replace(',', '.') : '';
+    if (rawNum && !num) numEl.value = '';
     item.price = (cur && num) ? cur + num : num;
   }
   // Prix remisé
@@ -7315,7 +7320,11 @@ function collectProdForm(card, item) {
       item.allergens[lang] = el.value.split(',').map(s => s.trim()).filter(Boolean);
     } else {
       if (!item[field]) item[field] = {};
-      item[field][lang] = el.value;
+      const val = el.value.trim();
+      // Un nom vide (espaces uniquement) ne doit jamais écraser un nom déjà enregistré :
+      // le produit apparaîtrait sans titre sur le menu public d'un client.
+      if (field === 'name' && !val && item[field][lang]) return;
+      item[field][lang] = val;
     }
   });
 }
@@ -9486,13 +9495,24 @@ function toggleOrderCard(cardId) {
   if (card) card.classList.toggle('collapsed');
 }
 
-function setOrderStatus(orderId, status) {
-  _rref('orders/' + orderId + '/status').set(status).then(() => {
+async function setOrderStatus(orderId, status) {
+  try {
+    await _withTimeout(_rref('orders/' + orderId + '/status').set(status), 10000);
     _logAction('order_status', { orderId, status });
-  }).catch(() => {
-    const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-    showToastMsg(t.settingsErr || '❌ Erreur', true);
-  });
+  } catch (e) {
+    // Même pattern que _writeToggleField()/tables-count-save : reconnexion + 1
+    // nouvel essai avant d'abandonner et d'afficher une erreur visible.
+    try {
+      await _ensureAuthed();
+      firebase.database().goOffline();
+      firebase.database().goOnline();
+      await _withTimeout(_rref('orders/' + orderId + '/status').set(status), 10000);
+      _logAction('order_status', { orderId, status });
+    } catch (e2) {
+      const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+      showToastMsg(t.settingsErr || '❌ Erreur', true);
+    }
+  }
 }
 
 function _logAction(type, extra) {

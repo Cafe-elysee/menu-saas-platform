@@ -66,7 +66,8 @@
           "adminPwd": {
             ".validate": "!newData.exists()"
           },
-          "active":       { ".read": true },
+          "active":       { ".read": true, ".write": "auth != null && auth.token.role === 'platform'" },
+          "suspendu":     { ".write": "auth != null && auth.token.role === 'platform'" },
           "defaultLang":  { ".read": true },
           "enabledLangs": { ".read": true },
           "features":     { ".read": true }
