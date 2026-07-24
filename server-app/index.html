@@ -917,11 +917,6 @@
     </div>
 
     <div style="margin-top:28px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
-      <div id="settings-notif-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Notifications en arrière-plan</div>
-      <div id="settings-notif-desc" style="font-size:0.78rem;color:var(--cream);line-height:1.7;white-space:pre-line"></div>
-    </div>
-
-    <div style="margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(200,164,78,0.05);border:1px solid rgba(200,164,78,0.15)">
       <div id="settings-fcm-title" style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Connexion application</div>
       <div id="settings-fcm-status" style="font-size:0.78rem;color:var(--cream);margin-bottom:10px">—</div>
       <button id="settings-fcm-retry-btn" onclick="_retryFcmRegister()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#0c0a08;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 12px rgba(200,164,78,0.32),inset 0 1.5px 0 rgba(255,255,255,0.26),inset 0 -1px 0 rgba(0,0,0,0.18)">🔄 Reconnecter</button>
@@ -979,7 +974,6 @@ const T = {
     settingsTitle:'Ενεργό εστιατόριο', settingsIdLabel:'ID εστιατορίου',
     settingsBtnChange:'🔄 Αλλαγή εστιατορίου', settingsChangeDesc:'Αποσυνδέεστε από αυτό το εστιατόριο και επιλέγετε ένα άλλο.',
     settingsChangeConfirm:'Αλλαγή εστιατορίου;\nΗ τρέχουσα σύνδεση θα διαγραφεί.',
-    settingsNotifTitle:'Ειδοποιήσεις παρασκηνίου', settingsNotifDesc:'Για λήψη ειδοποιήσεων όταν η εφαρμογή είναι κλειστή:\nΡυθμίσεις → Εφαρμογές → GeNext → Μπαταρία → Χωρίς περιορισμούς',
     settingsFcmTitle:'Σύνδεση εφαρμογής', settingsFcmRetry:'🔄 Επανασύνδεση', settingsFcmNoToken:'❌ Εφαρμογή μη συνδεδεμένη', settingsFcmConnected:'✅ Εφαρμογή συνδεδεμένη', settingsFcmWaiting:'⏳ Σύνδεση…', settingsFcmError:'❌ Σφάλμα σύνδεσης',
     notifBannerTxt:'Ειδοποιήσεις απενεργοποιημένες — αγγίξτε για ενεργοποίηση', notifBannerBtn:'Ενεργοπ.', confirmYes:'Επιβεβαίωση', confirmNo:'Ακύρωση',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'Χωρίς ζάχαρη', sugarMedium:'Μέτρια', sugarSweet:'Γλυκό',
@@ -998,7 +992,6 @@ const T = {
     settingsTitle:'Restaurant actif', settingsIdLabel:'ID restaurant',
     settingsBtnChange:'🔄 Changer de restaurant', settingsChangeDesc:'Déconnecte ce restaurant et vous permet d\'en choisir un autre.',
     settingsChangeConfirm:'Changer de restaurant ?\nLa connexion actuelle sera supprimée.',
-    settingsNotifTitle:'Notifications en arrière-plan', settingsNotifDesc:'Pour recevoir les notifications quand l\'app est fermée :\nParamètres → Applications → GeNext Serveur → Batterie → Aucune restriction',
     settingsFcmTitle:'Connexion application', settingsFcmRetry:'🔄 Reconnecter', settingsFcmNoToken:'❌ Application non connectée', settingsFcmConnected:'✅ Application connectée', settingsFcmWaiting:'⏳ Connexion en cours…', settingsFcmError:'❌ Connexion échouée — vérifiez internet et réessayez',
     notifBannerTxt:'Notifications désactivées — touchez pour activer', notifBannerBtn:'Activer', confirmYes:'Confirmer', confirmNo:'Annuler',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'Sans sucre', sugarMedium:'Sucre moyen', sugarSweet:'Sucré',
@@ -1017,7 +1010,6 @@ const T = {
     settingsTitle:'Active restaurant', settingsIdLabel:'Restaurant ID',
     settingsBtnChange:'🔄 Change restaurant', settingsChangeDesc:'Disconnects from this restaurant and lets you choose another.',
     settingsChangeConfirm:'Change restaurant?\nThe current connection will be removed.',
-    settingsNotifTitle:'Background notifications', settingsNotifDesc:'To receive notifications when the app is closed:\nSettings → Apps → GeNext Server → Battery → No restrictions',
     settingsFcmTitle:'App connection', settingsFcmRetry:'🔄 Reconnect', settingsFcmNoToken:'❌ Application not connected', settingsFcmConnected:'✅ Application connected', settingsFcmWaiting:'⏳ Connecting…', settingsFcmError:'❌ Connection error',
     notifBannerTxt:'Notifications disabled — tap to enable', notifBannerBtn:'Enable', confirmYes:'Confirm', confirmNo:'Cancel',
     doseSingle:'Single', doseDouble:'Double', sugarNone:'No sugar', sugarMedium:'Medium', sugarSweet:'Sweet',
@@ -1036,7 +1028,6 @@ const T = {
     settingsTitle:'Aktives Restaurant', settingsIdLabel:'Restaurant-ID',
     settingsBtnChange:'🔄 Restaurant wechseln', settingsChangeDesc:'Trennt die Verbindung und ermöglicht die Auswahl eines anderen Restaurants.',
     settingsChangeConfirm:'Restaurant wechseln?\nDie aktuelle Verbindung wird gelöscht.',
-    settingsNotifTitle:'Hintergrundbenachrichtigungen', settingsNotifDesc:'Um Benachrichtigungen bei geschlossener App zu erhalten:\nEinstellungen → Apps → GeNext Server → Akku → Keine Einschränkungen',
     settingsFcmTitle:'App-Verbindung', settingsFcmRetry:'🔄 Neu verbinden', settingsFcmNoToken:'❌ App nicht verbunden', settingsFcmConnected:'✅ App verbunden', settingsFcmWaiting:'⏳ Verbindung…', settingsFcmError:'❌ Verbindungsfehler',
     notifBannerTxt:'Benachrichtigungen deaktiviert — tippen zum Aktivieren', notifBannerBtn:'Aktivieren', confirmYes:'Bestätigen', confirmNo:'Abbrechen',
     doseSingle:'Single', doseDouble:'Doppelt', sugarNone:'Ohne Zucker', sugarMedium:'Mittel', sugarSweet:'Süß',
@@ -1055,7 +1046,6 @@ const T = {
     settingsTitle:'Restaurante activo', settingsIdLabel:'ID del restaurante',
     settingsBtnChange:'🔄 Cambiar restaurante', settingsChangeDesc:'Desconecta de este restaurante y le permite elegir otro.',
     settingsChangeConfirm:'¿Cambiar restaurante?\nSe eliminará la conexión actual.',
-    settingsNotifTitle:'Notificaciones en segundo plano', settingsNotifDesc:'Para recibir notificaciones con la app cerrada:\nAjustes → Aplicaciones → GeNext → Batería → Sin restricciones',
     settingsFcmTitle:'Conexión de la app', settingsFcmRetry:'🔄 Reintentar conexión', settingsFcmNoToken:'❌ App desconectada', settingsFcmConnected:'✅ App conectada', settingsFcmWaiting:'⏳ Conectando…', settingsFcmError:'❌ Error de conexión',
     notifBannerTxt:'Notificaciones desactivadas — toque para activar', notifBannerBtn:'Activar', doseSingle:'Simple', doseDouble:'Doble', sugarNone:'Sin azúcar', sugarMedium:'Medio', sugarSweet:'Azucarado', confirmYes:'Confirmar', confirmNo:'Cancelar',
   }
@@ -1447,8 +1437,6 @@ function applyLang() {
   document.getElementById('settings-id-label').textContent      = t.settingsIdLabel;
   document.getElementById('settings-change-btn').childNodes[0].textContent = t.settingsBtnChange;
   document.getElementById('settings-change-desc').textContent   = t.settingsChangeDesc;
-  document.getElementById('settings-notif-title').textContent   = t.settingsNotifTitle;
-  document.getElementById('settings-notif-desc').textContent    = t.settingsNotifDesc;
   document.getElementById('settings-fcm-title').textContent     = t.settingsFcmTitle;
   document.getElementById('settings-fcm-retry-btn').textContent = t.settingsFcmRetry;
   _updateFcmStatus();
