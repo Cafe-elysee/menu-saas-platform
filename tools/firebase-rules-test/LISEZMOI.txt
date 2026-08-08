@@ -1,0 +1,62 @@
+BANC DE TEST DES RÈGLES FIREBASE — menu-saas-platform
+=====================================================
+
+À QUOI ÇA SERT
+--------------
+Rejouer 70 scénarios réels contre firebase-rules.json dans un Firebase LOCAL,
+avant de coller quoi que ce soit dans la Console Firebase de production.
+
+RÈGLE DU PROJET : ne JAMAIS donner une règle Firebase à coller sans l'avoir
+passée dans ce banc de test d'abord. Deux incidents l'ont déjà justifié
+(2026-07-13 permissions cumulatives, 2026-07-23 bug de cascade config).
+
+COMMENT LE LANCER (PowerShell, depuis ce dossier)
+-------------------------------------------------
+  # 1. Installer les dépendances HORS du Drive (Google Drive corrompt node_modules)
+  #    -> copier ce dossier dans le scratchpad de session, y faire npm install,
+  #       et lancer depuis là. Ne jamais faire npm install directement ici.
+
+  npm install --no-audit --no-fund
+
+  # 2. Copier les règles à tester
+  Copy-Item "G:\Mon Drive\menu-saas-platform\firebase-rules.json" ".\database.rules.json" -Force
+
+  # 3. Lancer (Java fourni par Android Studio)
+  $env:PATH="C:\Program Files\Android\Android Studio\jbr\bin;$env:PATH"
+  npx --yes firebase-tools@latest emulators:exec --only database --project menu-saas-platform "node test.mjs"
+
+Résultat attendu : "RÉSULTAT : 70 réussis, 0 échoués, 70 au total"
+
+CE QUE COUVRENT LES 70 SCÉNARIOS
+--------------------------------
+1. Les 12 abus que permettait la faille du 2026-08-08 (jeton du menu public
+   qui avait les droits du restaurateur) — tous doivent être REFUSÉS.
+2. Non-régression du MENU CLIENT : commande, appel de table, reçus,
+   statistiques, lecture publique du menu. Tous doivent être AUTORISÉS.
+3. Non-régression de l'APP SERVEUR (rôle staff) : jeton de notification,
+   statuts commande/appel, langues, durée de conservation.
+4. Non-régression de l'ADMIN (rôle admin) : menu, profil, abonnement, PIN,
+   tables, messages, sessions.
+5. Verrou de facturation : un restaurant suspendu ne peut pas se réactiver
+   lui-même ; seule la plateforme le peut.
+6. Isolation entre restaurants A et B, dans les deux sens.
+7. control-app (rôle platform) : lecture globale, archives, page démo.
+8. Contournement en profondeur de logs/errors.
+
+PIÈGES DÉJÀ RENCONTRÉS — NE PAS LES REFAIRE
+-------------------------------------------
+- Les règles Firebase sont CUMULATIVES EN CASCADE : une règle sur un enfant
+  ne protège RIEN si un ancêtre autorise déjà. Pour restreindre un champ
+  précis, la condition doit être DANS la règle de l'ancêtre.
+- "$other": {".validate": false} placé seul dans un nœud casse aussi les
+  champs légitimes ($other matche TOUS les enfants). Il faut déclarer
+  explicitement chaque enfant autorisé À CÔTÉ de $other.
+- Ne pas tester avec le SDK REST brut et un ?ns= arbitraire : ça crée un
+  espace de noms SANS règles chargées et tout semble réussir à tort.
+  @firebase/rules-unit-testing évite ce piège.
+
+APRÈS UN TEST RÉUSSI
+--------------------
+Les règles doivent encore être COLLÉES À LA MAIN par Malek dans la Console
+Firebase (projet menu-saas-platform > Realtime Database > Règles > Publier).
+Elles ne sont jamais déployées automatiquement par un push git.

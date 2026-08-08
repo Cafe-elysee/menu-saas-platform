@@ -3153,7 +3153,10 @@ function _getComboPrice(d, forfait, mode) {
 
 // ── Construire le HTML de la section facturation (grille 2 formules annuelles) ──
 function _buildClientBillingSectionHTML(cmdKey, d) {
-  if (d.paymentMode == null) return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '"></div>';
+  // Un mode de paiement absent ne justifie plus de masquer toute la section : la ligne
+  // suivante retombe déjà sur l'annuel, comme le serveur. L'ancien retour anticipé
+  // renvoyait une carte VIDE (grille des forfaits, date de renouvellement et historique
+  // invisibles) sans le moindre message, pour une commande par ailleurs valide.
   var activeForfait = d.forfait || 'menu-qr';
   var activeMode = d.paymentMode || 'annual';
 
@@ -3637,7 +3640,7 @@ function _addMonths(ts, n) {
 function _getCommandePrice(d) {
   // Priorité : prix combo actif → prix custom → tarif public actuel → dernier recours
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode    = d.paymentMode || 'monthly';
+  var activeMode    = d.paymentMode || 'annual';
   var ck = _comboKey(activeForfait, activeMode);
   if (d.prices && d.prices[ck] != null) return d.prices[ck];
   if (d.price != null && d.price >= 0) return d.price;
@@ -3886,7 +3889,7 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   // en déduire un changement de mode de paiement : un client mensuel dont on édite le prix
   // annuel de référence ne doit PAS basculer en annuel (bug confirmé, Fix audit paiements).
   var activeForfait = d.forfait || 'menu-qr';
-  var activeMode = d.paymentMode || 'monthly';
+  var activeMode = d.paymentMode || 'annual';
   var activeComboKey = _comboKey(activeForfait, activeMode);
   var isActiveCombo = (comboKey === activeComboKey);
   _commandesCache[cmdKey].price = isActiveCombo ? price : _commandesCache[cmdKey].price;
@@ -3916,7 +3919,7 @@ const _birthdatePickers = {};
 function _initBirthdatePicker(key) {
   if (typeof flatpickr === 'undefined') return;
   const d = _commandesCache[key];
-  if (!d || !d.paymentMode) return;
+  if (!d) return;   // le mode de paiement absent ne bloque plus le sélecteur de date
   const inp = document.getElementById('birthdate-inp-' + key);
   if (!inp) return;
   if (_birthdatePickers[key]) {
@@ -3995,7 +3998,17 @@ function _markPaid(key) {
   const d = _commandesCache[key];
   if (!d) return;
   const isFirstSub = !d.paidAt;  // Premier abonnement = fin du mois d'essai
-  const isMonthly  = d.paymentMode !== 'annual';
+  // 🔴 LE POINT LE PLUS SENSIBLE DE TOUTE LA FACTURATION (corrigé 2026-08-08).
+  // Écrit auparavant `d.paymentMode !== 'annual'` : un mode ABSENT (undefined) était donc
+  // traité comme MENSUEL, et l'échéance fixée à +1 mois au lieu de +12. Un client ayant
+  // réglé son ANNÉE se serait vu réclamer un paiement au bout d'un mois, puis SUSPENDU
+  // automatiquement par _checkAutoSuspend — alors qu'il était parfaitement à jour.
+  // Le mensuel n'existe plus comme offre (Fix #161) et le serveur considère lui-même
+  // l'annuel par défaut (notify-commande.js : `paymentMode || 'annual'`).
+  // Formulation explicite : seul un 'monthly' EXPLICITE vaut mensuel ; toute autre valeur,
+  // absente ou inattendue, retombe sur l'annuel — jamais dans le sens qui raccourcirait
+  // un cycle déjà payé.
+  const isMonthly  = (d.paymentMode || 'annual') === 'monthly';
   const price      = _getCommandePrice(d);
   const priceStr   = price + ' €/' + (isMonthly ? 'mois' : 'an');
   const nextLabel  = isMonthly ? 'dans 1 mois' : 'dans 12 mois';
@@ -4024,13 +4037,13 @@ function _markPaid(key) {
         // de paiement "seul" du cycle précédent (voir notify-forfait.js computeUpgradeProrata),
         // sinon un futur upgrade mi-cycle continuerait de se baser sur un cycle déjà révolu.
         update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
-        payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
+        payEntry = { date: now, montant: price, mode: d.paymentMode || 'annual', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       } else {
         // Récurrent — partir de nextReminderAt si dans le futur, sinon de now
         const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
         const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
         update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
-        payEntry = { date: now, montant: price, mode: d.paymentMode || 'monthly', forfait: d.forfait || 'menu-qr', type: 'subscription' };
+        payEntry = { date: now, montant: price, mode: d.paymentMode || 'annual', forfait: d.forfait || 'menu-qr', type: 'subscription' };
       }
 
       const prev = _commandesCache[key];
@@ -4073,7 +4086,7 @@ function _markPaid(key) {
                   name: d.restaurant || '',
                   lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
                   amount: price,
-                  paymentMode: d.paymentMode || 'monthly',
+                  paymentMode: d.paymentMode || 'annual',
                   nextDue: update.nextReminderAt,
                   sid: sid
                 })
@@ -4404,8 +4417,8 @@ async function restoreClient(slug, d) {
         var pushRes2 = await _controlWrite('/commandes', 'push', {
           statut: 'traite', lu: true, ts: Date.now(),
           restaurant: d.name || slug, email: d.email || null, langue: 'fr',
-          forfait: subF.forfait || 'menu-qr', paymentMode: subF.paymentMode || 'monthly', price: subF.price || 0,
-          emailData: { email: d.email || null, rid: rid, pwd: pwd, name: d.name || slug, forfait: subF.forfait || 'menu-qr', lang: 'fr', paymentMode: subF.paymentMode || 'monthly' }
+          forfait: subF.forfait || 'menu-qr', paymentMode: subF.paymentMode || 'annual', price: subF.price || 0,
+          emailData: { email: d.email || null, rid: rid, pwd: pwd, name: d.name || slug, forfait: subF.forfait || 'menu-qr', lang: 'fr', paymentMode: subF.paymentMode || 'annual' }
         });
         var commandeKey2 = pushRes2 && pushRes2.result && pushRes2.result.name;
         _watchFirstOpen(rid, commandeKey2);
@@ -4421,7 +4434,7 @@ async function restoreClient(slug, d) {
     var isCS = d.forfait === 'commandes-services';
     // Prix/mode du client restauré (jamais le prix global par défaut) : combo custom
     // enregistré sur sa commande, sinon son ancien prix, sinon le tarif public actuel.
-    var paymentMode = d.paymentMode || 'monthly';
+    var paymentMode = d.paymentMode || 'annual';
     var price = _getComboPrice(d, d.forfait || 'menu-qr', paymentMode);
     const _restoreContacts = d.email ? { contacts: { email: d.email } } : {};
     // .update() (pas .set()) : Firebase autorise chaque clé sur son propre chemin, déjà permis.
@@ -4688,7 +4701,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     // Prix/mode réellement vus par le client à sa commande (jamais le prix global
     // par défaut) : combo custom enregistré sur sa commande, sinon le tarif public actuel.
     const _subForfait2 = cmdData.forfait || 'menu-qr';
-    const _subPayMode2 = cmdData.paymentMode || 'monthly';
+    const _subPayMode2 = cmdData.paymentMode || 'annual';
     const _subEmail2   = cmdData.email || null;
     const _subPrice2   = _getComboPrice(cmdData, _subForfait2, _subPayMode2);
     const _profContacts2 = _subEmail2 ? { email: _subEmail2 } : null;
@@ -4712,7 +4725,7 @@ async function showNewClientModalFromCommande(btnEl, restaurantName, commandeKey
     await _controlWrite('/commandes/' + commandeKey, 'update', {
       statut: 'en_cours', lu: true, clientCree: clientCreeData,
       emailLivraisonProgramme: _nowTs2 + 2 * 60 * 60 * 1000,
-      emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'monthly' }
+      emailData: { email: cmdData.email || null, rid, pwd, name: restaurantName, forfait: cmdData.forfait || 'menu-qr', lang: cmdData.langue || 'fr', paymentMode: cmdData.paymentMode || 'annual' }
     });
     _watchFirstOpen(rid, commandeKey);
     showToast('✅ ' + escapeHtml(restaurantName) + ' créé');
@@ -4748,7 +4761,7 @@ function recreerClientDepuisCommande(btnEl) {
         // Prix/mode réellement vus par le client à sa commande (jamais le prix global
         // par défaut) : combo custom enregistré sur sa commande, sinon le tarif public actuel.
         const _subForfaitR = cmdData.forfait || 'menu-qr';
-        const _subPayModeR = cmdData.paymentMode || 'monthly';
+        const _subPayModeR = cmdData.paymentMode || 'annual';
         const _subEmailR   = cmdData.email || null;
         const _subPriceR   = _getComboPrice(cmdData, _subForfaitR, _subPayModeR);
         const _profContactsR = _subEmailR ? { contacts: { email: _subEmailR } } : {};
@@ -4776,7 +4789,7 @@ function recreerClientDepuisCommande(btnEl) {
           emailLivraisonProgramme: _nowTs3 + 2 * 60 * 60 * 1000,
           emailLivraisonSent: null,
           lastReminderSent: null,
-          emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'monthly' }
+          emailData: { email: _cmdDataRecr.email || null, rid: oldRid, pwd, name: restaurantName, forfait: _cmdDataRecr.forfait || 'menu-qr', lang: _cmdDataRecr.langue || 'fr', paymentMode: _cmdDataRecr.paymentMode || 'annual' }
         });
         _watchFirstOpen(oldRid, commandeKey);
         showToast('✅ ' + escapeHtml(restaurantName) + ' recréé');
@@ -4972,7 +4985,7 @@ async function confirmDeleteClient() {
     await _saasDb.ref('/archivedClients/' + slug).set({
       name:        _dProf.name || slug,
       forfait:     _dSub.forfait || 'menu-qr',
-      paymentMode: _dSub.paymentMode || 'monthly',
+      paymentMode: _dSub.paymentMode || 'annual',
       email:       (_dProf.contacts && _dProf.contacts.email) || _dSub.email || '',
       deletedAt:   Date.now(),
       cmdKey:      _dCk || null,
