@@ -12,7 +12,7 @@
 ============================================================ */
 
 const crypto = require('crypto');
-const { getServiceAccount, getAccessToken, fbRequest, verifyIdToken, revokeRefreshTokens } = require('./_lib/firebaseAdmin');
+const { getServiceAccount, getAccessToken, fbRequest, fbRequestStrict, verifyIdToken, revokeRefreshTokens } = require('./_lib/firebaseAdmin');
 
 const SAAS_DB = 'https://menu-saas-platform-default-rtdb.europe-west1.firebasedatabase.app';
 
@@ -35,7 +35,18 @@ module.exports = async function handler(req, res) {
 
   try {
     const token = await getAccessToken(sa);
-    const existingHash = await fbRequest(SAAS_DB, '/platformAuth/passwordHash', 'GET', token);
+    // 🔴 Lecture STRICTE obligatoire ici : c'est l'ABSENCE de hash qui ouvre le mode création
+    // initiale sans authentification. Avec fbRequest() (tolérant), une simple réponse d'erreur
+    // de Firebase — page HTML de 5xx, corps tronqué — résolvait `null`, donc "aucun hash",
+    // donc réouverture du bootstrap : n'importe qui pouvait alors définir le mot de passe
+    // plateforme et prendre le contrôle de TOUS les restaurants (audit 2026-08-08).
+    // fbRequestStrict() rejette dans ce cas → on tombe dans le catch → 500, échec fermé.
+    let existingHash;
+    try {
+      existingHash = await fbRequestStrict(SAAS_DB, '/platformAuth/passwordHash', 'GET', token);
+    } catch (readErr) {
+      return res.status(503).json({ error: 'Vérification impossible pour le moment — réessayez.' });
+    }
 
     if (existingHash) {
       const payload = await verifyIdToken(sid, 'menu-saas-platform');

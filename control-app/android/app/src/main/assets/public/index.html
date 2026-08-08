@@ -4894,7 +4894,13 @@ function buildClientCard(client) {
       '<div class="retention-row"><span class="retention-label">&#128722; Commandes</span>'+
       '<select class="retention-sel" id="ret-orders-'+id+'" onchange="writeRetention(\'' + s + '\',\'orders\',this)">'+retOpts+'</select></div>'+
       '<button id="card-suspend-btn-'+id+'" class="commande-suspend-btn '+(_cd0 && _cd0.suspendu ? 'reactivate-action' : 'suspend-action')+'" style="width:100%;margin-top:12px" onclick="_askSuspendFromCard(\'' + s + '\')">' + (_cd0 && _cd0.suspendu ? '&#9654; R&#233;activer le compte' : '&#9208; Suspendre') + '</button>'+
-      '<button class="btn-action-red" style="margin-top:8px;width:100%" onclick="askDeleteClient(\'' + s + '\',\''+_nameEsc+'\')">&#128465; Supprimer</button>'+
+      // 🔴 Le nom du client passe par data-* + dataset, JAMAIS interpolé dans le littéral
+      // JS de l'onclick : escapeHtml() protège le CONTENU HTML, mais dans un attribut le
+      // parseur redécode &#39; en apostrophe réelle AVANT que le JS ne soit compilé — un
+      // restaurateur pouvait donc s'auto-renommer avec une apostrophe et exécuter du code
+      // dans la session plateforme de Malek (audit 2026-08-08). Même pattern que
+      // buildCommandeCard (data-rest + this.dataset.rest), simplement oublié ici.
+      '<button class="btn-action-red" style="margin-top:8px;width:100%" data-delslug="' + s + '" data-delname="' + _nameEsc + '" onclick="askDeleteClient(this.dataset.delslug, this.dataset.delname)">&#128465; Supprimer</button>'+
     '</div>'+
     '</div></div>';
 

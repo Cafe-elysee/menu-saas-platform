@@ -216,7 +216,13 @@ module.exports = async (req, res) => {
       let authorized = false;
       try {
         const payload = await verifyIdToken(sid, 'menu-saas-platform');
-        authorized = !!payload && payload.rid === restaurantId;
+        // 🔴 Le claim "rid" seul ne suffit pas : le jeton du menu public
+        // (role:'menu-client') le porte aussi et est mintable par quiconque connaît le rid
+        // (imprimé sur les QR codes). Sans contrôle de rôle, n'importe quel visiteur
+        // pouvait pousser une notification arbitraire aux téléphones du personnel et la
+        // stocker durablement dans messages/ — vecteur d'hameçonnage (audit 2026-08-08).
+        authorized = !!payload && payload.rid === restaurantId
+                     && (payload.role === 'admin' || payload.role === 'staff' || payload.role === 'platform');
       } catch (e) { authorized = false; }
       if (!authorized) { res.status(401).json({ error: 'Unauthorized' }); return; }
     }

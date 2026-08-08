@@ -112,6 +112,39 @@ function fbRequest(db, path, method, token, body) {
   });
 }
 
+// Variante STRICTE de fbRequest, à utiliser UNIQUEMENT quand l'absence d'une valeur est
+// interprétée comme une autorisation (ex. "aucun mot de passe plateforme enregistré → mode
+// création initiale ouvert"). fbRequest() ci-dessus résout `null` aussi bien pour "le nœud
+// n'existe pas" que pour "Firebase a répondu une page d'erreur HTML illisible" — confondre
+// les deux transforme une panne passagère de Firebase en réouverture d'un mode privilégié
+// (audit 2026-08-08). Ici, toute réponse non-2xx ou tout corps non parsable REJETTE, ce qui
+// laisse l'appelant échouer fermé au lieu de supposer "absent".
+function fbRequestStrict(db, path, method, token, body) {
+  return new Promise((resolve, reject) => {
+    const url     = new URL(db + path + '.json?access_token=' + token);
+    const bodyStr = body != null ? JSON.stringify(body) : null;
+    const opts    = { hostname: url.hostname, path: url.pathname + url.search, method, headers: {} };
+    if (bodyStr) {
+      opts.headers['Content-Type']   = 'application/json';
+      opts.headers['Content-Length'] = Buffer.byteLength(bodyStr);
+    }
+    const req = https.request(opts, res => {
+      let data = ''; res.on('data', d => data += d);
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error('Firebase REST ' + res.statusCode + ' on ' + path));
+        }
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('Firebase REST unparsable response on ' + path)); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(8000, () => req.destroy(new Error('Firebase REST request timed out')));
+    if (bodyStr) req.write(bodyStr);
+    req.end();
+  });
+}
+
 // Révoque les jetons/sessions déjà émis pour un uid (équivalent réel du
 // sessions.remove() actuel) — best-effort, jamais bloquant pour l'appelant.
 function revokeRefreshTokens(accessToken, uid) {
@@ -186,4 +219,4 @@ async function verifyIdToken(idToken, projectId) {
   }
 }
 
-module.exports = { getServiceAccount, getAccessToken, mintCustomToken, fbRequest, revokeRefreshTokens, verifyIdToken };
+module.exports = { getServiceAccount, getAccessToken, mintCustomToken, fbRequest, fbRequestStrict, revokeRefreshTokens, verifyIdToken };

@@ -3349,6 +3349,7 @@ const ADMIN_UI = {
     filterToday:'Σήμερα', filter7d:'7 ημέρες', filter30d:'30 ημέρες', filter12m:'12 μήνες', filterCustom:'Προσαρμοσμένο',
     chartOrdersTitle:'Παραγγελίες ανά τραπέζι', chartCallsTitle:'Κλήσεις ανά τραπέζι',
     chartProductsTitle:'Κορυφαία προϊόντα', chartEmpty:'Δεν υπάρχουν δεδομένα', chartTopN:'top 10',
+    ordersLoadError:'⚠️ Οι παραγγελίες δεν είναι προσωρινά διαθέσιμες — ελέγξτε τη σύνδεσή σας.',
     scAnalytics:'📊 Στατιστικά', statsSectionTitle:'Στατιστικά',
     btnGenerate:'Δημιουργία', tblLabel:'Τραπέζι', tblOpen:'↗ Άνοιγμα', tblCopy:'Αντιγραφή', tblCopied:'Αντιγράφηκε!', tblUnit:'τραπέζια', tblGenFirst:'Δημιουργήστε πρώτα τα τραπέζια σας παρακάτω.',
     btnDelLogo:    'Διαγραφή λογοτύπου',
@@ -3510,6 +3511,7 @@ const ADMIN_UI = {
     filterToday:'Aujourd\'hui', filter7d:'7 jours', filter30d:'30 jours', filter12m:'12 mois', filterCustom:'Personnalisé',
     chartOrdersTitle:'Commandes par table', chartCallsTitle:'Appels par table',
     chartProductsTitle:'Produits les plus vendus', chartEmpty:'Aucune donnée sur cette période', chartTopN:'top 10',
+    ordersLoadError:'⚠️ Commandes momentanément indisponibles — vérifiez votre connexion.',
     scAnalytics:'📊 Statistiques', statsSectionTitle:'Statistiques',
     btnGenerate:'Générer', tblLabel:'Table', tblOpen:'↗ Ouvrir', tblCopy:'Copier', tblCopied:'Copié !', tblUnit:'tables', tblGenFirst:'Générez d\'abord vos tables ci-dessous.',
     btnDelLogo:    'Supprimer le logo',
@@ -3671,6 +3673,7 @@ const ADMIN_UI = {
     filterToday:'Today', filter7d:'7 days', filter30d:'30 days', filter12m:'12 months', filterCustom:'Custom',
     chartOrdersTitle:'Orders by table', chartCallsTitle:'Calls by table',
     chartProductsTitle:'Top products', chartEmpty:'No data for this period', chartTopN:'top 10',
+    ordersLoadError:'⚠️ Orders temporarily unavailable — please check your connection.',
     scAnalytics:'📊 Statistics', statsSectionTitle:'Statistics',
     btnGenerate:'Generate', tblLabel:'Table', tblOpen:'↗ Open', tblCopy:'Copy', tblCopied:'Copied!', tblUnit:'tables', tblGenFirst:'Generate your tables below first.',
     btnDelLogo:    'Delete logo',
@@ -3832,6 +3835,7 @@ const ADMIN_UI = {
     filterToday:'Heute', filter7d:'7 Tage', filter30d:'30 Tage', filter12m:'12 Monate', filterCustom:'Benutzerdefiniert',
     chartOrdersTitle:'Bestellungen pro Tisch', chartCallsTitle:'Anrufe pro Tisch',
     chartProductsTitle:'Top-Produkte', chartEmpty:'Keine Daten für diesen Zeitraum', chartTopN:'top 10',
+    ordersLoadError:'⚠️ Bestellungen vorübergehend nicht verfügbar — bitte Verbindung prüfen.',
     scAnalytics:'📊 Statistiken', statsSectionTitle:'Statistiken',
     btnGenerate:'Generieren', tblLabel:'Tisch', tblOpen:'↗ Öffnen', tblCopy:'Kopieren', tblCopied:'Kopiert!', tblUnit:'Tische', tblGenFirst:'Erstellen Sie zuerst unten Ihre Tische.',
     btnDelLogo:    'Logo löschen',
@@ -3993,6 +3997,7 @@ const ADMIN_UI = {
     filterToday:'Hoy', filter7d:'7 días', filter30d:'30 días', filter12m:'12 meses', filterCustom:'Personalizado',
     chartOrdersTitle:'Pedidos por mesa', chartCallsTitle:'Llamadas por mesa',
     chartProductsTitle:'Mejores productos', chartEmpty:'No hay datos para este período', chartTopN:'top 10',
+    ordersLoadError:'⚠️ Pedidos no disponibles temporalmente — comprueba tu conexión.',
     scAnalytics:'📊 Estadísticas', statsSectionTitle:'Estadísticas',
     btnGenerate:'Generar', tblLabel:'Mesa', tblOpen:'↗ Abrir', tblCopy:'Copiar', tblCopied:'¡Copiado!', tblUnit:'mesas', tblGenFirst:'Genera primero tus mesas abajo.',
     btnDelLogo:    'Eliminar logo',
@@ -4433,9 +4438,9 @@ document.addEventListener('keydown', e => {
     const qr = document.getElementById('qr-modal');
     if (qr && qr.style.display !== 'none') { closeQRModal(); return; }
   }
-  const notifBox = document.getElementById('notif-box');
-  if (notifBox && notifBox.style.display !== 'none') {
-    if (typeof _hideNotifBox === 'function') _hideNotifBox();
+  const notifModal = document.getElementById('notif-modal');
+  if (notifModal && notifModal.classList.contains('on')) {
+    if (typeof window._closeNotifModal === 'function') { window._closeNotifModal(); return; }
   }
 });
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
@@ -5869,6 +5874,11 @@ function setupNotifFab() {
     modal.classList.remove('on');
     if (history.state?.adminModal === 'notif') history.back();
   }
+  // Exposée pour que la touche Échap (gestionnaire global défini bien plus haut) puisse
+  // fermer cette modale comme toutes les autres — elle visait auparavant un id
+  // "notif-box" inexistant (c'est une CLASSE) et une fonction _hideNotifBox jamais
+  // définie, donc Échap n'a jamais rien fermé ici (audit 2026-08-08).
+  window._closeNotifModal = closeModal;
   cancelBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
@@ -9384,6 +9394,20 @@ function startOrdersListener() {
     renderOrdersAdmin(orders);
     if (_adminCurrentTab === 'orders') updateAnalytics();
     if (!_analyticsBackfillDone) { _analyticsBackfillDone = true; _backfillAnalyticsFromOrders(_analyticsData); }
+  }, err => {
+    // 🔴 Sans ce callback, un échec de lecture (jeton expiré après un onglet resté
+    // ouvert, réseau) laissait la liste sur "Aucune commande pour le moment" —
+    // en plein service, le restaurateur croyait n'avoir aucune commande alors que
+    // ses clients commandaient réellement, sans le moindre indice (audit 2026-08-08).
+    console.error('[orders listener]', err);
+    ordersListener = null;
+    const box = document.getElementById('orders-admin-list');
+    const t2 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+    if (box) box.innerHTML = '<div class="orders-empty">' + esc(t2.ordersLoadError || '⚠️ Commandes momentanément indisponibles — vérifiez votre connexion.') + '</div>';
+    // Réparation silencieuse (même pattern que _writeToggleField/saveData) puis nouvel essai.
+    if (typeof _ensureAuthed === 'function') {
+      _ensureAuthed().then(() => { setTimeout(startOrdersListener, 1200); }).catch(() => {});
+    }
   });
 }
 
@@ -10363,9 +10387,14 @@ function buildProductsChart(containerId, data) {
     data.map((d, i) => {
       const pct = maxQ > 0 ? (d.value / maxQ * 100).toFixed(1) : 0;
       const rank = i === 0 ? '<span class="prod-top-rank first">🏆</span>' : '<span class="prod-top-rank">' + (i+1) + '</span>';
+      // 🔴 esc() obligatoire : d.label vient de analytics/{date}/products/{id}/name.
+      // Ce nom n'est PAS toujours celui d'un produit réel du menu — quand l'id ne
+      // correspond à aucun produit vivant, computeAnalytics() retombe sur la valeur
+      // brute stockée en base. Sans échappement, un nom piégé s'exécutait dans le
+      // panneau du restaurateur à l'ouverture de l'onglet Commandes (audit 2026-08-08).
       const nm = String(d.label).length > 32 ? String(d.label).substring(0,31) + '…' : String(d.label);
       return '<div class="prod-top-row">' + rank +
-        '<div class="prod-top-body"><div class="prod-top-name" title="' + String(d.label).replace(/"/g,'&quot;') + '">' + nm + '</div>' +
+        '<div class="prod-top-body"><div class="prod-top-name" title="' + esc(String(d.label)) + '">' + esc(nm) + '</div>' +
         '<div class="prod-top-bar-wrap"><div class="prod-top-bar" data-w="' + pct + '"></div></div></div>' +
         '<div class="prod-top-qty">' + d.value + '</div></div>';
     }).join('') + '</div>';

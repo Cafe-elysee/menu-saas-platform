@@ -4,10 +4,10 @@
       ".read": "auth != null && auth.token.role === 'platform'",
       "$rid": {
         "devices": {
-          ".read": true,
-          ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+          ".read": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
+          ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
           "$deviceId": {
-            ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+            ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
             ".validate": "!newData.exists() || (newData.hasChildren(['token','ts','lang']) && newData.child('token').isString() && newData.child('token').val().length < 300 && newData.child('ts').isNumber() && newData.child('lang').isString())"
           }
         },
@@ -32,50 +32,66 @@
 
         "logs": {
           ".read": true,
-          ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+          ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
           "errors": {
             ".write": true,
             "$errId": {
-              ".validate": "!newData.exists() || (newData.hasChildren(['msg','ts']) && newData.child('msg').isString() && newData.child('msg').val().length < 300 && newData.child('ts').isNumber())"
+              ".validate": "!newData.exists() || (newData.hasChildren(['msg','ts']) && newData.child('msg').isString() && newData.child('msg').val().length < 300 && newData.child('ts').isNumber())",
+              "msg":  { ".validate": "newData.isString() && newData.val().length < 300" },
+              "src":  { ".validate": "newData.isString() && newData.val().length < 200" },
+              "line": { ".validate": "newData.isNumber()" },
+              "ts":   { ".validate": "newData.isNumber()" },
+              "ctx":  { ".validate": "newData.isString() && newData.val().length < 40" },
+              "$other": { ".validate": false }
             }
           },
-          "actions":  { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+          "actions":  { ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))" },
           "receipts": { ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" }
         },
 
         "messages": {
           ".read": true,
-          ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+          ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
           "$msgId": {
-            ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+            ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && (auth.token.role === 'admin' || auth.token.role === 'staff')))",
             ".validate": "!newData.exists() || (newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length < 500 && newData.child('ts').isNumber())"
           }
         },
 
         "analytics": {
           ".read": true,
-          ".write": true,
+          ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
           "$dateKey": {
-            ".validate": "!newData.exists() || newData.child('createdAt').isNumber()"
+            ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
+            ".validate": "!newData.exists() || newData.child('createdAt').isNumber()",
+            "products": {
+              "$productId": {
+                "name": { ".validate": "newData.isString() && newData.val().length < 120" },
+                "qty":  { ".validate": "newData.isNumber()" }
+              }
+            }
           }
         },
 
         "config": {
-          ".read": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')",
-          ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && newData.child('active').val() === data.child('active').val() && newData.child('suspendu').val() === data.child('suspendu').val()))",
+          ".read": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin'))",
+          ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin' && newData.child('active').val() === data.child('active').val() && newData.child('suspendu').val() === data.child('suspendu').val()))",
           "adminPwd": {
             ".validate": "!newData.exists()"
           },
           "active":       { ".read": true },
           "suspendu":     { },
           "defaultLang":  { ".read": true },
+          "primaryLang":  { ".read": true },
           "enabledLangs": { ".read": true },
-          "features":     { ".read": true }
+          "features":     { ".read": true },
+          "retention":    { ".read": true },
+          "tableCount":   { ".read": true }
         },
 
-        "menu":      { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "profile":   { ".read": true, ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
-        "sessions":  { ".read": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')", ".write": "auth != null && (auth.token.rid === $rid || auth.token.role === 'platform')" },
+        "menu":      { ".read": true, ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin'))" },
+        "profile":   { ".read": true, ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin'))" },
+        "sessions":  { ".read": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin'))", ".write": "auth != null && (auth.token.role === 'platform' || (auth.token.rid === $rid && auth.token.role === 'admin'))" },
         "firstOpen": { ".read": true, ".write": true, ".validate": "newData.isBoolean()" }
       }
     },

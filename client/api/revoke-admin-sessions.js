@@ -25,7 +25,12 @@ module.exports = async function handler(req, res) {
   if (!rid && role !== 'platform') return res.status(400).json({ error: 'Missing rid' });
 
   const payload = await verifyIdToken(sid, 'menu-saas-platform');
-  const isSelf = !!payload && (payload.role === 'platform' || payload.rid === rid);
+  // 🔴 Le claim "rid" seul ne suffit pas : le jeton du menu public (role:'menu-client') le
+  // porte aussi et se minte sans secret pour n'importe quel rid (le rid est imprimé sur les
+  // QR codes). Sans contrôle de rôle, un visiteur pouvait déconnecter en boucle le
+  // restaurateur et son personnel (audit 2026-08-08). Seul le restaurateur authentifié
+  // (role:'admin') ou la plateforme peut révoquer.
+  const isSelf = !!payload && (payload.role === 'platform' || (payload.rid === rid && payload.role === 'admin'));
   if (!isSelf) return res.status(401).json({ error: 'Unauthorized' });
 
   const uid = role === 'platform' ? 'platform_malek' : (role === 'staff' ? 'staff_' : 'admin_') + rid;

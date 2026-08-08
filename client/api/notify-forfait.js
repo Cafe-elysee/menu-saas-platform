@@ -147,7 +147,14 @@ async function verifySession(rid, sid) {
     const { verifyIdToken } = require('./_lib/firebaseAdmin');
     const payload = await verifyIdToken(sid, 'menu-saas-platform');
     if (!payload) return false;
-    return payload.rid === rid;
+    // 🔴 Le claim "rid" ne suffit PAS : le jeton du MENU PUBLIC (role:'menu-client', minté
+    // sans secret par /api/mint-menu-token pour n'importe quel rid — le rid est public,
+    // il est imprimé sur les QR codes) porte lui aussi ce claim. Sans contrôle de rôle,
+    // n'importe quel visiteur pouvait changer le forfait/les fonctionnalités/le prix d'un
+    // restaurant tiers (audit 2026-08-08). Seul le restaurateur authentifié (admin.html →
+    // /api/admin-login → role:'admin') ou la plateforme peut agir ici.
+    if (payload.role !== 'admin' && payload.role !== 'platform') return false;
+    return payload.rid === rid || payload.role === 'platform';
   } catch (e) { return false; }
 }
 // Même principe que verifySession() ci-dessus, mais pour l'identité "platform" de
