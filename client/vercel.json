@@ -4,7 +4,7 @@
       "src": "/(.*)",
       "headers": {
         "X-Frame-Options":         "SAMEORIGIN",
-        "Content-Security-Policy": "frame-ancestors 'self' https://menu-pro-demo.vercel.app https://genext-qr.com",
+        "Content-Security-Policy": "frame-ancestors 'self' https://menu-pro-demo.vercel.app https://menu-pro-demo-cafe-elysees-projects.vercel.app https://genext-qr.com",
         "X-Content-Type-Options":  "nosniff",
         "Referrer-Policy":         "strict-origin-when-cross-origin",
         "Permissions-Policy":      "camera=(), microphone=(), geolocation=()"
@@ -14,9 +14,9 @@
     { "src": "^/api/(.*)$",      "dest": "/api/$1" },
     { "src": "^/menu$",          "dest": "/index.html" },
     { "src": "^/admin$",         "dest": "/admin.html" },
-    { "src": "^/site-api/(.*)$","dest": "https://menu-pro-demo.vercel.app/api/$1" },
-    { "src": "^/$",              "dest": "https://menu-pro-demo.vercel.app/" },
+    { "src": "^/site-api/(.*)$","dest": "https://menu-pro-demo-cafe-elysees-projects.vercel.app/api/$1" },
+    { "src": "^/$",              "dest": "https://menu-pro-demo-cafe-elysees-projects.vercel.app/" },
     { "handle": "filesystem" },
-    { "src": "^/(.*)$", "dest": "https://menu-pro-demo.vercel.app/$1" }
+    { "src": "^/(.*)$", "dest": "https://menu-pro-demo-cafe-elysees-projects.vercel.app/$1" }
   ]
 }
