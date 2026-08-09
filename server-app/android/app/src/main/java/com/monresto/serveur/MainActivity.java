@@ -5,6 +5,7 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.capacitorjs.plugins.app.AppPlugin;
 import com.capacitorjs.plugins.pushnotifications.PushNotificationsPlugin;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -75,6 +76,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(NativeSettingsPlugin.class);
+        registerPlugin(AppPlugin.class);
         registerPlugin(PushNotificationsPlugin.class);
         createFcmChannel();
         super.onCreate(savedInstanceState);

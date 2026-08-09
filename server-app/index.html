@@ -1164,8 +1164,10 @@ function loadMessages() {
   } catch(_) { messages = []; }
 }
 
+var _msgsListenAttempts = 0;
 function startMessagesListener() {
   _rref('messages').on('value', function(snap) {
+    _msgsListenAttempts = 0;
     var data = snap.val() || {};
     var cutoff = Date.now() - 30 * 24 * 3600 * 1000; // 30 jours
     var toDelete = {};
@@ -1203,6 +1205,17 @@ function startMessagesListener() {
       renderMessages();
       updateMessagesBadge();
     }
+  }, function() {
+    // Même rattrapage que startOrdersListener : un refus de lecture désabonne le listener
+    // définitivement — sans ça, plus aucun message de l'administrateur n'arriverait.
+    if (_msgsListenAttempts >= 3) return;
+    _msgsListenAttempts++;
+    var _delay = 1000 * _msgsListenAttempts;
+    _ensureStaffAuth().then(function() {
+      setTimeout(startMessagesListener, _delay);
+    }).catch(function() {
+      setTimeout(startMessagesListener, _delay);
+    });
   });
 }
 
@@ -1518,6 +1531,16 @@ var _accountValid = false;
 var _pendingNativeToken = null;
 function startPolling() {
   setConnected(false);
+  // Le badge suit l'état RÉEL du socket Firebase (`.info/connected`, maintenu en direct par
+  // le SDK) et non plus le simple succès de la toute première lecture : avant ce correctif,
+  // une fois "Connecté" affiché il ne repassait JAMAIS à "En attente…", même quand la
+  // connexion mourait (longue mise en arrière-plan/Doze Android) — le serveur croyait donc
+  // recevoir les commandes alors que plus rien n'arrivait.
+  try {
+    firebase.database().ref('.info/connected').on('value', function(snap) {
+      setConnected(snap.val() === true);
+    });
+  } catch (e) {}
   _rref('calls/lastCall').on('value', function(snap) {
     var call = snap.val();
     if (call && call.ts && call.ts > _lastCallTs) {
@@ -1525,7 +1548,6 @@ function startPolling() {
       localStorage.setItem(_PFX+'last_call_ts', String(_lastCallTs));
       receiveCall(String(call.table), call.ts);
     }
-    setConnected(true);
   }, function() { setConnected(false); });
 }
 
@@ -1776,12 +1798,30 @@ function switchTab(tab) {
 /* ── ORDERS ── */
 var orders = {};
 
+var _ordersListenAttempts = 0;
 function startOrdersListener() {
   _rref('orders').on('value', function(snap) {
+    _ordersListenAttempts = 0;
     orders = snap.val() || {};
     renderOrders();
     updateOrdersTabBadge();
     if (!_ordersReady) { _ordersReady = true; _maybeApplyInitialTab(); }
+  }, function() {
+    // 🔴 Un `.on()` Firebase qui essuie un refus de lecture se DÉSABONNE définitivement :
+    // sans ce rattrapage, plus aucune nouvelle commande n'arrivait jusqu'au prochain
+    // redémarrage complet de l'app, et rien ne le signalait (même piège que Tables & QR,
+    // voir feedback_pagedemo_tables_qr_investigation_2026_07_22). On réauthentifie puis on
+    // se réabonne pour de bon (jamais une simple lecture ponctuelle), 3 tentatives max.
+    if (!_ordersReady) { _ordersReady = true; _maybeApplyInitialTab(); }
+    setConnected(false);
+    if (_ordersListenAttempts >= 3) return;
+    _ordersListenAttempts++;
+    var _delay = 1000 * _ordersListenAttempts;
+    _ensureStaffAuth().then(function() {
+      setTimeout(startOrdersListener, _delay);
+    }).catch(function() {
+      setTimeout(startOrdersListener, _delay);
+    });
   });
 }
 
@@ -2308,7 +2348,13 @@ function init() {
       // Compte actif — démarrage normal, après vérification du code PIN du personnel
       // (transition douce : si le restaurateur n'a pas encore défini de code, l'accès
       // est accordé sans rien demander — voir client/api/staff-login.js)
-      _ensureStaffAuth().then(function() { _startApp(true); });
+      _ensureStaffAuth().then(function() { _startApp(true); }).catch(function() { _startApp(false); });
+    }).catch(function() {
+      // 🔴 Sans ce rattrapage, un échec de lecture de config/active (réseau instable,
+      // refus de permission passager) laissait l'app FIGÉE sur l'écran de chargement,
+      // indéfiniment : la promesse échouait sans que rien ne la rattrape (le .catch()
+      // ci-dessous ne couvre que la chaîne parente, pas celle-ci).
+      _startApp(false);
     });
   }).catch(function() {
     // Erreur réseau → démarrer quand même pour ne pas bloquer (sans écrire firstOpen)

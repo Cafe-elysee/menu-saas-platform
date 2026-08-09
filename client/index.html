@@ -5566,6 +5566,15 @@
       cursor:pointer; transition:border-color 0.2s;
     }
     .cart-qty-btn:hover { border-color:var(--gold); }
+    /* Zone tactile élargie à 44px (recommandation Android/WCAG) SANS changer la taille
+       visible du bouton : le cercle doré reste à 26px, seule la surface qui répond au
+       doigt grandit. Les 2 zones restent séparées de 16px, aucun risque de toucher « + »
+       en visant « − ». */
+    .cart-qty-btn { position:relative; }
+    .cart-qty-btn::after {
+      content:''; position:absolute; top:50%; left:50%;
+      width:44px; height:44px; transform:translate(-50%,-50%);
+    }
     .cart-qty { font-size:0.86rem; color:var(--cream); min-width:18px; text-align:center; }
     .cart-item-price { font-size:0.78rem; color:var(--gold); font-weight:600; flex-shrink:0; }
     .cart-total-row {
