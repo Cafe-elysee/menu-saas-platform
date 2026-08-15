@@ -320,12 +320,12 @@
     }
     .tabs-track {
       display: flex; height: 100%;
-      width: 500%;
+      width: 400%;
       will-change: transform;
       transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-pane {
-      width: 20%; flex-shrink: 0;
+      width: 25%; flex-shrink: 0;
       overflow-y: auto; overflow-x: hidden;
       padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 1rem);
     }
@@ -563,31 +563,6 @@
       border-radius: 99px; padding: 0.1rem 0.5rem;
       margin-top: 0.1rem; align-self: flex-start;
     }
-    /* ── Trial countdown badge ── */
-    .commande-trial-badge {
-      display: inline-flex; align-items: center;
-      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em;
-      border-radius: 99px; padding: 0.13rem 0.5rem;
-      border: 1px solid; white-space: nowrap;
-      transition: color 0.3s, border-color 0.3s, background 0.3s;
-    }
-    .commande-trial-badge.urgency-ok {
-      color: var(--gold); border-color: rgba(200,164,78,.3);
-      background: rgba(200,164,78,.1);
-    }
-    .commande-trial-badge.urgency-warning {
-      color: #e8932a; border-color: rgba(232,147,42,.3);
-      background: rgba(232,147,42,.1);
-    }
-    .commande-trial-badge.urgency-expired {
-      color: #e85252; border-color: rgba(232,82,82,.3);
-      background: rgba(232,82,82,.08);
-    }
-    /* ── Suspend / Reactivate button ── */
-    .commande-trial-action {
-      padding: 0.6rem 0.75rem 0.75rem;
-      border-top: 1px solid var(--border);
-    }
     .commande-suspend-btn {
       width: 100%; padding: 0.6rem 1rem; border-radius: 8px;
       font-size: 0.82rem; font-weight: 600; cursor: pointer;
@@ -746,53 +721,6 @@
     }
     /* ── Section facturation dans carte client ── */
     .client-billing-section { padding: 0.4rem 0 0.2rem; }
-    .client-billing-section .commande-trial-action {
-      padding: 0.65rem 0 0.4rem; border-top: 1px solid var(--border); margin-top: 0.3rem;
-    }
-    /* ── Bouton Payé ── */
-    .commande-paid-btn {
-      width: 100%; padding: 0.55rem 1rem; border-radius: 8px; margin-bottom: 0.4rem;
-      font-size: 0.82rem; font-weight: 600; cursor: pointer;
-      border: 1px solid rgba(72,185,100,0.4);
-      background: rgba(72,185,100,0.1); color: #3db862;
-      font-family: 'Outfit', sans-serif; letter-spacing: 0.01em;
-      transition: all 0.25s;
-    }
-    .commande-paid-btn:hover { background: rgba(72,185,100,0.2); border-color: rgba(72,185,100,0.6); }
-    /* ── Bouton Historique paiements ── */
-    .hist-btn {
-      width:100%; margin-top:0.35rem;
-      background:rgba(200,164,78,0.07); color:#c8a44e;
-      border:1px solid rgba(200,164,78,0.25) !important;
-      font-size:0.78rem; font-weight:500;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .hist-btn:hover { background:rgba(200,164,78,0.14); border-color:rgba(200,164,78,0.45) !important; }
-    /* ── Modal historique paiements ── */
-    #hist-modal { display:none; position:fixed; inset:0; z-index:10003; background:rgba(5,3,2,0.68); align-items:center; justify-content:center; padding:20px; }
-    html.light #hist-modal { background:rgba(195,182,162,0.52); }
-    .hist-box { background-color:#0a0704; border:1px solid rgba(200,164,78,0.38); border-radius:18px; padding:22px 20px 18px; max-width:390px; width:100%; max-height:72vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,164,78,0.10); animation:ctrl-in 0.22s ease; }
-    html.light .hist-box { background-color:#faf7f2; border-color:rgba(200,164,78,0.40); }
-    .hist-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:1.15rem; font-weight:600; color:var(--gold); letter-spacing:0.04em; margin-bottom:3px; }
-    .hist-sub { font-size:0.75rem; color:rgba(244,234,208,0.65); margin-bottom:16px; }
-    html.light .hist-sub { color:rgba(26,18,8,0.62); }
-    .hist-empty { font-size:0.8rem; color:rgba(244,234,208,0.55); text-align:center; padding:24px 0; }
-    html.light .hist-empty { color:rgba(26,18,8,0.55); }
-    .hist-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid rgba(200,164,78,0.15); }
-    .hist-item:last-child { border-bottom:none; }
-    .hist-item-badge { font-size:1.05rem; flex-shrink:0; margin-top:1px; }
-    .hist-item-body { flex:1; }
-    .hist-item-date { font-size:0.82rem; color:#f0e4c8; font-weight:600; }
-    html.light .hist-item-date { color:#1a1208; }
-    .hist-item-detail { font-size:0.71rem; color:rgba(244,234,208,0.62); margin-top:2px; }
-    html.light .hist-item-detail { color:rgba(26,18,8,0.60); }
-    .hist-next { margin-top:14px; padding:10px 12px; background:rgba(200,164,78,0.09); border:1px solid rgba(200,164,78,0.28); border-radius:10px; }
-    .hist-next-label { font-size:0.71rem; color:rgba(244,234,208,0.62); margin-bottom:3px; }
-    html.light .hist-next-label { color:rgba(26,18,8,0.60); }
-    .hist-next-val { font-size:0.83rem; color:#c8a44e; font-weight:600; }
-    .hist-close-btn { width:100%; margin-top:16px; padding:10px; border-radius:12px; border:1px solid rgba(200,164,78,0.22); background:rgba(200,164,78,0.06); color:rgba(244,234,208,0.85); font-family:'Outfit',sans-serif; font-size:0.85rem; cursor:pointer; transition:background 0.2s; }
-    html.light .hist-close-btn { border-color:rgba(200,164,78,0.32); background:rgba(200,164,78,0.08); color:rgba(26,18,8,0.82); }
-    .hist-close-btn:hover { background:rgba(200,164,78,0.14); }
     .btn-creer-client {
       background: var(--gold-dim); color: var(--gold);
       border: 1px solid rgba(200,164,78,0.3) !important;
@@ -1718,7 +1646,6 @@
   html.light .gn-login-subtitle{ color:#8a6520; }
   /* ── Textes gold utilisés comme TEXTE (pas accent) — contraste ~2.1:1 en light sans ceci,
      même famille de bug que .gn-login-subtitle ci-dessus (audit accessibilité 2026-07-15) ── */
-  html.light .hist-title{ color:#8a6520; }
   html.light .del-name{ color:#8a6520; }
   html.light .settings-label{ color:#8a6520 !important; } /* !important requis : style inline */
   /* ── Même bug pattern trouvé sur d'autres classes texte-gold (audit 2026-07-17) ── */
@@ -1729,8 +1656,7 @@
   html.light .contact-btn,
   html.light .contact-save-btn,
   html.light .contact-send-btn,
-  html.light .exclient-restore-btn,
-  html.light .paie-voir-btn{ color:#8a6520; }
+  html.light .exclient-restore-btn{ color:#8a6520; }
   /* ── Icônes et états vides — visibilité améliorée ── */
   .commande-empty-icon{ opacity:0.65; }
   .dp-cam svg{ opacity:0.62; }
@@ -1766,19 +1692,12 @@
     .exclient-info { font-size: 0.77rem; color: var(--muted); line-height: 1.85; }
     .exclient-info strong { color: var(--text); opacity: 0.75; font-weight: 500; }
     html.light .exclient-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.09); }
-    .paie-badge-yellow { display: inline-flex; align-items: center; gap: 4px; background: rgba(200,164,78,0.14); border: 1px solid rgba(200,164,78,0.32); color: #c8a44e; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
-    .paie-badge-red { display: inline-flex; align-items: center; gap: 4px; background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.3); color: #e05252; border-radius: 20px; padding: 3px 10px; font-size: 0.77rem; font-weight: 600; }
-    .paie-voir-btn { background: rgba(200,164,78,0.10); border: 1px solid rgba(200,164,78,0.25); color: var(--gold); border-radius: 8px; padding: 5px 11px; font-size: 0.77rem; cursor: pointer; font-family: var(--font); }
-    /* Header paiements — padding compensant le border-radius 16px des coins */
-    .commande-card-header { padding: 14px 16px 8px; }
-    .commande-card-body-padded { padding: 0 16px 14px; }
     .hist-inline { margin-top: 4px; }
     .hist-inline-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.77rem; }
     .hist-inline-item:last-child { border-bottom: none; }
     .hist-inline-date { color: var(--muted); }
     .hist-inline-amt { color: var(--gold); font-weight: 600; }
     .hist-inline-empty { font-size: 0.77rem; color: var(--muted); padding: 4px 0; font-style: italic; }
-    .hist-voir-tout { margin-top: 9px; font-size: 0.75rem; background: transparent; border: 1px solid rgba(200,164,78,0.2); color: var(--gold); border-radius: 8px; padding: 4px 11px; cursor: pointer; }
     .f4-history-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin: 0.5rem 0 0.3rem; letter-spacing: 0.01em; }
   </style>
 
@@ -1864,16 +1783,6 @@
       <div class="clients-list" id="clients-list"></div>
     </div>
 
-    <!-- TAB PAIEMENTS -->
-    <div class="tab-pane tab-hidden" id="pane-paiements">
-      <div class="section-title">Paiements en attente</div>
-      <div id="paiements-empty" class="commande-empty" style="display:none">
-        <div class="commande-empty-icon">✅</div>
-        Aucun paiement en attente.
-      </div>
-      <div id="paiements-list"></div>
-    </div>
-
     <!-- TAB EX-CLIENTS -->
     <div class="tab-pane tab-hidden" id="pane-exclients">
       <div class="section-title">Ex-Clients archivés</div>
@@ -1896,17 +1805,31 @@
       <div class="settings-section" id="settings-pricing">
         <div class="settings-title">💶 Tarification — Prix publics</div>
         <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
-          Ces prix s'affichent sur la page Démo et sont appliqués par défaut aux nouveaux clients.<br>
-          L'abonnement commence après 1 mois d'essai gratuit — aucun frais de création.
+          Ces prix s'affichent sur la page Démo et sont appliqués par défaut aux nouveaux clients.
         </div>
-        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Abonnements (après 1 mois d'essai gratuit)</div>
-        <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">📋 Menu QR Code</div>
+        <div class="f4-grid" style="margin-bottom:14px;pointer-events:none">
+
+          <div class="f4-combo">
+            <div class="f4-name">📋 Menu QR</div>
+            <div class="f4-mode">Mensuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-qr-monthly" class="f4-price-inp" type="number" min="0" step="1" value="20"
+                aria-label="Prix public Menu QR Code — mensuel, en euros"
+                onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-qr-monthly', function(v){_saveGlobalPlanPrice('qr-monthly',v);})"
+                onchange="_saveGlobalPlanPrice('qr-monthly',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('qr-monthly',this.value);this.blur();}">
+              <span class="f4-unit">€/mois</span>
+            </div>
+          </div>
 
           <div class="f4-combo">
             <div class="f4-name">📋 Menu QR</div>
             <div class="f4-mode">Annuel</div>
             <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-qr-annual" class="f4-price-inp" type="number" min="0" step="1" value="490"
+              <input id="gs-qr-annual" class="f4-price-inp" type="number" min="0" step="1" value="200"
+                aria-label="Prix public Menu QR Code — annuel, en euros"
                 onclick="event.stopPropagation()"
                 oninput="_debouncePriceInput('gs-qr-annual', function(v){_saveGlobalPlanPrice('qr-annual',v);})"
                 onchange="_saveGlobalPlanPrice('qr-annual',this.value)"
@@ -1914,12 +1837,31 @@
               <span class="f4-unit">€/an</span>
             </div>
           </div>
+        </div>
+
+        <div class="settings-label" style="margin-bottom:8px;font-weight:700;color:var(--gold);">🛎 Commandes &amp; Services</div>
+        <div class="f4-grid" style="margin-bottom:0;pointer-events:none">
+
+          <div class="f4-combo">
+            <div class="f4-name">🛎 Commandes</div>
+            <div class="f4-mode">Mensuel</div>
+            <div class="f4-price-wrap" style="pointer-events:all">
+              <input id="gs-srv-monthly" class="f4-price-inp" type="number" min="0" step="1" value="30"
+                aria-label="Prix public Commandes et Appels — mensuel, en euros"
+                onclick="event.stopPropagation()"
+                oninput="_debouncePriceInput('gs-srv-monthly', function(v){_saveGlobalPlanPrice('srv-monthly',v);})"
+                onchange="_saveGlobalPlanPrice('srv-monthly',this.value)"
+                onkeydown="if(event.key==='Enter'){event.stopPropagation();_saveGlobalPlanPrice('srv-monthly',this.value);this.blur();}">
+              <span class="f4-unit">€/mois</span>
+            </div>
+          </div>
 
           <div class="f4-combo">
             <div class="f4-name">🛎 Commandes</div>
             <div class="f4-mode">Annuel</div>
             <div class="f4-price-wrap" style="pointer-events:all">
-              <input id="gs-srv-annual" class="f4-price-inp" type="number" min="0" step="1" value="990"
+              <input id="gs-srv-annual" class="f4-price-inp" type="number" min="0" step="1" value="300"
+                aria-label="Prix public Commandes et Appels — annuel, en euros"
                 onclick="event.stopPropagation()"
                 oninput="_debouncePriceInput('gs-srv-annual', function(v){_saveGlobalPlanPrice('srv-annual',v);})"
                 onchange="_saveGlobalPlanPrice('srv-annual',this.value)"
@@ -1928,7 +1870,8 @@
             </div>
           </div>
         </div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:10px;line-height:1.5;">
+        <div id="gs-savings-hint" style="font-size:0.74rem;color:var(--gold);margin-top:12px;font-weight:600;line-height:1.5;"></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px;line-height:1.5;">
           ⚠ Ces prix sont publics (page Démo). Le prix par client reste modifiable depuis la carte client.
         </div>
       </div>
@@ -2080,16 +2023,6 @@
     </div>
     <span class="nav-label">Clients</span>
   </button>
-  <button class="nav-btn" id="nav-paiements" onclick="switchTab('paiements')" style="display:none">
-    <div class="nav-badge" id="badge-paiements"></div>
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/>
-        <line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-    </div>
-    <span class="nav-label">Paiements</span>
-  </button>
   <button class="nav-btn" id="nav-exclients" onclick="switchTab('exclients')" style="display:none">
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2132,19 +2065,6 @@
       <button class="del-btn-cancel" onclick="closeDelModal()">Annuler</button>
       <button class="del-btn-confirm" id="del-confirm-btn" onclick="confirmDeleteClient()">Supprimer</button>
     </div>
-  </div>
-</div>
-
-<div id="hist-modal" onclick="if(event.target===this)_hideHistModal()">
-  <div class="hist-box">
-    <div class="hist-title">📋 Historique des paiements</div>
-    <div id="hist-sub" class="hist-sub"></div>
-    <div id="hist-list"></div>
-    <div id="hist-next" class="hist-next" style="display:none">
-      <div class="hist-next-label">📅 Prochain paiement attendu</div>
-      <div id="hist-next-val" class="hist-next-val"></div>
-    </div>
-    <button class="hist-close-btn" onclick="_hideHistModal()">✕ Fermer</button>
   </div>
 </div>
 
@@ -2260,9 +2180,11 @@ const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:
 const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
 const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande:'🛒 Commande' };
 const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
-const _PRICE_MONTHLY  = { 'menu-qr': 49, 'commandes-services': 99 };
-const _PRICE_ANNUAL   = { 'menu-qr': 490, 'commandes-services': 990 };
-let _GLOBAL_PLAN_PRICES   = { 'qr-annual': 490, 'srv-annual': 990 };
+// Tarifs de secours — n'entrent en jeu que si Firebase n'a encore aucun prix public.
+// L'annuel vaut 10 mois : c'est l'argument « 2 mois offerts » affiché aux clients.
+const _PRICE_MONTHLY  = { 'menu-qr': 20,  'commandes-services': 30  };
+const _PRICE_ANNUAL   = { 'menu-qr': 200, 'commandes-services': 300 };
+let _GLOBAL_PLAN_PRICES   = { 'qr-monthly': 20, 'qr-annual': 200, 'srv-monthly': 30, 'srv-annual': 300 };
 let _priceInputTimers     = {};
 
 // ── Sync subscription temps réel (admin ↔ control) ────────────────
@@ -2299,7 +2221,6 @@ function _setupSubSyncListener(slug, cmdKey) {
       // Persiste dans control Firebase pour offline/historique
       _controlWrite('/commandes/' + cmdKey, 'update', { price: d.price, forfait: d.forfait, paymentMode: d.paymentMode, prices: d.prices || null }).catch(function() {});
       _rerenderClientBillingSection(cmdKey);
-      _doRenderPaiements();
     }
   });
 }
@@ -2574,8 +2495,6 @@ function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 // Fermeture des modales avec Echap (même couverture que le bouton retour Android, ligne ~5900)
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  var _hm = document.getElementById('hist-modal');
-  if (_hm && _hm.style.display === 'flex') { _hideHistModal(); return; }
   var _ccm = document.getElementById('ctrl-confirm-modal');
   if (_ccm && _ccm.style.display === 'flex') { _hideCtrlConfirm(); return; }
   var _cem = document.getElementById('contact-edit-modal');
@@ -2630,20 +2549,19 @@ function showApp() {
 // ════════════════════════════════════════════════════
 // TAB NAVIGATION
 // ════════════════════════════════════════════════════
-const TABS = ['clients', 'paiements', 'exclients', 'demopage', 'reglages'];
+const TABS = ['clients', 'exclients', 'demopage', 'reglages'];
 let _currentTab = 'clients';
 
 function switchTab(tab) {
   _currentTab = tab;
   const idx = TABS.indexOf(tab);
-  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 20) + '%)';
+  document.getElementById('tabs-track').style.transform = 'translateX(-' + (idx * 25) + '%)';
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _navEl = document.getElementById('nav-' + tab);
   if (_navEl) _navEl.classList.add('active');
   const fab = document.getElementById('quick-nav-fab');
   if (fab) fab.style.display = tab === 'clients' ? 'flex' : 'none';
   if (tab === 'reglages') refreshNotifStatus();
-  if (tab === 'paiements') _doRenderPaiements();
   if (tab === 'exclients') _renderExClients();
 }
 
@@ -2666,7 +2584,7 @@ function switchTab(tab) {
     const dy = e.changedTouches[0].clientY - _ty;
     const dt = Date.now() - _tt;
     if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 2.0 && dt < 420) {
-      // Ignorer les onglets dont le bouton nav est masqué (paiements, exclients conditionnels)
+      // Ignorer les onglets dont le bouton nav est masqué (ex-clients, conditionnel)
       const visTabs = TABS.filter(function(t) { var n = document.getElementById('nav-'+t); return !n || n.style.display !== 'none'; });
       const idx = visTabs.indexOf(_currentTab);
       if (dx < 0 && idx < visTabs.length - 1) switchTab(visTabs[idx + 1]);
@@ -2738,15 +2656,17 @@ async function initFirebase() {
       // Première utilisation — écrire les valeurs par défaut dans Firebase
       _saasDb.ref('demoPage/pricing').set({
         prices: {
-          'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 490,
-          'srv-annual':  _GLOBAL_PLAN_PRICES['srv-annual']  || 990
+          'qr-monthly':  _GLOBAL_PLAN_PRICES['qr-monthly']  || 20,
+          'qr-annual':   _GLOBAL_PLAN_PRICES['qr-annual']   || 200,
+          'srv-monthly': _GLOBAL_PLAN_PRICES['srv-monthly'] || 30,
+          'srv-annual':  _GLOBAL_PLAN_PRICES['srv-annual']  || 300
         }
       }).catch(function(){});
       return;
     }
     if (s.prices && typeof s.prices === 'object') {
       const _validated = {};
-      ['qr-annual','srv-annual'].forEach(function(k) {
+      ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
         if (s.prices[k] != null) {
           const _v = Math.max(0, parseInt(Number(s.prices[k]), 10) || 0);
           _validated[k] = _v;
@@ -2834,14 +2754,13 @@ let _firstOpenWatchersSetup = false;
 function _watchFirstOpen(rid, cmdKey) {
   function _commitFirstOpen(attemptsLeft) {
     const _foTs = Date.now();
-    const _trialEnd = _addMonths(_foTs, 1);
-    // Essai gratuit : nextReminderAt = fin du mois d'essai (premier paiement dû à trialEndAt).
-    // Les deux écritures (date pivot de facturation) doivent réussir AVANT de détacher le
-    // listener — sinon un échec réseau laisserait le client sans trialEndAt/nextReminderAt,
-    // sans jamais se re-déclencher (firstOpen ne repasse pas à true une 2e fois).
+    // On n'enregistre plus que la DATE de première connexion : elle sert uniquement de
+    // repère à Malek pour savoir quand relancer (suivi manuel depuis le 2026-08-15).
+    // Plus aucune échéance ni fin d'essai n'est calculée ici. L'écriture doit réussir AVANT
+    // de détacher le listener — sinon un échec réseau laisserait le client sans date, sans
+    // jamais se re-déclencher (firstOpen ne repasse pas à true une 2e fois).
     Promise.all([
-      _controlWrite('/commandes/' + cmdKey, 'update', { statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs, nextReminderAt: _trialEnd, trialEndAt: _trialEnd }),
-      _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: _trialEnd, trialEndAt: _trialEnd })
+      _controlWrite('/commandes/' + cmdKey, 'update', { statut: 'traite', lu: true, clientCree: null, firstOpenAt: _foTs })
     ]).then(function() {
       _saasDb.ref('restaurants/' + rid + '/firstOpen').off();
       localStorage.removeItem('ctrl_fopen_' + rid);
@@ -2883,32 +2802,19 @@ function buildDeliverySubject(rest, forfait, lang) {
   return s[lang] || s.fr;
 }
 
-function _paySection(lang) {
-  const s = {
-    fr: '\n\n— Période d\'essai & Paiement —\n⏰ Vous bénéficiez d\'une semaine d\'essai complète à compter de votre première connexion à votre espace — pas à partir de la réception de ce message. Prenez le temps de tout découvrir avant de régler.\n\nLe paiement doit être finalisé dans ce délai :\n\n💳 Par virement bancaire : le virement doit être reçu dans la semaine, ou envoyez-nous la preuve de virement par WhatsApp / Viber / email avant la fin de la semaine.\n\n💵 En espèces : envoyez-nous votre localisation et votre identifiant (ci-dessus) par WhatsApp / Viber / email afin de convenir d\'un rendez-vous dans la semaine.\n\n📅 Pour les prochains règlements (mensuel ou annuel), la même procédure s\'applique.',
-    en: '\n\n— Trial Period & Payment —\n⏰ You have a full 1-week trial starting from your first login to your space — not from the receipt of this message. Take your time to explore everything before paying.\n\nPayment must be completed within this period:\n\n💳 Bank transfer: the transfer must be received within the week, or send us proof of transfer via WhatsApp / Viber / email before the end of the week.\n\n💵 Cash: send us your location and your ID (above) via WhatsApp / Viber / email so we can arrange a meeting within the week.\n\n📅 For upcoming payments (monthly or annual), the same procedure applies.',
-    el: '\n\n— Δοκιμαστική Περίοδος & Πληρωμή —\n⏰ Έχετε μια πλήρη εβδομάδα δοκιμής από την πρώτη σας σύνδεση στον χώρο σας — όχι από τη λήψη αυτού του μηνύματος. Πάρτε τον χρόνο σας να ανακαλύψετε τα πάντα πριν πληρώσετε.\n\nΗ πληρωμή πρέπει να ολοκληρωθεί εντός αυτής της περιόδου:\n\n💳 Τραπεζικό έμβασμα: πρέπει να ληφθεί εντός της εβδομάδας, ή στείλτε μας απόδειξη εμβάσματος μέσω WhatsApp / Viber / email πριν το τέλος της εβδομάδας.\n\n💵 Μετρητά: στείλτε μας την τοποθεσία σας και το αναγνωριστικό σας (παραπάνω) μέσω WhatsApp / Viber / email για να κανονίσουμε ραντεβού εντός της εβδομάδας.\n\n📅 Για τις επόμενες πληρωμές (μηνιαίες ή ετήσιες), εφαρμόζεται η ίδια διαδικασία.',
-    es: '\n\n— Período de prueba y pago —\n⏰ Dispone de una semana de prueba completa a partir de su primer inicio de sesión — no desde la recepción de este mensaje. Tómese el tiempo de descubrir todo antes de pagar.\n\nEl pago debe completarse dentro de este plazo:\n\n💳 Transferencia bancaria: la transferencia debe recibirse dentro de la semana, o envíenos comprobante por WhatsApp / Viber / email antes del final de la semana.\n\n💵 Efectivo: envíenos su ubicación y su ID (arriba) por WhatsApp / Viber / email para concertar una cita dentro de la semana.\n\n📅 Para los próximos pagos (mensual o anual), se aplica el mismo procedimiento.',
-    de: '\n\n— Testphase & Zahlung —\n⏰ Sie erhalten eine vollständige Testwoche ab Ihrer ersten Anmeldung in Ihrem Bereich — nicht ab dem Empfang dieser Nachricht. Nehmen Sie sich die Zeit, alles zu entdecken, bevor Sie zahlen.\n\nDie Zahlung muss innerhalb dieser Frist abgeschlossen werden:\n\n💳 Banküberweisung: muss innerhalb der Woche eingehen, oder senden Sie uns einen Zahlungsnachweis per WhatsApp / Viber / E-Mail vor Ende der Woche.\n\n💵 Bar: Senden Sie uns Ihren Standort und Ihre Kennung (oben) per WhatsApp / Viber / E-Mail, damit wir einen Termin innerhalb der Woche vereinbaren können.\n\n📅 Für zukünftige Zahlungen (monatlich oder jährlich) gilt dasselbe Verfahren.'
-  };
-  return s[lang] || s.fr;
-}
-
 function buildDeliveryMsg(rest, rid, pwd, forfait, lang) {
   const adminUrl = 'https://genext-qr.com/admin';
   const menuUrl  = 'https://genext-qr.com/menu?rid=' + rid + '&table=1';
   const apkUrl   = 'https://github.com/Cafe-elysee/menu-saas-platform/releases/download/apk-serveur-v1/MenuProServeur-SaaS-v1.0.apk';
   const isCS     = forfait === 'Commandes & Services';
   const m = {
-    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n🎁 1 mois d\'essai gratuit dès votre première connexion — aucun frais de création\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
-    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n🎁 1-month free trial from your first login — no setup fee\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
-    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n🎁 1 μήνας δωρεάν δοκιμή από την πρώτη σύνδεση — χωρίς τέλη δημιουργίας\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    es: '¡Hola ' + rest + '! 🎉\n\nSu espacio GeNext está listo.\n\n📋 Plan: ' + forfait + '\n🎁 1 mes de prueba gratis desde su primer inicio de sesión — sin tarifa de creación\n\n— Panel de administración —\n🔗 Enlace de acceso: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Contraseña: ' + pwd + '\n\nVaya a este enlace e inicie sesión para gestionar su restaurante.\n\n— Su menú online —\n🍽️ Enlace del menú: ' + menuUrl + '\n\nComparta este enlace o muestre su código QR en las mesas — sus clientes pueden consultar el menú directamente desde su teléfono.' + (isCS ? '\n\nCon el plan Pedidos y Servicios, sus clientes también pueden realizar pedidos y llamar al camarero desde su teléfono.\n\n— App de camareros —\n📱 Comparta este enlace con sus camareros para que descarguen e instalen la app en su teléfono Android:\n' + apkUrl + '\n\n⚠️ La app está actualmente disponible solo en Android. La versión iOS está en desarrollo y estará disponible pronto.' : '') + '\n\nAtentamente,\nEl equipo GeNext',
-    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n🎁 1 Monat kostenlose Testphase ab Ihrer ersten Anmeldung — keine Einrichtungsgebühr\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
+    fr: 'Bonjour ' + rest + ' ! 🎉\n\nVotre espace GeNext est prêt.\n\n📋 Forfait : ' + forfait + '\n\n— Administration —\n🔗 Lien d\'accès : ' + adminUrl + '\n🆔 Identifiant : ' + rid + '\n🔑 Mot de passe : ' + pwd + '\n\nRendez-vous sur ce lien, entrez votre identifiant puis votre mot de passe pour accéder à votre administration.\n\n— Votre menu en ligne —\n🍽️ Lien Menu : ' + menuUrl + '\n\nPartagez ce lien ou affichez son QR code sur vos tables — vos clients pourront consulter votre menu directement depuis leur téléphone.' + (isCS ? '\n\nGrâce au forfait Commandes & Services, vos clients peuvent également passer des commandes et appeler le serveur depuis leur téléphone.\n\n— Application serveur —\n📱 Partagez ce lien avec vos serveurs pour qu\'ils téléchargent et installent l\'application sur leur téléphone Android :\n' + apkUrl + '\n\n⚠️ L\'application est actuellement disponible sur Android uniquement. La version iOS est en cours de développement et sera disponible prochainement.' : '') + '\n\nCordialement,\nL\'équipe GeNext',
+    en: 'Hello ' + rest + '! 🎉\n\nYour GeNext space is ready.\n\n📋 Plan: ' + forfait + '\n\n— Admin panel —\n🔗 Access link: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Password: ' + pwd + '\n\nGo to this link and sign in to manage your restaurant.\n\n— Your online menu —\n🍽️ Menu link: ' + menuUrl + '\n\nShare this link or display its QR code on your tables — your guests can browse your menu directly from their phone.' + (isCS ? '\n\nWith the Orders & Services plan, your guests can also place orders and call the waiter from their phone.\n\n— Server app —\n📱 Share this link with your waiters so they can download and install the app on their Android phone:\n' + apkUrl + '\n\n⚠️ The app is currently available on Android only. The iOS version is under development and will be available soon.' : '') + '\n\nBest regards,\nThe GeNext team',
+    el: 'Γεια σας ' + rest + '! 🎉\n\nΟ χώρος GeNext σας είναι έτοιμος.\n\n📋 Πακέτο: ' + forfait + '\n\n— Πίνακας διαχείρισης —\n🔗 Σύνδεσμος: ' + adminUrl + '\n🆔 Αναγνωριστικό: ' + rid + '\n🔑 Κωδικός: ' + pwd + '\n\nΣυνδεθείτε για να διαχειριστείτε το εστιατόριό σας.\n\n— Το online μενού σας —\n🍽️ Σύνδεσμος μενού: ' + menuUrl + '\n\nΜοιραστείτε αυτόν τον σύνδεσμο ή εμφανίστε το QR code στα τραπέζια σας — οι πελάτες σας μπορούν να δουν το μενού από το κινητό τους.' + (isCS ? '\n\nΜε το πακέτο Παραγγελίες & Υπηρεσίες, οι πελάτες μπορούν επίσης να παραγγείλουν και να καλέσουν τον σερβιτόρο.\n\n— Εφαρμογή σερβιτόρου —\n📱 Μοιραστείτε αυτόν τον σύνδεσμο με τους σερβιτόρους σας για να κατεβάσουν και να εγκαταστήσουν την εφαρμογή στο Android τηλέφωνό τους:\n' + apkUrl + '\n\n⚠️ Η εφαρμογή είναι διαθέσιμη μόνο για Android αυτή τη στιγμή. Η έκδοση iOS βρίσκεται υπό ανάπτυξη και θα είναι διαθέσιμη σύντομα.' : '') + '\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
+    es: '¡Hola ' + rest + '! 🎉\n\nSu espacio GeNext está listo.\n\n📋 Plan: ' + forfait + '\n\n— Panel de administración —\n🔗 Enlace de acceso: ' + adminUrl + '\n🆔 ID: ' + rid + '\n🔑 Contraseña: ' + pwd + '\n\nVaya a este enlace e inicie sesión para gestionar su restaurante.\n\n— Su menú online —\n🍽️ Enlace del menú: ' + menuUrl + '\n\nComparta este enlace o muestre su código QR en las mesas — sus clientes pueden consultar el menú directamente desde su teléfono.' + (isCS ? '\n\nCon el plan Pedidos y Servicios, sus clientes también pueden realizar pedidos y llamar al camarero desde su teléfono.\n\n— App de camareros —\n📱 Comparta este enlace con sus camareros para que descarguen e instalen la app en su teléfono Android:\n' + apkUrl + '\n\n⚠️ La app está actualmente disponible solo en Android. La versión iOS está en desarrollo y estará disponible pronto.' : '') + '\n\nAtentamente,\nEl equipo GeNext',
+    de: 'Hallo ' + rest + '! 🎉\n\nIhr GeNext Bereich ist bereit.\n\n📋 Paket: ' + forfait + '\n\n— Verwaltung —\n🔗 Zugangslink: ' + adminUrl + '\n🆔 Kennung: ' + rid + '\n🔑 Passwort: ' + pwd + '\n\nMelden Sie sich an, um Ihr Restaurant zu verwalten.\n\n— Ihre Online-Speisekarte —\n🍽️ Menü-Link: ' + menuUrl + '\n\nTeilen Sie diesen Link oder zeigen Sie den QR-Code an Ihren Tischen — Ihre Gäste können die Speisekarte direkt vom Handy aufrufen.' + (isCS ? '\n\nMit dem Paket Bestellungen & Services können Ihre Gäste auch Bestellungen aufgeben und den Kellner rufen.\n\n— Kellner-App —\n📱 Teilen Sie diesen Link mit Ihren Kellnern, damit sie die App auf ihrem Android-Handy herunterladen und installieren können:\n' + apkUrl + '\n\n⚠️ Die App ist derzeit nur für Android verfügbar. Die iOS-Version wird entwickelt und wird bald verfügbar sein.' : '') + '\n\nMit freundlichen Grüßen,\nDas GeNext Team'
   };
-  const _base = m[lang] || m.fr;
-  const _lb = _base.lastIndexOf('\n\n');
-  return _lb === -1 ? _base + _paySection(lang) : _base.slice(0, _lb) + _paySection(lang) + _base.slice(_lb);
+  return m[lang] || m.fr;
 }
 
 function _rerenderCommandeCard(key) {
@@ -2993,7 +2899,6 @@ async function _pollCommandesOnce() {
       }
     });
     renderCommandes();
-    setTimeout(_checkAutoSuspend, 200); // vérifier après le rendu initial
     // Rafraîchir les sections facturation des cartes client déjà affichées
     // (y compris clients dont clientCree=null après firstOpen — on détecte via emailData.rid)
     setTimeout(function() {
@@ -3030,7 +2935,6 @@ function renderCommandes() {
 function _doRenderCommandes() {
   const empty = document.getElementById('commande-empty');
   const wrap  = document.getElementById('commande-cards');
-  _doRenderPaiements();
   if (!wrap) return;
   const keys  = Object.keys(_commandesCache).sort((a, b) => b - a);
   const newCount = keys.filter(k => !_commandesCache[k].lu).length;
@@ -3042,53 +2946,6 @@ function _doRenderCommandes() {
   const frag = document.createDocumentFragment();
   keys.forEach(k => frag.appendChild(buildCommandeCard(k, _commandesCache[k])));
   wrap.appendChild(frag);
-  _doRenderPaiements();
-}
-
-function _trialInfo(d, key) {
-  const WEEK = 7 * 24 * 60 * 60 * 1000;
-  if (d.clientDeleted) return { isExpired: false, isSuspended: false, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'none' };
-  const isSuspended = d.suspendu === true;
-  const now = Date.now();
-
-  function _makeResult(expireTs, expiredLabel, ptype) {
-    const remaining = expireTs - now;
-    const isExpired = remaining <= 0;
-    let label = '', urgency = 'ok';
-    if (!isExpired) {
-      const days  = Math.floor(remaining / 86400000);
-      const hours = Math.floor((remaining % 86400000) / 3600000);
-      const mins  = Math.floor((remaining % 3600000) / 60000);
-      if (days > 0)       { label = '⏱ ' + days + 'j ' + hours + 'h'; urgency = days <= 1 ? 'warning' : 'ok'; }
-      else if (hours > 0) { label = '⏱ ' + hours + 'h ' + mins + 'min'; urgency = 'warning'; }
-      else                { label = '⏱ ' + mins + ' min'; urgency = 'warning'; }
-    } else {
-      label = expiredLabel; urgency = 'expired';
-    }
-    return { isExpired, isSuspended, label, urgency, ts: expireTs, noTrial: false, paymentType: ptype };
-  }
-
-  // ── Cycles récurrents (après premier paiement) ──────────────────────────────
-  if (d.paidAt) {
-    if (!d.nextReminderAt || now < d.nextReminderAt) {
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'recurring' };
-    }
-    return _makeResult(d.nextReminderAt + WEEK, '⌛ Paiement expiré', 'recurring');
-  }
-
-  // ── Essai gratuit → premier abonnement (1 mois depuis premier usage) ─────────
-  if (d.firstOpenAt) {
-    const trialEnd = d.trialEndAt || (d.firstOpenAt + 30 * 24 * 60 * 60 * 1000);
-    if (now < trialEnd) {
-      return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'subscription' };
-    }
-    // Essai terminé — premier paiement dû (délai 7 jours)
-    const dueTs = (d.nextReminderAt && d.nextReminderAt >= trialEnd) ? d.nextReminderAt : trialEnd;
-    return _makeResult(dueTs + WEEK, '⌛ Abonnement expiré', 'subscription');
-  }
-
-  // Client pas encore activé (jamais utilisé l'ID)
-  return { isExpired: false, isSuspended, label: '', urgency: 'ok', ts: 0, noTrial: true, paymentType: 'subscription' };
 }
 
 // ── Trouver la commande d'un slug client ────────────────────────────────────
@@ -3111,9 +2968,35 @@ function _comboKey(forfait, mode) {
 
 // ── Refresh UI Réglages Tarification ─────────────────────────────────────────
 function _refreshPricingSettingsUI() {
-  var el;
-  el = document.getElementById('gs-qr-annual');    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['qr-annual']   || 490;
-  el = document.getElementById('gs-srv-annual');   if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES['srv-annual']  || 990;
+  var _defaults = { 'qr-monthly': 20, 'qr-annual': 200, 'srv-monthly': 30, 'srv-annual': 300 };
+  Object.keys(_defaults).forEach(function(k) {
+    var el = document.getElementById('gs-' + k);
+    // Ne jamais écraser un champ en cours de saisie par Malek (le listener Firebase se
+    // redéclenche à chaque enregistrement, y compris le sien).
+    if (el && document.activeElement !== el) el.value = _GLOBAL_PLAN_PRICES[k] || _defaults[k];
+  });
+  _refreshPricingSavingsHint();
+}
+
+// ── Aide visuelle « 2 mois offerts » sous les prix publics ──────────────────
+// Calculée, jamais codée en dur : si Malek change un prix, l'argument commercial affiché
+// reste exact au lieu de mentir (ex. « 2 mois offerts » alors qu'il n'y en a plus qu'un).
+function _monthsFreeFor(monthlyKey, annualKey) {
+  var m = Number(_GLOBAL_PLAN_PRICES[monthlyKey]);
+  var a = Number(_GLOBAL_PLAN_PRICES[annualKey]);
+  if (!m || !a || m <= 0) return 0;
+  return Math.max(0, Math.round((m * 12 - a) / m));
+}
+function _refreshPricingSavingsHint() {
+  var el = document.getElementById('gs-savings-hint');
+  if (!el) return;
+  var qr  = _monthsFreeFor('qr-monthly', 'qr-annual');
+  var srv = _monthsFreeFor('srv-monthly', 'srv-annual');
+  var txt = (qr === srv)
+    ? (qr > 0 ? 'Payer à l\'année revient à ' + qr + ' mois offerts sur les 2 forfaits.'
+              : 'Aucune remise sur le paiement annuel actuellement.')
+    : 'Paiement annuel : ' + qr + ' mois offerts sur Menu QR Code, ' + srv + ' sur Commandes & Services.';
+  el.textContent = txt;
 }
 
 // ── Sauvegarder un prix de plan global ───────────────────────────────────────
@@ -3121,11 +3004,13 @@ function _saveGlobalPlanPrice(key, rawVal) {
   const price = Math.max(0, parseInt(rawVal, 10) || 0);
   const oldPrice = _GLOBAL_PLAN_PRICES[key];
   _GLOBAL_PLAN_PRICES[key] = price;
+  _refreshPricingSavingsHint();
   if (!_saasDb) { showToast('💾 Prix ' + key + ' : ' + price + ' €'); return; }
   _saasDb.ref('demoPage/pricing/prices/' + key).set(price).then(function() {
     showToast('💾 Prix ' + key + ' : ' + price + ' €');
   }).catch(function() {
     _GLOBAL_PLAN_PRICES[key] = oldPrice; // rollback — évite un prix affiché désynchronisé de Firebase
+    _refreshPricingSavingsHint();
     showToast('⚠ Erreur synchronisation Firebase');
   });
 }
@@ -3139,7 +3024,6 @@ function _debouncePriceInput(inputId, saveFn) {
   }, 900);
 }
 
-// ── Sauvegarder un prix de frais de création custom (conservé pour rétrocompatibilité) ──────────────────────────
 // ── Prix pour une combinaison forfait+mode ────────────────────────────────
 function _getComboPrice(d, forfait, mode) {
   var ck = _comboKey(forfait, mode);
@@ -3153,16 +3037,17 @@ function _getComboPrice(d, forfait, mode) {
 
 // ── Construire le HTML de la section facturation (grille 2 formules annuelles) ──
 function _buildClientBillingSectionHTML(cmdKey, d) {
-  // Un mode de paiement absent ne justifie plus de masquer toute la section : la ligne
-  // suivante retombe déjà sur l'annuel, comme le serveur. L'ancien retour anticipé
-  // renvoyait une carte VIDE (grille des forfaits, date de renouvellement et historique
-  // invisibles) sans le moindre message, pour une commande par ailleurs valide.
+  // Un mode de paiement absent ne justifie pas de masquer la section : la ligne suivante
+  // retombe sur l'annuel, comme le serveur. Un ancien retour anticipé renvoyait ici une
+  // carte VIDE, sans le moindre message, pour une commande par ailleurs valide.
   var activeForfait = d.forfait || 'menu-qr';
   var activeMode = d.paymentMode || 'annual';
 
   var combos = [
-    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',   modeLabel: 'Annuel', unit: '&#8364;/an' },
-    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes', modeLabel: 'Annuel', unit: '&#8364;/an' }
+    { forfait: 'menu-qr',            mode: 'monthly', label: '&#128203; Menu QR',   modeLabel: 'Mensuel', unit: '&#8364;/mois' },
+    { forfait: 'menu-qr',            mode: 'annual',  label: '&#128203; Menu QR',   modeLabel: 'Annuel',  unit: '&#8364;/an'   },
+    { forfait: 'commandes-services', mode: 'monthly', label: '&#128717; Commandes', modeLabel: 'Mensuel', unit: '&#8364;/mois' },
+    { forfait: 'commandes-services', mode: 'annual',  label: '&#128717; Commandes', modeLabel: 'Annuel',  unit: '&#8364;/an'   }
   ];
 
   var gridHtml = combos.map(function(c) {
@@ -3188,18 +3073,13 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     '<input type="text" id="birthdate-inp-' + cmdKey + '" class="commande-birthdate-input" readonly placeholder="S&#233;lectionner&#8230;" value="">' +
   '</div>';
 
-  // ── Prochain renouvellement — toujours visible, jamais besoin d'ouvrir une modale ──
-  var renewalRow = '';
-  if (d.nextReminderAt) {
-    var renewalDate = new Date(d.nextReminderAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
-    var renewalOverdue = d.nextReminderAt < Date.now() && !d.suspendu;
-    renewalRow = '<div class="commande-birthdate-row">' +
-      '<span class="commande-birthdate-label">&#128260; Prochain renouvellement :</span>' +
-      '<span style="flex:1;text-align:center;font-weight:700;font-size:0.86rem;color:' + (renewalOverdue ? '#e05252' : 'var(--gold)') + '">' + escapeHtml(renewalDate) + '</span>' +
-    '</div>';
-  }
+  // Plus de « prochain renouvellement » ici : depuis le 2026-08-15, les échéances sont
+  // suivies par Malek dans son fichier Excel, la plateforme ne les calcule plus.
 
   const _forfaitTypeLabels = {
+    'request-approved': '✅ Demande validée', 'malek-set': '🔄 Changement de forfait',
+    // Types issus de l'ancien système de facturation — conservés uniquement pour que
+    // l'historique déjà enregistré reste lisible.
     'upgrade-paid': '⬆️ Upgrade payé', 'downgrade-immediate': '⬇️ Downgrade immédiat',
     'downgrade-scheduled': '⬇️ Downgrade appliqué', 'trial': '🔄 Changement (essai)',
     'window-first-use': '🔄 Changement de forfait', 'window-already-used': '🔄 Changement de forfait'
@@ -3225,145 +3105,102 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
       }).join('');
   var historySection = '<div class="f4-history-label">&#128220; Historique du forfait</div>' + historyHtml;
 
-  // ── Visibilité des changements en attente (invisible auparavant — bug d'audit) ──
+  // ── Demande de changement de forfait déposée par le client ────────────────────
+  // Le client ne change jamais son forfait lui-même : il dépose une demande, Malek
+  // l'appelle, puis valide (ou refuse) ici. C'est le seul endroit où elle est visible.
   var pendingHtml = '';
-  if (d.pendingForfaitChange) {
-    var pfc = d.pendingForfaitChange;
-    var pfcLabel = pfc.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-    var pfcDate = pfc.scheduledAt ? new Date(pfc.scheduledAt).toLocaleDateString('fr-FR') : '—';
-    pendingHtml += '<div class="f4-pending-badge">' +
-      '&#128197; Downgrade programm&#233; &#8594; ' + escapeHtml(pfcLabel) + ' le ' + pfcDate +
-      ' &#183; ' + pfc.price + '&#8364;' +
-      ' <button class="f4-pending-btn" onclick="_cancelScheduledDowngrade(\'' + cmdKey + '\')">Annuler</button>' +
-      ' <button class="f4-pending-btn" onclick="_forceApplyDowngrade(\'' + cmdKey + '\')">Forcer maintenant</button>' +
-    '</div>';
-  }
-  if (d.pendingUpgrade) {
-    var pu = d.pendingUpgrade;
-    var puDate = pu.deadline ? new Date(pu.deadline).toLocaleDateString('fr-FR') : '—';
-    pendingHtml += '<div class="f4-pending-badge f4-pending-upgrade">' +
-      '&#9203; Upgrade en attente de paiement &#8212; <b>' + pu.prorata.amountDue + '&#8364;</b> avant le ' + puDate +
-      ' <button class="f4-pending-btn f4-pending-btn-ok" onclick="_confirmUpgradePaid(\'' + cmdKey + '\')">&#9989; Marqu&#233; pay&#233;</button>' +
-      ' <button class="f4-pending-btn" onclick="_cancelPendingUpgradeCtrl(\'' + cmdKey + '\')">Annuler</button>' +
-    '</div>';
+  if (d.forfaitRequest && d.forfaitRequest.forfait) {
+    var fr = d.forfaitRequest;
+    var frLabel = fr.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR Code';
+    var frMode  = fr.paymentMode === 'monthly' ? 'mensuel' : 'annuel';
+    var frDate  = fr.requestedAt ? new Date(fr.requestedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' }) : '';
+    var frPrice = (fr.price != null) ? (' &#183; ' + fr.price + '&#8364;') : '';
+    pendingHtml =
+      '<div class="f4-pending-badge f4-pending-upgrade">' +
+        '&#128276; Demande du client' + (frDate ? ' (' + escapeHtml(frDate) + ')' : '') + ' &#8594; <b>' +
+        escapeHtml(frLabel) + '</b> ' + escapeHtml(frMode) + frPrice +
+        ' <button class="f4-pending-btn f4-pending-btn-ok" onclick="_approveForfaitRequest(\'' + cmdKey + '\')">&#9989; Valider</button>' +
+        ' <button class="f4-pending-btn" onclick="_rejectForfaitRequest(\'' + cmdKey + '\')">Refuser</button>' +
+      '</div>';
   }
 
   return '<div class="client-billing-section" data-cmdkey="' + cmdKey + '">' +
     pendingHtml +
     '<div class="f4-grid" id="f4-grid-' + cmdKey + '">' + gridHtml + '</div>' +
     birthdateRow +
-    renewalRow +
     historySection +
   '</div>';
 }
 
-// ── Actions sur les changements en attente (badges ci-dessus) ───────────────────
-function _cancelScheduledDowngrade(cmdKey) {
+// ── Demande de changement de forfait — validation / refus par Malek ─────────────
+// Le serveur fait autorité : il relit la demande réellement en base avant de l'appliquer
+// (la carte affichée ici peut dater de quelques secondes). On ne devine jamais le résultat.
+const _forfaitRequestInFlight = {};
+
+function _approveForfaitRequest(cmdKey) {
   var d = _commandesCache[cmdKey];
-  if (!d) return;
-  var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', pending: 'cancel', actor: 'malek' }).then(function(r) {
-    if (_mainWriteFailedGuard(r, rid)) return;
-    if (r && r.ok) {
-      // Efface le badge "programmé" du cache local AVANT de re-rendre — sinon la carte
-      // affiche encore brièvement le badge/bouton "Annuler" pendant le court délai avant
-      // que _pollCommandesOnce() ne rattrape la vraie donnée serveur (flash confirmé en
-      // audit du 2026-07-15, même famille que les flashs déjà corrigés sur ce projet).
-      _commandesCache[cmdKey] = Object.assign({}, d, { pendingForfaitChange: null });
-      showToast('✅ Changement annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce();
-    }
-    else { showToast('❌ Erreur'); }
-  }).catch(function() { showToast('❌ Erreur réseau'); });
-}
-const _upgradeConfirmInFlight = {};
-function _confirmUpgradePaid(cmdKey) {
-  var d = _commandesCache[cmdKey];
-  if (!d || !d.pendingUpgrade || _upgradeConfirmInFlight[cmdKey]) return;
-  var amount = d.pendingUpgrade.prorata ? d.pendingUpgrade.prorata.amountDue : 0;
+  if (!d || !d.forfaitRequest || _forfaitRequestInFlight[cmdKey]) return;
+  var fr    = d.forfaitRequest;
+  var label = fr.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR Code';
+  var mode  = fr.paymentMode === 'monthly' ? 'mensuel' : 'annuel';
   _showCtrlConfirm(
-    'Confirmer le paiement ?',
-    'Upgrade de « ' + escapeHtml(d.restaurant || '') + ' » marqué payé (' + amount + ' €).',
-    '✅ Confirmer',
+    'Valider la demande ?',
+    '« ' + escapeHtml(d.restaurant || '') +' » passera en <b>' + escapeHtml(label) + '</b> (' + mode + ')' +
+    (fr.price != null ? ' à <b>' + fr.price + ' €</b>' : '') + '.<br><br>Le changement est appliqué immédiatement et le client en est informé par e-mail.',
+    '✅ Valider',
     function() {
-      if (_upgradeConfirmInFlight[cmdKey]) return;
-      _upgradeConfirmInFlight[cmdKey] = true;
+      if (_forfaitRequestInFlight[cmdKey]) return;
+      _forfaitRequestInFlight[cmdKey] = true;
       var rid = _getSlugFromCmdKey(cmdKey);
       _callNotifyForfait({
-        rid: rid, cmdKey: cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr',
-        newForfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || 'commandes-services',
-        email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-        paymentMode: d.paymentMode || 'annual', actor: 'malek', confirmUpgradePayment: true
+        rid: rid, cmdKey: cmdKey, name: d.restaurant || '',
+        email: (d.emailData && d.emailData.email) || d.email || '',
+        lang: d.langue || 'fr', actor: 'malek', approve: true
       }).then(function(r) {
         if (_mainWriteFailedGuard(r, rid)) return;
-        if (r && r.ok) {
-          // Même correctif anti-flash que _cancelScheduledDowngrade : refléter le résultat
-          // connu (forfait/mode déjà déterminés par le devis) avant de re-rendre, plutôt que
-          // de laisser le badge "en attente de paiement" visible pendant le court délai avant
-          // le prochain sondage.
-          _commandesCache[cmdKey] = Object.assign({}, d, {
-            forfait: (d.pendingUpgrade && d.pendingUpgrade.forfait) || d.forfait,
-            paymentMode: (d.pendingUpgrade && d.pendingUpgrade.newMode) || d.paymentMode,
-            pendingUpgrade: null
-          });
-          showToast('✅ Upgrade confirmé et payé'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce();
+        if (!r || !r.ok) { showToast(r && r.error === 'no-request' ? 'ℹ️ Demande déjà traitée' : '❌ Erreur'); _pollCommandesOnce(); return; }
+        // On reflète le résultat RÉEL renvoyé par le serveur, jamais une supposition locale.
+        _commandesCache[cmdKey] = Object.assign({}, d, {
+          forfait: r.applied.forfait, paymentMode: r.applied.paymentMode, price: r.applied.price,
+          forfaitRequest: null
+        });
+        _rerenderClientBillingSection(cmdKey);
+        _pollCommandesOnce();
+        if (r.emailStatus && r.emailStatus.indexOf('error') === 0) {
+          showToast('⚠️ Forfait changé, mais l\'e-mail au client a échoué — préviens-le toi-même');
+        } else {
+          showToast('✅ Forfait mis à jour');
         }
-        else { showToast('❌ Erreur'); }
       }).catch(function() { showToast('❌ Erreur réseau'); })
-        .finally(function() { delete _upgradeConfirmInFlight[cmdKey]; });
+        .finally(function() { delete _forfaitRequestInFlight[cmdKey]; });
     },
     false
   );
 }
-function _cancelPendingUpgradeCtrl(cmdKey) {
+
+function _rejectForfaitRequest(cmdKey) {
   var d = _commandesCache[cmdKey];
-  if (!d) return;
-  var rid = _getSlugFromCmdKey(cmdKey);
-  _callNotifyForfait({ rid: rid, cmdKey: cmdKey, newForfait: d.forfait || 'menu-qr', cancelUpgrade: true, actor: 'malek' }).then(function(r) {
-    if (_mainWriteFailedGuard(r, rid)) return;
-    if (r && r.ok) {
-      _commandesCache[cmdKey] = Object.assign({}, d, { pendingUpgrade: null });
-      showToast('↩️ Upgrade annulé'); _rerenderClientBillingSection(cmdKey); _pollCommandesOnce();
-    }
-    else { showToast('❌ Erreur'); }
-  }).catch(function() { showToast('❌ Erreur réseau'); });
-}
-
-function _buildPaymentHistoryInlineHTML(cmdKey, d) {
-  var paiementsObj = d.paiements || {};
-  var payments = Object.values(paiementsObj).filter(function(p) { return p && p.date; }).sort(function(a,b) { return b.date - a.date; });
-
-  if (payments.length === 0) {
-    return '<div class="hist-inline-empty">Aucun paiement enregistré.</div>';
-  }
-  var rows = payments.slice(0, 5).map(function(p) {
-    var ds  = new Date(p.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
-    var lbl = p.mode === 'annual' ? '📅 Annuel' : '🔁 Mensuel';
-    var unit = p.mode === 'annual' ? 'an' : 'mois';
-    var amt  = p.montant !== undefined ? p.montant : '?';
-    return '<div class="hist-inline-item"><span class="hist-inline-date">' + escapeHtml(ds) + ' · ' + lbl + '</span><span class="hist-inline-amt">' + escapeHtml(String(amt)) + ' €/' + unit + '</span></div>';
-  }).join('');
-  return rows + '<button class="hist-voir-tout" onclick="_showPaymentHistory(\'' + cmdKey + '\')">&#128203; Voir tout l\'historique</button>';
-}
-
-function _buildPaymentSectionHTML(cmdKey, d) {
-  var trial = _trialInfo(d, cmdKey);
-  var pendingHtml = '';
-  if (!trial.noTrial) {
-    var paidBtnLabel = '&#9989; Marquer comme pay&#233;';
-    var typePrefix = trial.paymentType === 'subscription' ? '1er abonnement · ' : (trial.paymentType === 'recurring' ? 'Abonnement · ' : '');
-    var suspHtml = trial.isExpired
-      ? '<button class="commande-suspend-btn ' + (trial.isSuspended ? 'reactivate-action' : 'suspend-action') + '" onclick="_toggleSuspend(\'' + cmdKey + '\')" style="width:100%;margin-top:6px">' +
-          (trial.isSuspended ? '&#9654; R&#233;activer le compte' : '&#9208; Suspendre le compte') +
-        '</button>'
-      : '';
-    pendingHtml =
-      '<div class="commande-trial-action" style="margin-bottom:12px">' +
-        '<div style="margin-bottom:8px"><span class="commande-trial-badge urgency-' + trial.urgency + '" data-ts="' + trial.ts + '" data-cmdkey="' + cmdKey + '">' + typePrefix + trial.label + '</span></div>' +
-        '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + cmdKey + '\')">' + paidBtnLabel + '</button>' +
-        suspHtml +
-      '</div>';
-  }
-  return pendingHtml + _buildPaymentHistoryInlineHTML(cmdKey, d);
+  if (!d || !d.forfaitRequest || _forfaitRequestInFlight[cmdKey]) return;
+  _showCtrlConfirm(
+    'Refuser la demande ?',
+    'La demande de « ' + escapeHtml(d.restaurant || '') + ' » sera retirée. Son forfait actuel ne change pas.',
+    'Refuser',
+    function() {
+      if (_forfaitRequestInFlight[cmdKey]) return;
+      _forfaitRequestInFlight[cmdKey] = true;
+      var rid = _getSlugFromCmdKey(cmdKey);
+      _callNotifyForfait({ rid: rid, cmdKey: cmdKey, actor: 'malek', rejectRequest: true }).then(function(r) {
+        if (r && r.ok) {
+          _commandesCache[cmdKey] = Object.assign({}, d, { forfaitRequest: null });
+          _rerenderClientBillingSection(cmdKey);
+          _pollCommandesOnce();
+          showToast('↩️ Demande retirée');
+        } else { showToast('❌ Erreur'); }
+      }).catch(function() { showToast('❌ Erreur réseau'); })
+        .finally(function() { delete _forfaitRequestInFlight[cmdKey]; });
+    },
+    true
+  );
 }
 
 // ── Sauvegarder le mode paiement (optimistic) ────────────────────────────────
@@ -3392,8 +3229,6 @@ function _rerenderClientBillingSection(cmdKey) {
   }
   var billingEl = document.getElementById('billing-section-' + slugId);
   if (billingEl) { billingEl.innerHTML = _buildClientBillingSectionHTML(cmdKey, d); _initBirthdatePicker(cmdKey); }
-  var payEl = document.getElementById('payment-section-' + slugId);
-  if (payEl) payEl.innerHTML = _buildPaymentSectionHTML(cmdKey, d);
   // Mettre à jour le bouton Suspendre/Réactiver dans section 5 de la carte client
   var suspBtn = document.getElementById('card-suspend-btn-' + slugId);
   if (suspBtn) {
@@ -3578,39 +3413,10 @@ function _toggleSuspend(key) {
               showToast('⚠ Suspension enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
             });
           } else {
+            // Réactivation : plus aucune échéance à recalculer — rien ne re-suspendra ce
+            // client automatiquement, la suspension est désormais 100 % manuelle.
             _saasDb.ref('restaurants/' + ridSync + '/config').update({ active: true, suspendu: false }).catch(function() {
               showToast('⚠ Réactivation enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
-            });
-            // Si la date de renouvellement est déjà dans le passé, la recalculer au
-            // moment de la réactivation — sinon le cron B4 re-suspend automatiquement
-            // ce client au run suivant, annulant silencieusement le geste de Malek.
-            if (d.nextReminderAt && Date.now() >= d.nextReminderAt) {
-              const newNextReminderAt = _addMonths(Date.now(), (d.paymentMode === 'annual') ? 12 : 1);
-              _controlWrite('/commandes/' + key + '/nextReminderAt', 'set', newNextReminderAt).catch(function() {
-                showToast('⚠ Échéance non resynchronisée — vérifiez manuellement');
-              });
-              _saasDb.ref('restaurants/' + ridSync + '/config/subscription/endDate').set(newNextReminderAt).catch(function() {
-                showToast('⚠ Échéance non resynchronisée côté restaurant — vérifiez manuellement');
-              });
-              if (_commandesCache[key]) _commandesCache[key].nextReminderAt = newNextReminderAt;
-            }
-          }
-        }
-        if (!willSuspend) {
-          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
-          if (emailAddr) {
-            _platformIdToken().then(function(sid) {
-              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: emailAddr,
-                  name: d.restaurant || '',
-                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                  type: 'reactivation',
-                  sid: sid
-                })
-              }).catch(function() {});
             });
           }
         }
@@ -3681,7 +3487,7 @@ async function _callNotifyForfait(payload) {
   // totalement inchangé, sans que rien ne le signale (tous les appelants ne regardent que
   // result.ok pour afficher leur toast de succès). 1 réessai automatique après 1,5s, puis
   // alerte explicite si l'échec persiste — jamais plus de silence sur un chemin qui
-  // déclenche une vraie facturation (même discipline que _markPaid/_toggleSuspend).
+  // change réellement le forfait d'un restaurant (même discipline que _toggleSuspend).
   if (result && result.ok && result.mainWrite && payload.rid) {
     const _doMainWrite = () => Promise.all([
       result.mainWrite.features     ? _saasDb.ref('restaurants/' + payload.rid + '/config/features').update(result.mainWrite.features) : null,
@@ -3720,159 +3526,73 @@ function _mainWriteFailedGuard(r, rid) {
 }
 
 const _comboChangeInFlight = {};
+// Changement de forfait décidé par Malek depuis la grille — application immédiate.
+// (Le client, lui, ne peut que déposer une demande, traitée par _approveForfaitRequest.)
 async function _setActiveCombo(cmdKey, forfait, mode) {
   const d = _commandesCache[cmdKey];
   if (!d || _comboChangeInFlight[cmdKey]) return;
   const normForfait = (forfait === 'services' || forfait === 'commandes-services') ? 'commandes-services' : 'menu-qr';
   const normMode    = (mode === 'annual') ? 'annual' : 'monthly';
-  // Défaut aligné sur le serveur (curMode = cmdData.paymentMode || 'annual', notify-forfait.js)
-  // — jamais 'monthly' ici : ce projet n'a plus que le mode annuel (Fix #161), un défaut
-  // différent entre client et serveur pouvait faire diverger silencieusement la décision
-  // "déjà actif ?" du garde local de celle, faisant foi, du serveur.
+  // Défaut aligné sur le serveur (curMode = cmdData.paymentMode || 'annual') — un défaut
+  // différent entre app et serveur ferait diverger la décision « déjà actif ? ».
   if (normForfait === (d.forfait || 'menu-qr') && normMode === (d.paymentMode || 'annual')) return;
 
   const rid = _getSlugFromCmdKey(cmdKey);
-  const payload = {
-    rid, cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: normForfait,
-    email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-    paymentMode: normMode, actor: 'malek',
-    // Depuis la carte client (control-app), le changement suit désormais EXACTEMENT les mêmes
-    // règles que le client verrait dans admin.html — mêmes emails, même popup de devis au
-    // prorata pour un upgrade, même programmation en fin de période pour un downgrade (2026-07-14,
-    // sur demande explicite de Malek : "respecte les mêmes règles... et tout le comportement").
-    // La SEULE différence : après programmation d'un downgrade, Malek reçoit EN PLUS le choix
-    // de l'appliquer immédiatement (voir plus bas, cas 'mid-cycle-downgrade') — jamais envoyé
-    // ici dès le départ, jamais possible pour le client lui-même (admin.html n'envoie jamais ce
-    // drapeau).
-  };
+  const label = normForfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR Code';
+  const modeLbl = normMode === 'annual' ? 'annuel' : 'mensuel';
 
-  // AUCUNE mise à jour optimiste ici : la vraie décision (application immédiate, devis au
-  // prorata, ou simple programmation en fin de période) n'est connue qu'APRÈS la réponse du
-  // serveur. Deviner et afficher un résultat avant de le connaître causait un flash suivi
-  // d'une correction (bug confirmé par Malek), et polluait le cache local avec un forfait
-  // temporairement faux — lu ensuite par le clic suivant comme si c'était l'état réel.
-  _comboChangeInFlight[cmdKey] = true;
-  const gridEl = document.getElementById('f4-grid-' + cmdKey);
-  if (gridEl) gridEl.classList.add('loading');
+  _showCtrlConfirm(
+    'Changer le forfait ?',
+    '« ' + escapeHtml(d.restaurant || '') + ' » passera en <b>' + escapeHtml(label) + '</b> (' + modeLbl + ').' +
+    '<br><br>Le changement est appliqué immédiatement et le client en est informé par e-mail.',
+    'Changer',
+    async function() {
+      if (_comboChangeInFlight[cmdKey]) return;
+      _comboChangeInFlight[cmdKey] = true;
+      const gridEl = document.getElementById('f4-grid-' + cmdKey);
+      if (gridEl) gridEl.classList.add('loading');
 
-  let result;
-  try {
-    result = await _callNotifyForfait(payload);
-  } catch(e) {
-    if (gridEl) gridEl.classList.remove('loading');
-    delete _comboChangeInFlight[cmdKey];
-    showToast('❌ Erreur réseau');
-    return;
-  }
-  if (gridEl) gridEl.classList.remove('loading');
-  delete _comboChangeInFlight[cmdKey];
-
-  if (!result || !result.ok) {
-    showToast(result && result.case === 'window-already-used' ? '❌ Déjà changé une fois cette fenêtre' : '❌ Erreur');
-    return;
-  }
-  if (_mainWriteFailedGuard(result, rid)) return;
-
-  // Upgrade en cours de cycle payé : devis reçu, RIEN n'a encore été écrit — on demande
-  // confirmation à Malek avec le montant exact avant de créer le paiement en attente.
-  if (result.case === 'mid-cycle-upgrade-prorata') {
-    const q = result.quote;
-    _showCtrlConfirm(
-      'Upgrade au prorata',
-      'Montant dû : <b>' + q.amountDue + '€</b><br>(prix plein ' + q.newFullPrice + '€ − valeur non utilisée ' + q.unusedValue + '€ sur ' + q.daysRemaining + 'j restants du forfait actuel)<br><br>Confirmer et créer un paiement en attente de 7 jours ?',
-      'Confirmer',
-      function() {
-        _callNotifyForfait(Object.assign({}, payload, { confirm: true })).then(function(r2) {
-          if (_mainWriteFailedGuard(r2, rid)) return;
-          if (r2 && r2.ok) { showToast('⏳ Upgrade en attente de paiement'); _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce(); }
-          else { showToast('❌ Erreur'); }
-        }).catch(function() { showToast('❌ Erreur réseau'); });
+      let result;
+      try {
+        result = await _callNotifyForfait({
+          rid: rid, cmdKey: cmdKey, name: d.restaurant || '', newForfait: normForfait,
+          email: (d.emailData && d.emailData.email) || d.email || '',
+          lang: d.langue || 'fr', paymentMode: normMode, actor: 'malek'
+        });
+      } catch(e) {
+        showToast('❌ Erreur réseau');
+        return;
+      } finally {
+        if (gridEl) gridEl.classList.remove('loading');
+        delete _comboChangeInFlight[cmdKey];
       }
-    );
-    return;
-  }
 
-  if (result.case === 'no-op') {
-    // Le serveur a comparé le NOUVEAU forfait demandé au forfait RÉEL déjà en base
-    // (CONTROL_DB, jamais celui du cache local control-app) et les a trouvés identiques —
-    // rien à écrire. Ne jamais afficher un faux succès (trouvé en audit), MAIS ne jamais
-    // non plus rester silencieux (bug confirmé par Malek, 2026-07-14 : clic sans aucun
-    // retour visible, cache local visiblement désynchronisé de l'état serveur réel).
-    // Toujours prévenir explicitement + forcer une resynchro immédiate du cache local sur
-    // la vraie donnée serveur, pour que la carte s'auto-corrige au lieu de rester figée
-    // sur un état périmé qui continuerait à provoquer le même "rien ne se passe" en boucle.
-    showToast('ℹ️ Déjà sur ce forfait — carte resynchronisée');
-    _pollCommandesOnce().then(function() { _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); });
-    return;
-  }
+      if (!result || !result.ok) { showToast('❌ Erreur'); return; }
+      if (_mainWriteFailedGuard(result, rid)) return;
 
-  if (result.case === 'mid-cycle-downgrade') {
-    // Exactement le même résultat que si le client avait programmé ce downgrade lui-même
-    // depuis admin.html (même email "changement programmé", même échéance de paiement
-    // inchangée à la date de renouvellement déjà prévue) — le forfait ACTIF ne change PAS
-    // maintenant, on pose juste le badge "pending" via la réponse serveur.
-    _commandesCache[cmdKey] = Object.assign({}, d, {
-      pendingForfaitChange: { forfait: normForfait, price: result.newPrice, mode: 'downgrade-end-of-period', scheduledAt: result.scheduledFor }
-    });
-    _rerenderClientBillingSection(cmdKey);
-    _doRenderPaiements();
-    _pollCommandesOnce();
-    showToast('📅 Changement programmé en fin de période');
-    // Seule différence avec l'expérience client (demande explicite de Malek, 2026-07-14) :
-    // proposer EN PLUS le choix d'appliquer tout de suite plutôt que d'attendre le renouvellement
-    // — jamais automatique, toujours une action volontaire supplémentaire de Malek. Réutilise
-    // _forceApplyDowngrade(), déjà le mécanisme du bouton "Forcer maintenant" sur le badge
-    // programmé — aucune duplication de logique, aucun paiement demandé, email envoyé pareil.
-    const scheduledDateStr = result.scheduledFor ? new Date(result.scheduledFor).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : 'la fin de la période en cours';
-    _showCtrlConfirm(
-      'Appliquer dès maintenant ?',
-      'Le changement a été programmé pour le ' + scheduledDateStr + ' — comme le ferait le client. Voulez-vous plutôt l\'appliquer immédiatement (aucun paiement requis) ?',
-      'Appliquer maintenant',
-      function() { _forceApplyDowngrade(cmdKey); },
-      false
-    );
-    return;
-  }
+      if (result.case === 'no-op') {
+        // Le serveur a comparé au forfait RÉEL en base et l'a trouvé identique : le cache
+        // local était périmé. On le resynchronise au lieu de laisser la carte figée.
+        showToast('ℹ️ Déjà sur ce forfait — carte resynchronisée');
+        _pollCommandesOnce().then(function() { _rerenderClientBillingSection(cmdKey); });
+        return;
+      }
 
-  // Application instantanée : essai gratuit ou fenêtre de 7j non encore utilisée (même
-  // comportement que si le client l'avait fait lui-même depuis admin.html). Le forfait a
-  // réellement changé côté serveur, on reflète maintenant ce vrai résultat.
-  _commandesCache[cmdKey] = Object.assign({}, d, { forfait: normForfait, paymentMode: normMode });
-  _rerenderClientBillingSection(cmdKey);
-  _doRenderPaiements();
-  _pollCommandesOnce();
-  showToast('&#9989; Formule mise à jour');
-}
-
-// ── Forcer l'application immédiate d'un downgrade programmé (cas support exceptionnel) ──
-async function _forceApplyDowngrade(cmdKey) {
-  const d = _commandesCache[cmdKey];
-  if (!d || !d.pendingForfaitChange) return;
-  const rid = _getSlugFromCmdKey(cmdKey);
-  const pfc = d.pendingForfaitChange;
-  try {
-    const result = await _callNotifyForfait({
-      rid, cmdKey, name: d.restaurant || '', oldForfait: d.forfait || 'menu-qr', newForfait: pfc.forfait,
-      email: (d.emailData && d.emailData.email) || d.email || '', lang: d.langue || 'fr',
-      paymentMode: d.paymentMode || 'annual', actor: 'malek', immediate: true
-    });
-    if (_mainWriteFailedGuard(result, rid)) return;
-    if (result && result.ok) {
-      // emailStatus tracé explicitement côté serveur (2026-07-15, signalé par Malek : le
-      // changement s'appliquait mais l'email de confirmation manquait sans aucune trace).
-      // Ne jamais afficher "✅" seul si l'email a réellement échoué — Malek doit le savoir
-      // immédiatement, pas le découvrir des jours plus tard via une plainte du client.
+      // On reflète le résultat réellement renvoyé par le serveur, jamais une supposition.
+      _commandesCache[cmdKey] = Object.assign({}, d, {
+        forfait: result.applied.forfait, paymentMode: result.applied.paymentMode,
+        price: result.applied.price, forfaitRequest: null
+      });
+      _rerenderClientBillingSection(cmdKey);
+      _pollCommandesOnce();
       if (result.emailStatus && result.emailStatus.indexOf('error') === 0) {
-        showToast('⚠️ Changement appliqué, mais l\'email de confirmation a échoué — préviens le client manuellement');
-      } else if (result.emailStatus === 'no-email') {
-        showToast('✅ Changement appliqué (aucun email sur ce compte, rien envoyé)');
+        showToast('⚠️ Forfait changé, mais l\'e-mail au client a échoué — préviens-le toi-même');
       } else {
-        showToast('✅ Changement appliqué immédiatement');
+        showToast('✅ Forfait mis à jour');
       }
-      _rerenderClientBillingSection(cmdKey); _doRenderPaiements(); _pollCommandesOnce();
-    }
-    else { showToast('❌ Erreur'); }
-  } catch(e) { showToast('❌ Erreur réseau'); }
+    },
+    false
+  );
 }
 
 // ── Enregistrer le prix d'une formule spécifique ────────────────────────────
@@ -3885,9 +3605,10 @@ function _saveComboPrice(cmdKey, comboKey, rawVal) {
   prices[comboKey] = price;
   _commandesCache[cmdKey] = Object.assign({}, d, { prices });
 
-  // La grille ne montre que des combos annuels (édition de prix de référence) — ne jamais
-  // en déduire un changement de mode de paiement : un client mensuel dont on édite le prix
-  // annuel de référence ne doit PAS basculer en annuel (bug confirmé, Fix audit paiements).
+  // Éditer le prix d'une formule est une simple mise à jour de tarif de référence — jamais
+  // un changement de forfait ni de mode de paiement. Un client mensuel dont on corrige le
+  // prix annuel ne doit PAS basculer en annuel (bug confirmé, Fix audit paiements). Seul le
+  // prix de la formule ACTIVE se répercute sur `price` (le montant réellement facturé).
   var activeForfait = d.forfait || 'menu-qr';
   var activeMode = d.paymentMode || 'annual';
   var activeComboKey = _comboKey(activeForfait, activeMode);
@@ -3949,335 +3670,27 @@ function _saveFirstOpenAt(key, newTs) {
   if (!d) return;
   if (d.firstOpenAt === newTs) return;
   const prev = Object.assign({}, d);
-  const rid  = _getSlugFromCmdKey(key);
 
-  // La date d'anniversaire ancre tout le cycle d'essai (même logique que _watchFirstOpen
-  // au premier usage réel) — tant qu'aucun premier paiement n'a été enregistré, la fin
-  // d'essai ET la prochaine échéance doivent suivre exactement la nouvelle date, des deux
-  // côtés (CONTROL_DB + config/subscription client). Une fois le client payant, son cycle
-  // récurrent (nextReminderAt/endDate) est indépendant et ne doit plus être déplacé.
-  const update     = { firstOpenAt: newTs };
-  const mainUpdate = {};
-  if (!d.paidAt) {
-    // Seulement tant que le client n'a jamais payé : trialEndAt/nextReminderAt/endDate
-    // sont encore purement dérivés de firstOpenAt. Une fois payant, les repousser ici
-    // pourrait réafficher à tort la bannière "essai gratuit" côté client (admin.html se
-    // base uniquement sur trialEndAt vs. maintenant, sans vérifier paidAt) — on laisse
-    // alors son cycle réel (déjà indépendant) intact.
-    const newTrialEnd = _addMonths(newTs, 1);
-    update.trialEndAt = newTrialEnd;
-    update.nextReminderAt = newTrialEnd;
-    mainUpdate.trialEndAt = newTrialEnd;
-    mainUpdate.endDate = newTrialEnd;
-  }
+  // Simple repère de suivi pour Malek (date de première connexion du client) — depuis le
+  // 2026-08-15 elle ne déclenche plus aucun calcul : ni fin d'essai, ni échéance, ni
+  // suspension. La modifier n'a donc plus aucun effet sur le client.
+  const update = { firstOpenAt: newTs };
 
   _commandesCache[key] = Object.assign({}, d, update);
   _rerenderCommandeCard(key);
-  _doRenderPaiements();
 
   _controlWrite('/commandes/' + key, 'update', update)
     .then(function() {
       // 🔴 Fix (2026-07-22, audit SKILL.md) : le toast de succès s'affichait avant, en
-      // synchrone, hors de ce .then() — même défaut déjà corrigé sur _markPaid/_saveComboPrice.
-      showToast('📅 Date d\'anniversaire mise à jour' + (!d.paidAt ? ' — cycle d\'essai recalculé' : ''));
-      if (rid && Object.keys(mainUpdate).length > 0) {
-        _saasDb.ref('restaurants/' + rid + '/config/subscription').update(mainUpdate).catch(function() {
-          showToast('⚠ Date enregistrée mais la synchronisation du restaurant a échoué — vérifiez manuellement');
-        });
-      }
+      // synchrone, hors de ce .then() — jamais annoncer un enregistrement non confirmé.
+      showToast('📅 Date de première connexion mise à jour');
     })
     .catch(function() {
       _commandesCache[key] = prev;
       _rerenderCommandeCard(key);
-      _doRenderPaiements();
       showToast('⚠ Erreur de synchronisation — réessayez.');
     });
 }
-
-function _markPaid(key) {
-  const d = _commandesCache[key];
-  if (!d) return;
-  const isFirstSub = !d.paidAt;  // Premier abonnement = fin du mois d'essai
-  // 🔴 LE POINT LE PLUS SENSIBLE DE TOUTE LA FACTURATION (corrigé 2026-08-08).
-  // Écrit auparavant `d.paymentMode !== 'annual'` : un mode ABSENT (undefined) était donc
-  // traité comme MENSUEL, et l'échéance fixée à +1 mois au lieu de +12. Un client ayant
-  // réglé son ANNÉE se serait vu réclamer un paiement au bout d'un mois, puis SUSPENDU
-  // automatiquement par _checkAutoSuspend — alors qu'il était parfaitement à jour.
-  // Le mensuel n'existe plus comme offre (Fix #161) et le serveur considère lui-même
-  // l'annuel par défaut (notify-commande.js : `paymentMode || 'annual'`).
-  // Formulation explicite : seul un 'monthly' EXPLICITE vaut mensuel ; toute autre valeur,
-  // absente ou inattendue, retombe sur l'annuel — jamais dans le sens qui raccourcirait
-  // un cycle déjà payé.
-  const isMonthly  = (d.paymentMode || 'annual') === 'monthly';
-  const price      = _getCommandePrice(d);
-  const priceStr   = price + ' €/' + (isMonthly ? 'mois' : 'an');
-  const nextLabel  = isMonthly ? 'dans 1 mois' : 'dans 12 mois';
-
-  _showCtrlConfirm(
-    'Confirmer le paiement ?',
-    'Paiement ' + priceStr + ' enregistré pour « ' + escapeHtml(d.restaurant || '') + ' ». Prochain rappel ' + nextLabel + '.',
-    '✅ Confirmer',
-    function() {
-      const now = Date.now();
-      let update, payEntry;
-
-      if (isFirstSub) {
-        // Premier abonnement — cycles alignés sur trialEndAt pour régularité, MAIS jamais
-        // en-deçà d'aujourd'hui : si l'essai est resté impayé plus longtemps qu'un cycle
-        // complet (trialEndAt très ancien — ex. date d'anniversaire reculée manuellement
-        // pour un test), trialEndAt+1cycle peut retomber avant maintenant. Sans ce filet,
-        // le paiement du jour ne protège alors plus RIEN : classifyForfaitChange (serveur)
-        // revoit aussitôt nextReminderAt <= now et traite le prochain changement de forfait
-        // le jour même comme une fenêtre gratuite (instantané, sans devis ni paiement) —
-        // bug confirmé, même famille que le Fix #102 déjà appliqué à la branche récurrente.
-        const base = d.trialEndAt || d.nextReminderAt || now;
-        let nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
-        if (nextReminderAt <= now) nextReminderAt = isMonthly ? _addMonths(now, 1) : _addMonths(now, 12);
-        // Nouveau cycle réellement payé : efface l'ancrage d'un éventuel changement de mode
-        // de paiement "seul" du cycle précédent (voir notify-forfait.js computeUpgradeProrata),
-        // sinon un futur upgrade mi-cycle continuerait de se baser sur un cycle déjà révolu.
-        update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
-        payEntry = { date: now, montant: price, mode: d.paymentMode || 'annual', forfait: d.forfait || 'menu-qr', type: 'subscription' };
-      } else {
-        // Récurrent — partir de nextReminderAt si dans le futur, sinon de now
-        const base = (d.nextReminderAt && d.nextReminderAt > now) ? d.nextReminderAt : now;
-        const nextReminderAt = isMonthly ? _addMonths(base, 1) : _addMonths(base, 12);
-        update = { paidAt: now, nextReminderAt, suspendu: false, cycleAnchorMode: null, cycleAnchorPrice: null };
-        payEntry = { date: now, montant: price, mode: d.paymentMode || 'annual', forfait: d.forfait || 'menu-qr', type: 'subscription' };
-      }
-
-      const prev = _commandesCache[key];
-      _commandesCache[key] = Object.assign({}, d, update);
-      _rerenderCommandeCard(key);
-      _doRenderPaiements();
-
-      _controlWrite('/commandes/' + key, 'update', update)
-        .then(function() {
-          // 🔴 Fix audit 2026-07-17 (même défaut déjà corrigé sur _saveComboPrice le
-          // 2026-07-19) : le toast de succès s'affichait inconditionnellement plus bas,
-          // AVANT même que cette écriture n'aboutisse — un échec (hors-ligne) laissait
-          // voir "✅ Paiement enregistré" puis, seulement après, un toast d'erreur
-          // contradictoire. Déplacé ici, dans le vrai chemin de succès.
-          showToast('✅ Paiement enregistré');
-          _controlWrite('/commandes/' + key + '/paiements', 'push', payEntry).catch(function() {
-            showToast('⚠ Paiement enregistré mais absent de l\'historique — vérifiez manuellement');
-          });
-          const rid = (d.emailData && d.emailData.rid) || d.clientCree?.rid;
-          if (rid) {
-            // Sans .catch ici, un échec laisserait silencieusement le restaurant suspendu/
-            // périmé côté MAIN_DB alors que la commande est déjà marquée payée côté CONTROL_DB —
-            // alerter Malek explicitement plutôt que de masquer l'incohérence.
-            Promise.all([
-              _saasDb.ref('restaurants/' + rid + '/config').update({ active: true, suspendu: false }),
-              _saasDb.ref('restaurants/' + rid + '/config/subscription').update({ endDate: update.nextReminderAt })
-            ]).catch(function() {
-              showToast('⚠ Paiement enregistré mais la réactivation du restaurant a échoué — vérifiez manuellement');
-            });
-          }
-          const emailAddr = (d.emailData && d.emailData.email) || d.email || '';
-          if (emailAddr) {
-            _platformIdToken().then(function(sid) {
-              fetch('https://menu-saas-platform.vercel.app/api/notify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  rid: rid || '',
-                  email: emailAddr,
-                  name: d.restaurant || '',
-                  lang: (d.emailData && d.emailData.lang) || d.langue || 'fr',
-                  amount: price,
-                  paymentMode: d.paymentMode || 'annual',
-                  nextDue: update.nextReminderAt,
-                  sid: sid
-                })
-              }).catch(function() {});
-            });
-          }
-        })
-        .catch(function() {
-          _commandesCache[key] = prev;
-          _rerenderCommandeCard(key);
-          showToast('⚠ Erreur de synchronisation — réessayez.');
-        });
-    },
-    false
-  );
-}
-
-function _showPaymentHistory(cmdKey) {
-  const d = _commandesCache[cmdKey];
-  if (!d) return;
-  document.getElementById('hist-sub').textContent = d.restaurant || '—';
-
-  const paiementsObj = d.paiements || {};
-  const payments = Object.values(paiementsObj)
-    .filter(function(p) { return p && p.date; })
-    .sort(function(a, b) { return a.date - b.date; });
-
-  const listEl = document.getElementById('hist-list');
-  if (payments.length === 0) {
-    listEl.innerHTML = '<div class="hist-empty">Aucun paiement enregistré</div>';
-  } else {
-    const forfaitLabels = { 'commandes-services': 'Commandes & Services', 'menu-qr': 'Menu QR' };
-    listEl.innerHTML = payments.map(function(p) {
-      const dt = new Date(p.date);
-      const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-      const montant = (p.montant || 0) + ' €/' + (p.mode === 'annual' ? 'an' : 'mois');
-      const forfait = forfaitLabels[p.forfait] || p.forfait || '—';
-      return '<div class="hist-item">' +
-        '<span class="hist-item-badge">✅</span>' +
-        '<div class="hist-item-body">' +
-          '<div class="hist-item-date">' + escapeHtml(dateStr) + '</div>' +
-          '<div class="hist-item-detail">' + escapeHtml(montant) + ' · ' + escapeHtml(forfait) + '</div>' +
-        '</div></div>';
-    }).join('');
-  }
-
-  const nextEl  = document.getElementById('hist-next');
-  const nextVal = document.getElementById('hist-next-val');
-  if (d.nextReminderAt) {
-    const nd = new Date(d.nextReminderAt);
-    const ns = nd.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-    const price = _getCommandePrice(d);
-    const unit  = d.paymentMode === 'annual' ? 'an' : 'mois';
-    nextVal.textContent = ns + ' — ' + price + ' €/' + unit;
-    nextEl.style.display = '';
-  } else {
-    nextEl.style.display = 'none';
-  }
-
-  const modal = document.getElementById('hist-modal');
-  modal.style.display = 'flex';
-}
-
-function _hideHistModal() {
-  document.getElementById('hist-modal').style.display = 'none';
-}
-
-// Un upgrade au prorata en attente de paiement (carte client) est un VRAI paiement dû,
-// distinct du cycle normal (essai/renouvellement) que _trialInfo() connaît déjà — jusqu'ici
-// il n'apparaissait QUE dans la carte du client, jamais dans l'onglet Paiements, risquant de
-// passer inaperçu (bug confirmé par Malek, 2026-07-14). Le cron B_UPG_TIMEOUT efface
-// pendingUpgrade après le deadline (7j) s'il n'est pas confirmé — tant qu'il existe, il est
-// donc par construction toujours réellement en attente.
-function _hasPendingUpgrade(d) {
-  return !!(d && d.pendingUpgrade && d.pendingUpgrade.prorata);
-}
-
-function _doRenderPaiements() {
-  const listEl  = document.getElementById('paiements-list');
-  const emptyEl = document.getElementById('paiements-empty');
-  if (!listEl) return;
-
-  const _tc = {};
-  function _gt(k) { if (!_tc[k]) _tc[k] = _trialInfo(_commandesCache[k], k); return _tc[k]; }
-
-  const pendingKeys = Object.keys(_commandesCache).filter(function(k) {
-    return !_gt(k).noTrial || _hasPendingUpgrade(_commandesCache[k]);
-  }).sort(function(a, b) {
-    const da = _commandesCache[a], db = _commandesCache[b];
-    const ua = _hasPendingUpgrade(da), ub = _hasPendingUpgrade(db);
-    const ta = _gt(a), tb = _gt(b);
-    // Priorité : retard réel (expiré) > upgrade en attente de paiement > échéance à venir
-    const rankA = ta.isExpired ? 0 : (ua ? 1 : 2);
-    const rankB = tb.isExpired ? 0 : (ub ? 1 : 2);
-    if (rankA !== rankB) return rankA - rankB;
-    // Suspendus après les non-suspendus dans chaque groupe
-    if (ta.isSuspended !== tb.isSuspended) return ta.isSuspended ? 1 : -1;
-    const tsA = ua ? da.pendingUpgrade.deadline : (ta.ts || 0);
-    const tsB = ub ? db.pendingUpgrade.deadline : (tb.ts || 0);
-    return tsA - tsB;
-  });
-
-  // Nav visibility
-  var _navP = document.getElementById('nav-paiements');
-  var _paneP = document.getElementById('pane-paiements');
-  if (_navP) _navP.style.display = pendingKeys.length > 0 ? '' : 'none';
-  if (_paneP) _paneP.classList.toggle('tab-hidden', pendingKeys.length === 0);
-  if (pendingKeys.length === 0 && _currentTab === 'paiements') switchTab('clients');
-
-  var expiredCount = pendingKeys.filter(function(k) { return _tc[k].isExpired; }).length;
-  var badge = document.getElementById('badge-paiements');
-  if (badge) {
-    var n = expiredCount > 0 ? expiredCount : pendingKeys.length;
-    if (n > 0) { badge.textContent = n > 9 ? '9+' : String(n); badge.classList.add('show'); }
-    else badge.classList.remove('show');
-  }
-  if (pendingKeys.length === 0) { listEl.innerHTML = ''; if (emptyEl) emptyEl.style.display = 'block'; return; }
-  if (emptyEl) emptyEl.style.display = 'none';
-  var frag = document.createDocumentFragment();
-  var _now = Date.now();
-  pendingKeys.forEach(function(k) {
-    var d = _commandesCache[k], trial = _tc[k];
-    var created = d.clientCree || _lastCreatedClients[k];
-    var rid  = (created && created.rid) || (d.emailData && d.emailData.rid) || '—';
-    var name = d.restaurant || (d.emailData && d.emailData.name) || '—';
-    var ridEsc0 = escapeHtml(rid);
-    var suspTag0 = trial.isSuspended ? '<span style="font-size:0.7rem;color:#e05252;background:rgba(224,82,82,0.12);padding:2px 8px;border-radius:20px;margin-left:6px">⏸ Suspendu</span>' : '';
-
-    if (_hasPendingUpgrade(d)) {
-      // Upgrade au prorata en attente de paiement — même bouton "Marqué payé" que sur la
-      // carte client (_confirmUpgradePaid), jamais dupliqué : marquer payé ici ou depuis la
-      // carte produit exactement le même résultat, les deux vues se resynchronisent ensemble.
-      var pu = d.pendingUpgrade;
-      var puAmount = pu.prorata ? pu.prorata.amountDue : 0;
-      var puForfaitLbl = pu.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-      var puDeadlineStr = pu.deadline ? new Date(pu.deadline).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' }) : '—';
-      var cardU = document.createElement('div');
-      cardU.className = 'commande-card'; cardU.dataset.cmdkey = k;
-      cardU.innerHTML =
-        '<div class="commande-card-header">' +
-          '<div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(name)+suspTag0+'</div>' +
-          '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">ID : <code style="color:var(--gold)">'+ridEsc0+'</code> &middot; Upgrade &#8594; '+escapeHtml(puForfaitLbl)+' &middot; '+puAmount+' &#8364;</div>' +
-          '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc0 + '\')">&#128100; Voir le client</button>' +
-        '</div>' +
-        '<div class="commande-card-body-padded">' +
-          '<div style="margin-bottom:10px"><span class="paie-badge-yellow">&#11014;&#65039; Upgrade en attente &middot; avant le ' + puDeadlineStr + '</span></div>' +
-          '<div class="commande-trial-action" style="flex-direction:column;gap:6px">' +
-            '<button class="commande-paid-btn" style="width:100%" onclick="_confirmUpgradePaid(\'' + k + '\')">&#9989; Marquer comme pay&#233; (' + puAmount + ' &#8364;)</button>' +
-          '</div>' +
-        '</div>';
-      frag.appendChild(cardU);
-      return;
-    }
-
-    var displayPrice = _getCommandePrice(d);
-    var displayPhase = trial.paymentType === 'subscription' ? '1er abonnement' : 'Abonnement';
-    var displayUnit  = '/' + (d.paymentMode === 'annual' ? 'an' : 'mois');
-    var paidBtnLabel = '&#9989; Marquer comme pay&#233; (' + displayPrice + ' &#8364;' + displayUnit + ')';
-    var suspTag = suspTag0;
-    var paieBadge;
-    if (trial.isExpired) {
-      var expAt = (trial.ts||0) + 7*24*3600*1000, od = Math.max(0,Math.floor((_now-expAt)/86400000));
-      paieBadge = '<span class="paie-badge-red">🔴 ' + (od > 0 ? '+'+od+'j de retard' : 'Expiré') + '</span>';
-    } else {
-      paieBadge = '<span class="paie-badge-yellow">⏳ ' + trial.label.replace(/^[⏱⏳]\s*/u,'') + ' restant</span>';
-    }
-    var ridEsc = ridEsc0;
-    var suspendPaieBtn = trial.isSuspended
-      ? '<button class="commande-suspend-btn reactivate-action" style="width:100%" onclick="_toggleSuspend(\'' + k + '\')">&#9654; R&#233;activer le compte</button>'
-      : '<button class="commande-suspend-btn suspend-action" style="width:100%" onclick="_toggleSuspend(\'' + k + '\')">&#9208; Suspendre</button>';
-    var card = document.createElement('div');
-    card.className = 'commande-card'; card.dataset.cmdkey = k;
-    card.innerHTML =
-      '<div class="commande-card-header">' +
-        '<div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(name)+suspTag+'</div>' +
-        '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">ID : <code style="color:var(--gold)">'+ridEsc+'</code> &middot; '+displayPhase+' &middot; '+displayPrice+' &#8364;'+displayUnit+'</div>' +
-        '<button class="paie-voir-btn" onclick="_gotoClientCard(\'' + ridEsc + '\')">&#128100; Voir le client</button>' +
-      '</div>' +
-      '<div class="commande-card-body-padded">' +
-        '<div style="margin-bottom:10px">'+paieBadge+'</div>' +
-        '<div class="commande-trial-action" style="flex-direction:column;gap:6px">' +
-          '<button class="commande-paid-btn" style="width:100%" onclick="_markPaid(\'' + k + '\')">' + paidBtnLabel + '</button>' +
-          suspendPaieBtn +
-        '</div>' +
-      '</div>';
-    frag.appendChild(card);
-  });
-  listEl.innerHTML = '';
-  listEl.appendChild(frag);
-}
-
 
 function loadArchivedClients() {
   _saasDb.ref('/archivedClients').on('value', function(snap) {
@@ -4395,12 +3808,10 @@ async function restoreClient(slug, d) {
       var _existingCmdData = d.cmdKey ? await _controlRead('/commandes/' + d.cmdKey) : null;
       if (d.cmdKey && _existingCmdData) {
         // La commande d'origine n'a jamais été supprimée (juste marquée clientDeleted) —
-        // la réactiver préserve tel quel le cycle d'abonnement réel (nextReminderAt,
-        // trialEndAt, pendingUpgrade/pendingForfaitChange...) au lieu de repartir sur un
-        // essai gratuit neuf comme le faisait l'ancienne reconstruction générique.
+        // la réactiver préserve tel quel son forfait, son mode de paiement, ses prix
+        // personnalisés et son historique, au lieu de repartir de zéro.
         // Écriture CRITIQUE, jamais silencieuse ici : si elle échoue, la commande d'origine
-        // reste clientDeleted:true et le cron n'enverra plus JAMAIS aucun rappel/facture à ce
-        // client pourtant restauré et actif — mirroir exact du bug de suppression ci-dessus.
+        // reste clientDeleted:true et ce client restauré n'apparaîtrait plus dans le suivi.
         // Laisser l'erreur remonter au catch englobant plutôt que de prétendre "Restauré ✅".
         await _controlWrite('/commandes/' + d.cmdKey, 'update', { clientDeleted: false, clientDeletedAt: null, restaurant: d.name || slug });
         delete _deletedClients[d.cmdKey];
@@ -4408,8 +3819,8 @@ async function restoreClient(slug, d) {
         // N'observer un "premier login" que si le client n'avait jamais réellement ouvert son
         // application avant suppression — sinon son cycle réel (déjà préservé ci-dessus en
         // réactivant sa commande d'origine intacte) serait écrasé par un nouveau cycle d'essai
-        // qui repartirait de zéro dès que ce listener se déclencherait (il se déclenche
-        // immédiatement si firstOpen est déjà à true).
+        // sa date de première connexion serait écrasée dès que ce listener se déclencherait
+        // (il se déclenche immédiatement si firstOpen est déjà à true).
         if (d.snapshot.firstOpen !== true) { _watchFirstOpen(rid, d.cmdKey); }
       } else {
         // Commande d'origine introuvable (cas rare) — en crée une neuve pour que le cron
@@ -4450,10 +3861,10 @@ async function restoreClient(slug, d) {
       firstOpen: false
     });
     await _saasDb.ref('/archivedClients/'+rid).remove();
-    // Créer l'entrée control Firebase manquante — sans elle, ce client restauré était
-    // invisible du cron (plus aucun rappel/suspension automatique). Reproduit les mêmes
-    // champs qu'une création normale, sans firstOpenAt/nextReminderAt : le cycle d'essai
-    // redémarre normalement au prochain login réel via _watchFirstOpen, comme un nouveau client.
+    // Créer l'entrée control Firebase manquante — sans elle, ce client restauré n'aurait
+    // aucune carte dans l'onglet Clients et ne pourrait plus recevoir de demande de
+    // changement de forfait. Reproduit les mêmes champs qu'une création normale, sans
+    // firstOpenAt : il est reposé au prochain login réel via _watchFirstOpen.
     var pushRes = await _controlWrite('/commandes', 'push', {
       statut: 'traite', lu: true, ts: Date.now(),
       restaurant: d.name || slug, email: d.email || null, langue: 'fr',
@@ -4468,111 +3879,6 @@ async function restoreClient(slug, d) {
     alert('Erreur restauration : ' + e.message);
   }
 }
-
-function _gotoClientCard(rid) {
-  switchTab('clients');
-  setTimeout(function() {
-    var slugId = rid.replace(/-/g,'_');
-    var card = document.getElementById('card-'+slugId);
-    if (card) {
-      card.scrollIntoView({ behavior:'smooth', block:'center' });
-      if (!card.classList.contains('open')) card.querySelector('.card-top').click();
-      setTimeout(function() {
-        var billing = document.getElementById('billing-section-'+slugId);
-        if (billing) billing.scrollIntoView({ behavior:'smooth', block:'center' });
-      }, 350);
-    }
-  }, 200);
-}
-
-function _checkAutoSuspend() {
-  Object.keys(_commandesCache).forEach(function(key) {
-    const d = _commandesCache[key];
-    if (!d || d.suspendu) return;
-    const trial = _trialInfo(d, key);
-    if (trial.noTrial || !trial.isExpired) return;
-    const prev = _commandesCache[key];
-    _commandesCache[key] = Object.assign({}, d, { suspendu: true });
-    _rerenderCommandeCard(key);
-    _controlWrite('/commandes/' + key + '/suspendu', 'set', true).catch(function() {
-      _commandesCache[key] = prev;
-      _rerenderCommandeCard(key);
-    });
-  });
-}
-
-function _buildReminderSubject(rest, lang) {
-  const s = {
-    fr: '⚠️ Rappel de paiement GeNext — ' + rest,
-    en: '⚠️ GeNext payment reminder — ' + rest,
-    el: '⚠️ Υπενθύμιση πληρωμής GeNext — ' + rest,
-    es: '⚠️ Recordatorio de pago GeNext — ' + rest,
-    de: '⚠️ Zahlungserinnerung GeNext — ' + rest
-  };
-  return s[lang] || s.fr;
-}
-
-function _buildPaymentReminderMsg(d, restaurant, lang) {
-  const price    = _getCommandePrice(d);
-  const isAnnual = d.paymentMode === 'annual';
-  const modeLabels = {
-    fr: isAnnual ? 'annuel' : 'mensuel',
-    en: isAnnual ? 'annual' : 'monthly',
-    el: isAnnual ? 'ετήσια' : 'μηνιαία',
-    es: isAnnual ? 'Anual' : 'Mensual',
-    de: isAnnual ? 'jährlich' : 'monatlich'
-  };
-  const unitLabels = {
-    fr: isAnnual ? 'an' : 'mois',
-    en: isAnnual ? 'year' : 'month',
-    el: isAnnual ? 'έτος' : 'μήνα',
-    es: isAnnual ? 'año' : 'mes',
-    de: isAnnual ? 'Jahr' : 'Monat'
-  };
-  const priceStr = price + ' €/' + (unitLabels[lang] || unitLabels.fr);
-  const mode     = modeLabels[lang] || modeLabels.fr;
-  const m = {
-    fr: 'Bonjour ' + restaurant + ',\n\nVotre abonnement GeNext (' + mode + ' — ' + priceStr + ') arrive à échéance.\n\nMerci de régulariser dans les 7 jours pour maintenir l\'accès à votre service.\n\n💳 Par virement bancaire : effectuez le virement de ' + priceStr + ' et envoyez-nous la preuve par WhatsApp / Viber / email.\n\n💵 En espèces : envoyez votre localisation par WhatsApp / Viber / email pour convenir d\'un rendez-vous dans la semaine.\n\nCordialement,\nL\'équipe GeNext',
-    en: 'Hello ' + restaurant + ',\n\nYour GeNext subscription (' + mode + ' — ' + priceStr + ') is due for renewal.\n\nPlease settle within 7 days to keep your service running.\n\n💳 Bank transfer: send ' + priceStr + ' and share proof of payment via WhatsApp / Viber / email.\n\n💵 Cash: send your location via WhatsApp / Viber / email to arrange a meeting within the week.\n\nBest regards,\nThe GeNext team',
-    el: 'Γεια σας ' + restaurant + ',\n\nΗ συνδρομή σας GeNext (' + mode + ' — ' + priceStr + ') λήγει σύντομα.\n\nΠαρακαλούμε τακτοποιήστε εντός 7 ημερών για να διατηρήσετε την πρόσβαση στην υπηρεσία σας.\n\n💳 Τραπεζικό έμβασμα: στείλτε το ποσό ' + priceStr + ' και αποδείξτε την πληρωμή μέσω WhatsApp / Viber / email.\n\n💵 Μετρητά: στείλτε την τοποθεσία σας μέσω WhatsApp / Viber / email για ραντεβού εντός της εβδομάδας.\n\nΜε εκτίμηση,\nΗ ομάδα GeNext',
-    es: '¡Hola ' + restaurant + ',\n\nSu suscripción GeNext (' + mode + ' — ' + priceStr + ') está próxima a vencer.\n\nPor favor, regularice el pago en 7 días para mantener el acceso a su espacio.\n\nContacte con nosotros por WhatsApp / Viber / email para cualquier pregunta.\n\nAtentamente,\nEl equipo GeNext',
-    de: 'Hallo ' + restaurant + ',\n\nIhr GeNext Abonnement (' + mode + ' — ' + priceStr + ') ist zur Verlängerung fällig.\n\nBitte begleichen Sie innerhalb von 7 Tagen, um Ihren Dienst aufrechtzuerhalten.\n\n💳 Banküberweisung: überweisen Sie ' + priceStr + ' und teilen Sie den Zahlungsnachweis per WhatsApp / Viber / E-Mail mit.\n\n💵 Bar: Senden Sie Ihren Standort per WhatsApp / Viber / E-Mail für einen Termin innerhalb der Woche.\n\nMit freundlichen Grüßen,\nDas GeNext Team'
-  };
-  return m[lang] || m.fr;
-}
-
-// Live countdown ticker: update badge text every 60 seconds + auto-suspend expired
-setInterval(function() {
-  const WEEK = 7 * 24 * 60 * 60 * 1000;
-  // Auto-suspension des comptes expirés non payés
-  _checkAutoSuspend();
-  // Mise à jour des badges countdown visibles
-  document.querySelectorAll('.commande-trial-badge[data-ts]').forEach(function(el) {
-    const ts = Number(el.dataset.ts);
-    if (!ts) return;
-    const remaining = (ts + WEEK) - Date.now();
-    if (remaining <= 0) {
-      // Expiré → re-render (commande card ou billing section client)
-      const billingSection = el.closest('.client-billing-section');
-      if (billingSection && billingSection.dataset.cmdkey) {
-        _rerenderClientBillingSection(billingSection.dataset.cmdkey);
-        return;
-      }
-      const card = el.closest('.commande-card');
-      if (card && card.dataset.key) _rerenderCommandeCard(card.dataset.key);
-      return;
-    }
-    const days  = Math.floor(remaining / 86400000);
-    const hours = Math.floor((remaining % 86400000) / 3600000);
-    const mins  = Math.floor((remaining % 3600000) / 60000);
-    let label = '', urgency = 'ok';
-    if (days > 0)       { label = '⏱ ' + days + 'j ' + hours + 'h'; urgency = days <= 1 ? 'warning' : 'ok'; }
-    else if (hours > 0) { label = '⏱ ' + hours + 'h ' + mins + 'min'; urgency = 'warning'; }
-    else                { label = '⏱ ' + mins + ' min'; urgency = 'warning'; }
-    el.textContent = label;
-    el.className = 'commande-trial-badge urgency-' + urgency;
-  });
-}, 60000);
 
 let _ctrlConfirmCb = null;
 function _showCtrlConfirm(title, msg, okLabel, cb, isDanger) {
@@ -4835,7 +4141,6 @@ function buildClientCard(client) {
   const _ck0   = _findCommandeForClient(s);
   const _cd0   = _ck0 ? _commandesCache[_ck0] : null;
   const _billInit = (_ck0 && _cd0) ? _buildClientBillingSectionHTML(_ck0, _cd0) : '<div class="hist-inline-empty">Aucune commande.</div>';
-  const _payInit  = (_ck0 && _cd0) ? _buildPaymentSectionHTML(_ck0, _cd0) : '';
   const _nameEsc  = escapeHtml(client.name || '');
 
   const div = document.createElement('div');
@@ -4894,9 +4199,6 @@ function buildClientCard(client) {
     '</div>'+
     '<div class="card-section"><div class="card-section-header">&#128203; Forfait &amp; Abonnement</div>'+
       '<div id="billing-section-'+id+'" class="client-billing-section" data-slug="'+s+'">'+_billInit+'</div>'+
-    '</div>'+
-    '<div class="card-section"><div class="card-section-header">&#128176; Paiement</div>'+
-      '<div id="payment-section-'+id+'">'+_payInit+'</div>'+
     '</div>'+
     '<div class="card-section"><div class="card-section-header">&#128222; Contacts</div>'+
       '<div id="contacts-list-'+id+'"><div class="hist-inline-empty">Chargement…</div></div>'+
@@ -5248,22 +4550,19 @@ function _sendContactMsg(slug, type) {
   var restaurant = d ? (d.restaurant || (d.emailData && d.emailData.name) || slug) : slug;
   var langue = (d && d.langue) || 'fr';
   var forfaitLabel = d && d.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR';
-  var trial = d ? _trialInfo(d, cmdKey) : null;
-  var isReminderActive = trial && !trial.noTrial;
+  // Un seul message possible désormais : la livraison des accès. Les relances de paiement
+  // se font à la main (2026-08-15) — plus aucun message de rappel généré ici.
   var created = d ? (d.clientCree || _lastCreatedClients[cmdKey] || (d.emailData ? { rid: slug, name: d.emailData.name || '', pwd: d.emailData.pwd || '' } : null)) : null;
+  var msgBody = created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue) : '';
+  if (!msgBody) { showToast('Client pas encore créé — aucun message à envoyer.'); return; }
   if (type === 'email') {
-    var subj = isReminderActive ? _buildReminderSubject(restaurant, langue) : buildDeliverySubject(restaurant, forfaitLabel, langue);
-    var body = isReminderActive ? _buildPaymentReminderMsg(d, restaurant, langue) : (created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue) : '');
-    window.open('mailto:' + encodeURIComponent(val) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body), '_system');
+    var subj = buildDeliverySubject(restaurant, forfaitLabel, langue);
+    window.open('mailto:' + encodeURIComponent(val) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(msgBody), '_system');
   } else if (type === 'whatsapp') {
-    var num = val.replace(/[^0-9]/g, '');
-    var msg = isReminderActive ? _buildPaymentReminderMsg(d, restaurant, langue) : (created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue) : '');
-    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_system');
+    window.open('https://wa.me/' + val.replace(/[^0-9]/g, '') + '?text=' + encodeURIComponent(msgBody), '_system');
   } else if (type === 'viber') {
-    var num2 = val.replace(/[^0-9]/g, '');
-    var msg2 = isReminderActive ? _buildPaymentReminderMsg(d, restaurant, langue) : (created ? buildDeliveryMsg(restaurant, created.rid, created.pwd, forfaitLabel, langue) : '');
-    navigator.clipboard.writeText(msg2).then(function() { showToast('Message copié ! Ouvre Viber. 📋'); });
-    window.open('viber://chat?number=%2B' + num2, '_system');
+    navigator.clipboard.writeText(msgBody).then(function() { showToast('Message copié ! Ouvre Viber. 📋'); });
+    window.open('viber://chat?number=%2B' + val.replace(/[^0-9]/g, ''), '_system');
   }
 }
 
@@ -6236,8 +5535,6 @@ document.addEventListener('deviceready', () => {
   const _CapApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
   if (_CapApp) {
     _CapApp.addListener('backButton', () => {
-      var _hm = document.getElementById('hist-modal');
-      if (_hm && _hm.style.display === 'flex') { _hideHistModal(); return; }
       var _ccm = document.getElementById('ctrl-confirm-modal');
       if (_ccm && _ccm.style.display === 'flex') { _hideCtrlConfirm(); return; }
       var _cem = document.getElementById('contact-edit-modal');
