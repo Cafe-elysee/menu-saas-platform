@@ -2189,9 +2189,6 @@ let _clientsLoaded = false; // true après le 1er retour Firebase (même si vide
 function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 const LANG_LABELS   = { el:'Ελληνικά', fr:'Français', en:'English', de:'Deutsch', es:'Español' };
-const STYLE_LABELS  = { papier:'📄 Papier', dynamique:'🖼️ Dynamique' };
-const OPTION_LABELS = { themes:'🎨 Thème', sonnette:'🔔 Sonnette', commande:'🛒 Commande' };
-const CANAL_LABELS   = { whatsapp:'WhatsApp', viber:'Viber' };
 // Tarifs de secours — n'entrent en jeu que si Firebase n'a encore aucun prix public.
 // L'annuel vaut 10 mois : c'est l'argument « 2 mois offerts » affiché aux clients.
 const _PRICE_MONTHLY  = { 'menu-qr': 20,  'commandes-services': 30  };
@@ -2236,40 +2233,6 @@ function _setupSubSyncListener(slug, cmdKey) {
     }
   });
 }
-
-const ALL_THEMES_LIST = [
-  { id:'gold-noir',       name:'Gold Noir',                accent:'#c8a44e' },
-  { id:'neon-tokyo',      name:'Neon Pulse',               accent:'#00f5d4' },
-  { id:'botanical',       name:'Botanical Forest',         accent:'#7acc5a' },
-  { id:'rose-parisien',   name:'Rose Parisien',            accent:'#e890b0' },
-  { id:'midnight-luxe',   name:'Enseigne',                 accent:'#f0d060' },
-  { id:'velvet-luxe',     name:'Velvet Luxe',              accent:'#d4af37' },
-  { id:'prestige',        name:'Prestige',                 accent:'#c8a44e' },
-  { id:'santorin',        name:'Santorini',                accent:'#4db8ff' },
-  { id:'editorial',       name:'Éditorial',                accent:'#c0ccd8' },
-  { id:'dyn-bento',       name:'Dashboard Bento',          accent:'#ffffff' },
-  { id:'carte-classique', name:'Carte Classique', accent:'#d4b896' },
-  { id:'paper-elegant',   name:'Livre d\'Or (Papier)',      accent:'#e8e0d0' },
-  { id:'carte-sommelier',  name:'Sommelier',                  accent:'#b8a8c8' },
-  { id:'carte-bento',      name:'Bento Moderne',              accent:'#00c8d8' },
-  { id:'carte-telegraphe', name:'Télégraphe',                 accent:'#c8a070' },
-  { id:'carte-couture',    name:'Haute Couture',              accent:'#d8d8d8' },
-  { id:'carte-journal',    name:'Devanture',                  accent:'#e8a030' },
-  { id:'carte-voyage',     name:'Carnet de Voyage',           accent:'#d44040' },
-  { id:'carte-artisan',    name:"L'Atelier",                 accent:'#c08040' },
-  { id:'carte-ardoise',    name:'Ardoise Bistrot',            accent:'#e8e4dc' },
-  { id:'carte-maroc',      name:'Maroc & Épices',             accent:'#d4902c' },
-  { id:'livre-noir',        name:'Livre Noir',                 accent:'#c0c0cc' },
-  { id:'livre-botanique',   name:'Livre Botanique',            accent:'#7ec878' },
-  { id:'livre-azure',       name:'Livre Azur',                 accent:'#40a8d8' },
-  { id:'livre-rose',        name:'Livre Rose',                 accent:'#e880b0' },
-  { id:'livre-antique',     name:'Livre Antique',              accent:'#d4b870' },
-  { id:'livre-epure',       name:'Livre Épuré',                accent:'#d0d0d8' },
-  { id:'livre-cerise',      name:'Livre Cerise',               accent:'#e83040' },
-  { id:'livre-indigo',      name:'Livre Indigo',               accent:'#8080e8' },
-  { id:'livre-foret',       name:'Livre Forêt',                accent:'#c0b060' },
-  { id:'aurora',            name:'Aurora',                     accent:'#9070f8' },
-];
 
 const THEME_VARIANTS = [
   { family:'gold-noir', name:'Gold Noir', variants:[
@@ -2609,7 +2572,6 @@ function switchTab(tab) {
 // FIREBASE INIT
 // ════════════════════════════════════════════════════
 let _controlDb = null;
-const _clientDbs = {};
 
 let _saasDb = null;
 
@@ -2763,7 +2725,6 @@ function getClientDb(slug) {
 let _commandesCache = {};
 let _profileContactsCache = {}; // D-3 fix: cache profileContacts pour re-render post-commandes
 let _archivedClientsCache = {};
-let _initialTabDecided = false;
 // Clients créés depuis une commande : commandeKey → {rid, pwd, name, forfait}
 let _lastCreatedClients = {};
 // Commandes dont le client créé a été supprimé : commandeKey → rid
@@ -2811,13 +2772,6 @@ function _watchFirstOpen(rid, cmdKey) {
 }
 
 // ── Textes tooltips (i) ───────────────────────────
-const _INFO_TIPS = {
-  forfait: '<strong>📋 Menu QR</strong> — Le client accède au menu digital via son téléphone. Idéal pour consulter la carte, pas de commandes.<br><br><strong>🛎 Commandes & Services</strong> — En plus du menu, les clients peuvent <strong>passer des commandes</strong> et <strong>appeler le serveur</strong> directement depuis leur téléphone.',
-  retention: 'Les appels et commandes sont <strong>automatiquement supprimés</strong> après la durée choisie. Cela garde la base de données légère et rapide.',
-  contact_avant: 'Envoie un message de <strong>confirmation de réception</strong> au client — lui indique que sa demande a bien été reçue et qu\'il sera contacté bientôt.',
-  contact_apres: 'Envoie le <strong>message de livraison</strong> avec le lien d\'accès, l\'identifiant et le mot de passe du client pour qu\'il puisse se connecter immédiatement.'
-};
-
 // ── Messages de livraison (après création client) ─
 function buildDeliverySubject(rest, forfait, lang) {
   const s = {
@@ -4579,22 +4533,6 @@ function _sendContactMsg(slug, type) {
 // ════════════════════════════════════════════════════
 // WRITE HELPERS
 // ════════════════════════════════════════════════════
-const _CTRL_COLORS = [
-  '#C8A44E','#E8D5A0','#F0F0EB','#4A4A4A','#1E3A5F',
-  '#2B7FBE','#47A3A3','#2E7D52','#9B4DCA','#E91E8C',
-  '#D4A090','#E87B3A','#C73535','#8B6914','#5D4037'
-];
-const _CTRL_NAMES = [
-  'Or','Champagne','Crème','Anthracite','Marine',
-  'Bleu royal','Turquoise','Vert forêt','Violet','Rose vif',
-  'Rose poudré','Terracotta','Rouge','Brun doré','Brun profond'
-];
-
-function _colorDist(h1, h2) {
-  const p = h => { const s=h.replace('#',''); return [parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16)]; };
-  const [r1,g1,b1]=p(h1),[r2,g2,b2]=p(h2);
-  return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
-}
 function writeDefaultLang(slug, lang) {
   getClientState(slug).defaultLang = lang;
   const el = document.getElementById('default-lang-'+slug.replace(/-/g,'_')); if (el) el.value = lang;

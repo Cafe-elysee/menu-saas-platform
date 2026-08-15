@@ -425,23 +425,37 @@ module.exports = async function handler(req, res) {
   // (bug racine corrigé le 2026-07-14). 'emailData.rid' n'est jamais nullifié : c'est le
   // repli fiable. Quand control-app fournit 'cmdKey', on le préfère (un même rid peut avoir
   // plusieurs entrées après une recréation).
+  //
+  // ⚡ Deux chemins, pour ne pas relire toute la base à chaque appel :
+  //   • RAPIDE — un 'cmdKey' est fourni (control-app l'a toujours ; l'espace client l'a dès
+  //     que le serveur le lui a renvoyé une première fois) → lecture d'UN SEUL nœud.
+  //   • REPLI — pas de cmdKey, ou cmdKey qui ne correspond pas à ce rid → lecture complète,
+  //     exactement comme avant. Le rid trouvé est alors mémorisé dans MAIN_DB pour que les
+  //     appels suivants prennent le chemin rapide.
+  // Le contrôle 'ridMatches' s'applique dans LES DEUX cas : un cmdKey fourni par l'appelant
+  // n'est jamais accepté sans vérifier qu'il appartient bien au restaurant demandé.
   const secret = process.env.FIREBASE_CONTROL_SECRET;
   let cmdKey = null;
   let cmdData = null;
+  let cmdKeyResolvedByScan = false;
+  const ridMatches = (d) => !!d && ((d.clientCree && d.clientCree.rid === rid) || (d.emailData && d.emailData.rid === rid));
   if (secret) {
-    try {
-      const commandes = await fbGet(CONTROL_DB, '/commandes', secret);
-      if (commandes) {
-        const ridMatches = (d) => !!d && ((d.clientCree && d.clientCree.rid === rid) || (d.emailData && d.emailData.rid === rid));
-        if (reqCmdKey && ridMatches(commandes[reqCmdKey])) {
-          cmdKey = reqCmdKey;
-          cmdData = commandes[reqCmdKey];
-        } else {
+    const safeReqKey = (typeof reqCmdKey === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(reqCmdKey)) ? reqCmdKey : null;
+    if (safeReqKey) {
+      try {
+        const one = await fbGet(CONTROL_DB, '/commandes/' + safeReqKey, secret);
+        if (ridMatches(one)) { cmdKey = safeReqKey; cmdData = one; }
+      } catch(e) { /* on retombe sur la lecture complète ci-dessous */ }
+    }
+    if (!cmdKey) {
+      try {
+        const commandes = await fbGet(CONTROL_DB, '/commandes', secret);
+        if (commandes) {
           const entry = Object.entries(commandes).find(([, d]) => ridMatches(d));
-          if (entry) { cmdKey = entry[0]; cmdData = entry[1]; }
+          if (entry) { cmdKey = entry[0]; cmdData = entry[1]; cmdKeyResolvedByScan = true; }
         }
-      }
-    } catch(e) { /* traité comme "commande introuvable" ci-dessous, jamais ignoré en silence */ }
+      } catch(e) { /* traité comme "commande introuvable" ci-dessous, jamais ignoré en silence */ }
+    }
   }
 
   // ── Écritures vérifiées ──────────────────────────────────────────────────────
@@ -468,6 +482,14 @@ module.exports = async function handler(req, res) {
     return 'ok';
   }
 
+  // Mémorise le cmdKey dans le nœud du restaurant la première fois qu'il a fallu scanner
+  // pour le trouver — les appels suivants de CE client prennent alors le chemin rapide.
+  // Aucune fuite : ce cmdKey désigne un nœud de la base CONTROL, inaccessible au client, et
+  // le serveur revérifie toujours qu'il appartient bien au restaurant demandé.
+  function withCmdKey(patch) {
+    return (cmdKeyResolvedByScan && cmdKey) ? Object.assign({ cmdKey }, patch) : patch;
+  }
+
   // ── Prix applicable à une combinaison forfait + mode ─────────────────────────
   // Priorité : prix personnalisé de la carte client → prix publics (demoPage/pricing) →
   // tarifs de secours codés en dur. Les prix publics ne sont lus qu'en cas de besoin réel.
@@ -492,11 +514,11 @@ module.exports = async function handler(req, res) {
       catch(e) { return res.status(500).json({ error: 'control-write-failed', detail: e.message }); }
     }
     let mainStatus = 'skipped';
-    try { mainStatus = await mainPatch('/restaurants/' + rid + '/config/subscription', { request: null }); }
+    try { mainStatus = await mainPatch('/restaurants/' + rid + '/config/subscription', withCmdKey({ request: null })); }
     catch(e) { mainStatus = 'error: ' + e.message; }
     return res.status(200).json({
       ok: true, case: isMalek ? 'request-rejected' : 'request-cancelled',
-      mainStatus, mainWrite: { subscription: { request: null } }
+      mainStatus, mainWrite: { subscription: withCmdKey({ request: null }) }
     });
   }
 
@@ -538,7 +560,7 @@ module.exports = async function handler(req, res) {
     let mainStatus = 'skipped';
     try {
       const f = await mainPatch('/restaurants/' + rid + '/config/features', features);
-      const s = await mainPatch('/restaurants/' + rid + '/config/subscription', subscription);
+      const s = await mainPatch('/restaurants/' + rid + '/config/subscription', withCmdKey(subscription));
       mainStatus = (f === 'ok' && s === 'ok') ? 'ok' : (f === 'no-token' ? 'no-token' : 'partial');
     } catch(e) { mainStatus = 'error: ' + e.message; }
 
@@ -572,7 +594,7 @@ module.exports = async function handler(req, res) {
       ok: true, case: changeType,
       applied: { forfait: targetForfait, paymentMode: targetMode, price },
       controlStatus, mainStatus, emailStatus,
-      mainWrite: { features, subscription }
+      mainWrite: { features, subscription: withCmdKey(subscription) }
     });
   }
 
@@ -622,7 +644,7 @@ module.exports = async function handler(req, res) {
   catch(e) { return res.status(500).json({ error: 'control-write-failed', detail: e.message }); }
 
   let mainStatus = 'skipped';
-  try { mainStatus = await mainPatch('/restaurants/' + rid + '/config/subscription', { request }); }
+  try { mainStatus = await mainPatch('/restaurants/' + rid + '/config/subscription', withCmdKey({ request })); }
   catch(e) { mainStatus = 'error: ' + e.message; }
 
   let fcmStatus = 'skipped';
@@ -639,6 +661,6 @@ module.exports = async function handler(req, res) {
   return res.status(200).json({
     ok: true, case: 'request-created', request,
     mainStatus, fcmStatus,
-    mainWrite: { subscription: { request } }
+    mainWrite: { subscription: withCmdKey({ request }) }
   });
 };
