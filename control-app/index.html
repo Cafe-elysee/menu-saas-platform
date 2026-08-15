@@ -2664,6 +2664,22 @@ async function initFirebase() {
       }).catch(function(){});
       return;
     }
+    // ── Migration unique vers les 4 tarifs décidés le 2026-08-15 ────────────────
+    // La base ne contenait que 2 prix annuels (490/990) hérités de l'époque où le mensuel
+    // n'existait plus. L'absence des DEUX clés mensuelles identifie cet ancien format de
+    // façon certaine : dès que la migration a écrit les 4 prix, cette condition ne peut
+    // plus jamais être vraie — un prix ajusté ensuite par Malek ne sera donc jamais écrasé.
+    if (s.prices && typeof s.prices === 'object'
+        && s.prices['qr-monthly'] == null && s.prices['srv-monthly'] == null) {
+      _saasDb.ref('demoPage/pricing/prices').update({
+        'qr-monthly': 20, 'qr-annual': 200, 'srv-monthly': 30, 'srv-annual': 300
+      }).then(function() {
+        showToast('💶 Tarifs publics mis à jour : 20/200 € et 30/300 €');
+      }).catch(function() {
+        showToast('⚠ Tarifs publics non mis à jour — à saisir dans l\'onglet Page Démo');
+      });
+      return; // le listener se redéclenche avec les nouvelles valeurs
+    }
     if (s.prices && typeof s.prices === 'object') {
       const _validated = {};
       ['qr-monthly','qr-annual','srv-monthly','srv-annual'].forEach(function(k) {
