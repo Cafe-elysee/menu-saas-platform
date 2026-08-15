@@ -691,9 +691,17 @@
     }
     .f4-pending-badge.f4-pending-upgrade { background: rgba(217,148,64,0.1); border-color: rgba(217,148,64,0.35); }
     .f4-pending-btn {
+      position: relative;
       font-size: 0.66rem; font-weight: 600; padding: 3px 9px; border-radius: 8px;
       background: rgba(200,164,78,0.15); border: 1px solid rgba(200,164,78,0.35);
       color: var(--gold); cursor: pointer; font-family: inherit;
+    }
+    /* Valider / Refuser décident du forfait réellement facturé à un client : la zone
+       tactile est portée à ~44 px sans changer la taille visible (même recette que les
+       boutons +/− du panier, session #132). L'extension horizontale (3 px de chaque côté)
+       reste inférieure au gap de 6 px : deux boutons voisins ne se chevauchent jamais. */
+    .f4-pending-btn::after {
+      content: ''; position: absolute; inset: -13px -3px;
     }
     .f4-pending-btn:hover { background: rgba(200,164,78,0.25); }
     .f4-pending-btn-ok { background: rgba(90,180,110,0.18); border-color: rgba(90,180,110,0.4); color: #5ab46e; }
@@ -1657,6 +1665,10 @@
   html.light .contact-save-btn,
   html.light .contact-send-btn,
   html.light .exclient-restore-btn{ color:#8a6520; }
+  /* Refonte paiement 2026-08-15 — lisibilité en mode clair (contrastes mesurés) */
+  html.light #gs-savings-hint{ color:#8a6520; }        /* 4.50:1 */
+  html.light .f4-pending-btn{ color:#6b5218; }          /* 5.69:1 */
+  html.light .f4-pending-btn-ok{ color:#256b39; }       /* 4.82:1 */
   /* ── Icônes et états vides — visibilité améliorée ── */
   .commande-empty-icon{ opacity:0.65; }
   .dp-cam svg{ opacity:0.62; }
@@ -3130,7 +3142,7 @@ function _buildClientBillingSectionHTML(cmdKey, d) {
     var frLabel = fr.forfait === 'commandes-services' ? 'Commandes & Services' : 'Menu QR Code';
     var frMode  = fr.paymentMode === 'monthly' ? 'mensuel' : 'annuel';
     var frDate  = fr.requestedAt ? new Date(fr.requestedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' }) : '';
-    var frPrice = (fr.price != null) ? (' &#183; ' + fr.price + '&#8364;') : '';
+    var frPrice = (fr.price != null) ? (' &#183; ' + (Number(fr.price) || 0) + '&#8364;') : '';
     pendingHtml =
       '<div class="f4-pending-badge f4-pending-upgrade">' +
         '&#128276; Demande du client' + (frDate ? ' (' + escapeHtml(frDate) + ')' : '') + ' &#8594; <b>' +
@@ -3162,7 +3174,7 @@ function _approveForfaitRequest(cmdKey) {
   _showCtrlConfirm(
     'Valider la demande ?',
     '« ' + escapeHtml(d.restaurant || '') +' » passera en <b>' + escapeHtml(label) + '</b> (' + mode + ')' +
-    (fr.price != null ? ' à <b>' + fr.price + ' €</b>' : '') + '.<br><br>Le changement est appliqué immédiatement et le client en est informé par e-mail.',
+    (fr.price != null ? ' à <b>' + (Number(fr.price) || 0) + ' €</b>' : '') + '.<br><br>Le changement est appliqué immédiatement et le client en est informé par e-mail.',
     '✅ Valider',
     function() {
       if (_forfaitRequestInFlight[cmdKey]) return;
@@ -3450,24 +3462,6 @@ function _askSuspendFromCard(slug) {
   var key = _findCommandeForClient(slug);
   if (!key) { showToast('⚠ Aucune commande trouvée.'); return; }
   _toggleSuspend(key);
-}
-
-// ── Helpers billing ─────────────────────────────────────────────────────────
-function _addMonths(ts, n) {
-  const d = new Date(ts);
-  d.setMonth(d.getMonth() + n);
-  return d.getTime();
-}
-
-function _getCommandePrice(d) {
-  // Priorité : prix combo actif → prix custom → tarif public actuel → dernier recours
-  var activeForfait = d.forfait || 'menu-qr';
-  var activeMode    = d.paymentMode || 'annual';
-  var ck = _comboKey(activeForfait, activeMode);
-  if (d.prices && d.prices[ck] != null) return d.prices[ck];
-  if (d.price != null && d.price >= 0) return d.price;
-  if (_GLOBAL_PLAN_PRICES[ck] != null) return _GLOBAL_PLAN_PRICES[ck];
-  return activeMode === 'annual' ? (_PRICE_ANNUAL[activeForfait] || 0) : (_PRICE_MONTHLY[activeForfait] || 0);
 }
 
 // ── Activer une formule (forfait + mode) et synchroniser partout ────────────

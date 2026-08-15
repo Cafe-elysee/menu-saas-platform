@@ -2145,7 +2145,11 @@
   html.light .settings-section { border-bottom-color:rgba(200,164,78,0.12); }
   /* Subscription 4-choice grid */
   .sub-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-  .sub-opt { background:rgba(200,164,78,.07); border:1.5px solid rgba(200,164,78,.18); border-radius:14px; padding:13px 11px 11px; text-align:left; cursor:pointer; transition:background .18s,border-color .18s; position:relative; width:100%; box-sizing:border-box; }
+  /* display:flex + justify-content:flex-start : un <button> centre verticalement son
+     contenu par défaut. Avec 4 formules dont certaines portent un badge, les cartes
+     d'une même ligne n'ont pas la même hauteur de contenu — les titres se retrouvaient
+     décalés d'une carte à l'autre. Ancrage en haut : tous les titres s'alignent. */
+  .sub-opt { background:rgba(200,164,78,.07); border:1.5px solid rgba(200,164,78,.18); border-radius:14px; padding:13px 11px 11px; text-align:left; cursor:pointer; transition:background .18s,border-color .18s; position:relative; width:100%; box-sizing:border-box; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; }
   .sub-opt.sub-opt-active { background:rgba(200,164,78,.18); border-color:#c8a44e; box-shadow:0 0 0 1px rgba(200,164,78,.28); }
   .sub-opt:not(.sub-opt-active):active { background:rgba(200,164,78,.14); }
   .sub-opt-check { position:absolute; top:8px; right:9px; color:#c8a44e; font-size:0.7rem; font-weight:800; opacity:0; transition:opacity .15s; }
@@ -2155,6 +2159,17 @@
   .sub-opt-price { font-size:1rem; font-weight:700; color:#c8a44e; margin-top:5px; line-height:1; }
   .sub-opt-price span { font-size:0.6rem; font-weight:400; color:var(--muted); }
   html.light .sub-opt { background:rgba(200,164,78,.07); }
+  /* ── Lisibilité en mode clair (mode par défaut du site) ──────────────────────
+     --gold (#c8a44e) reste identique dans les 2 modes (constante voulue), mais posé
+     en TEXTE sur le fond très clair de ces cartes il tombe à ~2:1 — bien en dessous
+     du seuil lisible. Recette habituelle du projet : #6b5218 (mesuré 5.9 à 6.5:1). */
+  .sub-opt-free { font-size:0.66rem; font-weight:700; color:#c8a44e; background:rgba(200,164,78,.14); border-radius:20px; padding:2px 8px; margin-top:5px; display:inline-block; }
+  .sub-opt-pending { font-size:0.66rem; font-weight:700; color:#c8a44e; margin-top:5px; }
+  .sub-request-banner strong { color:#c8a44e; }
+  html.light .sub-opt-price { color:#6b5218; }
+  html.light .sub-opt-free,
+  html.light .sub-opt-pending,
+  html.light .sub-request-banner strong { color:#6b5218; }
   html.light .sub-opt.sub-opt-active { background:rgba(200,164,78,.2); }
   .settings-sec-hd {
     font-family:'Crimson Pro',serif; font-size:1.1rem; font-weight:600;
@@ -8378,9 +8393,10 @@ function _renderSubSection(el, t, sub) {
     ? (req.paymentMode === 'monthly' ? (t.subMonthly || 'Mensuel') : (t.subAnnual || 'Annuel'))
     : '';
   const requestBanner = req
-    ? `<div style="font-size:0.79rem;background:rgba(200,164,78,.10);border:1.5px solid rgba(200,164,78,.35);border-radius:12px;padding:12px 14px;margin-bottom:14px;line-height:1.65">
-         <strong style="color:#c8a44e">⏳ ${t.subRequestPending || 'Demande en cours'}</strong> — <strong>${esc(reqFLbl)} · ${esc(reqMLbl)}</strong>
-         <div style="opacity:0.85;margin-top:3px">${t.subRequestPendingDesc || 'Nous vous contactons rapidement pour finaliser ce changement. Votre forfait actuel reste inchangé d\'ici là.'}</div>
+    ? `<div class="sub-request-banner" style="font-size:0.79rem;background:rgba(200,164,78,.10);border:1.5px solid rgba(200,164,78,.35);border-radius:12px;padding:12px 14px;margin-bottom:14px;line-height:1.65">
+         <strong>⏳ ${t.subRequestPending || 'Demande en cours'}</strong>
+         <div style="margin-top:2px;font-weight:700">${esc(reqFLbl)} · ${esc(reqMLbl)}</div>
+         <div style="opacity:0.85;margin-top:4px">${t.subRequestPendingDesc || 'Nous vous contactons rapidement pour finaliser ce changement. Votre forfait actuel reste inchangé en attendant.'}</div>
          <button onclick="_cancelForfaitRequest()" style="background:none;border:none;color:var(--muted);font-size:0.74rem;text-decoration:underline;cursor:pointer;padding:0;margin-top:7px">${t.subRequestCancel || 'Annuler ma demande'}</button>
        </div>`
     : '';
@@ -8399,17 +8415,19 @@ function _renderSubSection(el, t, sub) {
       const _mLbl = _m === 'annual' ? (t.subAnnual || 'Annuel') : (t.subMonthly || 'Mensuel');
       const _free = _m === 'annual' ? _subMonthsFree(_f) : 0;
       const _freeBadge = _free > 0
-        ? `<div style="font-size:0.66rem;font-weight:700;color:#c8a44e;background:rgba(200,164,78,.14);border-radius:20px;padding:2px 8px;margin-top:5px;display:inline-block">🎁 ${(t.subMonthsFree || '{n} mois offerts').replace('{n}', _free)}</div>`
+        ? `<div class="sub-opt-free">🎁 ${(t.subMonthsFree || '{n} mois offerts').replace('{n}', _free)}</div>`
         : '';
       const _pendBadge = _pend
-        ? `<div style="font-size:0.66rem;font-weight:700;color:#c8a44e;margin-top:5px">⏳ ${t.subRequestPending || 'Demande en cours'}</div>`
+        ? `<div class="sub-opt-pending">⏳ ${t.subRequestPending || 'Demande en cours'}</div>`
         : '';
       _subOpts.push(
-        `<button class="sub-opt${_act ? ' sub-opt-active' : ''}" onclick="_changeSubscription('${_f}','${_m}')">` +
+        // aria-pressed : sans lui, un lecteur d'écran annonce 4 boutons identiques sans
+        // dire lequel est la formule actuelle (l'état n'est signalé que visuellement).
+        `<button class="sub-opt${_act ? ' sub-opt-active' : ''}" aria-pressed="${_act}" onclick="_changeSubscription('${_f}','${_m}')">` +
           `<span class="sub-opt-check">✓</span>` +
           `<div class="sub-opt-forfait">${esc(_fLbl)}</div>` +
           `<div class="sub-opt-mode">${esc(_mLbl)}</div>` +
-          `<div class="sub-opt-price">${_std}€<span>${_sfx}</span></div>` +
+          `<div class="sub-opt-price">${Number(_std) || 0}€<span>${_sfx}</span></div>` +
           _freeBadge + _pendBadge +
         `</button>`
       );
